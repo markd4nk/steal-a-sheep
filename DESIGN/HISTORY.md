@@ -216,6 +216,13 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   Zeus in 4.3 h; climbs never take over a minute (lower tiers zoom); every tier's numbers are in the same proportion
   (a walker level costs 60 s of one adult from the tier below), so nothing breaks, but Climbing outruns the signs
   10-70x between new tiers, so chases are easy most of the time.
+  The user then raised walker costs (10x: about ten minutes of income per upgrade; simulated 6.5 h to Zeus, Climbing
+  1.3-5x the signs), left trails alone (no prices decided yet), and replaced being sent home after a catch with a punch:
+  the god launches the thief three tiers down (same share along the tier; the foot from tiers 1-3). The server picks
+  the landing (`MountainService:Punch`), the thief's device flies them there on a tumbling arc (Remotes.Punch,
+  MovementController), both movement checks wait for the flight, and the server puts them on the spot if they aren't
+  there by then. Checked in Studio: 52 of 52 tests; caught 81% along tier 6, the thief flew 1.7 s and landed 82% along
+  tier 3, 0.4 studs from the spot, no correction; a tier 3 catch landed at the foot (x 342); no script errors.
 
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9

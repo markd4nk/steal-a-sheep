@@ -305,12 +305,13 @@ function Economy.DexReward(tier: number): number
 	return Economy.DexRewardSeconds * Economy.BaseIncome(tier)
 end
 
--- The upgrade from walker level L to L + 1: round(120 x 2.5^L).
+-- The upgrade from walker level L to L + 1: round(1200 x 2.5^L), about ten minutes of income from the tier
+-- below, so Climbing stays near the signs instead of racing past them.
 function Economy.WalkerCost(level: number): number?
 	if level >= Economy.MaxWalker then
 		return nil
 	end
-	return Economy.Round(120 * 2.5 ^ level)
+	return Economy.Round(1200 * 2.5 ^ level)
 end
 
 function Economy.WalkerRate(level: number): number

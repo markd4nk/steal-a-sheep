@@ -106,10 +106,9 @@ lamb.
 - **Long runs at the top**: about 7.6 minutes' climb to Zeus and about 2.5 minutes' slide home; the user keeps it all on
   foot (DECISIONS.md).
 - **High Olympus is sparse**: the user will add obstacles to the higher levels later.
-- **The economy is generous (2026-10-05 simulation)**: a walker level costs about a minute of one sheep's income
-  from the tier below, at every tier, so Climbing races past the signs (10-70x them) and chases get easy fast. An
-  efficient player reaches Zeus in about 4.3 hours (a real one maybe 2-3x that). Trails stop mattering after about
-  tier 8 (fixed prices). Waiting for the user's call on slowing it (DESIGN/HISTORY.md, Climbing).
+- **Pacing (2026-10-05 simulation)**: with walker upgrades at 10x, an efficient player reaches Zeus in about 6.5 hours
+  (a real one maybe 2-3x that), Climbing about 1.3-5x the next sign. Trail prices are fixed and unreviewed (the user
+  hasn't set them yet).
 - **Very fast slides meet the trees hard**: at 150+ studs/s a slide that clips a tree stops dead and its god catches
   up (seen at x 944 on tier 3). Same decor issue, felt more at high speed.
 - **Plots: 5.** A sixth player is kicked with "server full"; set Maximum Visitor Count to 5 in Creator Hub.

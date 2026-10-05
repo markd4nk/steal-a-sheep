@@ -36,6 +36,8 @@ local Remotes = {
 	-- A slider knocked this player back, down the slope (the direction), or this player's slide hit someone.
 	Knockback = Net.ToClient("Knockback") :: Net.ToClient<Vector3>,
 	SlideHit = Net.ToClient("SlideHit") :: Net.ToClient<number>,
+	-- A god caught this player and punched them down the mountain: where they land, and how long the flight takes.
+	Punch = Net.ToClient("Punch") :: Net.ToClient<(Vector3, number)>,
 
 	-- The player's own flock: equip, unequip, lock or unlock one sheep, or Equip Best (no id).
 	FlockAction = Net.Request(

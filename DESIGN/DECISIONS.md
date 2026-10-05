@@ -166,8 +166,15 @@ Calls made building Climbing (2026-10-05):
 - **Saved sheep**: schema 2 turns Burden 1/2/3 into Weight 1.05/1.2/1.35; sizes already rolled stay.
 - **Dropped lambs** (the user: a caught thief's lamb stays where it fell, anyone can steal it, its god chases them):
   being caught or dying on the ramp drops it; giving up, falling off the world, resetting or leaving puts it straight
-  back, and the tutorial lamb always goes back. A dropped lamb lies there 30 s, then returns to its pasture. The caught
-  thief reads "<God> caught you! You dropped the lamb" and is sent home. Gods still walk home slowly (the user's call).
+  back, and the tutorial lamb always goes back. A dropped lamb lies there 30 s, then returns to its pasture. Gods still
+  walk home slowly (the user's call).
+- **The punch** (the user: a caught thief is launched down about three or four tiers, not sent home): three tiers
+  down, to the same share along that tier (caught 80% along tier 6, you land 80% along tier 3); from tiers 1-3, the
+  mountain's foot. A tumbling arc of 1 to 2.5 s (longer the further), peaking 12% of its length above the straight line,
+  then 0.5 s held still. The message reads "<God> punched you! You dropped the lamb".
+- **Walker upgrades cost 10x** (the user agreed they should cost more): round(1200 x 2.5^L), about ten minutes of
+  income from the tier below. Simulated, Climbing then sits about 1.3-5x the next sign instead of 10-70x, and an
+  efficient player reaches Zeus in about 6.5 h (was 4.3).
 - **Server ground-speed check**: each player may cover ground at the fastest they could legally go there (walking,
   their escape speed, or a knockback), 30% slack and up to a second banked for lag; anyone faster is put back where they
   were. Server teleports (home after a catch, onto the plot, debug steals) reset it.
@@ -197,7 +204,7 @@ Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls
 - **Numbers, tiers 13-30**: reach about x2.5 a tier from 81M (200M, 500M, 1.3B ... 480T, 1.2Qa at Zeus), Light and Heavy
   at 1.5x and 2.25x as before; income keeps round(2 x 2.5^(tier - 1)) (Zeus ~694B/s); growth 45 + 15 per tier (Zeus 8
   minutes); slide speeds 50-60 (three tiers each at 50, 52 ... 60). Stair walker levels 12-29 added (5M up to 25T a
-  second), each covering the next tier's reach gap in about a minute like levels 0-11; costs keep round(120 x 2.5^L).
+  second), each covering the next tier's reach gap in about a minute like levels 0-11; costs keep round(120 x 2.5^L) (since raised to round(1200 x 2.5^L)).
 - **Families**: Gale (Frost), Wild (Moss + goat horns), Ambrosia (Cupcake, honey frosting), Fortune (Pirate), Potion
   (Slime), Chaos (Glitch), Spirit (Ghost), Slumber (Dream), Starlit (Galaxy), Fright (Wolf in Sheep's Clothing), Dread
   (Black Hole), Bone (Skeleton), Avenger (Mecha), in Shear a Sheep's colours; Prism is a plain sheep in rainbow puffs;
