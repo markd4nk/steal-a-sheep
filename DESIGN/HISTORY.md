@@ -25,8 +25,19 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   the escape speed from Climbing (`Economy.EscapeSpeed`, with burden weights replacing the old Carry tables), set when
   a slide starts and kept all the way down because momentum carries you (`MovementController` slideTarget).
   `Mountain.SlideSpeedAt` and the under-trained floor went. The carry card shows "you N, god N".
-  Checked: `check.ps1`; formula tests (climb share, climb tier, escape level points, god speed). Not playtested: the
-  shared Studio was in another session's playtest.
+  Then, wanting as few numbers as possible, the user settled on one rule: your ratio is Climbing / (sign x lamb weight),
+  your speed is the ratio below 1 and +1x per 4x above, no cap on the mountain, 7x for walking in the safe zone, tier 1
+  never below normal; the sign is just enough for the lightest lamb, an average one leaving about 95%. Weight became
+  hidden and a smooth range, saved with the sheep and tilting (not deciding) adult size; the Light/Stout/Heavy words
+  and the carry card's speeds went. The Merge Shrine session asked for the weight interface: `Economy.RollWeight(random,
+  luck)`, `SizeOdds(weight)`, `RollSize`, `LambScale`, a placeholder Titan size. Schema 2 migrates Burden to Weight.
+  `Mountain.SpeedAt` replaced `ClimbSpeedAt`; slides now reach their speed in about 2 s.
+  Checked: `check.ps1`; 40 of 40 tests in Studio; a playtest in StealASheep.rbxl with this branch's scripts swapped in
+  (main's put back after, not saved): the server put a client teleport to x 900 back to x 235; tier 3 uphill at 0,
+  200, 800 and 12,800 Climbing measured 1.0, 4.4, 17.6 and ~54 studs/s; chases on tier 3 (god 25.6) with a 1.03
+  lamb: caught at 200, escaped at 800 (24.9, god 39 studs behind), easy at 3,200 (50.7); at 1e9 Climbing walking on
+  the plots stopped at 126, uphill ran 245 with no airborne samples, slides of 200-260 stayed on the floor; the carry
+  card shows only the lamb's name. Console clean.
 
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9

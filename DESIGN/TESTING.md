@@ -54,3 +54,18 @@ Useful measurements:
 - Screenshots: `screen_capture` with `camera_position` turns on Freecam, which then eats the mouse; restart the
   playtest after using it. The world and ViewportFrames only render in captures while the Studio window isn't
   minimized.
+
+## Climbing playtest (2026-10-05)
+
+- **Swap a branch's scripts into the open place**: `rojo build tools/sync.project.json` into the Studio version's
+  `content/sas/`, then in Edit move each same-named child of ReplicatedStorage, ServerScriptService and
+  StarterPlayerScripts (and `ServerStorage.Tests`) into a `ServerStorage.TEMP_MainScripts` folder and parent the new
+  ones; put them back the same way afterwards and don't save.
+- **Drive a slide**: bind a RenderStep at `Input + 1` calling `Humanoid:Move` towards (-1, 0, dz) with dz steering to
+  z 192: the lanes at z 168-198 run clear from tier 3 down (raycast check); a straight -X slide from the tier 3 lamb
+  spot hits a tree at x 852.
+- **Wait for the god to get home** between chases (Mood "Idle"): a returning god walks home at 16 studs/s and sits in
+  the lane, and the next thief slides into it (up to 42 s on tier 3).
+- **Measured**: uphill on tier 3 (sign 800): 1.0 studs/s at 0 Climbing, 4.4 at 200, 17.6 along x at 800. Tier 3
+  chases (god 25.6): 200 caught in 7 s; 800 with a 1.03 lamb escaped in 29 s, god 39 studs behind; 3,200 in 15 s at
+  50.7. At 1e9: 126 on the plots (7x cap), 245 uphill on tiers 1-2, slides of 200-260 on the floor.

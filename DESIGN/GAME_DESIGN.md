@@ -71,25 +71,27 @@ Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels
 products.
 
 ## Climbing (the user, 2026-10-05)
-One stat, **Climbing** (the stair walker trains it; saved as `ClimbPower`), is both how fast you go uphill and how well
-you carry. No walls: every tier is open to everyone. Going up a tier's slope you move at
-`18 x Climbing / (Climbing + Reach)` studs a second, never under a 1 stud/s crawl. That's half speed at the tier's Reach
-and 91% at ten times it. Reach grows about 4x a tier, so one tier above your Climbing is slow (about 3.6 studs/s) and
-two or more is a crawl: possible, but nobody wants to. Moving across the slope is unaffected.
+Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain
+and to outrun its gods. No walls: every tier is open to everyone.
 
-## Escaping: your speed vs its speed (the user, 2026-10-05)
-Like Steal an Egg: every god has **one set speed** for the whole chase, and the thief's **escape speed comes from
-Climbing**. A slide's speed is set when it starts and kept all the way down (momentum: lower stretches don't slow it).
+**Your ratio on a tier = Climbing / (its sign number x the carried lamb's weight)** (weight 1 empty-handed).
 
-- God: `0.8 x its tier's top slide speed` (Olympus `SlideSpeed`, 24 at tier 1 up to 60 at tier 30), so 19 to 48.
-  It never walks and never scales with the thief.
-- Thief: `top slide speed x Climbing / (Climbing + 0.2 x Reach x weight)`; weight Light 1, Stout 1.3, Heavy 1.6
-  (empty-handed 0.5, using the tier slid from). Walking with a lamb uses the same share of 18.
-- So: a Light lamb is level with its god at 0.8x its tier's Reach and outruns it from the Reach on the sign; a Heavy
-  one needs about 1.6x. A thief who crawled up a tier far above their Climbing slides at a fraction and is caught.
+- **Your speed**: the ratio itself below 1 (a quarter of the sign, a quarter of normal speed; never under a 1 stud/s
+  crawl), then +1x normal speed for every 4x above it, no cap on the mountain. Signs grow about 4x a tier, so every
+  tier above you is a quarter speed (two above is a crawl) and every tier you've outgrown is +1x.
+- **Walking and climbing** = 18 studs/s x your speed. Slowed, only the uphill part is held down. Tier 1 and the safe
+  zone (plots, hub) never go below normal; walking in the safe zone stops at 7x.
+- **Sliding away** = the god's speed x your speed (at least walking speed), set when the slide starts and kept all the
+  way down. It reaches it in about 2 seconds.
+- **Gods**: one set speed each for the whole chase, 0.8 x its tier's `SlideSpeed` (19 at tier 1 up to 48 at tier 30),
+  never walking, never scaled by the thief.
+- **So**: at the sign's number the lightest lamb's thief matches the god and the head start gets them away; an
+  average lamb leaves about 95% (caught near the bottom); heavy ones need more.
 
-Tier 6 (Reach 51.2K, top 40, god 32): Light lamb at 12.8K Climbing 22, at 51.2K 33, at 102K 36, at 512K 39;
-Heavy at 51.2K 30, at 102K 35.
+## Lamb weight (the user, 2026-10-05)
+Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (lightest) up, saved with the sheep
+(`Weight`). Wild lambs: 1-1.1 mostly, 1.1-1.5 for one in twenty. Heavier lambs are slower to carry and tend to grow
+bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look a little bigger as lambs.
 
 ## Not built
 Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.

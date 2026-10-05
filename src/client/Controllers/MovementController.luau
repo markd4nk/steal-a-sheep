@@ -222,7 +222,8 @@ local function step(dt: number)
 		slideSpeed = math.max(0, slideSpeed - brake * dt)
 	elseif grounded then
 		if slideSpeed < target then
-			slideSpeed = math.min(target, slideSpeed + settings.SlideAccel * dt)
+			local accel = math.max(settings.SlideAccel, target / settings.SlideRiseSeconds)
+			slideSpeed = math.min(target, slideSpeed + accel * dt)
 		else
 			slideSpeed = math.max(target, slideSpeed - settings.SlideAccel * 0.5 * dt)
 		end
