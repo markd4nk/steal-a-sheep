@@ -31,6 +31,11 @@ Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session 
 - **Lane check**: every collidable part under a stretch's `Decor` in its frame (x across, y up from the floor) must have
   |x| >= 56 or sit 16+ studs up. `lune run tools/check-lanes.luau` checks the built `StealASheep.rbxl` without Studio
   (exits 1 and lists the parts if any are in the lane); rerun it after changing a theme or the stretches' layout.
+- **A mesh's cost**: in Edit, `AssetService:CreateEditableMeshAsync(part.MeshContent)` then `#mesh:GetFaces()` gives its
+  triangles, and `AssetService:CreateEditableImageAsync(part.TextureContent).Size` its texture size (destroy both
+  after). Measured 2026-10-05: `generate_mesh` gods come out at 8.8-9.9k triangles with a 1024x1024 texture unless
+  `maxTriangles` caps them (at 4,000 a face up close turns blurry); split into seven pieces they carried seven
+  1024 textures. Its prompt fails ("Character limit exceeded") somewhere past about 430 characters.
 - **`check.ps1` doesn't read `tools/`**: a syntax error in `UpperMountain.luau` only shows when `build-place.ps1` runs
   it. Run `stylua --check tools/UpperMountain.luau` or build the place after editing the builder.
 - **Slides on the steep stretches**: bind a RenderStep at `Input + 1` that calls `Humanoid:Move(-X)` (the slide reads
