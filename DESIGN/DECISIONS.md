@@ -30,6 +30,9 @@ confirmed or reversed it.
   as few numbers as possible. No cap on the mountain: more Climbing keeps making you faster. Walking in the safe zone
   (the plots and hub) is capped at 7x normal; tier 1 and the safe zone never go below normal. The sign's number is
   just enough for the lightest lamb on that tier; an average lamb leaves about 95% of the god's speed there.
+- **Caught thieves are punched three tiers down (2026-10-05)**, not sent home, and drop the lamb where they were caught.
+  Walker upgrades are properly expensive (about ten minutes of income each). Most escapes should feel close: tune
+  towards Climbing sitting just over the next sign, not far past it.
 - **Hidden lamb weight (2026-10-05)**: no Light/Stout/Heavy words and no numbers on screen: players feel it. A smooth
   range, not three kinds. Saved with the sheep; heavier lambs tend to grow bigger, but a light one can still grow
   large, just less likely. The carry card shows no speeds.
