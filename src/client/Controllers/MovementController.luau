@@ -232,6 +232,14 @@ local function step(dt: number)
 	end
 	humanoid.WalkSpeed = slideSpeed * boost
 	humanoid:Move(heading, false)
+	-- On High Olympus's steep stretches a fast slide outruns its own fall and hops along the floor (in the air a
+	-- third of the way down, measured at 52 degrees): it drops at least as fast as the ramp does, unless it jumped.
+	if onRamp and humanoid:GetState() ~= Enum.HumanoidStateType.Jumping then
+		local follow = -Vector2.new(velocity.X, velocity.Z).Magnitude * Mountain.RampSlope(position.X) * boost
+		if velocity.Y * boost > follow then
+			root.AssemblyLinearVelocity = Vector3.new(velocity.X * boost, follow, velocity.Z * boost)
+		end
+	end
 end
 
 -- The player's own stair walker steps down while they train, and they walk on the spot.

@@ -86,14 +86,17 @@ local function place(god: God, at: Vector3, facing: Vector3)
 	god.Turn.CFrame = CFrame.lookAlong(Vector3.zero, god.Facing)
 end
 
--- A step of `distance` towards `goal` (feet height ignored), along the floor and inside the lane.
+-- A step of `distance` towards `goal` (feet height ignored), along the floor and inside the lane. Distances are
+-- measured along the slope, as a player's Humanoid moves its WalkSpeed along it: on a steep stretch a step covers
+-- less ground, so a god keeps the same share of a slider's speed on every grade.
 local function stepTowards(god: God, goal: Vector3, distance: number): number
 	local flat = Vector3.new(goal.X - god.At.X, 0, goal.Z - god.At.Z)
 	local remaining = flat.Magnitude
 	if remaining < 1e-3 then
 		return 0
 	end
-	local move = flat.Unit * math.min(distance, remaining)
+	local slope = Mountain.RampSlope(god.At.X)
+	local move = flat.Unit * math.min(distance / math.sqrt(1 + slope * slope), remaining)
 	local x = math.max(god.At.X + move.X, Olympus.SafeLineX)
 	local z = math.clamp(god.At.Z + move.Z, Olympus.LaneZ[1] - LANE_MARGIN, Olympus.LaneZ[2] + LANE_MARGIN)
 	place(god, Vector3.new(x, Mountain.Floor(x, z, groundParams), z), flat)

@@ -1,9 +1,9 @@
 --!strict
 
--- The primitive accessories three families wear on top of a Shear a Sheep breed (primitive pieces):
--- the Grape Sheep's leaf, the War Sheep's helmet and plume, the Laurel Sheep's wreath, and the Wingfoot Sheep's ankle
--- wings. Built on a sheep dressed at its rig's own size (Looks.Dress at scale 1), welded to the piece they sit on, and
--- scaled with the sheep afterwards.
+-- The primitive accessories some families wear on top of a Shear a Sheep breed: the Grape Sheep's leaf, the War
+-- Sheep's helmet and plume, the Laurel Sheep's wreath, the Wingfoot Sheep's ankle wings, the Cupid and Victory sheep's
+-- back wings, the Justice Sheep's blindfold and the Hearth Sheep's flame. Built on a sheep dressed at its rig's own size
+-- (Looks.Dress at scale 1), welded to the piece they sit on, and scaled with the sheep afterwards.
 local Extras = {}
 
 local function part(
@@ -122,6 +122,68 @@ function Extras.Add(model: Model, kind: string)
 				* CFrame.Angles(0, angle, rad(25))
 			part(model, head, `Leaf{index}`, Enum.PartType.Ball, Vector3.new(0.32, 0.12, 0.2), at, LEAF)
 		end
+	elseif kind == "BackWings" then
+		-- A pair of wings up off its back, for the Cupid and Victory sheep.
+		local body = piece(model, "Body")
+		if body then
+			for _, side in { -1, 1 } do
+				for index, size in { Vector3.new(0.08, 0.7, 1.15), Vector3.new(0.08, 0.5, 0.8) } do
+					part(
+						model,
+						body,
+						`BackWing{side}{index}`,
+						Enum.PartType.Block,
+						size,
+						CFrame.new(side * (0.75 + index * 0.18), 1.05 + index * 0.12, 0.15 + index * 0.1)
+							* CFrame.Angles(rad(-15), 0, rad(side * -40)),
+						Color3.fromRGB(255, 255, 255),
+						Enum.Material.Neon
+					)
+				end
+			end
+		end
+	elseif kind == "Blindfold" then
+		-- Justice is blind: a band round its eyes.
+		part(
+			model,
+			head,
+			"Blindfold",
+			Enum.PartType.Block,
+			Vector3.new(1.18, 0.24, 1.03),
+			CFrame.new(0, 0.12, 0),
+			Color3.fromRGB(236, 238, 246)
+		)
+		part(
+			model,
+			head,
+			"Knot",
+			Enum.PartType.Ball,
+			Vector3.new(0.3, 0.3, 0.3),
+			CFrame.new(0, 0.12, 0.56),
+			Color3.fromRGB(236, 238, 246)
+		)
+	elseif kind == "Flame" then
+		-- The hearth's flame on its head.
+		part(
+			model,
+			head,
+			"Flame",
+			Enum.PartType.Block,
+			Vector3.new(0.42, 0.55, 0.42),
+			CFrame.new(0, 1.3, 0.05) * CFrame.Angles(0, rad(45), 0),
+			Color3.fromRGB(255, 140, 50),
+			Enum.Material.Neon
+		)
+		part(
+			model,
+			head,
+			"FlameCore",
+			Enum.PartType.Block,
+			Vector3.new(0.24, 0.42, 0.24),
+			CFrame.new(0, 1.42, 0.05) * CFrame.Angles(0, rad(45), 0),
+			Color3.fromRGB(255, 220, 110),
+			Enum.Material.Neon
+		)
 	elseif kind == "Wings" then
 		for _, spec in WING_LEGS do
 			local leg = piece(model, spec.Name)

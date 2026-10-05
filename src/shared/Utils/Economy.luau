@@ -61,8 +61,40 @@ Economy.MaxPens = 12
 Economy.MergeAfterDeliveries = 3
 Economy.UnderTrainedFloor = 0.45 -- the share of a burden's speed left to a thief with almost no Climbing
 
--- Climbing a second on the stair walker, by its level (0 is the free one).
-Economy.WalkerRates = table.freeze({ 2, 12, 40, 160, 640, 2200, 9000, 36000, 100000, 300000, 900000, 1800000 })
+-- Climbing a second on the stair walker, by its level (0 is the free one). Each level covers the gap between the
+-- next two tiers' reach in about a minute, and the last carries Zeus's Heavy target.
+Economy.WalkerRates = table.freeze({
+	2,
+	12,
+	40,
+	160,
+	640,
+	2200,
+	9000,
+	36000,
+	100000,
+	300000,
+	900000,
+	1800000,
+	5e6,
+	13e6,
+	32e6,
+	80e6,
+	200e6,
+	500e6,
+	1.3e9,
+	3e9,
+	7.8e9,
+	20e9,
+	48e9,
+	120e9,
+	300e9,
+	770e9,
+	1.9e12,
+	4.8e12,
+	12e12,
+	25e12,
+})
 Economy.MaxWalker = #Economy.WalkerRates - 1
 
 Economy.Trails = table.freeze({
@@ -88,7 +120,7 @@ function Economy.Tier(family: string): Olympus.Tier
 	return tier
 end
 
--- round(2 x 2.5^(tier - 1)): 2, 5, 13, 31, 78 ... 47,684.
+-- round(2 x 2.5^(tier - 1)): 2, 5, 13, 31, 78 ... 47,684 at tier 12 ... about 694 billion at Zeus's 30.
 function Economy.BaseIncome(tier: number): number
 	return Economy.Round(2 * 2.5 ^ (tier - 1))
 end
