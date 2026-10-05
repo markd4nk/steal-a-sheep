@@ -91,6 +91,17 @@ Useful measurements:
   playtest after using it. The world and ViewportFrames only render in captures while the Studio window isn't
   minimized.
 
+## Leaderboards (2026-10-05)
+
+- In an unpublished place the boards rank the players in the playtest only and say "This server". A new save is 0 in
+  everything, so a board reads "No one yet" until the debug panel adds Climbing or sheep (`GiveSheep` gives
+  income and counts as a steal); boards redraw every 5 s. Selling through `Remotes.FlockAction:Invoke("Sell", id)`
+  checks This Server drops while Top Income keeps the best.
+- To see full boards, set rows 2-10's `Visible`, `PlayerName.Text`, `Value.Text` and `Picture.Image` from a Client
+  `execute_luau` (`workspace.Base.Leaderboard.<model>.<Id>Board.Screen.Back.Row<n>`): the server leaves rows it
+  hides alone, so they stay until Stop. Hold the camera with a RenderStep bound after `RenderPriority.Last` (setting
+  it once is undone by the camera scripts), and unbind it after.
+
 ## Climbing playtest (2026-10-05)
 
 - **Swap a branch's scripts into the open place**: `rojo build tools/sync.project.json` into the Studio version's

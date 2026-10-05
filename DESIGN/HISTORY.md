@@ -6,7 +6,7 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
-- **Put lambs down anywhere in the pen; sheep roam and graze (2026-10-05, branch `t3code/free-roaming-sheep-pens`)**.
+- **Put lambs down anywhere in the pen; sheep roam and graze (2026-10-05)**.
   The user: instead of the delivery platform and fixed pads you unlock, be like Steal an Egg (bring the lamb into the
   pen and place it where you choose); sheep walk around on their own like Shear a Sheep's; lambs mostly eat off the
   floor, looking down and chewing with an eating face; make it fluid.
@@ -44,7 +44,7 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     never grazing or changing face (two takes in five). It now takes joints and the face from `DescendantAdded` too;
     three lambs put down in a row then all grazed, chewed, blinked and baa-ed (25 s face log).
   - *UI*: objective "Bring it into your pen" / "Put it down where you like" (and the full-pen warning); Flock card "In
-    your pen"; Shop "Pen Space n/12".
+    your pen"; Shop "Pen Space n/20".
   - *Checked*: `check.ps1` passes; 43 tests pass in Studio (Wander, PlayerData homes). Playtested solo in this session's
     own Studio on `build/PenPlaytest.rbxl` (main's Studio was in someone's playtest): a stolen lamb carried home, no
     prompt outside the gate or in another plot (the notice showed), "Put down" pressed with E landed it 4 studs ahead
@@ -53,6 +53,39 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     with the stand-in face) and filmed; store, equip (hops back in at home), grow-up rebuilds in place, merge (hops in
     at the first sheep's home), sell, and a full pen (stored, warning shown). Console clean. Not checked: two players,
     touch, gamepad, a real rejoin.
+
+- **Coins renamed cash (2026-10-05)**. The user: there are no coins, just cash, all through the game. The nine messages
+  that said coins now say cash (selling, the Shop's "Need ... more", Sheepdex rewards, the tutorial reward, the
+  welcome-back card, the debug panel). Code names and saved data keep `Coins`; the map and the borrowed assets have
+  no coin text (scanned with Lune). Tyche's crown of coins and the coin-clink sounds stay: decoration, not money.
+
+- **World leaderboards (2026-10-05)**. The user: make the leaderboard actually work, on the map's billboard in the safe
+  zone rather than inside a HUD icon. The map has four boards (`workspace.Base.Leaderboard`, two pairs at x 280, z
+  28-66 and 303-341, facing the plots), so each ranks one thing. The first mock-up (Coins Earned, Top Income, Most
+  Steals, Climb Power, a trophy by each title) drew the user's calls: the money is cash, not coins, so swap Coins
+  Earned for This Server (the richest here) next to Top Income (the richest overall, best ever); the look is OK; drop
+  the icon, words only.
+  - *LeaderboardService* (folder): `Boards` (the four rankings, in the order of the boards sorted by z: This Server,
+    Top Income, Most Steals, Climbing), `Score` (store encoding and the merge), `Face` (the screen). Each board gets
+    an upright invisible part just in front of its panel with a SurfaceGui (50 px a stud), since the map's panels lie
+    on their side. Every 5 s it measures each loaded player's values (their best this session; This Server takes
+    their income now) and redraws the boards from the store's top 10 merged with this server's players. This Server
+    has no store. Every 60 s it writes what went up
+    (`UpdateAsync` with `math.max`) and reads each store's top 10 (`GetSortedAsync`), looking names up in one
+    `UserService:GetUserInfosByUserIdsAsync` call. The last write happens on `DataService.PlayerReleasing`, and from
+    `Destroy` for anyone still in at shutdown (it's destroyed before DataService releases them).
+  - *Stores*: `Leaderboard_Income`, `_Steals`, `_Climb` (`_Studio` in Studio). Values are
+    `floor(log10(1 + value) x 1e13)`: late-game income (about 5e14/s for a full pen at Zeus, stored in tenths) and
+    Climb Power head past what an OrderedDataStore and Luau hold exactly. The order holds, and whole numbers come back
+    exact below about 2e12. No saved data changed.
+  - *Checked*: `check.ps1` passes. Playtests in a second Studio on a copy of the built place: both bootstraps ready, 41
+    tests pass (5 new for `Score`: exact round trip to a trillion, order, under 2^53 at 1e300, the merge). Without
+    DataStores the boards say "This server" and the console has one line saying so. After debug Climb Power and three
+    sheep, all four boards showed the player within 5 s, matching the player list (2.38K/s, 48K); after selling the
+    best sheep, This Server read 854/s and Top Income kept 2.38K/s. Screenshots of both pairs, words-only titles, with
+    sample rows filled in on the client. Store writes and reads weren't run (unpublished place). Merging main
+    (Climbing) retitled the last board CLIMBING, as everything on screen now says.
+
 - **Climbing: one stat, no walls (2026-10-05)**. The user asked how chaser speed worked, then: climbing and speed
   should be one thing called Climbing; the steeper the slope the less it works, so going higher needs almost
   exponentially more; you can still climb when far too weak, just painfully slowly ("crawl", not slip back), and that

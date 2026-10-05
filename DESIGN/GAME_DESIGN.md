@@ -42,6 +42,7 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
   `FlockService`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
 - Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
+- Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climbing): `LeaderboardService`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
 ## The map
@@ -87,8 +88,8 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Coins (sheep in the pen, first-discovery rewards, selling) buy stair walker levels, pen space and trails. No Robux
-products.
+Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards and selling, and
+buys stair walker levels, pen space and trails. No Robux products.
 
 ## Climbing (the user, 2026-10-05)
 Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain

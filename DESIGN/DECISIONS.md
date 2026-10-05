@@ -49,6 +49,11 @@ confirmed or reversed it.
   Brainrot: its base starts at 10 and is very expensive to upgrade).
 - **Sheep roam the full plot**, at the easy stroll pace they have (the user, 2026-10-05: "they can roam the full plot
   ... I wouldn't change much about that").
+- **The game's money is cash, the only currency** (the user, 2026-10-05: no coins anywhere). Every word players see
+  says cash; the code and saved data still call it `Coins`.
+- **Leaderboards live on the map's billboards in the safe zone, not behind a HUD icon** (the user, 2026-10-05): This
+  Server (the richest here, by income), Top Income (the richest overall, each player's best ever), Most Steals and
+  Climb Power (titled CLIMBING since Climbing replaced Climb Power on screen). Titles are words only, no icon; otherwise the boards' look (dark panel, medal rows, headshots) is OK'd.
 
 ## To review
 
@@ -74,6 +79,20 @@ Calls made building free placement and roaming sheep (2026-10-05):
   0.4-1.6 s between a lamb's bouts. Wild lambs graze too. Faces: Munch's two frames in turn (0.22 s each) while
   chewing, Baa while baa-ing, a blink every 2.5-6 s on a plain face.
 - **Flock menu** says "In your pen" (or "(pinned)") instead of "In pen slot N".
+
+Calls made building the world leaderboards (2026-10-05); the user's own calls are under Confirmed rules.
+
+- **Where each board stands**: the north pair has This Server (outer) and Top Income (inner), the south pair Most
+  Steals (inner) and Climbing (outer). The inner ones stand nearest the hub.
+- **This Server ranks income right now**, so it drops when a player sells; Top Income keeps their best.
+- **Top 10 across all servers**, read once a minute, with this server's players redrawn every 5 s so a player sees
+  their own rise at once. Players at 0 aren't listed; an empty board reads "No one yet".
+- **Most Steals counts every delivery**, the tutorial lamb included.
+- **A row**: rank badge (gold, silver, bronze for the top three, rows tinted to match), avatar headshot, display name,
+  value in the board's colour (lime for income, gold for Climbing, white for steals). A small line at the bottom
+  says "Right now" on This Server, and "All servers" on the others ("This server" where DataStores aren't available).
+- **Studio uses its own stores** (`_Studio`), so playtests never reach the live boards. The player list (Income,
+  Climbing) stays as it was.
 
 Calls made building Climbing (2026-10-05):
 

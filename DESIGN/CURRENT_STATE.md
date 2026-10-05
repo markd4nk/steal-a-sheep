@@ -38,8 +38,13 @@ lamb.
   the place by `tools/UpperMountain.luau` (Lune, in `build-place.ps1`); `tools/preview-upper-mountain.luau` previews it
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
+- **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
+  Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
+  `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
+
 - **Server**: `DataService`, `PurchaseService` (pack, no products), `SheepService`, `PlotService`, `FlockService`,
-  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `DebugService` (Studio only).
+  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
+  `DebugService` (Studio only).
 - **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Popup, Studio
   DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
@@ -52,14 +57,15 @@ lamb.
 
 ## In progress
 
-- **The eating face is A ("Munch")**, uploaded 2026-10-05 (`Faces.MunchA`/`MunchB`, `ChewFaces`), cleared by Roblox's
-  review and seen on a chewing lamb in Studio. Until a picture loads, a sheep keeps its own face. Drawn by
-  `art/faces/chew_faces.py` with Shear a Sheep's `art/sheep/mock_faces.py` helpers.
+- Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
+  (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
 
 - **Two players**: slide hits and knockback (server checks, client knockback) were never tried with a second player.
+- **All-servers leaderboards**: the place isn't published, so the boards ran on this server's players only; the
+  store writes and reads, name lookups and the last write on leaving are untested.
 - **Saving**: the place isn't published, so playtests used ProfileStore's mock store; rejoin, offline credit on a real
   rejoin and session locking are untested (the offline maths is unit-tested).
 - **Touch and gamepad**: only keyboard and mouse in Studio. Prompts (Steal, Put down), HUD buttons and the slide use
@@ -93,7 +99,6 @@ lamb.
   They load if this game is published under the same owner.
 - **ViewportFrames (the menus' 3D sheep) don't show in Studio MCP screenshots while the window is minimized**; they do
   in play.
-- The map's four leaderboard boards are decoration; the player list shows Income and Climbing.
 - **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
   little sunk in the straw.
 - Studio MCP screenshots don't show ProximityPrompt buttons (Steal, Put down); they work in play.
