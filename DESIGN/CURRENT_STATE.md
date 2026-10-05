@@ -48,8 +48,9 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   Olympus stretches for the eleven Olympians who moved up. Main (275-stud stretches) merged in, lanes clear, playtested.
   Waiting for the user's OK on the new stretches before merging.
 - **Real god models**: two Zeus mock-ups made with `generate_mesh` (cartoon: asset 84879965895469; heroic:
-  133271949323056), each split into head, torso, arms, legs and bolt so they can take the rig's joints. Waiting for the
-  user's pick and OK before rigging Zeus and modelling the other 29.
+  133271949323056), each split into head, torso, arms, legs and bolt so they can take the rig's joints. On hold: the
+  user got a notice that Roblox removed one generated mesh for breaking its rules. Not identified: on 2026-10-05 all
+  28 parts of both models (and every asset in the account's models) still loaded and none was marked deleted.
 
 ## Not verified
 
