@@ -156,12 +156,6 @@ function Hud.Build(playerGui: Instance): ScreenGui
 		AlignX = Enum.TextXAlignment.Left,
 		Order = 1,
 	})
-	UIKit.Text(words, "BurdenLabel", "", 16, Theme.Fleece.Muted, UDim2.fromOffset(0, 22), {
-		Font = Theme.Font.TextHeavy,
-		Auto = Enum.AutomaticSize.X,
-		AlignX = Enum.TextXAlignment.Left,
-		Order = 2,
-	})
 	local giveUp = UIKit.Button(carry, "ReturnButton", "Soft", 110, Theme.ButtonHeight.Standard, "Return")
 	giveUp.LayoutOrder = 3
 
@@ -215,7 +209,6 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local carryCard = root:FindFirstChild("CarryCard") :: Frame
 	local carryToken = carryCard:FindFirstChild("Token") :: Frame
 	local carryName = carryCard:FindFirstChild("NameLabel", true) :: TextLabel
-	local carryBurden = carryCard:FindFirstChild("BurdenLabel", true) :: TextLabel
 	local returnButton = carryCard:FindFirstChild("ReturnButton") :: TextButton
 	local meter = root:FindFirstChild("TrainMeter") :: Frame
 	local gainLabel = meter:FindFirstChild("GainLabel") :: TextLabel
@@ -385,24 +378,17 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 		local reached = Economy.ClimbTier(power)
 		local readiness = Economy.Readiness(power, reached)
-		local _, light, heavy = Economy.Targets(reached)
+		local _, _, heavy = Economy.Targets(reached)
 		local here = Olympus.Tiers[reached]
-		if readiness == "Reach" then
-			return {
-				Title = `Train for Light sheep: {Format.Short(power)}/{Format.Short(light)}`,
-				Sub = `{here.God}'s light lambs get easier to escape with`,
-				Progress = power / light,
-			}
-		end
 		local nextTier = Olympus.Tiers[reached + 1]
 		if not nextTier then
 			if readiness == "Light" then
 				return {
-					Title = `Train for Heavy sheep: {Format.Short(power)}/{Format.Short(heavy)}`,
+					Title = `Train for heavier sheep: {Format.Short(power)}/{Format.Short(heavy)}`,
 					Progress = power / heavy,
 				}
 			end
-			return { Title = "Ready for Zeus's heaviest sheep", Sub = "Complete your Sheepdex" }
+			return { Title = "Ready for the heaviest sheep", Sub = "Complete your Sheepdex" }
 		end
 		local delivered = (data.Deliveries[tostring(reached)] or 0) > 0
 		if not delivered then
@@ -448,21 +434,15 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 		local family = player:GetAttribute("CarriedFamily")
 		local tier = player:GetAttribute("CarryTier")
-		local burden = player:GetAttribute("CarryBurden")
-		if type(family) == "string" and type(tier) == "number" and type(burden) == "number" then
+		if type(family) == "string" and type(tier) == "number" then
 			SheepIcon.Paint(carryToken, family, 1)
 			carryName.Text = string.gsub(Olympus.Tiers[tier].FamilyName, "Sheep$", "Lamb")
-			local climb = player:GetAttribute("ClimbPower")
-			local power = if type(climb) == "number" then climb else 0
-			local speed = Economy.EscapeSpeed(power, tier, Economy.Burdens[burden].Weight)
-			local god = Economy.GodSpeed(tier)
-			carryBurden.Text = `{Economy.Burdens[burden].Name}: you {math.floor(speed)}, god {math.floor(god)}`
 		end
 	end
 	trove:Connect(returnButton.Activated, function()
 		Remotes.ReturnSheep:Fire()
 	end)
-	for _, name in { "Carrying", "CarriedFamily", "CarryBurden" } do
+	for _, name in { "Carrying", "CarriedFamily" } do
 		trove:Connect(player:GetAttributeChangedSignal(name), refreshCarry)
 	end
 	refreshCarry()
@@ -485,8 +465,8 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		local reach, light, heavy = Economy.Targets(reached)
 		local nextTier = Olympus.Tiers[reached + 1]
 		local steps: { { At: number, Name: string } } = {
-			{ At = light, Name = "Light sheep" },
-			{ At = heavy, Name = "Heavy sheep" },
+			{ At = light, Name = "Lightest sheep" },
+			{ At = heavy, Name = "Heavier sheep" },
 			{ At = if nextTier then nextTier.Reach else math.huge, Name = if nextTier then nextTier.God else "" },
 		}
 		for _, step in steps do

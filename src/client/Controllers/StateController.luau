@@ -21,7 +21,7 @@ export type SheepView = {
 	Id: string,
 	Family: string,
 	Rarity: number,
-	Burden: number,
+	Weight: number,
 	Size: number, -- 0 while it's a lamb
 	Rank: number,
 	Locked: boolean,

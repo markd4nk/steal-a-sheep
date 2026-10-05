@@ -56,7 +56,7 @@ local commands: { [string]: Command } = {
 	GiveSheep = function(player, value)
 		local tier = Olympus.Tiers[math.clamp(math.floor(value or 1), 1, Olympus.Count)]
 		local size = math.random(1, 3)
-		registry.FlockService:Deliver(player, { Family = tier.Family, Rarity = 1, Burden = 1, Size = size })
+		registry.FlockService:Deliver(player, { Family = tier.Family, Rarity = 1, Weight = 1.05, Size = size })
 		return true, nil
 	end,
 	-- Every lamb in the pen grows up now.

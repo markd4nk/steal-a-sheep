@@ -13,7 +13,7 @@ local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- The climb's rules on the ramp. Climbing: nothing walls a tier off; each player climbs at the speed their Climbing
--- allows on that tier's slope (Mountain.ClimbSpeedAt, MovementController moves them), down to a crawl. The server
+-- allows on that tier's slope (Mountain.SpeedAt, MovementController moves them), down to a crawl. The server
 -- keeps a ceiling per player that rises at that speed (with some slack for lag) and puts anyone found above it back on
 -- it. A sign at the foot of each tier from the second up names it and its Reach. Slide hits: a player sliding downhill
 -- fast enough who reaches a player walking uphill knocks them back down the slope (their client moves them), protects
@@ -114,7 +114,7 @@ local function enforce(dt: number)
 		end
 		local position = root.Position
 		local ceiling = ceilings[player] or math.min(position.X, Olympus.SafeLineX)
-		local speed = Mountain.ClimbSpeedAt(ceiling, data.ClimbPower) * speedBoost(player)
+		local speed = Mountain.SpeedAt(ceiling, data.ClimbPower, 1) * speedBoost(player)
 		local lead = math.max(LEAD_STUDS, speed * LEAD_SECONDS)
 		ceiling = math.min(ceiling + speed * CLIMB_SLACK * dt, position.X + lead)
 		ceilings[player] = ceiling

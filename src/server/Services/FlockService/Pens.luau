@@ -19,14 +19,14 @@ export type Shown = {
 	Label: TextLabel,
 }
 
--- Lambs grow from their burden's size to this share of a Standard adult before their size shows.
+-- Lambs grow from their weight's size to this share of a Standard adult before their size shows.
 local LAMB_GROWN_SHARE = 0.85
 
 function Pens.Scale(sheep: Sheep): number
 	if Economy.IsAdult(sheep) then
 		return Economy.Scale(sheep, GameConfig.SheepSize)
 	end
-	local start = Economy.Burdens[sheep.Burden].Scale
+	local start = Economy.LambScale(sheep.Weight)
 	local share = math.clamp(sheep.Grown / Economy.GrowthSeconds(sheep), 0, 1)
 	return GameConfig.SheepSize * (start + (LAMB_GROWN_SHARE - start) * share)
 end

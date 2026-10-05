@@ -14,10 +14,10 @@ export type Tier = {
 	Area: string,
 	Family: string, -- GameConfig.Breeds key
 	FamilyName: string,
-	Reach: number, -- Climbing that climbs this tier's slope at half walking speed (Economy.ClimbShare)
+	Reach: number, -- the Climbing this tier needs: normal speed on its slope, the god's speed with its lightest lamb
 	XStart: number, -- the tier's gate on the ramp (studs along +X)
 	XEnd: number,
-	SlideSpeed: number, -- the top slide speed for this tier's lambs (Economy.EscapeSpeed); its god runs at 0.8 of it
+	SlideSpeed: number, -- its god runs at 0.8 of this (Economy.GodSpeed)
 	-- The god's primitive look.
 	Robe: Color3,
 	Skin: Color3,
@@ -34,7 +34,7 @@ local tiers: { Tier } = {
 		Area = "Foothill Meadow",
 		Family = "Meadow",
 		FamilyName = "Meadow Sheep",
-		Reach = 0,
+		Reach = 25,
 		XStart = 330,
 		XEnd = 580,
 		SlideSpeed = 24,

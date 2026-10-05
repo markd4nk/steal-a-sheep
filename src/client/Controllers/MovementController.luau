@@ -12,8 +12,9 @@ local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
--- How the local character moves. Walking: 18 studs a second, times a carried lamb's burden share; going up the ramp,
--- no faster up the slope than the player's Climbing allows there (Mountain.ClimbSpeedAt; the server checks). Sliding:
+-- How the local character moves. Walking: as fast as the player's Climbing allows here, for the lamb's hidden weight
+-- (Mountain.SpeedAt; the server checks the uphill part): slower than normal only up a slope too steep for them,
+-- faster the more they've outgrown it. Sliding:
 -- moving downhill on the ramp starts a slide by itself; it speeds up to the escape speed set when it starts
 -- (Economy.EscapeSpeed: Climbing against the lamb's tier and weight) and keeps it all the way down, like momentum;
 -- it steers within a cone either side of straight downhill with the ordinary movement controls,
@@ -56,42 +57,43 @@ local function climbing(): number
 	return if type(climb) == "number" then climb else 0
 end
 
--- The carried lamb's tier and burden, or nil when empty-handed.
+-- The carried lamb's tier and hidden weight, or nil when empty-handed.
 local function carried(): (number?, number?)
 	if player:GetAttribute("Carrying") ~= true then
 		return nil, nil
 	end
 	local tier = player:GetAttribute("CarryTier")
-	local burden = player:GetAttribute("CarryBurden")
-	if type(tier) ~= "number" or type(burden) ~= "number" then
+	local weight = player:GetAttribute("CarryWeight")
+	if type(tier) ~= "number" or type(weight) ~= "number" then
 		return nil, nil
 	end
-	return tier, burden
+	return tier, weight
 end
 
--- The share of walking speed a carried lamb leaves the player (Economy.CarryShare), 1 when empty-handed.
-local function carryShare(): number
-	local tier, burden = carried()
-	return if tier and burden then Economy.CarryShare(burden, climbing(), tier) else 1
-end
-
--- The speed a slide starting at `x` keeps all the way down.
+-- The speed a slide starting at `x` keeps all the way down (Economy.EscapeSpeed), never under walking speed so a
+-- player too weak for the slope still gets home.
 local function escapeSpeed(x: number): number
-	local tier, burden = carried()
-	if tier and burden then
-		return Economy.EscapeSpeed(climbing(), tier, Economy.Burdens[burden].Weight)
-	end
-	return Economy.EscapeSpeed(climbing(), math.max(Mountain.TierAt(x), 1), Economy.EmptyWeight)
+	local tier, weight = carried()
+	local speed = if tier and weight
+		then Economy.EscapeSpeed(climbing(), tier, weight)
+		else Economy.EscapeSpeed(climbing(), math.max(Mountain.TierAt(x), 1), 1)
+	return math.max(speed, GameConfig.Movement.WalkSpeed)
 end
 
--- Walking speed, held down when the move heads up the ramp so its uphill part never beats the climb speed there.
--- Moving across the slope stays at full speed.
-local function walkSpeed(position: Vector3, input: Vector3, walk: number, share: number): number
-	if input.X <= 0 or position.X < Olympus.SafeLineX then
-		return walk
+-- Walking speed here (Mountain.SpeedAt, for the carried weight). Faster than normal it's the same every way; slower,
+-- only the move's uphill part is held down to it, so a player on a slope too steep for them can still cross it or
+-- come back down at normal speed.
+local function walkSpeed(position: Vector3, input: Vector3): number
+	local _, weight = carried()
+	local speed = Mountain.SpeedAt(position.X, climbing(), weight or 1)
+	local normal = GameConfig.Movement.WalkSpeed
+	if speed >= normal then
+		return speed
 	end
-	local climb = Mountain.ClimbSpeedAt(position.X, climbing()) * share
-	return math.min(walk, climb / input.X)
+	if input.X <= 0 then
+		return normal
+	end
+	return math.min(normal, speed / input.X)
 end
 
 -- What the player is asking for, in world space: the Humanoid's MoveDirection as Roblox's own controls set it this
@@ -156,8 +158,7 @@ local function step(dt: number)
 		return
 	end
 	local now = os.clock()
-	local share = carryShare()
-	local walk = GameConfig.Movement.WalkSpeed * share
+	local walk = GameConfig.Movement.WalkSpeed
 	local boost = speedBoost()
 	local settings = GameConfig.Movement
 
@@ -182,7 +183,7 @@ local function step(dt: number)
 	local input = moveInput(humanoid)
 
 	if not sliding then
-		humanoid.WalkSpeed = walkSpeed(position, input, walk, share) * boost
+		humanoid.WalkSpeed = walkSpeed(position, input) * boost
 		local downhill = -velocity.X
 		local flat = Vector2.new(velocity.X, velocity.Z).Magnitude
 		if

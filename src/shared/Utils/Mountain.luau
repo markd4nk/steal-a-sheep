@@ -53,12 +53,17 @@ function Mountain.TierAt(x: number): number
 	return #Olympus.Tiers
 end
 
--- How fast a player with `climb` Climbing may go up the slope at `x`, in studs a second: walking speed times the
--- tier's climb share, never under a crawl. Below the safety line it's walking speed.
-function Mountain.ClimbSpeedAt(x: number, climb: number): number
+-- How fast a player with `climb` Climbing, carrying `weight` (1 empty-handed), moves up the slope at `x`, in studs a
+-- second: walking speed times the tier's speed factor (Economy.SpeedFactor), never under a crawl. Below the safety
+-- line it's tier 1's, between normal speed and SafeZoneCap times it.
+function Mountain.SpeedAt(x: number, climb: number, weight: number): number
 	local movement = GameConfig.Movement
-	local share = Economy.ClimbShare(climb, Mountain.TierAt(x))
-	return math.max(movement.CrawlSpeed, movement.WalkSpeed * share)
+	local tier = Mountain.TierAt(x)
+	local factor = Economy.SpeedFactor(Economy.Ratio(climb, math.max(tier, 1), weight), math.max(tier, 1))
+	if tier == 0 then
+		factor = math.clamp(factor, 1, Economy.SafeZoneCap)
+	end
+	return math.max(movement.CrawlSpeed, movement.WalkSpeed * factor)
 end
 
 -- On the ramp between the safety line and the summit, near its floor (not on a roof or cloud above it).

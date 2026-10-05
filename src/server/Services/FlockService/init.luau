@@ -30,7 +30,7 @@ local FlockService = {
 export type Wild = {
 	Family: string,
 	Rarity: number,
-	Burden: number,
+	Weight: number,
 	Size: number,
 	Tutorial: boolean?,
 }
@@ -73,7 +73,7 @@ local function view(sheep: Sheep, penSlots: number): { [string]: any }
 		Id = sheep.Id,
 		Family = sheep.Family,
 		Rarity = sheep.Rarity,
-		Burden = sheep.Burden,
+		Weight = sheep.Weight,
 		Size = if adult then sheep.Size else 0,
 		Rank = sheep.Rank,
 		Locked = sheep.Locked,
@@ -380,7 +380,7 @@ function FlockService.Deliver(_self: any, player: Player, wild: Wild): Sheep?
 		Id = id,
 		Family = wild.Family,
 		Rarity = wild.Rarity,
-		Burden = wild.Burden,
+		Weight = wild.Weight,
 		Size = wild.Size,
 		Grown = 0,
 		Rank = 0,
