@@ -15,6 +15,43 @@ confirmed or reversed it.
 
 ## To review
 
+Calls made building High Olympus, thirty gods (2026-10-05). The user's own calls: thirty gods from their list, map parts
+for each, Zeus on the new top, the look indistinguishable from the commissioned map, every section grouped, the climb
+no steeper than about 60 degrees, gradual but noticeable.
+
+- **Climb order**: the old summit is Aeolus's (12, "Windswept Peaks"); then Iris, Pan, Hebe, Eros, Tyche, Asclepius,
+  Eris, Hecate, Hypnos, Morpheus, Phobos, Deimos, Thanatos, Nemesis, Themis, Nike, Hestia, Zeus (13-30): bright and wild
+  first, then dusk, sleep, dreams, fear and death, then justice, victory and the hearth by Zeus's throne. The user's
+  list ranks by fame; the old map's stages already hold the Olympians, so the minor gods are above them.
+- **Grade**: 32 degrees above the old summit, about one more each god, 52 at Zeus (`STRETCHES` in
+  `tools/UpperMountain.luau`). Each stretch is 210 studs along its floor (130-178 across the ground).
+- **Look**: stage 3's floor slab and terrace blocks for every stretch, recoloured per god; trees, rocks, islands, clouds,
+  spires, arches and the pavilion cloned from the stages; block props per god (a rainbow over the path, Pan's pipes and
+  toadstools, goblets and a fountain, hearts, coins and a wheel of fortune, the serpent staff and pools, golden apples
+  and crystals, torches and a moon, poppies, floating dream shapes and stars, craters, Mars beside Deimos, eyes,
+  gravestones, ghosts and wisps, swords, columns and scales, trophies, wings and banners and a laurel arch, braziers and
+  a hearth, lightning bolts and storm clouds). Decor stays out of the lane (no slide snags); trees stand upright, not
+  tilted with the slope as the old stages' are. The old summit's end wall (stage 7's 80-block terrace) is removed.
+- **Summit**: a flat 90-stud plaza past Zeus's stretch with his gold throne, steps and a marble colonnade.
+- **Numbers, tiers 13-30**: reach about x2.5 a tier from 81M (200M, 500M, 1.3B ... 480T, 1.2Qa at Zeus), Light and Heavy
+  at 1.5x and 2.25x as before; income keeps round(2 x 2.5^(tier - 1)) (Zeus ~694B/s); growth 45 + 15 per tier (Zeus 8
+  minutes); slide speeds 50-60 (three tiers each at 50, 52 ... 60). Stair walker levels 12-29 added (5M up to 25T a
+  second), each covering the next tier's reach gap in about a minute like the design's; costs keep round(120 x 2.5^L).
+- **Families**: Gale (Frost), Wild (Moss + goat horns), Ambrosia (Cupcake, honey frosting), Fortune (Pirate), Potion
+  (Slime), Chaos (Glitch), Spirit (Ghost), Slumber (Dream), Starlit (Galaxy), Fright (Wolf in Sheep's Clothing), Dread
+  (Black Hole), Bone (Skeleton), Avenger (Mecha), in Shear a Sheep's colours; Prism is a plain sheep in rainbow puffs;
+  Cupid (pink Cloud wool), Victory (gold) and Justice and Hearth (Ringlets) are plain with new primitive extras: back
+  wings, a blindfold, a flame.
+- **Gods**: primitive block gods like the twelve, each with a signature: Aeolus's gusts and wind bag, Iris's rainbow
+  halo, Pan's horns and pipes, Hebe's cup, Eros's bow and wings, Tyche's coin crown, Asclepius's serpent staff, Eris's
+  golden apple, Hecate's two torches, Hypnos's nightcap, Morpheus's stars, Phobos's mask, Deimos's plumed helmet,
+  Thanatos's hood and scythe, Nemesis's sword, Themis's scales and blindfold, Nike's wings and laurel, Hestia's flame.
+- **Gods chase at the design's share of speed along the slope** (they used to step it across the ground, while a
+  player's Humanoid moves its speed along the slope): on 31 degrees gods were ~17% quicker than designed and on 52 they'd
+  have caught every thief. Old tiers' escapes are now slightly easier.
+- **Slides hug the ramp**: a slide drops at least as fast as the ramp under it (not during a jump); without it, slides on
+  45-52 degrees spent a third of the time in the air.
+
 Calls made while building the MVP on 2026-10-05:
 
 - **God order fits the map's stage themes**: Demeter (meadow), Dionysus (bamboo), Artemis (snow), Hephaestus and Ares
@@ -62,5 +99,9 @@ Calls made while building the MVP on 2026-10-05:
 
 ## Calls left to the user
 
-- Thin the corridor's decor (trees, rocks, arches) on a few slide lanes, or keep it as an obstacle course?
+- Thin the corridor's decor (trees, rocks, arches) on a few slide lanes, or keep it as an obstacle course? It matters
+  more now: every run from High Olympus slides through the old stages.
 - Keep the theme-fitted god order, or the design doc's order?
+- High Olympus's top grade: 52 degrees, or gentler (45 at Zeus)?
+- A shortcut up for the long climb (about 6.5 minutes to Zeus): a shrine that lifts a player to their highest open
+  god's gate, or keep it all on foot?

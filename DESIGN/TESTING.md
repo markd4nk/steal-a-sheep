@@ -19,6 +19,23 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
 
+## High Olympus in an open Studio (2026-10-05)
+
+- **Preview the map**: `lune run tools/preview-upper-mountain.luau "<Studio version folder>/content"`, then in Edit:
+  `local m = game:GetObjects("rbxasset://sas/upper.rbxm")[1]; m.Parent = game.ServerStorage;
+  require(m).Build({ Instance = Instance, CFrame = CFrame, Vector3 = Vector3, Color3 = Color3, Enum = Enum }, workspace);
+  m:Destroy()`. It replaces `Stages.HighOlympus` each run.
+- **Branch code without Rojo**: `rojo build tools/sync.project.json` (a Folder-rooted copy of the project:
+  ReplicatedStorage, ServerScriptService, StarterPlayerScripts, Tests) into `content/sas/sync.rbxm`, then in Edit
+  `GetObjects` it and swap each container's children.
+- **Lane check**: every collidable part under a stretch's `Decor` in its frame (x across, y up from the floor) must have
+  |x| >= 56 or sit 16+ studs up; 0 found.
+- **Slides on the steep stretches**: bind a RenderStep at `Input + 1` that calls `Humanoid:Move(-X)` (the slide reads
+  MoveDirection) and sample `FloorMaterial` and height over `Mountain.RampY`. Measured from Zeus's pasture: 60 studs/s
+  along the floor is 37 across it at 52 degrees; 0 of 74 samples in the air with the ramp hold, 29% without.
+- `require` of a game module from `execute_luau` gets a fresh copy, not the running one (SheepService:Build returned
+  nil): to look at families or gods side by side, clone the running game's own wild lambs and gods instead.
+
 ## Playtesting through the Studio MCP from a script (2026-10-05)
 
 The build session drove a second Studio holding a copy of the built place (`build/Playtest.rbxl`, opened with

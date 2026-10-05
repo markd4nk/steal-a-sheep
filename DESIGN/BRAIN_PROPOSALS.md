@@ -21,6 +21,25 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   of a place's instances with `roblox.serializeModel`; serialize the originals instead (trimmed in memory)." Seen
   2026-10-05 extracting Shear a Sheep's sheep rig.
 
+- **S4** (`BRAIN/PATTERNS/characters.md`): "A Humanoid moves its WalkSpeed along the slope it stands on, so it covers
+  WalkSpeed x cos(grade) across the ground (60 on 52 degrees: 37 studs/s of x). Anything a script moves beside it (NPCs
+  stepped by AlignPosition or CFrame) must measure its steps along the slope too, or on steep ground it outruns
+  players." Seen 2026-10-05 in Steal a Sheep: gods chasing at 0.88 of a slider's speed caught every thief on 52 degrees.
+- **S5** (`BRAIN/PATTERNS/characters.md`): "A Humanoid driven fast down a steep slope leaves the floor: sliding at 60
+  studs/s down 45-52 degrees it was in the air a third of the time. Each frame after your Move, cap its vertical
+  velocity at minus (horizontal speed x slope) unless it's Jumping: it then stays on the floor." Seen 2026-10-05.
+- **S6** (`BRAIN/GOTCHAS.md`): "Lune can't read derived properties: `part.Position` errors ('missing default value'),
+  use `part.CFrame.Position`; reading `Texture.Texture` fails too (clone an existing Texture rather than make one); a
+  Part made in Lune has Studs surfaces, not Studio's Smooth. Clones of a place's instances save fine with
+  `serializePlace`." Seen 2026-10-05 building High Olympus in Lune.
+- **S7** (`BRAIN/PATTERNS/testing-studio.md`): "`require` of a game ModuleScript from `execute_luau` runs a separate
+  copy in the command's context: a service required there never ran Start and holds none of the game's state (a
+  `Build` returned nil). To look at what the game made, read or clone its instances, or go through its remotes." Seen
+  2026-10-05.
+- **S8** (`BRAIN/PATTERNS/sessions.md`, Tools on Windows): "Claude Code's Bash tool fails a heredoc whose body has
+  backticks ('unexpected EOF while looking for matching'), even with a quoted delimiter: write such files with the
+  Write or Edit tools." Seen twice on 2026-10-05.
+
 ## Done
 
 - None yet.

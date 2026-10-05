@@ -4,6 +4,13 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, High Olympus**. `tools/assemble.luau` now runs `tools/UpperMountain.luau` on the map before saving the
+  place: `workspace.Stages.HighOlympus` (Folder) holds one Model a god, `Tier13 Iris` ... `Tier30 Zeus` (each `Floor`,
+  `Terraces`, `Decor`), and `Summit` (plaza, throne, colonnade). It destroys stage 7's end wall (the Model of 80 parts
+  across the path at x 3077). It needs from the map: `Stages.Stage3`'s slab and its 198- and 67-part terrace models,
+  the decor templates its `TEMPLATES` table names (stage, model name, part count, height), and `MaterialService.Studs`.
+  The ramp's shape above x 3060 in `Config/Olympus.Ramp` comes from its layout, not a measurement. Nothing is saved in
+  a place yet: the user's open Studio holds a preview of it, unsaved.
 - **2026-10-05, the first build**. There is no Roblox place yet. `scripts/build-place.ps1` makes `StealASheep.rbxl`
   from three inputs on disk, so the place can always be rebuilt:
   - **The map**, `vvs_map(commission) (1).rbxl` (the user's commission), as it is. The code expects:
