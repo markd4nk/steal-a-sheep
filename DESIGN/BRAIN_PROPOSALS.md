@@ -7,13 +7,19 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 
 ## Waiting
 
-- **S6** (`BRAIN/PATTERNS/testing-studio.md`): "`generate_mesh` reads `partNames` as one comma-separated string: a JSON
+- **S11** (`BRAIN/GOTCHAS.md`): "Roblox's moderation removes AI-generated limb meshes as if they broke the rules:
+  `generate_mesh` split two characters into head, torso, arms and legs, and within the hour two of the bare-skin limbs
+  (a leg, an arm: smooth skin-coloured tubes with rounded ends) were removed, with a notice to the account. Don't
+  split generated characters into bare limbs; generate them clothed, or whole. The public asset details
+  (`economy.roblox.com/v2/assets/<id>/details`) and Studio's cache still showed the removed meshes as fine, so only the
+  notice tells you." Seen 2026-10-05 making Steal a Sheep's Zeus mock-ups.
+- **S9** (`BRAIN/PATTERNS/testing-studio.md`): "`generate_mesh` reads `partNames` as one comma-separated string: a JSON
   list passed through it keeps its brackets and quotes in the part names (`[\"head\"_geom`). Pass `head, torso, left
   arm`. The result is a Model named after the prompt, one Model per part holding a MeshPart `<part>_geom`, dropped
   far from the map at the camera's focus; the mesh is published to the creator (`publishedAssetId` in the job result),
   so `insert_asset` brings it back later. Run it with `async` and collect with `wait_job_finished`: two in parallel
   took about four minutes." Seen 2026-10-05 making Steal a Sheep's Zeus mock-ups.
-- **S7** (`BRAIN/PATTERNS/testing-studio.md`): "`screen_capture` calls sent in parallel to one Studio time out (two of
+- **S10** (`BRAIN/PATTERNS/testing-studio.md`): "`screen_capture` calls sent in parallel to one Studio time out (two of
   three did); send them one at a time." Seen 2026-10-05.
 - **S1** (`BRAIN/PATTERNS/characters.md`): "PlayerScripts may have no `PlayerModule`: in Studio 2026-10 the default
   control scripts weren't there, so `require(PlayerModule):GetControls():GetMoveVector()` is gone. Read the player's
