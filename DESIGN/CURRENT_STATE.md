@@ -47,10 +47,9 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 - **Gods in rank order** (branch `t3code/order-olympian-gods`, not merged): `Config/Olympus` reordered, new High
   Olympus stretches for the eleven Olympians who moved up. Main (275-stud stretches) merged in, lanes clear, playtested.
   Waiting for the user's OK on the new stretches before merging.
-- **Real god models**: two Zeus mock-ups made with `generate_mesh` (cartoon: asset 84879965895469; heroic:
-  133271949323056), each split into head, torso, arms, legs and bolt so they can take the rig's joints. On hold: Roblox's
-  moderation removed two of the separate limb meshes (cartoon left leg 129905237156670, heroic left arm
-  97427732902021), both bare-skin tubes cut out by the generator's limb split; neither model is usable as it is.
+- **Real god models**: whole, fully clothed gods (the user's pick after Roblox removed two bare limb meshes from the
+  first, limb-split mock-ups). Three Zeus mock-ups, one mesh each: robed cartoon 139815870407251, regal
+  70380155759284, armoured 138543518856627. Waiting for the user's pick and OK before modelling the other 29.
 
 ## Not verified
 
