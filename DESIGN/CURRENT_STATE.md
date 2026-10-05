@@ -62,10 +62,9 @@ lamb.
   Olympus stretches for the eleven Olympians who moved up. Main merged in (Climbing, pens, leaderboards, dropped
   lambs). Waiting for the user's OK on the new stretches before merging.
 - **Real god models**: whole, fully clothed gods (the user's pick after Roblox removed two bare limb meshes). Zeus
-  candidate: asset 136717806015343 (muscular toga, angry, two arms, 5,760 triangles, one 1024 texture) with a neon-block
-  bolt welded in his raised right fist; shown in a playtest in place of the block Zeus (body hidden, mesh welded to
-  the root). The take the user liked first (107258528122394) had a third arm; cutting it out left a ragged stump.
-  Waiting for the user's OK before building it into GodService and modelling the other 29.
+  candidate (the user asked for C's bulk with two arms): asset 121399505965458, tunic, red sash and cape, big arms,
+  5,875 triangles, one 1024 texture, a neon-block bolt welded in his raised right fist; shown in a playtest in place of
+  the block Zeus. Two other bulky takes came out half bare-chested. Waiting for the user's OK.
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
