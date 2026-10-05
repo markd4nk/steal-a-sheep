@@ -14,7 +14,7 @@ export type Data = {
 	WalkerLevel: number,
 	Trails: { [string]: boolean }, -- owned, by Economy.Trails id
 	Trail: string, -- the equipped one, "" for none
-	PenSlots: number, -- earning slots, 3 to 12
+	PenSlots: number, -- how many sheep the pen holds (they earn), 3 to 12
 	Sheep: { [string]: Sheep }, -- every owned sheep by id, equipped or stored
 	NextId: number,
 	Deliveries: { [string]: number }, -- successful deliveries by source tier ("1" to "12")
@@ -59,6 +59,11 @@ local function isWhole(value: any, min: number, max: number): boolean
 	return isNatural(value) and value >= min and value <= max
 end
 
+-- A home spot's coordinate, in studs from the plot's middle (nil: none yet).
+local function isHome(value: any): boolean
+	return value == nil or (type(value) == "number" and value == value and math.abs(value) <= 500)
+end
+
 local function validSheep(id: any, sheep: any): boolean
 	return type(id) == "string"
 		and type(sheep) == "table"
@@ -72,6 +77,8 @@ local function validSheep(id: any, sheep: any): boolean
 		and type(sheep.Locked) == "boolean"
 		and isWhole(sheep.Slot, 0, Economy.MaxPens)
 		and type(sheep.Pinned) == "boolean"
+		and isHome(sheep.HomeX)
+		and isHome(sheep.HomeZ)
 end
 
 local function flags(value: any): boolean

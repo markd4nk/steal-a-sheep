@@ -16,9 +16,13 @@ export type Sheep = {
 	Grown: number, -- seconds it has grown (only while it's in a pen slot)
 	Rank: number, -- merge rank, 0 to 2
 	Locked: boolean,
-	Slot: number, -- its pen slot, 0 when stored
-	Pinned: boolean, -- kept in its slot by Equip Best
+	Slot: number, -- its place in the pen (1 to PenSlots: it stands in the plot and earns), 0 when stored
+	Pinned: boolean, -- kept in the pen by Equip Best
 	Tutorial: boolean?, -- the first lamb, which grows faster
+	-- Where it was put down, in studs from its owner's plot's middle (+X towards the gate): it roams round this spot.
+	-- Nil until it's been put down; such a sheep gets a free spot in the pen.
+	HomeX: number?,
+	HomeZ: number?,
 }
 
 export type Rarity = { Name: string, Multiplier: number, Chance: number, Color: Color3 }

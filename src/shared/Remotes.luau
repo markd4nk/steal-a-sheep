@@ -44,10 +44,13 @@ local Remotes = {
 	) :: Net.Request<(string, string?), (boolean, string?)>,
 	-- Three sheep into one at the Merge Shrine: (ok, message, the new sheep's id).
 	Merge = Net.Request("Merge", { Guard.Array(SHEEP_ID, 3) }, { Count = 4, Window = 1 }) :: Net.Request<({ string }), (boolean, string?, string?)>,
-	-- The shop: the next stair walker, the next pen slot, or a trail by id (bought, or equipped if owned).
+	-- The shop: the next stair walker, room for one more sheep in the pen, or a trail by id (bought, or equipped if
+	-- owned).
 	Buy = Net.Request("Buy", { Guard.OneOf(BUY_ITEMS), Guard.Optional(Guard.String(16)) }, { Count = 8, Window = 1 }) :: Net.Request<(string, string?), (boolean, string?)>,
 	-- Give up a run: the carried sheep goes back to its pasture.
 	ReturnSheep = Net.ToServer("ReturnSheep", {}, { Count = 2, Window = 1 }) :: Net.ToServer<()>,
+	-- Put the carried lamb down here, in the player's own pen: that delivers it (the server checks where they stand).
+	PutDown = Net.ToServer("PutDown", {}, { Count = 4, Window = 1 }) :: Net.ToServer<()>,
 	-- The client's slide state (MovementController): the server checks hits only for sliders it has heard from.
 	Slide = Net.ToServer("Slide", { Guard.Boolean() }, { Count = 20, Window = 1 }) :: Net.ToServer<boolean>,
 }

@@ -15,9 +15,9 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- The gods' wild lambs: four spawns a tier, each rolled once (fleece, burden, and the adult size it will grow to) and
 -- kept until someone delivers it; a failed theft puts the same lamb back. A theft: hold Interact on a lamb, it goes
--- over your head, its god gives chase (GodService), and you either reach your own delivery pad or lose it (caught,
--- dead, reset, left, gave up, blocked at a gate). New players also get one private, Light, ordinary Demeter lamb of
--- their own for the tutorial.
+-- over your head, its god gives chase (GodService), and you either carry it into your own plot and put it down there
+-- (Remotes.PutDown: anywhere inside your fence) or lose it (caught, dead, reset, left, gave up, blocked at a gate).
+-- New players also get one private, Light, ordinary Demeter lamb of their own for the tutorial.
 local WildService = { Name = "WildService" }
 
 type Roll = {
@@ -45,7 +45,7 @@ type Carry = {
 	Started: number,
 }
 
-local DELIVERY_CHECK = 0.1
+local CARRY_CHECK = 0.1
 local WRONG_PLOT_EVERY = 3
 local FALL_Y = -50
 
@@ -168,6 +168,8 @@ local function fill(spawn: Spawn)
 	end
 	model.Name = `Wild_{rolled.Family}`
 	model:SetAttribute("Tier", spawn.Tier)
+	-- Clients graze it like a lamb in a pen (AnimController).
+	model:SetAttribute("Lamb", true)
 	card(model, rolled)
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "StealPrompt"
@@ -209,6 +211,7 @@ end
 
 local function clearAttributes(player: Player)
 	player:SetAttribute("Carrying", false)
+	player:SetAttribute("InPen", nil)
 	player:SetAttribute("CarriedFamily", nil)
 	player:SetAttribute("CarriedScale", nil)
 	player:SetAttribute("CarryTier", nil)
@@ -247,17 +250,20 @@ function WildService.Fail(_self: any, player: Player, reason: string)
 	end
 end
 
-local function deliver(player: Player, carry: Carry)
+-- Put down in the thief's pen at `at`: the lamb joins their flock, hopping down from where it was held.
+local function deliver(player: Player, carry: Carry, at: CFrame)
 	if not endCarry(player) then
 		return
 	end
 	local spawn = carry.Spawn
+	local heldAt: CFrame? = nil
 	if spawn.Model then
+		heldAt = spawn.Model:GetPivot()
 		spawn.Model:Destroy()
 		spawn.Model = nil
 		spawn.Prompt = nil
 	end
-	registry.FlockService:Deliver(player, spawn.Roll)
+	registry.FlockService:Deliver(player, spawn.Roll, at, heldAt)
 	if spawn.Owner then
 		-- The tutorial lamb is a one-off.
 		tutorialSpawns[spawn.Owner] = nil
@@ -357,35 +363,55 @@ local function dropTutorialLamb(player: Player)
 	end
 end
 
+local function rootOf(player: Player): BasePart?
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	return if root and root:IsA("BasePart") then root else nil
+end
+
+-- Thieves who fell off the world lose the lamb; one in their own pen may put it down (InPen, for their client's
+-- prompt and objective); one in someone else's is told so.
 local function checkCarriers()
-	for player, carry in carries do
-		local character = player.Character
-		local root = character and character:FindFirstChild("HumanoidRootPart")
-		if not root or not root:IsA("BasePart") then
+	for player in carries do
+		local root = rootOf(player)
+		if not root then
 			continue
 		end
 		if root.Position.Y < FALL_Y then
 			WildService:Fail(player, "Fell")
 			continue
 		end
-		local plot = registry.PlotService:GetPlot(player)
-		for _, other in registry.PlotService:Plots() do
-			local pad = other.Pieces.Delivery
-			local offset = root.Position - pad.Position
-			if
-				Vector2.new(offset.X, offset.Z).Magnitude <= GameConfig.Theft.DeliverStuds
-				and math.abs(offset.Y) < 10
-			then
-				if other == plot then
-					deliver(player, carry)
-				elseif os.clock() - (wrongPlotAt[player] or 0) > WRONG_PLOT_EVERY then
-					wrongPlotAt[player] = os.clock()
-					notify(player, "That's not your plot! Yours has your name over the gate.", "Bad", "Denied")
-				end
-				break
-			end
+		local here = registry.PlotService:PenAt(root.Position, 0)
+		local home = here ~= nil and here == registry.PlotService:GetPlot(player)
+		if player:GetAttribute("InPen") ~= (if home then true else nil) then
+			player:SetAttribute("InPen", if home then true else nil)
+		end
+		if here and not home and os.clock() - (wrongPlotAt[player] or 0) > WRONG_PLOT_EVERY then
+			wrongPlotAt[player] = os.clock()
+			notify(player, "That's not your plot! Yours has your name over the gate.", "Bad", "Denied")
 		end
 	end
+end
+
+-- The thief asked to put their lamb down (their client shows the prompt inside their own fence): on the floor just in
+-- front of them, kept inside the fence. The server's view of them may be a step behind, so a little outside counts.
+local function putDown(player: Player)
+	local carry = carries[player]
+	local root = rootOf(player)
+	local plot = registry.PlotService:GetPlot(player)
+	if not carry or not root or not plot then
+		return
+	end
+	if registry.PlotService:PenAt(root.Position, -GameConfig.Theft.PutDownSlack) ~= plot then
+		notify(player, "Bring it inside your own fence first", "Bad", "Denied")
+		return
+	end
+	local look = root.CFrame.LookVector * Vector3.new(1, 0, 1)
+	look = if look.Magnitude > 1e-3 then look.Unit else Vector3.xAxis
+	local ahead = root.Position + look * GameConfig.Theft.PutDownAhead
+	local spot = registry.PlotService:ClampToPen(plot, ahead, GameConfig.SheepMotion.WanderFenceGap)
+	-- Facing the way its thief faced, as if set down in front of them.
+	deliver(player, carry, CFrame.lookAt(spot, spot + look))
 end
 
 local function refill()
@@ -487,13 +513,14 @@ function WildService.Start(_self: any)
 	trove:Add(Remotes.ReturnSheep:Connect(function(player: Player)
 		WildService:Fail(player, "Returned")
 	end))
+	trove:Add(Remotes.PutDown:Connect(putDown))
 
 	local sinceCheck = 0
 	local sinceRefill = 0
 	trove:Connect(RunService.Heartbeat, function(dt: number)
 		sinceCheck += dt
 		sinceRefill += dt
-		if sinceCheck >= DELIVERY_CHECK then
+		if sinceCheck >= CARRY_CHECK then
 			sinceCheck = 0
 			checkCarriers()
 		end

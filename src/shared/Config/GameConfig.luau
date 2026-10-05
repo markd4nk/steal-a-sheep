@@ -242,7 +242,12 @@ local GameConfig = {
 		CatchStuds = 3.5,
 		CatchCheckEvery = 0.1,
 		InventoryLimit = 100,
-		DeliverStuds = 9, -- from the delivery pad's centre
+		-- A stolen lamb is delivered when its thief puts it down inside their own plot's fence: PutDownAhead studs in
+		-- front of them, or the nearest clear spot round it. The server allows PutDownSlack studs outside the fence,
+		-- for a client a step ahead of it.
+		PutDownAhead = 4,
+		PutDownSlack = 3,
+		PutDownReach = 12, -- the Put down prompt's reach (it sits on the lamb over the thief's head)
 	},
 
 	Training = {
@@ -274,10 +279,61 @@ local GameConfig = {
 			Sly = "rbxassetid://75523291480618",
 			Seams = "rbxassetid://94306971506667",
 		} :: { [string]: string },
+		-- The faces a grazing sheep chews with, in turn (names in Faces). Blink, eyes shut and savouring, stands in
+		-- until the eating faces are drawn and uploaded.
+		ChewFaces = { "Blink" } :: { string },
 		WoolSpread = 0.5,
 	},
 
+	-- How penned sheep live (the server picks where they walk; each device animates them) and how each device brings
+	-- the nearest MaxAnimatedSheep within AnimationRange to life.
 	SheepMotion = {
+		-- Like Shear a Sheep's pens: a sheep stands about for StrollMinWait to StrollMaxWait seconds (a lamb, which
+		-- mostly grazes, LambStrollMinWait to LambStrollMaxWait), then strolls StrollMinDistance to StrollMaxDistance
+		-- studs any way, staying within RoamRadius of where its owner put it down, inside the fence and clear of the
+		-- plot's trees, hay and stair walker. ChainChance of strolls go on for another leg after a short pause;
+		-- TurnAroundChance of them are only a turn on the spot. A stroll that ends within SheepGap of another of the
+		-- owner's sheep, or off limits, is rolled again, StrollTries times at most.
+		StrollMinWait = 5,
+		StrollMaxWait = 14,
+		LambStrollMinWait = 12,
+		LambStrollMaxWait = 26,
+		StrollMinDistance = 3,
+		StrollMaxDistance = 12,
+		ChainChance = 0.3,
+		ChainPauseMin = 0.5,
+		ChainPauseMax = 1.5,
+		TurnAroundChance = 0.2,
+		TurnAroundSeconds = 0.8,
+		SheepGap = 3.5,
+		StrollTries = 8,
+		RoamRadius = 18,
+		WanderSpeed = 3, -- studs per second it walks
+		EaseSeconds = 0.4, -- it speeds up and slows down over this long at each end of a stroll
+		WanderTurnSeconds = 0.35, -- it turns to face where it's going first
+		WanderFenceGap = 3, -- studs a sheep keeps from the plot's fence
+		StrideStuds = 1.1, -- studs a step covers at rig scale 1: the legs keep in step with the ground
+		-- A lamb put down hops off its carrier's head onto its spot, this long and this many studs above the straight
+		-- line at the top, then hops for joy and looks Happy for HappySeconds.
+		DropHop = {
+			Seconds = 0.45,
+			Height = 2.5,
+		},
+		HappySeconds = 1.2,
+		-- Grazing (SheepClips.Graze): the head goes down to the grass, nibbles for BiteSeconds, comes up and chews for
+		-- ChewSeconds, as many bites as a bout rolls. Lambs graze nearly all the time, a short LambPause between bouts
+		-- (LambGrazeChance of their bouts; the rest they just look about); adults now and then (AdultGrazeChance), with
+		-- AdultPause between whatever they do.
+		BiteSeconds = { 1.6, 2.8 } :: { number },
+		ChewSeconds = { 1.8, 3 } :: { number },
+		BitesPerBout = { 1, 3 } :: { number },
+		LambGrazeChance = 0.9,
+		LambPause = { 0.4, 1.6 } :: { number },
+		AdultGrazeChance = 0.45,
+		AdultPause = { 3, 9 } :: { number },
+		ChewFrameSeconds = 0.22, -- each chew face shows this long, in turn
+		BlinkEvery = { 2.5, 6 } :: { number },
+		BlinkSeconds = 0.13,
 		AnimationRange = 70,
 		MaxAnimatedSheep = 50,
 		BaaEvery = { 6, 16 } :: { number },

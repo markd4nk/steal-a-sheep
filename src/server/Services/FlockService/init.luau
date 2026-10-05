@@ -17,10 +17,11 @@ local Roster = require(script.Roster)
 
 type Sheep = Economy.Sheep
 
--- A player's flock: delivering stolen lambs, pen slots, income and growth every second, offline credit on join, the
--- Sheepdex's first-delivery rewards, Equip Best, locking, selling, the Merge Shrine, and the snapshot each client
--- shows (Remotes.State). Every change to the flock and its coins happens here in one go, with no yields, so a save
--- never catches half of it.
+-- A player's flock: delivering stolen lambs (put down in the pen), how many the pen holds, the sheep living in the
+-- plot (Pens: where each stands and strolls), income and growth every second, offline credit on join, the Sheepdex's
+-- first-delivery rewards, Equip Best, locking, selling, the Merge Shrine, and the snapshot each client shows
+-- (Remotes.State). Every change to the flock and its coins happens here in one go, with no yields, so a save never
+-- catches half of it.
 local FlockService = {
 	Name = "FlockService",
 	-- A sheep reached its owner's plot: (player, the new sheep).
@@ -35,20 +36,31 @@ export type Wild = {
 	Tutorial: boolean?,
 }
 
+-- A sheep about to appear in the pen: where its owner put it down and where it hops in from (their head), or
+-- neither for one coming out of storage, which hops in where it lived before.
+type Arrival = {
+	At: CFrame?,
+	From: CFrame?,
+}
+
 type PlayerState = {
 	Shown: { [string]: Pens.Shown },
+	Arrivals: { [string]: Arrival },
 	Dirty: boolean,
 	Offline: { Coins: number, Matured: number }?,
 	Unlocked: number,
 }
 
 local TICK = 1
+local WANDER_CHECK = 0.25 -- seconds between passes over every penned sheep: strolls due, and where strollers are
 local PEN_FOLDER = "PenSheep"
+local HOP_IN_HEIGHT = 3 -- studs above its spot a sheep out of storage hops in from
 
 local registry: Lifecycle.Registry = {}
 local trove = Trove.new()
 local states: { [Player]: PlayerState } = {}
 local penFolder: Folder? = nil
+local random = Random.new()
 
 local function dataOf(player: Player): any
 	return registry.DataService:GetData(player)
@@ -139,8 +151,49 @@ local function push(player: Player)
 	Remotes.State:Fire(player, snapshot)
 end
 
--- Builds, moves and removes the models on the owner's pads to match their flock.
-local function refreshPen(player: Player)
+local function build(family: string, rarity: number, scale: number): Model?
+	return registry.SheepService:Build(family, rarity, scale)
+end
+
+-- What Pens needs to know about a plot's ground.
+local function groundOf(plot: any): Pens.Ground
+	return {
+		CanStand = function(position: Vector3, radius: number): boolean
+			return registry.PlotService:CanStand(plot, position, radius)
+		end,
+		PathClear = function(from: Vector3, to: Vector3, radius: number): boolean
+			return registry.PlotService:PathClear(plot, from, to, radius)
+		end,
+	}
+end
+
+-- Where a sheep coming into the pen stands: where it was put down, else where it lived before (its home), else any
+-- clear spot; moved to the nearest clear spot if another sheep or the decor is in the way.
+local function arrivalSpot(state: PlayerState, plot: any, ground: Pens.Ground, sheep: Sheep, at: CFrame?): CFrame
+	local scale = Pens.Scale(sheep)
+	local turn = CFrame.Angles(0, random:NextNumber(0, 2 * math.pi), 0)
+	local landed = if at then Pens.Landing(state.Shown, ground, at, scale) else nil
+	if not landed and sheep.HomeX and sheep.HomeZ then
+		local home = registry.PlotService:ToWorld(plot, sheep.HomeX, sheep.HomeZ)
+		landed = Pens.Landing(state.Shown, ground, CFrame.new(home) * turn, scale)
+	end
+	if not landed then
+		local pen: BasePart = plot.Pieces.Pen
+		local half = pen.Size / 2
+		landed = Pens.FreeSpot(state.Shown, ground, function(): Vector3
+			local inside = pen.CFrame:PointToWorldSpace(
+				Vector3.new(random:NextNumber(-half.X, half.X), 0, random:NextNumber(-half.Z, half.Z))
+			)
+			return Vector3.new(inside.X, plot.Origin.Y, inside.Z)
+		end, scale)
+	end
+	-- A pen with no clear spot at all (never in practice): where it was asked to go, or the middle.
+	return landed or at or CFrame.new(plot.Origin.Position) * turn
+end
+
+-- Builds, grows and removes the models in the owner's pen to match their flock. `arriving`: sheep that appear now
+-- (out of storage, a merge's result) hop in rather than just being there, as on a join.
+local function refreshPen(player: Player, arriving: boolean?)
 	local state = states[player]
 	local data = dataOf(player)
 	local plot = registry.PlotService:GetPlot(player)
@@ -148,6 +201,7 @@ local function refreshPen(player: Player)
 	if not state or not data or not plot or not folder then
 		return
 	end
+	local now = workspace:GetServerTimeNow()
 	local wanted: { [string]: Sheep } = {}
 	for id, sheep in data.Sheep do
 		if Roster.IsEquipped(sheep, data.PenSlots) then
@@ -156,27 +210,49 @@ local function refreshPen(player: Player)
 	end
 	for id, shown in state.Shown do
 		local sheep = wanted[id]
-		local slot = sheep and shown.Model:GetAttribute("Slot")
-		if not sheep or slot ~= sheep.Slot or not Pens.Update(shown, sheep) then
+		if
+			not sheep
+			or (
+				not Pens.Update(shown, sheep, now)
+				and not Pens.Rebuild(shown, sheep, player.UserId, folder, build, now)
+			)
+		then
 			shown.Model:Destroy()
 			state.Shown[id] = nil
 		end
 	end
+	local ground = groundOf(plot)
 	for id, sheep in wanted do
-		if not state.Shown[id] then
-			local at = registry.PlotService:SlotCFrame(plot, sheep.Slot)
-			if at then
-				local shown = Pens.Show(sheep, at, player.UserId, folder, function(family, rarity, scale)
-					return registry.SheepService:Build(family, rarity, scale)
-				end)
-				if shown then
-					shown.Model:SetAttribute("Slot", sheep.Slot)
-					state.Shown[id] = shown
-				end
-			end
+		if state.Shown[id] then
+			continue
+		end
+		local arrival = state.Arrivals[id]
+		state.Arrivals[id] = nil
+		local at = arrivalSpot(state, plot, ground, sheep, if arrival then arrival.At else nil)
+		local from = if arrival and arrival.From
+			then arrival.From
+			elseif arrival or arriving then at + Vector3.new(0, HOP_IN_HEIGHT, 0)
+			else nil
+		local shown = Pens.Show(sheep, at, player.UserId, folder, build, from)
+		if shown then
+			state.Shown[id] = shown
+			sheep.HomeX, sheep.HomeZ = registry.PlotService:ToLocal(plot, at.Position)
 		end
 	end
-	registry.PlotService:Refresh(player, data.PenSlots, data.WalkerLevel, Roster.Income(data.Sheep, data.PenSlots))
+	table.clear(state.Arrivals)
+	registry.PlotService:Refresh(player, data.WalkerLevel, Roster.Income(data.Sheep, data.PenSlots))
+end
+
+-- Every penned sheep's strolls (Pens.Wander).
+local function wander()
+	local now = workspace:GetServerTimeNow()
+	for player, state in states do
+		local data = dataOf(player)
+		local plot = registry.PlotService:GetPlot(player)
+		if data and plot and next(state.Shown) then
+			Pens.Wander(state.Shown, data.Sheep, groundOf(plot), now)
+		end
+	end
 end
 
 local function clearPen(player: Player)
@@ -238,8 +314,13 @@ local function settleOffline(player: Player, data: any)
 end
 
 local function onLoaded(player: Player, data: any)
-	states[player] =
-		{ Shown = {}, Dirty = true, Offline = nil, Unlocked = Economy.Unlocked(data.ClimbPower, data.Deliveries) }
+	states[player] = {
+		Shown = {},
+		Arrivals = {},
+		Dirty = true,
+		Offline = nil,
+		Unlocked = Economy.Unlocked(data.ClimbPower, data.Deliveries),
+	}
 	Roster.Normalize(data.Sheep, data.PenSlots)
 	settleOffline(player, data)
 	data.LastSeen = os.time()
@@ -312,12 +393,18 @@ function FlockService.Start(_self: any)
 	end)
 
 	local elapsed = 0
+	local sinceWander = 0
 	trove:Connect(RunService.Heartbeat, function(dt: number)
 		elapsed += dt
+		sinceWander += dt
 		if elapsed >= TICK then
 			local step = elapsed
 			elapsed = 0
 			tick(step)
+		end
+		if sinceWander >= WANDER_CHECK then
+			sinceWander = 0
+			wander()
 		end
 		for player, state in states do
 			if state.Dirty then
@@ -367,8 +454,10 @@ function FlockService.Income(_self: any, player: Player): number
 	return if data then Roster.Income(data.Sheep, data.PenSlots) else 0
 end
 
--- A stolen lamb reaches its owner's delivery pad: it joins the flock, in a free pen slot if there is one.
-function FlockService.Deliver(_self: any, player: Player, wild: Wild): Sheep?
+-- A stolen lamb is put down in its owner's pen: it joins the flock, standing at `at` (or the nearest clear spot) after
+-- hopping down from `from` (where it was held), if the pen has room; stored if not. Without `at` (Studio's GiveSheep)
+-- it appears on a free spot.
+function FlockService.Deliver(_self: any, player: Player, wild: Wild, at: CFrame?, from: CFrame?): Sheep?
 	local data = dataOf(player)
 	local tier = Olympus.ByFamily[wild.Family]
 	if not data or not tier then
@@ -395,7 +484,11 @@ function FlockService.Deliver(_self: any, player: Player, wild: Wild): Sheep?
 	data.Deliveries[key] = (data.Deliveries[key] or 0) + 1
 
 	local name = Economy.Name(sheep)
+	local state = states[player]
 	if slot then
+		if state then
+			state.Arrivals[id] = { At = at, From = from }
+		end
 		notify(player, `{name} is home! +{Format.Rate(Economy.Income(sheep))}/s`, "Good", "Coin")
 	else
 		notify(player, "Stored - not earning. Your pen is full.", "Bad", "Notice")
@@ -471,14 +564,14 @@ function FlockService.Act(_self: any, player: Player, action: string, id: string
 	end
 	local ok, message = act(player, data, action, id)
 	if ok then
-		refreshPen(player)
+		refreshPen(player, true)
 		push(player)
 	end
 	return ok, message
 end
 
 -- The Merge Shrine: three unlocked adults of one family, fleece and rank into one of the next rank, saved as one
--- change. If any of them was in the pen, the result takes the first of their slots.
+-- change. If any of them was in the pen, the result takes its place there and hops in where it lived.
 function FlockService.Merge(_self: any, player: Player, ids: { string }): (boolean, string?, string?)
 	local data = dataOf(player)
 	if not data then
@@ -507,6 +600,7 @@ function FlockService.Merge(_self: any, player: Player, ids: { string }): (boole
 	for _, sheep in inputs do
 		if Roster.IsEquipped(sheep, data.PenSlots) and (slot == 0 or sheep.Slot < slot) then
 			slot = sheep.Slot
+			result.HomeX, result.HomeZ = sheep.HomeX, sheep.HomeZ
 		end
 	end
 	for _, sheep in inputs do
@@ -517,7 +611,7 @@ function FlockService.Merge(_self: any, player: Player, ids: { string }): (boole
 	result.Id = id
 	result.Slot = slot
 	data.Sheep[id] = result
-	refreshPen(player)
+	refreshPen(player, true)
 	push(player)
 	return true, `{Economy.Name(result)}! +{Format.Rate(Economy.Income(result))}/s`, id
 end

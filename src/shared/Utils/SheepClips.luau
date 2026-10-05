@@ -1,9 +1,8 @@
 --!strict
 
--- The sheep's later animations (Shake, HappyHop, Scared, Struggle, LieDown) and the idle's readable layer, as pure
--- functions of time: each fills in a Motor6D transform per joint. Clients play them procedurally on top of the
--- Animator (SheepController/Procedural) until a published id is set in GameConfig.AnimationIds, and
--- studio/BuildSheepClips.luau bakes the same motion into Animation Editor drafts to polish and publish.
+-- The sheep's motion as pure functions of time, from Shear a Sheep (Shake, HappyHop, Scared, Struggle, LieDown, the
+-- idle's readable layer, the carried sway) plus this game's walk and graze: each fills in a Motor6D transform per
+-- joint, and AnimController plays them procedurally on every device.
 --
 -- Joint frames as in studio/BuildSheepAnimations.luau: +X rotation lifts a head or swings a leg forward, Y turns,
 -- Z rolls sideways; Body moving up is the whole sheep rising, since Root never moves.
@@ -171,6 +170,107 @@ function SheepClips.Carried(t: number, velocity: Vector3, pose: Pose)
 		local current = pose[name]
 		pose[name] = if current then current * swing else swing
 	end
+end
+
+local function add(pose: Pose, name: string, offset: CFrame)
+	local current = pose[name]
+	pose[name] = if current then current * offset else offset
+end
+
+-- Walking (Steal a Sheep's pens): legs swinging in diagonal pairs, the body bobbing and rolling a little with each
+-- step, the head nodding, the tail swaying. `phase` counts walk cycles (two steps each), so the caller keeps the legs
+-- in step with the ground; `pace` (0 to 1) blends it in and out; `scale` is the model's, for the bob's height.
+-- Layered on top of whatever the pose holds.
+function SheepClips.Walk(phase: number, pace: number, scale: number, pose: Pose)
+	if pace <= 0 then
+		return
+	end
+	local swing = math.sin(phase * TAU)
+	local lift = math.abs(swing)
+	add(pose, "Body", CFrame.new(0, 0.05 * lift * pace * scale, 0) * roll(2.5 * swing * pace))
+	add(pose, "Head", tip(4 * math.sin(phase * TAU * 2) * pace))
+	add(pose, "LegFL", tip(30 * swing * pace))
+	add(pose, "LegBR", tip(30 * swing * pace))
+	add(pose, "LegFR", tip(-30 * swing * pace))
+	add(pose, "LegBL", tip(-30 * swing * pace))
+	add(pose, "Tail", turn(12 * swing * pace))
+end
+
+-- A grazing bout: `count` times the head goes down to the grass (GRAZE_DOWN), nibbles and tugs at it for `bite`
+-- seconds, comes up a little (GRAZE_UP) and chews for `chew` seconds, its head working from side to side; then it
+-- stands up again (GRAZE_END). Body and front tip forward so the nose reaches the ground, the legs staying upright.
+export type Bout = {
+	Bite: number,
+	Chew: number,
+	Count: number,
+}
+
+local GRAZE_DOWN = 0.55
+local GRAZE_UP = 0.45
+local GRAZE_END = 0.5
+local CHEW_LEVEL = 0.3 -- how far down the head stays while it chews (1 is nose in the grass)
+local GRAZE_HEAD = 72 -- degrees the head tips down at the grass
+local GRAZE_BODY = 9 -- degrees the body tips forward
+local CHEW_RATE = 2.4 -- chews a second
+
+function SheepClips.GrazeLength(bout: Bout): number
+	return bout.Count * (GRAZE_DOWN + bout.Bite + GRAZE_UP + bout.Chew) + GRAZE_END
+end
+
+-- Where in a bout `t` is: how far down the head is (0 standing, 1 at the grass), and "Bite" or "Chew" while it's
+-- doing that (nil moving between, and after the end).
+function SheepClips.GrazeStage(bout: Bout, t: number): (number, string?)
+	local cycle = GRAZE_DOWN + bout.Bite + GRAZE_UP + bout.Chew
+	local body = bout.Count * cycle
+	if t < 0 then
+		return 0, nil
+	elseif t >= body then
+		return CHEW_LEVEL * (1 - smooth((t - body) / GRAZE_END)), nil
+	end
+	local index = math.floor(t / cycle)
+	local into = t - index * cycle
+	local before = if index == 0 then 0 else CHEW_LEVEL
+	if into < GRAZE_DOWN then
+		return before + (1 - before) * smooth(into / GRAZE_DOWN), nil
+	end
+	into -= GRAZE_DOWN
+	if into < bout.Bite then
+		return 1, "Bite"
+	end
+	into -= bout.Bite
+	if into < GRAZE_UP then
+		return 1 - (1 - CHEW_LEVEL) * smooth(into / GRAZE_UP), nil
+	end
+	return CHEW_LEVEL, "Chew"
+end
+
+-- The bout's pose at `t`, `weight` (0 to 1) of it (for fading out a bout cut short), layered on top of the pose.
+-- Returns how far down the head is, for the idle to make way.
+function SheepClips.Graze(bout: Bout, t: number, weight: number, pose: Pose): number
+	local level, stage = SheepClips.GrazeStage(bout, t)
+	level *= weight
+	if level <= 0 then
+		return 0
+	end
+	local nibble = 0
+	local sweep = 0
+	if stage == "Bite" then
+		-- Quick tugs at the grass, the head sweeping slowly along it.
+		nibble = 7 * math.abs(math.sin(t * TAU * 2.2)) * weight
+		sweep = 12 * math.sin(t * TAU * 0.4) * weight
+	end
+	local chew = 0
+	if stage == "Chew" then
+		chew = math.sin(t * TAU * CHEW_RATE) * weight
+	end
+	add(pose, "Body", tip(-GRAZE_BODY * level))
+	for _, leg in { "LegFL", "LegFR", "LegBL", "LegBR" } do
+		add(pose, leg, tip(GRAZE_BODY * level))
+	end
+	add(pose, "Head", turn(sweep) * tip(-GRAZE_HEAD * level + nibble + 2.5 * math.abs(chew)) * roll(5 * chew))
+	add(pose, "EarL", roll(-14 * level))
+	add(pose, "EarR", roll(14 * level))
+	return level
 end
 
 function SheepClips.Idle(t: number, seed: number, weight: number, pose: Pose)
