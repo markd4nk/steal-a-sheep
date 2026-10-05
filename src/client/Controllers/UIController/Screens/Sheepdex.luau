@@ -78,7 +78,7 @@ function Sheepdex.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			view:ClearAllChildren()
 		end
 		lines[1].Text = `{tier.God}'s {tier.Area}`
-		lines[2].Text = `Climb Power {Format.Short(tier.Reach)} to reach`
+		lines[2].Text = `Climbing {Format.Short(tier.Reach)} to reach`
 		lines[3].Text = if found
 			then `Found! Rewarded {Format.Short(Economy.DexReward(tier.Tier))} cash`
 			else `First one pays {Format.Short(Economy.DexReward(tier.Tier))} cash`

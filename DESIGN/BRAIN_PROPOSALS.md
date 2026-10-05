@@ -39,9 +39,18 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 - **S8** (`BRAIN/PATTERNS/sessions.md`, Tools on Windows): "Claude Code's Bash tool fails a heredoc whose body has
   backticks ('unexpected EOF while looking for matching'), even with a quoted delimiter: write such files with the
   Write or Edit tools." Seen twice on 2026-10-05.
+- **S9** (`BRAIN/PATTERNS/sessions.md`): "After `git merge`, list what's still conflicted with
+  `git diff --name-only --diff-filter=U` before you commit: a merge's output piped through `tail` hides some of its
+  CONFLICT lines, and `check.ps1` doesn't look for conflict markers in Markdown, so they get committed." Seen
+  2026-10-05 in Steal a Sheep: DECISIONS.md and CURRENT_STATE.md went in with markers after only HISTORY.md was fixed.
+  (Could also become a `check.ps1` test: fail on lines starting `<<<<<<<` or `>>>>>>>` in tracked text files.)
+- **S10** (`BRAIN/PATTERNS/characters.md`): "Humanoids hold up at high WalkSpeed: 245 studs/s up a 7-12 degree ramp and
+  slides of 200-260 down 12-29 degrees stayed on the floor (0 samples below it, 2 of 179 in the air), but anything they
+  clip at 150+ stops them dead. Give a fast movement a short rise (here: reach the target in about 2 s) rather than a
+  fixed acceleration, or high targets take ten seconds to reach." Seen 2026-10-05 playtesting Steal a Sheep's Climbing.
 - **S13** (`BRAIN/PATTERNS/leaderboards.md`, Store): "An OrderedDataStore holds whole numbers below 2^63, and an
   exponential economy's numbers head past that (Steal a Sheep: a full pen at the top earns about 5e14 cash a second,
-  and Climb Power passes 1e15; Luau is exact only to 2^53 anyway). Store `math.floor(math.log10(1 + value) * 1e13)`
+  and its Climbing stat passes 1e15; Luau is exact only to 2^53 anyway). Store `math.floor(math.log10(1 + value) * 1e13)`
   instead: the order holds, it stays under 2^53 up to 1e300, and `math.floor(10 ^ (stored / 1e13) - 1 + 0.5)` gives
   whole numbers back exactly below about 2e12 and to twelve digits above." Seen 2026-10-05 building Steal a Sheep's
   boards.

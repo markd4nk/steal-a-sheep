@@ -18,7 +18,7 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   Earned for This Server (the richest here) next to Top Income (the richest overall, best ever); the look is OK; drop
   the icon, words only.
   - *LeaderboardService* (folder): `Boards` (the four rankings, in the order of the boards sorted by z: This Server,
-    Top Income, Most Steals, Climb Power), `Score` (store encoding and the merge), `Face` (the screen). Each board gets
+    Top Income, Most Steals, Climbing), `Score` (store encoding and the merge), `Face` (the screen). Each board gets
     an upright invisible part just in front of its panel with a SurfaceGui (50 px a stud), since the map's panels lie
     on their side. Every 5 s it measures each loaded player's values (their best this session; This Server takes
     their income now) and redraws the boards from the store's top 10 merged with this server's players. This Server
@@ -35,7 +35,41 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     DataStores the boards say "This server" and the console has one line saying so. After debug Climb Power and three
     sheep, all four boards showed the player within 5 s, matching the player list (2.38K/s, 48K); after selling the
     best sheep, This Server read 854/s and Top Income kept 2.38K/s. Screenshots of both pairs, words-only titles, with
-    sample rows filled in on the client. Store writes and reads weren't run (unpublished place).
+    sample rows filled in on the client. Store writes and reads weren't run (unpublished place). Merging main
+    (Climbing) retitled the last board CLIMBING, as everything on screen now says.
+
+- **Climbing: one stat, no walls (2026-10-05)**. The user asked how chaser speed worked, then: climbing and speed
+  should be one thing called Climbing; the steeper the slope the less it works, so going higher needs almost
+  exponentially more; you can still climb when far too weak, just painfully slowly ("crawl", not slip back), and that
+  slowness gets you caught on the way down. Walls removed completely, no delivery lock, no god lunge. For the gods
+  they chose a fixed speed like Steal an Egg's and asked for it to be checked: guides say each zone has its own,
+  faster guardian that never scales with the player, and you escape with enough Speed over the zone's minimum. Ours
+  already did that, so `GodService` is unchanged.
+  How it works: `Economy.ClimbShare` (Climbing / (Climbing + Reach)), `Mountain.ClimbSpeedAt` (18 studs/s times that,
+  at least `Movement.CrawlSpeed` 1), `MovementController` caps the uphill part of a walk to it,
+  `MountainService` keeps a per-player ceiling rising at that speed (x1.3, with 10 studs or 1 s of lead) and puts
+  anyone above it back. `Economy.CarryMultiplier` keeps falling below Reach (to `UnderTrainedFloor` 0.45 of the
+  burden's first value). `Economy.ClimbTier` (highest Reach held) replaces `Unlocked` for HUD goals, the training
+  meter, Royal-lamb notices and the "in reach" notice. Gates became `TierSigns`. Every "Climb Power" on screen now
+  says "Climbing"; the saved field stays `ClimbPower`.
+  Then, after a napkin-maths explanation, the user made the chase "your speed vs its speed" like Steal an Egg: one set
+  speed per god for the whole chase (`Economy.GodSpeed`, 0.8 x the tier's `SlideSpeed`), no god walking speed, and
+  the escape speed from Climbing (`Economy.EscapeSpeed`, with burden weights replacing the old Carry tables), set when
+  a slide starts and kept all the way down because momentum carries you (`MovementController` slideTarget).
+  `Mountain.SlideSpeedAt` and the under-trained floor went. The carry card shows "you N, god N".
+  Then, wanting as few numbers as possible, the user settled on one rule: your ratio is Climbing / (sign x lamb weight),
+  your speed is the ratio below 1 and +1x per 4x above, no cap on the mountain, 7x for walking in the safe zone, tier 1
+  never below normal; the sign is just enough for the lightest lamb, an average one leaving about 95%. Weight became
+  hidden and a smooth range, saved with the sheep and tilting (not deciding) adult size; the Light/Stout/Heavy words
+  and the carry card's speeds went. The Merge Shrine session asked for the weight interface: `Economy.RollWeight(random,
+  luck)`, `SizeOdds(weight)`, `RollSize`, `LambScale`, a placeholder Titan size. Schema 2 migrates Burden to Weight.
+  `Mountain.SpeedAt` replaced `ClimbSpeedAt`; slides now reach their speed in about 2 s.
+  Checked: `check.ps1`; 40 of 40 tests in Studio; a playtest in StealASheep.rbxl with this branch's scripts swapped in
+  (main's put back after, not saved): the server put a client teleport to x 900 back to x 235; tier 3 uphill at 0,
+  200, 800 and 12,800 Climbing measured 1.0, 4.4, 17.6 and ~54 studs/s; chases on tier 3 (god 25.6) with a 1.03
+  lamb: caught at 200, escaped at 800 (24.9, god 39 studs behind), easy at 3,200 (50.7); at 1e9 Climbing walking on
+  the plots stopped at 126, uphill ran 245 with no airborne samples, slides of 200-260 stayed on the floor; the carry
+  card shows only the lamb's name. Console clean.
 
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9

@@ -60,7 +60,7 @@ local Boards: { Board } = {
 	},
 	{
 		Id = "Climb",
-		Title = "CLIMB POWER",
+		Title = "CLIMBING",
 		Color = Color.Gold300,
 		Value = function(_registry, _player, data)
 			return math.floor(data.ClimbPower)

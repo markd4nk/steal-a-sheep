@@ -34,6 +34,7 @@ here. Newest first.
     `<Build>Wool` and `<Build>Extras`), `WorldKit.MutationMachine` (the Merge Shrine; a primitive altar if missing).
   - **The code**, from `rojo build default.project.json`.
 - Made at runtime (not in the place): `workspace.Plots`, `Gods`, `WildSheep`, `CarriedSheep`, `PenSheep`,
-  `ClimbGates`, `Stations`, `ReplicatedStorage.SheepLooks`, the leaderboards' screens, every ScreenGui.
+  `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`, `ReplicatedStorage.SheepLooks`, the leaderboards' screens,
+  every ScreenGui.
 - Before publishing: set Maximum Visitor Count to 5 (one player a plot) in Creator Hub, turn on Studio access to API
   services for saving, and publish under the account that owns Shear a Sheep's assets.

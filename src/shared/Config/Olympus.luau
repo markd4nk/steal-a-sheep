@@ -5,7 +5,7 @@
 -- steeper (2, 7, 12, 17, 22, 29 and 31 degrees), long stages holding two or three tiers, gods ordered to fit each
 -- stage's theme (meadow, bamboo, snow, lava, rose garden, marble temple, golden cloud path). Above its old summit,
 -- High Olympus (tools/UpperMountain.luau, built into the place) carries on with one stretch a god, 32 degrees rising
--- to 52, up to Zeus's throne. Every tier keeps its numbers in order (reach threshold, income), so swapping two gods is
+-- to 52, up to Zeus's throne. Every tier keeps its numbers in order (Reach, income), so swapping two gods is
 -- a matter of swapping their rows' names and looks.
 
 export type Tier = {
@@ -14,10 +14,10 @@ export type Tier = {
 	Area: string,
 	Family: string, -- GameConfig.Breeds key
 	FamilyName: string,
-	Reach: number, -- Climb Power to climb into this tier
+	Reach: number, -- the Climbing this tier needs: normal speed on its slope, the god's speed with its lightest lamb
 	XStart: number, -- the tier's gate on the ramp (studs along +X)
 	XEnd: number,
-	SlideSpeed: number, -- an empty-handed slide's target speed on this stretch
+	SlideSpeed: number, -- its god runs at 0.8 of this (Economy.GodSpeed)
 	-- The god's primitive look.
 	Robe: Color3,
 	Skin: Color3,
@@ -34,7 +34,7 @@ local tiers: { Tier } = {
 		Area = "Foothill Meadow",
 		Family = "Meadow",
 		FamilyName = "Meadow Sheep",
-		Reach = 0,
+		Reach = 25,
 		XStart = 330,
 		XEnd = 580,
 		SlideSpeed = 24,
@@ -535,8 +535,6 @@ local Olympus = {
 	-- Where on its tier a god's pasture sits: from this share of the tier's length to its top.
 	PastureFrom = 0.45,
 	SpawnsPerTier = 4,
-	GateHeight = 140,
-	GateWidth = 700, -- z, wide enough to cover every stage's side terraces
 }
 
 return table.freeze(Olympus)

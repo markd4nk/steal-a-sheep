@@ -159,7 +159,7 @@ local function buy(player: Player, item: string, which: string?): (boolean, stri
 		registry.DataService:Replicate(player)
 		registry.FlockService:Push(player)
 		return true,
-			`Stair walker level {data.WalkerLevel + 1}: +{Format.Short(Economy.WalkerRate(data.WalkerLevel))} Climb Power/s`
+			`Stair walker level {data.WalkerLevel + 1}: +{Format.Short(Economy.WalkerRate(data.WalkerLevel))} Climbing/s`
 	elseif item == "PenSlot" then
 		local slot = data.PenSlots + 1
 		local cost = Economy.PenCost(slot)

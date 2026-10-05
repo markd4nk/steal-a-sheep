@@ -33,8 +33,8 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
 - **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
-  Top Income, Most Steals and Climb Power (top 10 across all servers, this server's players drawn in live):
-  `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climb.
+  Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
+  `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
 
 - **Server**: `DataService`, `PurchaseService` (pack, no products), `SheepService`, `PlotService`, `FlockService`,
   `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
@@ -43,12 +43,15 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
   `Utils/Economy` (every formula), `Utils/Mountain` (ramp height, tiers by position, floor checks).
+- **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
+  gods at one set speed; weight saved and tilting size odds (`Economy.RollWeight`, `SizeOdds`, for the Merge Shrine).
+  GAME_DESIGN.md, *Climbing* and *Lamb weight*.
 - **From Shear a Sheep**: UIKit, Theme, Style (trimmed), Panel, Buttons, Motion, Scale, the sheep rig, add-ons and
   breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds, the Mutation Machine (as the Merge Shrine).
 
 ## In progress
 
-- Nothing. High Olympus is merged into main; DECISIONS.md's *To review* lists its calls.
+- Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
 
@@ -59,10 +62,15 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   rejoin and session locking are untested (the offline maths is unit-tested).
 - **Touch and gamepad**: only keyboard and mouse in Studio. Prompts, HUD buttons and the slide use Roblox's own input.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
+- **Climbing in play**: playtested 2026-10-05 on tiers 1-3 and 6 with one player (TESTING.md); not on tiers 13-30,
+  not with two players, not on touch or gamepad.
+- **Escape speed isn't checked by the server**: a client could slide faster than its escape speed. The uphill check
+  only stops climbing too fast.
 - **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's
-  plaza). By the numbers it's about 7.6 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope).
+  plaza). By the numbers it's about 7.6 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope) at normal speed;
+  far under a tier's sign it's about 4 minutes a stretch.
 - **High Olympus theft to delivery**: a tier-30 slide was measured through all eighteen stretches (no hops, Zeus
-  falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; gates there weren't walked into.
+  falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; and the climb speed check wasn't tried there.
 
 ## Known issues
 
@@ -73,6 +81,8 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 - **Long runs at the top**: about 7.6 minutes' climb to Zeus and about 2.5 minutes' slide home; the user keeps it all on
   foot (DECISIONS.md).
 - **High Olympus is sparse**: the user will add obstacles to the higher levels later.
+- **Very fast slides meet the trees hard**: at 150+ studs/s a slide that clips a tree stops dead and its god catches
+  up (seen at x 944 on tier 3). Same decor issue, felt more at high speed.
 - **Plots: 5.** A sixth player is kicked with "server full"; set Maximum Visitor Count to 5 in Creator Hub.
 - **Asset ownership**: the sheep meshes, faces, UI images and sounds are Shear a Sheep's uploads (Mark's account).
   They load if this game is published under the same owner.
