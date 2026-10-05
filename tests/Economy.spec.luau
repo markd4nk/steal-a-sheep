@@ -96,18 +96,18 @@ return function(t: Run.Suite)
 	end)
 
 	t.Test("escape speed: Climbing against the lamb's Reach and weight, the god at 0.8 of the top", function()
-		-- Demeter's lambs are always full speed.
+		-- Tier 1's lambs are always full speed.
 		t.Expect(Economy.EscapeShare(0, 1, 1.6)).ToBe(1)
 		t.Expect(Economy.EscapeShare(0, 2, 1)).ToBe(0)
 		-- Level with the god at 0.8 x Reach x weight, a little faster at Reach x weight.
-		local aphrodite = Olympus.Tiers[6]
-		t.Expect(near(Economy.EscapeSpeed(0.8 * aphrodite.Reach, 6, 1), Economy.GodSpeed(6))).ToBe(true)
-		t.Expect(near(Economy.EscapeSpeed(0.8 * aphrodite.Reach * 1.6, 6, 1.6), Economy.GodSpeed(6))).ToBe(true)
-		t.Expect(Economy.EscapeSpeed(aphrodite.Reach, 6, 1) > Economy.GodSpeed(6)).ToBe(true)
-		t.Expect(Economy.EscapeSpeed(aphrodite.Reach, 6, 1.6) < Economy.GodSpeed(6)).ToBe(true)
+		local tier6 = Olympus.Tiers[6]
+		t.Expect(near(Economy.EscapeSpeed(0.8 * tier6.Reach, 6, 1), Economy.GodSpeed(6))).ToBe(true)
+		t.Expect(near(Economy.EscapeSpeed(0.8 * tier6.Reach * 1.6, 6, 1.6), Economy.GodSpeed(6))).ToBe(true)
+		t.Expect(Economy.EscapeSpeed(tier6.Reach, 6, 1) > Economy.GodSpeed(6)).ToBe(true)
+		t.Expect(Economy.EscapeSpeed(tier6.Reach, 6, 1.6) < Economy.GodSpeed(6)).ToBe(true)
 		t.Expect(near(Economy.EscapeShare(100, 2, 1), 1 / 1.2)).ToBe(true)
 		t.Expect(near(Economy.CarryShare(3, 100, 2), 100 / 132)).ToBe(true)
-		t.Expect(near(Economy.GodSpeed(6), aphrodite.SlideSpeed * 0.8)).ToBe(true)
+		t.Expect(near(Economy.GodSpeed(6), tier6.SlideSpeed * 0.8)).ToBe(true)
 	end)
 
 	t.Test("income: lamb share, fleece, size and merge rank", function()
@@ -185,7 +185,7 @@ return function(t: Run.Suite)
 		t.Expect(capped).ToBe(7200 * 2 * 0.25)
 	end)
 
-	t.Test("a slope's climb share is Climbing / (Climbing + Reach), full on Demeter's meadow", function()
+	t.Test("a slope's climb share is Climbing / (Climbing + Reach), full on tier 1", function()
 		t.Expect(Economy.ClimbShare(0, 1)).ToBe(1)
 		t.Expect(Economy.ClimbShare(0, 2)).ToBe(0)
 		t.Expect(Economy.ClimbShare(100, 2)).ToBe(0.5)

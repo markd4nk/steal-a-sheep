@@ -81,14 +81,14 @@ two or more is a crawl: possible, but nobody wants to. Moving across the slope i
 Like Steal an Egg: every god has **one set speed** for the whole chase, and the thief's **escape speed comes from
 Climbing**. A slide's speed is set when it starts and kept all the way down (momentum: lower stretches don't slow it).
 
-- God: `0.8 x its tier's top slide speed` (Olympus `SlideSpeed`, 24 at Demeter up to 60 at Zeus), so 19 to 48.
+- God: `0.8 x its tier's top slide speed` (Olympus `SlideSpeed`, 24 at tier 1 up to 60 at tier 30), so 19 to 48.
   It never walks and never scales with the thief.
 - Thief: `top slide speed x Climbing / (Climbing + 0.2 x Reach x weight)`; weight Light 1, Stout 1.3, Heavy 1.6
   (empty-handed 0.5, using the tier slid from). Walking with a lamb uses the same share of 18.
 - So: a Light lamb is level with its god at 0.8x its tier's Reach and outruns it from the Reach on the sign; a Heavy
   one needs about 1.6x. A thief who crawled up a tier far above their Climbing slides at a fraction and is caught.
 
-Aphrodite (Reach 51.2K, top 40, god 32): Light lamb at 12.8K Climbing 22, at 51.2K 33, at 102K 36, at 512K 39;
+Tier 6 (Reach 51.2K, top 40, god 32): Light lamb at 12.8K Climbing 22, at 51.2K 33, at 102K 36, at 512K 39;
 Heavy at 51.2K 30, at 102K 35.
 
 ## Not built

@@ -136,7 +136,7 @@ end
 
 -- The share of a tier's top slide speed (Olympus SlideSpeed) a player keeps on the way down, carrying `weight`:
 -- Climbing / (Climbing + 0.2 x Reach x weight). Against a god's 0.8 that's level at 0.8 x Reach x weight, a little
--- faster at Reach x weight (0.83), well clear at ten times it (0.98). Demeter's lambs (Reach 0) are always full speed.
+-- faster at Reach x weight (0.83), well clear at ten times it (0.98). Tier 1's lambs (Reach 0) are always full speed.
 function Economy.EscapeShare(climb: number, tier: number, weight: number): number
 	local reach = Olympus.Tiers[math.clamp(tier, 1, Olympus.Count)].Reach
 	if reach <= 0 then
@@ -164,7 +164,7 @@ end
 
 -- The share of walking speed a player keeps going up a tier's slope: Climbing / (Climbing + its Reach), so half speed
 -- at its Reach and 91% at ten times it. Each tier's Reach is about four times the last, so going higher needs about
--- four times the Climbing for the same pace. Demeter's meadow (Reach 0) is always full speed.
+-- four times the Climbing for the same pace. Tier 1 (Reach 0) is always full speed.
 function Economy.ClimbShare(climb: number, tier: number): number
 	local reach = if tier >= 1 then Olympus.Tiers[math.min(tier, Olympus.Count)].Reach else 0
 	if reach <= 0 then

@@ -38,11 +38,11 @@ Calls made building Climbing (2026-10-05):
 - **Climb speed**: `18 x Climbing / (Climbing + Reach)` uphill, each tier's old gate number as its Reach (half speed
   there). Crawl floor 1 stud/s: about 4 minutes a stretch when far under. Tier 1 (Reach 0) is always full speed.
 - **Only the uphill part is slowed**: walking across a slope is full speed; the cap applies to the move's uphill share.
-- **Escape numbers**: god = 0.8 x the tier's top slide speed (19 at Demeter to 48 at Zeus); thief = top x Climbing /
+- **Escape numbers**: god = 0.8 x the tier's top slide speed (19 at tier 1 to 48 at tier 30); thief = top x Climbing /
   (Climbing + 0.2 x Reach x weight), weights Light 1, Stout 1.3, Heavy 1.6, empty-handed 0.5. A Light lamb outruns
   its god from the Reach on the sign, a Heavy one from about 1.6x. Slides speed up at 26 studs/s each second to it.
 - **Carry card** reads "Light: you 33, god 32".
-- **Tutorial**: Demeter chases the first lamb at 0.7 of her top slide speed (17) instead of 0.8; Demeter's lambs are
+- **Tutorial**: tier 1's god chases the first lamb at 0.7 of its top slide speed (17) instead of 0.8; tier 1's lambs are
   always full speed (24), so it's always escapable.
 - **Signs stay without walls**: the foot of each tier from 2 shows "<God>'s <Area> / Climbing N" (its Reach).
 - **Goals**: the HUD's next goal and the training meter aim at the highest tier whose Reach you have; "<God>'s <Area>
