@@ -6,7 +6,7 @@ local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 
--- Where things are on the ramp: its height along the middle, which tier a spot is in, how fast a slide and a climb go
+-- Where things are on the ramp: its height along the middle, which tier a spot is in, how fast a climb goes
 -- there, and the real floor under a point. Uphill is +X; downhill, towards the plots, is -X.
 local Mountain = {}
 
@@ -51,11 +51,6 @@ function Mountain.TierAt(x: number): number
 		end
 	end
 	return #Olympus.Tiers
-end
-
-function Mountain.SlideSpeedAt(x: number): number
-	local tier = Mountain.TierAt(x)
-	return if tier > 0 then Olympus.Tiers[tier].SlideSpeed else Olympus.Tiers[1].SlideSpeed
 end
 
 -- How fast a player with `climb` Climbing may go up the slope at `x`, in studs a second: walking speed times the

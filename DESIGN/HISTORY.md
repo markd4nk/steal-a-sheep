@@ -20,8 +20,13 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   burden's first value). `Economy.ClimbTier` (highest Reach held) replaces `Unlocked` for HUD goals, the training
   meter, Royal-lamb notices and the "in reach" notice. Gates became `TierSigns`. Every "Climb Power" on screen now
   says "Climbing"; the saved field stays `ClimbPower`.
-  Checked: `check.ps1`; formula tests (climb share, climb tier, under-trained carry). Not playtested: the shared
-  Studio was in another session's playtest.
+  Then, after a napkin-maths explanation, the user made the chase "your speed vs its speed" like Steal an Egg: one set
+  speed per god for the whole chase (`Economy.GodSpeed`, 0.8 x the tier's `SlideSpeed`), no god walking speed, and
+  the escape speed from Climbing (`Economy.EscapeSpeed`, with burden weights replacing the old Carry tables), set when
+  a slide starts and kept all the way down because momentum carries you (`MovementController` slideTarget).
+  `Mountain.SlideSpeedAt` and the under-trained floor went. The carry card shows "you N, god N".
+  Checked: `check.ps1`; formula tests (climb share, climb tier, escape level points, god speed). Not playtested: the
+  shared Studio was in another session's playtest.
 
 - **High Olympus: thirty gods (2026-10-05)**. The user, liking the map: build out the next tiers from its parts and
   pieces, the top Olympus gods; then a list of thirty ("map parts for all of these gods"), Zeus on the new top, the

@@ -22,9 +22,10 @@ confirmed or reversed it.
   open; steeper tiers need more and more Climbing to climb at a useful pace. Too little gives a very slow crawl, never
   a slip back down, so it's technically possible but nobody wants to, and a thief that weak is caught carrying the lamb
   down. No delivery lock between tiers. No god lunge.
-- **Gods keep a fixed speed, like Steal an Egg's guardians (2026-10-05)**: verified there: each zone has its own
-  guardian, faster in higher zones, never scaled to the player; players escape with enough Speed over the zone's
-  minimum (guides: about 15-20% over, about double for the heaviest eggs). Ours already worked that way; unchanged.
+- **Your speed vs its speed, like Steal an Egg (2026-10-05)**: each god has one set speed for the whole chase (never
+  slower in lower stretches, never a walking speed); the thief's escape speed comes from Climbing; a slide keeps the
+  speed it starts with all the way down (momentum). Checked against Steal an Egg: each zone has its own guardian,
+  faster higher up, never scaled to the player; you escape with enough Speed over the zone's minimum.
 - **No shortcut up**: the climb stays on foot, however long (the user turned down a lift to the highest open gate,
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
@@ -37,8 +38,12 @@ Calls made building Climbing (2026-10-05):
 - **Climb speed**: `18 x Climbing / (Climbing + Reach)` uphill, each tier's old gate number as its Reach (half speed
   there). Crawl floor 1 stud/s: about 4 minutes a stretch when far under. Tier 1 (Reach 0) is always full speed.
 - **Only the uphill part is slowed**: walking across a slope is full speed; the cap applies to the move's uphill share.
-- **Carrying while under-trained**: below the lamb's tier's Reach, its carry share falls to 0.45 of its burden's
-  first value (a Light lamb with no Climbing keeps 38% speed; at a quarter of Reach 56%).
+- **Escape numbers**: god = 0.8 x the tier's top slide speed (19 at Demeter to 48 at Zeus); thief = top x Climbing /
+  (Climbing + 0.2 x Reach x weight), weights Light 1, Stout 1.3, Heavy 1.6, empty-handed 0.5. A Light lamb outruns
+  its god from the Reach on the sign, a Heavy one from about 1.6x. Slides speed up at 26 studs/s each second to it.
+- **Carry card** reads "Light: you 33, god 32".
+- **Tutorial**: Demeter chases the first lamb at 0.7 of her top slide speed (17) instead of 0.8; Demeter's lambs are
+  always full speed (24), so it's always escapable.
 - **Signs stay without walls**: the foot of each tier from 2 shows "<God>'s <Area> / Climbing N" (its Reach).
 - **Goals**: the HUD's next goal and the training meter aim at the highest tier whose Reach you have; "<God>'s <Area>
   is in reach!" pops when Climbing passes the next Reach. Player list column renamed Climbing; the HUD pill reads

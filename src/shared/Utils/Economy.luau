@@ -22,7 +22,7 @@ export type Sheep = {
 }
 
 export type Rarity = { Name: string, Multiplier: number, Chance: number, Color: Color3 }
-export type Burden = { Name: string, Chance: number, Carry: { number }, Sizes: { number }, Scale: number }
+export type Burden = { Name: string, Chance: number, Weight: number, Sizes: { number }, Scale: number }
 export type Size = { Name: string, Multiplier: number, Scale: number }
 export type Trail = { Id: string, Name: string, Cost: number, Multiplier: number, Color: Color3 }
 
@@ -34,12 +34,12 @@ Economy.Rarities = table.freeze({
 	{ Name = "Royal", Multiplier = 2.5, Chance = 2, Color = Color3.fromRGB(255, 196, 40) },
 } :: { Rarity })
 
--- Carry: the movement multiplier at the sheep's tier's Reach, Light and Heavy targets. Sizes: percent odds of a
--- Standard, Large and Giant adult. Scale: the wild lamb's size, a clue to its burden.
+-- Weight: how much bigger the lamb's tier's Reach counts in the escape speed (Economy.EscapeShare). Sizes: percent
+-- odds of a Standard, Large and Giant adult. Scale: the wild lamb's size, a clue to its burden.
 Economy.Burdens = table.freeze({
-	{ Name = "Light", Chance = 70, Carry = { 0.84, 0.92, 0.97 }, Sizes = { 89, 10, 1 }, Scale = 0.6 },
-	{ Name = "Stout", Chance = 25, Carry = { 0.72, 0.84, 0.95 }, Sizes = { 50, 47, 3 }, Scale = 0.7 },
-	{ Name = "Heavy", Chance = 5, Carry = { 0.60, 0.76, 0.94 }, Sizes = { 0, 80, 20 }, Scale = 0.8 },
+	{ Name = "Light", Chance = 70, Weight = 1, Sizes = { 89, 10, 1 }, Scale = 0.6 },
+	{ Name = "Stout", Chance = 25, Weight = 1.3, Sizes = { 50, 47, 3 }, Scale = 0.7 },
+	{ Name = "Heavy", Chance = 5, Weight = 1.6, Sizes = { 0, 80, 20 }, Scale = 0.8 },
 } :: { Burden })
 
 Economy.Sizes = table.freeze({
@@ -59,7 +59,9 @@ Economy.TutorialClimb = 25
 Economy.StartPens = 3
 Economy.MaxPens = 12
 Economy.MergeAfterDeliveries = 3
-Economy.UnderTrainedFloor = 0.45 -- the share of a burden's speed left to a thief with almost no Climbing
+Economy.EmptyWeight = 0.5 -- an empty-handed slide's weight, lighter than any lamb
+Economy.EscapeEase = 0.2 -- the share of a tier's Reach (times the weight) in the escape speed
+Economy.GodShare = 0.8 -- a god's set speed, as a share of its tier's top slide speed
 
 -- Climbing a second on the stair walker, by its level (0 is the free one). Each level covers the gap between the
 -- next two tiers' reach in about a minute, and the last carries Zeus's Heavy target.
@@ -125,33 +127,39 @@ function Economy.BaseIncome(tier: number): number
 	return Economy.Round(2 * 2.5 ^ (tier - 1))
 end
 
--- Reach, Light and Heavy Climbing for a tier: Light 1.5x and Heavy 2.25x its reach; Demeter is 0, 25, 60.
+-- Reach, Light and Heavy Climbing for a tier: a Light lamb outruns its god from its Reach, a Heavy one from its Reach
+-- times the Heavy weight (each a little faster than the god; it's level at 0.8 of those).
 function Economy.Targets(tier: number): (number, number, number)
-	if tier == 1 then
-		return 0, 25, 60
-	end
 	local reach = Olympus.Tiers[tier].Reach
-	return reach, reach * 1.5, reach * 2.25
+	return reach, reach * Economy.Burdens[1].Weight, reach * Economy.Burdens[3].Weight
 end
 
--- The share of normal speed and acceleration a carrier keeps: the burden's three values at the source tier's Reach,
--- Light and Heavy targets, straight lines between them, and the last above Heavy. Below Reach the share keeps falling
--- towards UnderTrainedFloor of the first value, so a lamb stolen from a slope the thief can barely climb is slow to
--- carry and its god catches them.
-function Economy.CarryMultiplier(burden: number, climb: number, tier: number): number
-	local carry = Economy.Burdens[burden].Carry
-	local reach, light, heavy = Economy.Targets(tier)
-	if climb < reach then
-		local floor = Economy.UnderTrainedFloor
-		return carry[1] * (floor + (1 - floor) * 2 * climb / (climb + reach))
-	elseif climb <= reach then
-		return carry[1]
-	elseif climb <= light then
-		return carry[1] + (carry[2] - carry[1]) * (climb - reach) / (light - reach)
-	elseif climb <= heavy then
-		return carry[2] + (carry[3] - carry[2]) * (climb - light) / (heavy - light)
+-- The share of a tier's top slide speed (Olympus SlideSpeed) a player keeps on the way down, carrying `weight`:
+-- Climbing / (Climbing + 0.2 x Reach x weight). Against a god's 0.8 that's level at 0.8 x Reach x weight, a little
+-- faster at Reach x weight (0.83), well clear at ten times it (0.98). Demeter's lambs (Reach 0) are always full speed.
+function Economy.EscapeShare(climb: number, tier: number, weight: number): number
+	local reach = Olympus.Tiers[math.clamp(tier, 1, Olympus.Count)].Reach
+	if reach <= 0 then
+		return 1
 	end
-	return carry[3]
+	local power = math.max(climb, 0)
+	return power / (power + Economy.EscapeEase * reach * weight)
+end
+
+-- A slide's speed, set when it starts and kept all the way down: a lamb's tier and weight while carrying, the tier
+-- slid from and EmptyWeight when empty-handed.
+function Economy.EscapeSpeed(climb: number, tier: number, weight: number): number
+	return Olympus.Tiers[math.clamp(tier, 1, Olympus.Count)].SlideSpeed * Economy.EscapeShare(climb, tier, weight)
+end
+
+-- The share of normal walking speed a carrier keeps: the same as the escape share of their lamb.
+function Economy.CarryShare(burden: number, climb: number, tier: number): number
+	return Economy.EscapeShare(climb, tier, Economy.Burdens[burden].Weight)
+end
+
+-- A god's one set speed for the whole chase.
+function Economy.GodSpeed(tier: number): number
+	return Olympus.Tiers[math.clamp(tier, 1, Olympus.Count)].SlideSpeed * Economy.GodShare
 end
 
 -- The share of walking speed a player keeps going up a tier's slope: Climbing / (Climbing + its Reach), so half speed

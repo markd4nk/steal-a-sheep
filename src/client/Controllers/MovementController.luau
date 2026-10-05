@@ -14,8 +14,9 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- How the local character moves. Walking: 18 studs a second, times a carried lamb's burden share; going up the ramp,
 -- no faster up the slope than the player's Climbing allows there (Mountain.ClimbSpeedAt; the server checks). Sliding:
--- moving downhill on the ramp starts a slide by itself; it speeds up to the stretch's slide speed (the burden slows it
--- and its acceleration), steers within a cone either side of straight downhill with the ordinary movement controls,
+-- moving downhill on the ramp starts a slide by itself; it speeds up to the escape speed set when it starts
+-- (Economy.EscapeSpeed: Climbing against the lamb's tier and weight) and keeps it all the way down, like momentum;
+-- it steers within a cone either side of straight downhill with the ordinary movement controls,
 -- brakes when pulled back, and runs out to a stop past the safety line. A slider's hit costs it speed; a hit player is
 -- moved back down the slope and stunned for a moment. Also: their stair walker steps while they train.
 local MovementController = { Name = "MovementController" }
@@ -31,6 +32,7 @@ local player = Players.LocalPlayer
 
 local sliding = false
 local slideSpeed = 0
+local slideTarget = 0
 local heading = Mountain.Downhill
 local knockUntil = 0
 local stunUntil = 0
@@ -54,17 +56,32 @@ local function climbing(): number
 	return if type(climb) == "number" then climb else 0
 end
 
--- The burden share a carried lamb leaves the player (Economy.CarryMultiplier), 1 when empty-handed.
-local function carryShare(): number
+-- The carried lamb's tier and burden, or nil when empty-handed.
+local function carried(): (number?, number?)
 	if player:GetAttribute("Carrying") ~= true then
-		return 1
+		return nil, nil
 	end
-	local burden = player:GetAttribute("CarryBurden")
 	local tier = player:GetAttribute("CarryTier")
-	if type(burden) ~= "number" or type(tier) ~= "number" then
-		return 1
+	local burden = player:GetAttribute("CarryBurden")
+	if type(tier) ~= "number" or type(burden) ~= "number" then
+		return nil, nil
 	end
-	return Economy.CarryMultiplier(burden, climbing(), tier)
+	return tier, burden
+end
+
+-- The share of walking speed a carried lamb leaves the player (Economy.CarryShare), 1 when empty-handed.
+local function carryShare(): number
+	local tier, burden = carried()
+	return if tier and burden then Economy.CarryShare(burden, climbing(), tier) else 1
+end
+
+-- The speed a slide starting at `x` keeps all the way down.
+local function escapeSpeed(x: number): number
+	local tier, burden = carried()
+	if tier and burden then
+		return Economy.EscapeSpeed(climbing(), tier, Economy.Burdens[burden].Weight)
+	end
+	return Economy.EscapeSpeed(climbing(), math.max(Mountain.TierAt(x), 1), Economy.EmptyWeight)
 end
 
 -- Walking speed, held down when the move heads up the ramp so its uphill part never beats the climb speed there.
@@ -177,6 +194,7 @@ local function step(dt: number)
 			and input.X < 0
 		then
 			slideSpeed = math.max(flat, walk)
+			slideTarget = escapeSpeed(position.X)
 			heading = Vector3.new(
 				-1,
 				0,
@@ -195,7 +213,7 @@ local function step(dt: number)
 		humanoid.WalkSpeed = walk * boost
 		return
 	end
-	local target = if pastLine then 0 else Mountain.SlideSpeedAt(position.X) * share
+	local target = if pastLine then 0 else slideTarget
 	local braking = input.X > 0.35
 	if braking or pastLine then
 		-- Past the safety line the slide runs out more gently than a pulled-back brake.
@@ -203,7 +221,7 @@ local function step(dt: number)
 		slideSpeed = math.max(0, slideSpeed - brake * dt)
 	elseif grounded then
 		if slideSpeed < target then
-			slideSpeed = math.min(target, slideSpeed + settings.SlideAccel * share * dt)
+			slideSpeed = math.min(target, slideSpeed + settings.SlideAccel * dt)
 		else
 			slideSpeed = math.max(target, slideSpeed - settings.SlideAccel * 0.5 * dt)
 		end

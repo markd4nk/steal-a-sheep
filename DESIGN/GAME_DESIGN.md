@@ -75,15 +75,21 @@ One stat, **Climbing** (the stair walker trains it; saved as `ClimbPower`), is b
 you carry. No walls: every tier is open to everyone. Going up a tier's slope you move at
 `18 x Climbing / (Climbing + Reach)` studs a second, never under a 1 stud/s crawl. That's half speed at the tier's Reach
 and 91% at ten times it. Reach grows about 4x a tier, so one tier above your Climbing is slow (about 3.6 studs/s) and
-two or more is a crawl: possible, but nobody wants to. Carrying: a lamb from a tier whose Reach you lack slows you
-down towards 0.45 of its burden's speed, so a thief who crawled up is caught by that tier's god. Moving across the
-slope or downhill is unaffected; slides keep the stretch's slide speed.
+two or more is a crawl: possible, but nobody wants to. Moving across the slope is unaffected.
 
-## Gods (as built)
-Each god chases at a fixed speed for the stretch it's on (88% of its slide speed, or of walking speed when the thief
-walks). It never scales with the thief, like Steal an Egg's guardians, which the user chose as the model
-(2026-10-05). Escaping takes enough Climbing over the lamb's tier: about 1.25x its Reach for a Light lamb, 2x for a
-Heavy one.
+## Escaping: your speed vs its speed (the user, 2026-10-05)
+Like Steal an Egg: every god has **one set speed** for the whole chase, and the thief's **escape speed comes from
+Climbing**. A slide's speed is set when it starts and kept all the way down (momentum: lower stretches don't slow it).
+
+- God: `0.8 x its tier's top slide speed` (Olympus `SlideSpeed`, 24 at Demeter up to 60 at Zeus), so 19 to 48.
+  It never walks and never scales with the thief.
+- Thief: `top slide speed x Climbing / (Climbing + 0.2 x Reach x weight)`; weight Light 1, Stout 1.3, Heavy 1.6
+  (empty-handed 0.5, using the tier slid from). Walking with a lamb uses the same share of 18.
+- So: a Light lamb is level with its god at 0.8x its tier's Reach and outruns it from the Reach on the sign; a Heavy
+  one needs about 1.6x. A thief who crawled up a tier far above their Climbing slides at a fraction and is caught.
+
+Aphrodite (Reach 51.2K, top 40, god 32): Light lamb at 12.8K Climbing 22, at 51.2K 33, at 102K 36, at 512K 39;
+Heavy at 51.2K 30, at 102K 35.
 
 ## Not built
 Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.

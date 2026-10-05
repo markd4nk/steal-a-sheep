@@ -44,8 +44,8 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 ## In progress
 
 - **Climbing** (branch `t3code/climbing-slope-scaling`, not merged): one stat for climbing speed and carrying; no
-  tier walls; uphill speed falls with each tier's Reach down to a 1 stud/s crawl; under-trained thieves carry slowly
-  and get caught. Gods unchanged (fixed speed). GAME_DESIGN.md, *Climbing*.
+  tier walls; uphill speed falls with each tier's Reach down to a 1 stud/s crawl; escapes are your speed (from
+  Climbing, kept all the way down) vs the god's one set speed. GAME_DESIGN.md, *Climbing* and *Escaping*.
 
 ## Not verified
 
@@ -54,8 +54,10 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   rejoin and session locking are untested (the offline maths is unit-tested).
 - **Touch and gamepad**: only keyboard and mouse in Studio. Prompts, HUD buttons and the slide use Roblox's own input.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
-- **Climbing in play**: not playtested (Studio was in use by another session). The crawl, the uphill cap, the
-  server's put-back and the under-trained chase are unit-tested in their formulas only.
+- **Climbing and escapes in play**: not playtested (Studio was in use by another session). The crawl, the uphill cap,
+  the server's put-back, kept slide speeds and set god speeds are unit-tested in their formulas only.
+- **Escape speed isn't checked by the server**: a client could slide faster than its escape speed (as before, when it
+  could beat the stretch's slide speed). The uphill check only stops climbing too fast.
 - **Upper tiers by foot**: tiers 7 and up were reached with the debug Unlock; climbing them on foot wasn't timed. By
   the numbers it's about 6.5 minutes from the plots to Zeus at full Climbing (a Humanoid walks its 18 studs/s along
   the slope); far under a tier's Reach it's about 4 minutes a stretch.

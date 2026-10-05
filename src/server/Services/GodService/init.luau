@@ -4,6 +4,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Mountain = require(ReplicatedStorage.Utils.Mountain)
@@ -13,11 +14,12 @@ local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Rig = require(script.Rig)
 
--- The twelve gods, one per tier, all on one state machine: Idle at home, Alert (the thief's head start), Chase along
+-- The thirty gods, one per tier, all on one state machine: Idle at home, Alert (the thief's head start), Chase along
 -- the ramp, Catch or Disengage, then Return home. A god chases only thieves of its own tier, nearest first with a short
 -- lock on its target, down the whole descent until they cross the foothill safety line. It moves along the floor itself
--- (no pathfinding to get stuck): at 0.88 times the stretch's unladen speed, a slide's when its target slides, never
--- scaled by the target's training or burden. A catch needs the target within reach and nothing solid between them.
+-- (no pathfinding to get stuck) at one set speed for the whole chase (Economy.GodSpeed), like Steal an Egg's guardians:
+-- never scaled by the thief, nor by the stretch it's on. A catch needs the target within reach and nothing solid
+-- between them.
 local GodService = {
 	Name = "GodService",
 	-- A god caught this thief: (player).
@@ -43,7 +45,6 @@ type God = {
 	Gentle: { [Player]: boolean }, -- tutorial thieves: a slower chase
 }
 
-local PURSUIT_SHARE = 0.88
 local TUTORIAL_SHARE = 0.7
 local TARGET_LOCK = 2
 local TAUNT_SECONDS = 1.6
@@ -175,10 +176,9 @@ local function update(god: God, dt: number, now: number)
 	if target and god.Mood ~= "Alert" then
 		setMood(god, "Run")
 		local root = rootOf(target) :: BasePart
-		local sliding = target:GetAttribute("Sliding") == true
-		local unladen = if sliding then Mountain.SlideSpeedAt(god.At.X) else GameConfig.Movement.WalkSpeed
-		local share = if god.Gentle[target] then TUTORIAL_SHARE else PURSUIT_SHARE
-		local speed = unladen * share
+		local speed = if god.Gentle[target]
+			then god.Tier.SlideSpeed * TUTORIAL_SHARE
+			else Economy.GodSpeed(god.Tier.Tier)
 		god.Model:SetAttribute("Speed", speed)
 		stepTowards(god, root.Position, speed * dt)
 		local offset = root.Position - (god.At + Vector3.new(0, Rig.Hip, 0))

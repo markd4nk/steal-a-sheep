@@ -17,7 +17,7 @@ export type Tier = {
 	Reach: number, -- Climbing that climbs this tier's slope at half walking speed (Economy.ClimbShare)
 	XStart: number, -- the tier's gate on the ramp (studs along +X)
 	XEnd: number,
-	SlideSpeed: number, -- an empty-handed slide's target speed on this stretch
+	SlideSpeed: number, -- the top slide speed for this tier's lambs (Economy.EscapeSpeed); its god runs at 0.8 of it
 	-- The god's primitive look.
 	Robe: Color3,
 	Skin: Color3,

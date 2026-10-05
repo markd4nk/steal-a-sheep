@@ -453,8 +453,10 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			SheepIcon.Paint(carryToken, family, 1)
 			carryName.Text = string.gsub(Olympus.Tiers[tier].FamilyName, "Sheep$", "Lamb")
 			local climb = player:GetAttribute("ClimbPower")
-			local share = Economy.CarryMultiplier(burden, if type(climb) == "number" then climb else 0, tier)
-			carryBurden.Text = `{Economy.Burdens[burden].Name}: {math.floor(share * 100 + 0.5)}% speed`
+			local power = if type(climb) == "number" then climb else 0
+			local speed = Economy.EscapeSpeed(power, tier, Economy.Burdens[burden].Weight)
+			local god = Economy.GodSpeed(tier)
+			carryBurden.Text = `{Economy.Burdens[burden].Name}: you {math.floor(speed)}, god {math.floor(god)}`
 		end
 	end
 	trove:Connect(returnButton.Activated, function()
