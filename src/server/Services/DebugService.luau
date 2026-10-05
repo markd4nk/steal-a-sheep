@@ -1,7 +1,9 @@
 --!strict
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
 
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Economy = require(ReplicatedStorage.Utils.Economy)
@@ -43,6 +45,12 @@ local commands: { [string]: Command } = {
 			return true, nil
 		end
 		return false, "no ready lamb on that tier"
+	end,
+	-- value: how many times normal speed the player moves (1 for normal), for this play session.
+	SetSpeed = function(player, value)
+		local boost = math.clamp(value or 1, 0.1, 20)
+		player:SetAttribute("DebugSpeed", if boost == 1 then nil else boost)
+		return true, nil
 	end,
 	-- value: a tier. An ordinary lamb of that tier's family goes straight into the flock, as if delivered.
 	GiveSheep = function(player, value)
@@ -120,6 +128,20 @@ end
 
 function DebugService.Start(_self: any)
 	Remotes.Debug:Handle(handle)
+	if not RunService:IsStudio() then
+		return
+	end
+	-- ServerStorage's DebugSpeed attribute, set in Edit, starts every playtest at that speed (clear it after).
+	local function boost(player: Player)
+		local speed = ServerStorage:GetAttribute("DebugSpeed")
+		if type(speed) == "number" and speed > 0 and speed ~= 1 then
+			player:SetAttribute("DebugSpeed", speed)
+		end
+	end
+	for _, player in Players:GetPlayers() do
+		boost(player)
+	end
+	Players.PlayerAdded:Connect(boost)
 end
 
 function DebugService.Destroy(_self: any) end

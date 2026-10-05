@@ -65,6 +65,15 @@ end
 
 -- What the player is asking for, in world space: the Humanoid's MoveDirection as Roblox's own controls set it this
 -- frame. This runs after them and before this controller's own Move (which then wins for the frame).
+-- Studio playtests only: the DebugSpeed attribute (DebugService) multiplies the character's speed.
+local function speedBoost(): number
+	if not RunService:IsStudio() then
+		return 1
+	end
+	local boost = player:GetAttribute("DebugSpeed")
+	return if type(boost) == "number" and boost > 0 then boost else 1
+end
+
 local function moveInput(humanoid: Humanoid): Vector3
 	local direction = humanoid.MoveDirection
 	return Vector3.new(direction.X, 0, direction.Z)
@@ -118,6 +127,7 @@ local function step(dt: number)
 	local now = os.clock()
 	local share = carryShare()
 	local walk = GameConfig.Movement.WalkSpeed * share
+	local boost = speedBoost()
 	local settings = GameConfig.Movement
 
 	-- Knocked back: moved down the slope, then held still until the stun ends.
@@ -134,13 +144,14 @@ local function step(dt: number)
 	end
 
 	local position = root.Position
-	local velocity = root.AssemblyLinearVelocity
+	-- In unboosted studs a second, so a Studio speed boost changes nothing but the result.
+	local velocity = root.AssemblyLinearVelocity / boost
 	local onRamp = Mountain.IsOnRamp(position)
 	local grounded = humanoid.FloorMaterial ~= Enum.Material.Air
 	local input = moveInput(humanoid)
 
 	if not sliding then
-		humanoid.WalkSpeed = walk
+		humanoid.WalkSpeed = walk * boost
 		local downhill = -velocity.X
 		local flat = Vector2.new(velocity.X, velocity.Z).Magnitude
 		if
@@ -167,7 +178,7 @@ local function step(dt: number)
 	local pastLine = position.X < Olympus.SafeLineX
 	if not onRamp and not pastLine and grounded then
 		setSliding(false, humanoid)
-		humanoid.WalkSpeed = walk
+		humanoid.WalkSpeed = walk * boost
 		return
 	end
 	local target = if pastLine then 0 else Mountain.SlideSpeedAt(position.X) * share
@@ -192,7 +203,7 @@ local function step(dt: number)
 	if stuckFor > 0.5 then
 		stuckFor = 0
 		setSliding(false, humanoid)
-		humanoid.WalkSpeed = walk
+		humanoid.WalkSpeed = walk * boost
 		return
 	end
 	-- Steering: the stick's sideways share turns the heading, never past the cone either side of downhill.
@@ -202,10 +213,10 @@ local function step(dt: number)
 	heading = Vector3.new(-1, 0, turned).Unit
 	if slideSpeed < settings.SlideStopSpeed then
 		setSliding(false, humanoid)
-		humanoid.WalkSpeed = walk
+		humanoid.WalkSpeed = walk * boost
 		return
 	end
-	humanoid.WalkSpeed = slideSpeed
+	humanoid.WalkSpeed = slideSpeed * boost
 	humanoid:Move(heading, false)
 end
 
