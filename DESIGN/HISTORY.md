@@ -29,9 +29,12 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     (`SheepClips.Graze`/`GrazeStage`: body tips 14 degrees, sinks a little, head tips 80 and the neck reaches so the nose
     touches the grass; bites tug and sweep, chews bob and roll), idle, happy-hop after landing, and swap faces (chew
     frames, Happy, Baa, Blink). Wild lambs carry `Lamb` and graze too.
-  - *Eating faces*: not built; two variants drawn as mock-ups with Shear a Sheep's face helpers
-    (`art/faces/chew_faces.py`, renders in `art/faces/renders/`, ignored) and shown to the user. Blink stands in
-    (`ChewFaces`).
+  - *Eating face*: two variants drawn with Shear a Sheep's face helpers (`art/faces/chew_faces.py`, renders in
+    `art/faces/renders/`, ignored), shown as a sheet and then filmed on a grazing tier 8 lamb (pictures loaded from
+    Studio's content folder, nothing uploaded); the user picked A, "Munch". MunchA and MunchB were uploaded through the
+    Studio MCP's `upload_image` (served on 127.0.0.1) as rbxassetid://140615494609777 and 118466923824368 and set as
+    `ChewFaces`. AnimController preloads its face pictures one request each and swaps in only those that have
+    arrived, so a picture still in Roblox's review never shows as a blank face.
   - *UI*: objective "Bring it into your pen" / "Put it down where you like" (and the full-pen warning); Flock card "In
     your pen"; Shop "Pen Space n/12".
   - *Checked*: `check.ps1` passes; 43 tests pass in Studio (Wander, PlayerData homes). Playtested solo in this session's

@@ -6,6 +6,7 @@ local RunService = game:GetService("RunService")
 
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
+local Preload = require(ReplicatedStorage.Utils.Preload)
 local SheepClips = require(ReplicatedStorage.Utils.SheepClips)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Wander = require(ReplicatedStorage.Utils.Wander)
@@ -78,6 +79,7 @@ local touched: { Motor6D } = {}
 local befores: { CFrame } = {}
 local sincePick = math.huge
 local nextBaa = 0
+local arrived: { [string]: boolean } = {} -- face pictures this device has downloaded: only those are swapped in
 
 local function smooth(x: number): number
 	local t = math.clamp(x, 0, 1)
@@ -383,8 +385,10 @@ local function faceFor(entry: Rigged, clock: number, stage: string?): string?
 	return nil
 end
 
-local function showFace(entry: Rigged, face: string?)
+local function showFace(entry: Rigged, wanted: string?)
 	local decal = entry.Face
+	-- A picture still on its way would show a blank face: the sheep keeps its own until it's here.
+	local face = if wanted and arrived[Pictures[wanted] or ""] then wanted else nil
 	if not decal or face == entry.FaceShown then
 		return
 	end
@@ -490,6 +494,16 @@ end
 function AnimController.Init(_self: any, _systems: Lifecycle.Registry) end
 
 function AnimController.Start(_self: any)
+	local faces = { Pictures.Happy, Pictures.Baa, Pictures.Blink }
+	for _, name in GameConfig.Sheep.ChewFaces do
+		table.insert(faces, Pictures[name])
+	end
+	-- One request each, so a picture Roblox is slow with (a new upload in review) doesn't hold up the rest.
+	for _, id in faces do
+		task.spawn(Preload.Images, { id }, function(loaded: string)
+			arrived[loaded] = true
+		end)
+	end
 	for _, instance in CollectionService:GetTagged(SHEEP_TAG) do
 		addSheep(instance)
 	end

@@ -24,8 +24,9 @@ confirmed or reversed it.
   then don't thin or fill the slide lanes, old stages included.
 - **Put lambs down anywhere in the pen (2026-10-05)**: like Steal an Egg, the thief brings the lamb into their pen and
   places it where they choose; no delivery platform, no fixed pads to unlock and stand sheep on. Sheep walk around on
-  their own like Shear a Sheep's; lambs mostly eat off the floor, head down and chewing, with an eating face (art to
-  be approved).
+  their own like Shear a Sheep's; lambs mostly eat off the floor, head down and chewing, with an eating face: the
+  user picked A, "Munch" (eyes shut, cheeks full, a grass sprig in the corner of a mouth working side to side), over B
+  (eyes on the grass, mouth opening on a green mouthful), after seeing both on a grazing lamb (2026-10-05).
 
 ## To review
 
@@ -47,8 +48,8 @@ Calls made building free placement and roaming sheep (2026-10-05):
   GiveSheep) gets any clear spot.
 - **Grazing**: lambs graze 90% of their standing time, adults 45% (3-9 s apart): bouts of 1-3 bites, each the head down
   to the grass for 1.6-2.8 s nibbling and tugging, then up a little chewing for 1.8-3 s, the head working side to side;
-  0.4-1.6 s between a lamb's bouts. Wild lambs graze too. Faces: chewing faces while chewing (Blink stands in), Baa while
-  baa-ing, a blink every 2.5-6 s on a plain face.
+  0.4-1.6 s between a lamb's bouts. Wild lambs graze too. Faces: Munch's two frames in turn (0.22 s each) while
+  chewing, Baa while baa-ing, a blink every 2.5-6 s on a plain face.
 - **Flock menu** says "In your pen" (or "(pinned)") instead of "In pen slot N".
 
 Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls are under Confirmed rules.
@@ -133,6 +134,5 @@ Calls made while building the MVP on 2026-10-05:
 ## Calls left to the user
 
 - Keep the theme-fitted god order, or change it?
-- The eating face: A (Munch) or B (Nom), or changes?
 - Keep the pen's capacity (3, bought up to 12), or let every sheep you own live in the pen and earn?
 - Sheep roam round where you put them (18 studs), or anywhere in the plot?

@@ -395,10 +395,13 @@ local GameConfig = {
 			Visor = "rbxassetid://82292653566945",
 			Ghost = "rbxassetid://75213874763495",
 			Eyepatch = "rbxassetid://119654690639983",
+			-- Eating (the user's pick, 2026-10-05): eyes shut, cheeks full, a grass sprig in the corner of a mouth
+			-- working side to side; art/faces/chew_faces.py draws them.
+			MunchA = "rbxassetid://140615494609777",
+			MunchB = "rbxassetid://118466923824368",
 		} :: { [string]: string },
-		-- The faces a grazing sheep chews with, in turn (names in Faces). Blink, eyes shut and savouring, stands in
-		-- until the eating faces are drawn and uploaded.
-		ChewFaces = { "Blink" } :: { string },
+		-- The faces a grazing sheep chews with, in turn (names in Faces).
+		ChewFaces = { "MunchA", "MunchB" } :: { string },
 		WoolSpread = 0.5,
 	},
 

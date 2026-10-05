@@ -23,7 +23,8 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
   it hops down in front of them, happy to be home. That's the delivery.
 - Each sheep roams round the spot it was put down (Shear a Sheep's wander: long spells standing, then a short stroll),
   never into the map's trees, hay or the stair walker, never on top of another sheep. Where it lives is saved.
-- Lambs graze nearly all the time: head down to the grass, nibbling, then up to chew with a chewing face. Grown sheep
+- Lambs graze nearly all the time: head down to the grass, nibbling, then up to chew with the "Munch" face (eyes
+  shut, cheeks full, a grass sprig working side to side). Grown sheep
   graze now and then and otherwise stand about, breathe, look round, blink and baa. Wild lambs graze in the pastures
   too.
 - The pen still holds a number of sheep (3, more bought in the Shop as Pen Space, up to 12); one put down in a full pen
