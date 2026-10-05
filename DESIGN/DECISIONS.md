@@ -18,6 +18,9 @@ confirmed or reversed it.
   pieces, studs and textures).
 - **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
   noticeable; then "keep it that").
+- **High Olympus's stretches are 275 studs along the floor** (the user, 2026-10-05: at 210 they felt shorter than the
+  first levels, about 250, so a bit longer than those). 169-233 across the ground, so the steep ones still look
+  shorter than they climb.
 - **No shortcut up**: the climb stays on foot, however long (the user turned down a lift to the highest open gate,
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
@@ -25,14 +28,20 @@ confirmed or reversed it.
 
 ## To review
 
+Calls made lengthening High Olympus's stretches to 275 (2026-10-05).
+
+- **Decor density kept**: each stretch's trees, rocks, islands, clouds and scattered props scale with its length
+  (x275/210), so the longer stretches look as full as the ones the user saw.
+- **Eris's crystals start 14 studs outside the lane** (was 6): a leaning one reached 6 studs into the lane.
+- **Zeus's summit plaza starts flush with the top of his stretch**: before, its edge was a chest-high ledge a walker
+  couldn't get onto, so nobody could reach the throne on foot.
+
 Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls are under Confirmed rules.
 
 - **Climb order**: the old summit is Aeolus's (12, "Windswept Peaks"); then Iris, Pan, Hebe, Eros, Tyche, Asclepius,
   Eris, Hecate, Hypnos, Morpheus, Phobos, Deimos, Thanatos, Nemesis, Themis, Nike, Hestia, Zeus (13-30): bright and wild
   first, then dusk, sleep, dreams, fear and death, then justice, victory and the hearth by Zeus's throne. The user's
   list ranks by fame; the old map's stages already hold the Olympians, so the minor gods are above them.
-- **Stretch length**: 210 studs along each stretch's floor (130-178 across the ground; grades in `STRETCHES`,
-  `tools/UpperMountain.luau`).
 - **Look**: stage 3's floor slab and terrace blocks for every stretch, recoloured per god; trees, rocks, islands, clouds,
   spires, arches and the pavilion cloned from the stages; block props per god (a rainbow over the path, Pan's pipes and
   toadstools, goblets and a fountain, hearts, coins and a wheel of fortune, the serpent staff and pools, golden apples

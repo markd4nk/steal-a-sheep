@@ -4,6 +4,10 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, High Olympus at 275 studs a stretch**. Same instances as below, rebuilt longer by `build-place.ps1`:
+  Zeus's top at x 6721.3, height 4439.1, the plaza from there to x 6811.3. The user's open `StealASheep.rbxl` holds
+  the 210 version until it's rebuilt from this branch.
+
 - **2026-10-05, High Olympus**. `tools/assemble.luau` now runs `tools/UpperMountain.luau` on the map before saving the
   place: `workspace.Stages.HighOlympus` (Folder) holds one Model a god, `Tier13 Iris` ... `Tier30 Zeus` (each `Floor`,
   `Terraces`, `Decor`), and `Summit` (plaza, throne, colonnade). It destroys stage 7's end wall (the Model of 80 parts
