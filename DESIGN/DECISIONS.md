@@ -25,8 +25,26 @@ confirmed or reversed it.
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
   then don't thin or fill the slide lanes, old stages included.
+- **The game's money is cash, not coins** (the user, 2026-10-05). Code still calls it `Coins`.
+- **Leaderboards live on the map's billboards in the safe zone, not behind a HUD icon** (the user, 2026-10-05): This
+  Server (the richest here, by income), Top Income (the richest overall, each player's best ever), Most Steals and
+  Climb Power. Titles are words only, no icon; otherwise the boards' look (dark panel, medal rows, headshots) is OK'd.
 
 ## To review
+
+Calls made building the world leaderboards (2026-10-05); the user's own calls are under Confirmed rules.
+
+- **Where each board stands**: the north pair has This Server (outer) and Top Income (inner), the south pair Most
+  Steals (inner) and Climb Power (outer). The inner ones stand nearest the hub.
+- **This Server ranks income right now**, so it drops when a player sells; Top Income keeps their best.
+- **Top 10 across all servers**, read once a minute, with this server's players redrawn every 5 s so a player sees
+  their own rise at once. Players at 0 aren't listed; an empty board reads "No one yet".
+- **Most Steals counts every delivery**, the tutorial lamb included.
+- **A row**: rank badge (gold, silver, bronze for the top three, rows tinted to match), avatar headshot, display name,
+  value in the board's colour (lime for income, gold for Climb Power, white for steals). A small line at the bottom
+  says "Right now" on This Server, and "All servers" on the others ("This server" where DataStores aren't available).
+- **Studio uses its own stores** (`_Studio`), so playtests never reach the live boards. The player list (Income,
+  Climb) stays as it was.
 
 Calls made lengthening High Olympus's stretches to 275 (2026-10-05).
 

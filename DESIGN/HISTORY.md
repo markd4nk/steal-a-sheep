@@ -6,6 +6,32 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **World leaderboards (2026-10-05)**. The user: make the leaderboard actually work, on the map's billboard in the safe
+  zone rather than inside a HUD icon. The map has four boards (`workspace.Base.Leaderboard`, two pairs at x 280, z
+  28-66 and 303-341, facing the plots), so each ranks one thing. The first mock-up (Coins Earned, Top Income, Most
+  Steals, Climb Power, a trophy by each title) drew the user's calls: the money is cash, not coins, so swap Coins
+  Earned for This Server (the richest here) next to Top Income (the richest overall, best ever); the look is OK; drop
+  the icon, words only.
+  - *LeaderboardService* (folder): `Boards` (the four rankings, in the order of the boards sorted by z: This Server,
+    Top Income, Most Steals, Climb Power), `Score` (store encoding and the merge), `Face` (the screen). Each board gets
+    an upright invisible part just in front of its panel with a SurfaceGui (50 px a stud), since the map's panels lie
+    on their side. Every 5 s it measures each loaded player's values (their best this session; This Server takes
+    their income now) and redraws the boards from the store's top 10 merged with this server's players. This Server
+    has no store. Every 60 s it writes what went up
+    (`UpdateAsync` with `math.max`) and reads each store's top 10 (`GetSortedAsync`), looking names up in one
+    `UserService:GetUserInfosByUserIdsAsync` call. The last write happens on `DataService.PlayerReleasing`, and from
+    `Destroy` for anyone still in at shutdown (it's destroyed before DataService releases them).
+  - *Stores*: `Leaderboard_Income`, `_Steals`, `_Climb` (`_Studio` in Studio). Values are
+    `floor(log10(1 + value) x 1e13)`: late-game income (about 5e14/s for a full pen at Zeus, stored in tenths) and
+    Climb Power head past what an OrderedDataStore and Luau hold exactly. The order holds, and whole numbers come back
+    exact below about 2e12. No saved data changed.
+  - *Checked*: `check.ps1` passes. Playtests in a second Studio on a copy of the built place: both bootstraps ready, 41
+    tests pass (5 new for `Score`: exact round trip to a trillion, order, under 2^53 at 1e300, the merge). Without
+    DataStores the boards say "This server" and the console has one line saying so. After debug Climb Power and three
+    sheep, all four boards showed the player within 5 s, matching the player list (2.38K/s, 48K); after selling the
+    best sheep, This Server read 854/s and Top Income kept 2.38K/s. Screenshots of both pairs, words-only titles, with
+    sample rows filled in on the client. Store writes and reads weren't run (unpublished place).
+
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9
   (4-5 are 126, 10-12 are 325), and 129-178 across the ground. The user picked 275.

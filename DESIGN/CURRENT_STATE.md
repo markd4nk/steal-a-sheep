@@ -32,8 +32,13 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   the place by `tools/UpperMountain.luau` (Lune, in `build-place.ps1`); `tools/preview-upper-mountain.luau` previews it
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
+- **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
+  Top Income, Most Steals and Climb Power (top 10 across all servers, this server's players drawn in live):
+  `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climb.
+
 - **Server**: `DataService`, `PurchaseService` (pack, no products), `SheepService`, `PlotService`, `FlockService`,
-  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `DebugService` (Studio only).
+  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
+  `DebugService` (Studio only).
 - **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Popup, Studio
   DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
@@ -48,6 +53,8 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 ## Not verified
 
 - **Two players**: slide hits and knockback (server checks, client knockback) were never tried with a second player.
+- **All-servers leaderboards**: the place isn't published, so the boards ran on this server's players only; the
+  store writes and reads, name lookups and the last write on leaving are untested.
 - **Saving**: the place isn't published, so playtests used ProfileStore's mock store; rejoin, offline credit on a real
   rejoin and session locking are untested (the offline maths is unit-tested).
 - **Touch and gamepad**: only keyboard and mouse in Studio. Prompts, HUD buttons and the slide use Roblox's own input.
@@ -71,4 +78,3 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   They load if this game is published under the same owner.
 - **ViewportFrames (the menus' 3D sheep) don't show in Studio MCP screenshots while the window is minimized**; they do
   in play.
-- The map's four leaderboard boards are decoration; the player list shows Income and Climb.

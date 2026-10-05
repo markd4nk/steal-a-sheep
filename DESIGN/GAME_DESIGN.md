@@ -22,6 +22,7 @@ deliver -> earn and grow -> upgrade.
 - Climb gates, slide hits and knockback: `MountainService`; client slide, steering, braking: `MovementController`.
 - Flock, pens, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging: `FlockService`.
 - Plots (the map's five), pen pads, delivery pads, stair walkers: `PlotService`.
+- Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climb Power): `LeaderboardService`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
 ## The map

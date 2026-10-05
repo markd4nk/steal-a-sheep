@@ -39,6 +39,16 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 - **S8** (`BRAIN/PATTERNS/sessions.md`, Tools on Windows): "Claude Code's Bash tool fails a heredoc whose body has
   backticks ('unexpected EOF while looking for matching'), even with a quoted delimiter: write such files with the
   Write or Edit tools." Seen twice on 2026-10-05.
+- **S13** (`BRAIN/PATTERNS/leaderboards.md`, Store): "An OrderedDataStore holds whole numbers below 2^63, and an
+  exponential economy's numbers head past that (Steal a Sheep: a full pen at the top earns about 5e14 cash a second,
+  and Climb Power passes 1e15; Luau is exact only to 2^53 anyway). Store `math.floor(math.log10(1 + value) * 1e13)`
+  instead: the order holds, it stays under 2^53 up to 1e300, and `math.floor(10 ^ (stored / 1e13) - 1 + 0.5)` gives
+  whole numbers back exactly below about 2e12 and to twelve digits above." Seen 2026-10-05 building Steal a Sheep's
+  boards.
+- **S14** (`BRAIN/PATTERNS/ui.md`): "A map's board panel can be modelled lying on its side (its RightVector pointing
+  down), and a SurfaceGui on it then reads sideways; SurfaceGuis have no rotation. Put the GUI on an invisible
+  upright part just in front of the panel's face instead (`CFrame.lookAt(centre, centre + normal)`, sized from the
+  panel's extents along world up and across)." Seen 2026-10-05 on Steal a Sheep's commissioned map.
 
 ## Done
 
