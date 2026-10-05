@@ -1,0 +1,39 @@
+# Testing
+
+This game's own test tools and measurements.
+
+## Debug panel (Studio only)
+
+The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:Invoke(command, value)` from a Client
+`execute_luau`:
+
+| Command | Value | Does |
+| --- | --- | --- |
+| `AddCash` | coins (1000) | Coins |
+| `AddClimb` | Climb Power (100) | Climb Power, and a fresh snapshot |
+| `Steal` | tier | Teleports to that tier's first ready lamb and steals it (needs the tier open) |
+| `GiveSheep` | tier | An ordinary lamb of that tier straight into the flock, as if delivered |
+| `GrowAll` | - | Every lamb grows up on the next tick (with its reveal) |
+| `UnlockAll` | - | Zeus's Heavy target in Climb Power and one delivery from every tier |
+| `WipeSave` | - | A new player's save |
+
+Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
+
+## Playtesting through the Studio MCP from a script (2026-10-05)
+
+The build session drove a second Studio holding a copy of the built place (`build/Playtest.rbxl`, opened with
+`RobloxStudioBeta.exe <path>`) through Studio's MCP server (`%LOCALAPPDATA%\Roblox\Versions\<v>\StudioMCP.exe`,
+JSON-RPC over stdio), always picking that Studio by name so the Shear a Sheep window was never touched. Code went in
+without Rojo: `rojo build` of a project whose root is a Folder holding ReplicatedStorage, ServerScriptService,
+StarterPlayerScripts and Tests, written into Studio's `content\sas\` folder, then an Edit `execute_luau` that
+`game:GetObjects("rbxasset://sas/sync.rbxm")` and swaps each container's children.
+
+Useful measurements:
+
+- Slide: tier 1 Light lamb 20.1 studs/s, Stout 17.3; tier 7 Light at full training ~38.8. Gods: 21.1 (Demeter
+  chasing a slider), 35.2 (Apollo), 12.6 (Demeter on the tutorial run, walking target).
+- Holding E for 0.7-0.9 s through `user_keyboard_input` steals a lamb; W held with the camera turned downhill starts a
+  slide.
+- Screenshots: `screen_capture` with `camera_position` turns on Freecam, which then eats the mouse; restart the
+  playtest after using it. The world and ViewportFrames only render in captures while the Studio window isn't
+  minimized.

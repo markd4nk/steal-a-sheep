@@ -1,0 +1,10 @@
+/Packages
+/ServerPackages
+/build
+sourcemap.json
+globalTypes.d.luau
+globalTypes.version
+*.rbxl.lock
+*.rbxlx.lock
+__pycache__/
+/StealASheep.rbxl

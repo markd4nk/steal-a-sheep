@@ -1,0 +1,33 @@
+{
+  "name": "trailer",
+  "ink": "0x152A55",
+  "font": "FredokaOne-Regular.ttf",
+  "variants": {
+    "page": { "size": [1920, 1080], "captions": "page" },
+    "tall": { "size": [1080, 1920], "captions": "social" }
+  },
+  "music": {
+    "file": "music/track.mp3",
+    "start": 0,
+    "gain_db": -2,
+    "fade_in": 0.1,
+    "fade_out": 2.0
+  },
+  "clips": [
+    {
+      "src": "verb_close.mkv", "in": 5.8, "out": 8.4, "game_audio_db": 0,
+      "captions": {
+        "page": [{ "text": "Do the core thing", "at": [0.25, 2.5] }],
+        "social": [{ "text": "THE HOOK IN 3 WORDS", "at": [0.15, 2.5] }]
+      }
+    },
+    { "src": "reward.mkv", "in": 3.0, "out": 5.1, "game_audio_db": -4, "x": 0.6, "zoom": 1.1 },
+    { "src": "threat.mkv", "in": 8.6, "out": 10.7, "game_audio_db": 3, "transition": 0.2 }
+  ],
+  "title": {
+    "text": "Game Name",
+    "sub": { "page": "", "social": "Play free on Roblox" },
+    "seconds": 3,
+    "transition": 0.35
+  }
+}

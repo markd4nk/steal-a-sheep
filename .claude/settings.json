@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Mark/Desktop/TizzyAi/**)",
+      "Read(//c/Users/markf/OneDrive/Desktop/TizzyAi/**)"
+    ]
+  }
+}

@@ -1,0 +1,57 @@
+--!strict
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local Economy = require(ReplicatedStorage.Utils.Economy)
+local Roster = require(ServerScriptService.Services.FlockService.Roster)
+local Run = require(script.Parent.Run)
+
+local function make(id: string, size: number, slot: number, pinned: boolean?): Economy.Sheep
+	local sheep: Economy.Sheep = {
+		Id = id,
+		Family = "Meadow",
+		Rarity = 1,
+		Burden = 1,
+		Size = size,
+		Grown = 0,
+		Rank = 0,
+		Locked = false,
+		Slot = slot,
+		Pinned = pinned == true,
+	}
+	sheep.Grown = Economy.GrowthSeconds(sheep)
+	return sheep
+end
+
+return function(t: Run.Suite)
+	t.Test("FreeSlot finds the lowest empty slot, nil when full", function()
+		local flock = { ["1"] = make("1", 1, 1), ["2"] = make("2", 1, 3) }
+		t.Expect(Roster.FreeSlot(flock, 3)).ToBe(2)
+		flock["3"] = make("3", 1, 2)
+		t.Expect(Roster.FreeSlot(flock, 3)).ToBe(nil)
+	end)
+
+	t.Test("Equip Best fills the slots with the top earners and keeps pinned ones", function()
+		local flock = {
+			["1"] = make("1", 1, 1, true), -- pinned, small
+			["2"] = make("2", 1, 2),
+			["3"] = make("3", 3, 0), -- a Giant in storage
+			["4"] = make("4", 2, 0),
+		}
+		Roster.EquipBest(flock, 3)
+		t.Expect(flock["1"].Slot).ToBe(1)
+		t.Expect(flock["3"].Slot > 0).ToBe(true)
+		t.Expect(flock["4"].Slot > 0).ToBe(true)
+		t.Expect(flock["2"].Slot).ToBe(0)
+		t.Expect(Roster.Income(flock, 3)).ToBe(2 + 5 + 3)
+	end)
+
+	t.Test("Normalize stores sheep past the pen's size and splits shared slots", function()
+		local flock = { ["1"] = make("1", 1, 5), ["2"] = make("2", 1, 2), ["3"] = make("3", 1, 2) }
+		Roster.Normalize(flock, 3)
+		t.Expect(flock["1"].Slot).ToBe(0)
+		t.Expect(flock["2"].Slot).ToBe(2)
+		t.Expect(flock["3"].Slot).ToBe(0)
+	end)
+end

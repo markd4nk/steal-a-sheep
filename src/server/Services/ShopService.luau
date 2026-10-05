@@ -1,0 +1,262 @@
+--!strict
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+
+local Economy = require(ReplicatedStorage.Utils.Economy)
+local Format = require(ReplicatedStorage.Utils.Format)
+local Lifecycle = require(ReplicatedStorage.Lifecycle)
+local Remotes = require(ReplicatedStorage.Remotes)
+local Trove = require(ReplicatedStorage.Packages.Trove)
+
+-- Coin purchases (the next stair walker level, the next pen slot, trails in order) and the hub's three stations: the
+-- map's two stalls become the Shop and the Sell Stall, and the Merge Shrine stands between them. A station's prompt
+-- carries an Opens attribute; the client opens that screen (PromptController). Trails train faster and show on the
+-- player as a coloured trail.
+local ShopService = { Name = "ShopService" }
+
+local SHRINE_AT = CFrame.new(287, 59.5, 245) * CFrame.Angles(0, math.rad(90), 0)
+local TRAIL_NAME = "PlayerTrail"
+
+local registry: Lifecycle.Registry = {}
+local trove = Trove.new()
+
+local function anchorPart(parent: Instance, name: string, cframe: CFrame): Part
+	local part = Instance.new("Part")
+	part.Name = name
+	part.Anchored = true
+	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
+	part.Transparency = 1
+	part.Size = Vector3.new(1, 1, 1)
+	part.CFrame = cframe
+	part.Parent = parent
+	return part
+end
+
+local function station(
+	parent: Instance,
+	name: string,
+	at: CFrame,
+	opens: string,
+	action: string,
+	title: string,
+	color: Color3
+)
+	local anchor = anchorPart(parent, name, at)
+	local prompt = Instance.new("ProximityPrompt")
+	prompt.Name = "StationPrompt"
+	prompt.ActionText = action
+	prompt.ObjectText = title
+	prompt.MaxActivationDistance = 12
+	prompt.RequiresLineOfSight = false
+	prompt.KeyboardKeyCode = Enum.KeyCode.E
+	prompt.GamepadKeyCode = Enum.KeyCode.ButtonX
+	prompt:SetAttribute("Opens", opens)
+	prompt.Parent = anchor
+	local billboard = Instance.new("BillboardGui")
+	billboard.Size = UDim2.fromOffset(260, 60)
+	billboard.StudsOffsetWorldSpace = Vector3.new(0, 14, 0)
+	billboard.MaxDistance = 220
+	billboard.LightInfluence = 0
+	billboard.Parent = anchor
+	local words = Instance.new("TextLabel")
+	words.BackgroundTransparency = 1
+	words.Size = UDim2.fromScale(1, 1)
+	words.FontFace = Font.fromEnum(Enum.Font.FredokaOne)
+	words.TextScaled = true
+	words.TextColor3 = color
+	words.Text = title
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 3
+	stroke.Parent = words
+	words.Parent = billboard
+end
+
+local function buildShrine(parent: Instance)
+	local assets = ServerStorage:FindFirstChild("Assets")
+	local kit = assets and assets:FindFirstChild("WorldKit")
+	local machine = kit and kit:FindFirstChild("MutationMachine")
+	if machine and machine:IsA("Model") then
+		local shrine = machine:Clone()
+		shrine.Name = "MergeShrine"
+		shrine:PivotTo(SHRINE_AT)
+		shrine.Parent = parent
+		return
+	end
+	-- No kit in the place: a primitive altar.
+	local altar = Instance.new("Part")
+	altar.Name = "MergeShrine"
+	altar.Anchored = true
+	altar.Size = Vector3.new(8, 4, 8)
+	altar.CFrame = SHRINE_AT * CFrame.new(0, 2, 0)
+	altar.Color = Color3.fromRGB(236, 230, 214)
+	altar.Material = Enum.Material.Marble
+	altar.Parent = parent
+end
+
+local function stallFront(model: Model): CFrame
+	local cframe, size = model:GetBoundingBox()
+	return CFrame.new(cframe.Position.X - size.X / 2 - 2, 63, cframe.Position.Z)
+end
+
+local function applyTrail(player: Player)
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	if not root then
+		return
+	end
+	local old = root:FindFirstChild(TRAIL_NAME)
+	if old then
+		old:Destroy()
+	end
+	for _, name in { "TrailTop", "TrailBottom" } do
+		local attachment = root:FindFirstChild(name)
+		if attachment then
+			attachment:Destroy()
+		end
+	end
+	local data = registry.DataService:GetData(player)
+	local trail = data and Economy.Trail(data.Trail)
+	if not trail then
+		return
+	end
+	local top = Instance.new("Attachment")
+	top.Name = "TrailTop"
+	top.Position = Vector3.new(0, 0.8, 0.4)
+	top.Parent = root
+	local bottom = Instance.new("Attachment")
+	bottom.Name = "TrailBottom"
+	bottom.Position = Vector3.new(0, -1.8, 0.4)
+	bottom.Parent = root
+	local effect = Instance.new("Trail")
+	effect.Name = TRAIL_NAME
+	effect.Attachment0 = top
+	effect.Attachment1 = bottom
+	effect.Color = ColorSequence.new(trail.Color)
+	effect.Transparency = NumberSequence.new(0.2, 1)
+	effect.Lifetime = 0.6
+	effect.LightEmission = 0.5
+	effect.Parent = root
+end
+
+local function buy(player: Player, item: string, which: string?): (boolean, string?)
+	local data = registry.DataService:GetData(player)
+	if not data then
+		return false, "Still loading"
+	end
+	if item == "Walker" then
+		local cost = Economy.WalkerCost(data.WalkerLevel)
+		if not cost then
+			return false, "Your stair walker is maxed"
+		end
+		if not registry.DataService:AdjustCoins(player, -cost) then
+			return false, `Need {Format.Short(cost - data.Coins)} more coins`
+		end
+		data.WalkerLevel += 1
+		registry.DataService:Replicate(player)
+		registry.FlockService:Push(player)
+		return true,
+			`Stair walker level {data.WalkerLevel + 1}: +{Format.Short(Economy.WalkerRate(data.WalkerLevel))} Climb Power/s`
+	elseif item == "PenSlot" then
+		local slot = data.PenSlots + 1
+		local cost = Economy.PenCost(slot)
+		if not cost then
+			return false, "Your pen is as big as it gets"
+		end
+		if not registry.DataService:AdjustCoins(player, -cost) then
+			return false, `Need {Format.Short(cost - data.Coins)} more coins`
+		end
+		data.PenSlots = slot
+		registry.DataService:Replicate(player)
+		registry.FlockService:Push(player)
+		return true, "One more sheep can earn"
+	elseif item == "Trail" then
+		local trail = Economy.Trail(which)
+		if not trail then
+			return false, "No such trail"
+		end
+		if data.Trails[trail.Id] then
+			data.Trail = if data.Trail == trail.Id then "" else trail.Id
+		else
+			local index = table.find(Economy.Trails, trail) or 1
+			local previous = Economy.Trails[index - 1]
+			if previous and not data.Trails[previous.Id] then
+				return false, `Buy the {previous.Name} first`
+			end
+			if not registry.DataService:AdjustCoins(player, -trail.Cost) then
+				return false, `Need {Format.Short(trail.Cost - data.Coins)} more coins`
+			end
+			data.Trails[trail.Id] = true
+			data.Trail = trail.Id
+		end
+		registry.DataService:Replicate(player)
+		registry.FlockService:Push(player)
+		applyTrail(player)
+		return true, if data.Trail == trail.Id then `{trail.Name}: x{trail.Multiplier} training` else "Trail off"
+	end
+	return false, "Unknown item"
+end
+
+function ShopService.Init(_self: any, systems: Lifecycle.Registry)
+	registry = systems
+end
+
+function ShopService.Start(_self: any)
+	local folder = Instance.new("Folder")
+	folder.Name = "Stations"
+	folder.Parent = workspace
+	trove:Add(folder)
+	local base = workspace:FindFirstChild("Base")
+	local shops = base and base:FindFirstChild("Shop")
+	local stalls: { Model } = {}
+	if shops then
+		for _, child in shops:GetChildren() do
+			if child:IsA("Model") then
+				table.insert(stalls, child)
+			end
+		end
+	end
+	table.sort(stalls, function(a: Model, b: Model)
+		return a:GetBoundingBox().Position.Z > b:GetBoundingBox().Position.Z
+	end)
+	local shopAt = if stalls[1] then stallFront(stalls[1]) else CFrame.new(275, 63, 205)
+	local sellAt = if stalls[2] then stallFront(stalls[2]) else CFrame.new(275, 63, 175)
+	station(folder, "ShopStation", shopAt, "Shop", "Shop", "SHOP", Color3.fromRGB(255, 214, 90))
+	station(folder, "SellStation", sellAt, "Sell", "Sell sheep", "SELL STALL", Color3.fromRGB(140, 235, 120))
+	buildShrine(folder)
+	station(
+		folder,
+		"MergeStation",
+		SHRINE_AT * CFrame.new(0, 4, 0),
+		"Merge",
+		"Merge",
+		"MERGE SHRINE",
+		Color3.fromRGB(200, 160, 255)
+	)
+
+	Remotes.Buy:Handle(function(player: Player, item: string, which: string?)
+		return buy(player, item, which)
+	end)
+	local function watch(player: Player)
+		trove:Connect(player.CharacterAdded, function(character: Model)
+			character:WaitForChild("HumanoidRootPart", 10)
+			applyTrail(player)
+		end)
+	end
+	for _, player in Players:GetPlayers() do
+		watch(player)
+	end
+	trove:Connect(Players.PlayerAdded, watch)
+	trove:Add(registry.DataService:ObserveLoaded(function(player: Player)
+		applyTrail(player)
+	end))
+end
+
+function ShopService.Destroy(_self: any)
+	trove:Clean()
+end
+
+return ShopService

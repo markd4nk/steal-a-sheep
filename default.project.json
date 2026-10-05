@@ -1,0 +1,28 @@
+{
+  "name": "StealASheep",
+  "tree": {
+    "$className": "DataModel",
+    "$ignoreUnknownInstances": true,
+    "ReplicatedStorage": {
+      "$ignoreUnknownInstances": true,
+      "$path": "src/shared",
+      "Packages": { "$path": "Packages" }
+    },
+    "ServerScriptService": {
+      "$ignoreUnknownInstances": true,
+      "$path": "src/server",
+      "ServerPackages": { "$path": "ServerPackages" }
+    },
+    "ServerStorage": {
+      "$ignoreUnknownInstances": true,
+      "Tests": { "$path": "tests" }
+    },
+    "StarterPlayer": {
+      "$ignoreUnknownInstances": true,
+      "StarterPlayerScripts": {
+        "$ignoreUnknownInstances": true,
+        "$path": "src/client"
+      }
+    }
+  }
+}
