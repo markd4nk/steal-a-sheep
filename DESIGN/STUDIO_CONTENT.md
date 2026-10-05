@@ -5,8 +5,8 @@ builds each, and what the place holds now (saved to Roblox or not). Instances th
 here. Newest first.
 
 - **2026-10-05, High Olympus at 275 studs a stretch**. Same instances as below, rebuilt longer by `build-place.ps1`:
-  Zeus's top at x 6721.3, height 4439.1, the plaza from there to x 6811.3. The user's open `StealASheep.rbxl` holds
-  the 210 version until it's rebuilt from this branch.
+  Zeus's top at x 6721.3, height 4439.1, the plaza from there to x 6811.3. `StealASheep.rbxl` in the main checkout
+  was rebuilt with it; a Studio that had it open still shows the 210 version until reopened without saving.
 
 - **2026-10-05, High Olympus**. `tools/assemble.luau` now runs `tools/UpperMountain.luau` on the map before saving the
   place: `workspace.Stages.HighOlympus` (Folder) holds one Model a god, `Tier13 Iris` ... `Tier30 Zeus` (each `Floor`,
