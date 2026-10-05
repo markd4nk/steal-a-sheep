@@ -69,7 +69,7 @@ Economy.RankNames = table.freeze({ [0] = "", [1] = "Merged", [2] = "Ascended" })
 Economy.MaxRank = 2
 Economy.LambShare = 0.5 -- a lamb earns this share of its family's base, times its fleece
 Economy.TutorialGrowth = 30
-Economy.SellSeconds = 15
+Economy.SellSeconds = 120 -- the user, 2026-10-05: two minutes of income, near Steal an Egg's 100 s, to start
 Economy.DexRewardSeconds = 30
 Economy.TutorialCoins = 60
 Economy.TutorialClimb = 25

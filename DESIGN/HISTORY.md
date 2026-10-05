@@ -6,6 +6,33 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **The Sell Stall's menu, and a two-minute sell price (2026-10-05)**. The user sent Steal an Egg's Sell Pets (and
+  its Free Gift) and asked for mock-ups of the menu the Sell Stall by the plots opens: like the reference, made easier.
+  - *Mock-ups* (`DESIGN/ui/mockups/sell-stall.html`, two rounds): A, the grid four across with a sell tile on the
+    right; B, the reference's layout (sort on the left, the total along the bottom); a pick-everything-stored button;
+    one confirm for the lot.
+  - *The user's calls*: A; it opens with nothing picked and each sheep is tapped; keep Select all; the pen's sheep
+    don't show at the stall at all, so the best can't be sold by mistake (moving the best stored ones into the pen
+    comes later); selling pays two minutes of income to start (Steal an Egg pays about 100 s).
+  - *Server*: `Economy.SellSeconds` 120 (was 15). `Remotes.Sell` (ids, up to the flock's 100; 4 a second) ->
+    `FlockService.Sell`: `Roster.CanSell` (stored only, unlocked, each once, never the whole flock), then every price
+    paid at once and one snapshot. The one-at-a-time `FlockAction "Sell"` is gone.
+  - *Client*: `Screens/SellStall`, built at runtime from UIKit like the other menus: `MenuParts.CardGrid` cards with a
+    red ring and tick when picked and a LAMB / MERGED / size chip, a `SellTile` (fan of picked tokens, total, Select
+    all / Clear, Sell N), the menu's confirm with the count, the Sell accent (`Theme.Fleece.Accent.Sell`). The stall's
+    prompt opens it (`PromptController`); the Flock menu lost its sell mode. UIController mounts screens from an
+    explicit order list: the new screen had to go in it (it was missing at first and never mounted).
+  - *Kit*: `DESIGN/ui/` (README): Shear a Sheep's Prize Fleece CSS, `kit.js` with this game's token and HUD,
+    `export-data.luau` (Lune loads `GameConfig`, `Olympus` and `Economy`, so every price is the game's) and
+    `render.mjs`. The mock-ups were HTML: when they were made, five Studios were open and 2.6 GB of RAM was free.
+  - *Checked*: `check.ps1` passes; 57 tests pass in Studio (new: `CanSell`, the two-minute price). Playtested in this
+    session's own Studio (`build/SellPlaytest.rbxl`, code swapped in from `content/sas/sell-sync.rbxm`), on main's
+    code too after merging it: both bootstraps ready; the stall's prompt (E) opened the menu with only the 8 stored
+    sheep (the 6 in the pen absent); taps picked with ring and tick and summed (120 + 360 = 480); the locked lamb
+    refused with its notice; Select all took the 7 unlocked (5.1K) and turned into Clear; the confirm showed x7 and
+    5.1K; Sell left only the locked lamb, income unchanged (3,865/s), "Sold 7 for 5.1K cash". Called directly, the
+    server refused a pen sheep, a locked one and a missing id, and the old FlockAction Sell. Your Flock has no Sell.
+    Console clean. Not checked: a phone screen, gamepad, two players.
 - **Stair walker: a StairMaster outside the pen (2026-10-05)**. After the study below, the user: the first five looks
   are good, stick with five for now; the level floats over the machine; place it outside the pen, very close, like
   Steal an Egg's treadmill; an upgrade sign beside it to upgrade directly with cash or Robux. Earlier calls: gym at

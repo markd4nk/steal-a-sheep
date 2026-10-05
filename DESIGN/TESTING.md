@@ -20,6 +20,16 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
 
+## Sell Stall (2026-10-05)
+
+- Own place copy `build/SellPlaytest.rbxl` (as the pens session's below), code swapped in from
+  `content/sas/sell-sync.rbxm`. Flock for a test: `Debug UnlockAll`, `GiveSheep` a dozen times (the first 8 fill the
+  pen, the rest are stored lambs), `GrowAll`, then `FlockAction Unequip` an adult or two to store them.
+- Open it like a player: pivot the character 6 studs in front of `Workspace.Stations.SellStation`'s `StationPrompt`
+  and press E (`user_keyboard_input`); cards are `SellStall.Root.Window.Pages.GridWell.List.Sheep<id>`, the buttons
+  `...Pages.SellTile.SelectButton` / `SellButton`, the confirm's `...Root.Confirm.Dialog.Body.Buttons.ConfirmButton`.
+- `Remotes.Sell` allows 4 calls a second: space out several refused-sale checks or the fifth is dropped.
+
 ## Pens in this session's own Studio (2026-10-05)
 
 - **Own place copy**: with other sessions each in their own Studio and main's mid-playtest, `rojo build

@@ -3,10 +3,11 @@
 -- The one module allowed to create instances at require time. Define every remote here with
 -- Net.ToServer / Net.ToClient / Net.Request before the server bootstrap calls Net.Publish().
 -- See BRAIN/PATTERNS/networking.md.
+local GameConfig = require(script.Parent.Config.GameConfig)
 local Net = require(script.Parent.Net)
 local Guard = Net.Guard
 
-local FLOCK_ACTIONS = { "Equip", "Unequip", "Lock", "Unlock", "Sell", "EquipBest" }
+local FLOCK_ACTIONS = { "Equip", "Unequip", "Lock", "Unlock", "EquipBest" }
 local BUY_ITEMS = { "Walker", "PenSlot", "Trail" }
 local SHEEP_ID = Guard.String(16)
 
@@ -36,7 +37,7 @@ local Remotes = {
 	Knockback = Net.ToClient("Knockback") :: Net.ToClient<Vector3>,
 	SlideHit = Net.ToClient("SlideHit") :: Net.ToClient<number>,
 
-	-- The player's own flock: equip, unequip, lock, unlock or sell one sheep, or Equip Best (no id).
+	-- The player's own flock: equip, unequip, lock or unlock one sheep, or Equip Best (no id).
 	FlockAction = Net.Request(
 		"FlockAction",
 		{ Guard.OneOf(FLOCK_ACTIONS), Guard.Optional(SHEEP_ID) },
@@ -44,6 +45,8 @@ local Remotes = {
 	) :: Net.Request<(string, string?), (boolean, string?)>,
 	-- Three sheep into one at the Merge Shrine: (ok, message, the new sheep's id).
 	Merge = Net.Request("Merge", { Guard.Array(SHEEP_ID, 3) }, { Count = 4, Window = 1 }) :: Net.Request<({ string }), (boolean, string?, string?)>,
+	-- The Sell Stall: these stored sheep sold together (ok, message).
+	Sell = Net.Request("Sell", { Guard.Array(SHEEP_ID, GameConfig.Theft.InventoryLimit) }, { Count = 4, Window = 1 }) :: Net.Request<({ string }), (boolean, string?)>,
 	-- The shop: the next stair walker, room for one more sheep in the pen, or a trail by id (bought, or equipped if
 	-- owned).
 	Buy = Net.Request("Buy", { Guard.OneOf(BUY_ITEMS), Guard.Optional(Guard.String(16)) }, { Count = 8, Window = 1 }) :: Net.Request<(string, string?), (boolean, string?)>,

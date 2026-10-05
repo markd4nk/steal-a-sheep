@@ -208,9 +208,9 @@ return function(t: Run.Suite)
 		t.Expect((Economy.CanMerge(top))).ToBe(false)
 	end)
 
-	t.Test("selling pays 15 seconds of current income", function()
-		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(45)
-		t.Expect(Economy.SellValue(sheep({}))).ToBe(15)
+	t.Test("selling pays two minutes of current income", function()
+		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(360)
+		t.Expect(Economy.SellValue(sheep({}))).ToBe(120)
 	end)
 
 	t.Test("offline: a quarter of at most two hours, lamb rate until grown", function()

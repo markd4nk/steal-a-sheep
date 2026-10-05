@@ -430,6 +430,9 @@ function FlockService.Start(_self: any)
 	Remotes.Merge:Handle(function(player: Player, ids: { string })
 		return FlockService:Merge(player, ids)
 	end)
+	Remotes.Sell:Handle(function(player: Player, ids: { string })
+		return FlockService:Sell(player, ids)
+	end)
 end
 
 function FlockService.Destroy(_self: any)
@@ -541,17 +544,6 @@ local function act(player: Player, data: any, action: string, id: string?): (boo
 	elseif action == "Lock" or action == "Unlock" then
 		sheep.Locked = action == "Lock"
 		return true, nil
-	elseif action == "Sell" then
-		if sheep.Locked then
-			return false, "Unlock it first"
-		end
-		if Roster.Count(data.Sheep) <= 1 then
-			return false, "You can't sell your last sheep"
-		end
-		local value = Economy.SellValue(sheep)
-		data.Sheep[sheep.Id] = nil
-		registry.DataService:AdjustCoins(player, value)
-		return true, `Sold for {Format.Short(value)} cash`
 	end
 	return false, "Unknown action"
 end
@@ -561,15 +553,35 @@ function FlockService.Act(_self: any, player: Player, action: string, id: string
 	if not data then
 		return false, "Still loading"
 	end
-	if action == "Sell" and player:GetAttribute("Carrying") == true then
-		return false, "Deliver your sheep first"
-	end
 	local ok, message = act(player, data, action, id)
 	if ok then
 		refreshPen(player, true)
 		push(player)
 	end
 	return ok, message
+end
+
+-- The Sell Stall: stored, unlocked sheep sold together for Economy.SellValue each, as one change.
+function FlockService.Sell(_self: any, player: Player, ids: { string }): (boolean, string?)
+	local data = dataOf(player)
+	if not data then
+		return false, "Still loading"
+	end
+	if player:GetAttribute("Carrying") == true then
+		return false, "Deliver your sheep first"
+	end
+	local ok, why = Roster.CanSell(data.Sheep, ids, data.PenSlots)
+	if not ok then
+		return false, why
+	end
+	local total = 0
+	for _, id in ids do
+		total += Economy.SellValue(data.Sheep[id])
+		data.Sheep[id] = nil
+	end
+	registry.DataService:AdjustCoins(player, total)
+	push(player)
+	return true, `Sold {#ids} for {Format.Short(total)} cash`
 end
 
 -- The Merge Shrine: three unlocked adults of one family, fleece and rank into one of the next rank, saved as one

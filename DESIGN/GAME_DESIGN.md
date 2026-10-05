@@ -39,7 +39,7 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
 - Gods and pursuit: `GodService` (one state machine, primitive block rigs).
 - Climb speed checks, tier signs, slide hits and knockback: `MountainService`; uphill speed, client slide, steering, braking: `MovementController`.
 - Flock, pen capacity, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging:
-  `FlockService`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
+  `FlockService`; the Sell Stall's menu (stored sheep only, several at once): `UIController/Screens/SellStall`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
 - Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
 - Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climbing): `LeaderboardService`.

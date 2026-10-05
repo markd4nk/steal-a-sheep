@@ -1,0 +1,893 @@
+/* "Prize Fleece": the menus' one design system, copied from Shear a Sheep's DESIGN/ui/fleece/fleece.css (its SPEC.md
+   has the rules; Theme.Fleece and UIKit build the same pieces in the game). Every size is a point at UIScale 1 (a
+   phone held sideways); a screen's .stage scales the whole panel the way a UIScale does in Roblox. Only what Roblox UI
+   can draw is used: linear gradients (UIGradient), outlines (UIStroke), lips (a frame behind, offset down), tiled
+   patterns and radial glows (images), text outlines (UIStroke on text). */
+
+@font-face { font-family: "Fredoka One"; src: url("/rbxfonts/FredokaOne-Regular.ttf"), local("Fredoka One"); }
+@font-face { font-family: "Builder Sans"; font-weight: 700; src: url("/rbxfonts/BuilderSans-Bold.otf"); }
+@font-face { font-family: "Builder Sans"; font-weight: 800; src: url("/rbxfonts/BuilderSans-ExtraBold.otf"); }
+
+:root {
+	--display: "Fredoka One", sans-serif;
+	--text: "Builder Sans", sans-serif;
+
+	/* Ink: every outline, every text edge. */
+	--ink: #12131a;
+
+	/* The panel's body and what sits on it. */
+	--body-hi: #3a4257;
+	--body: #2f3647;
+	--body-lo: #272d3c;
+	--well: #1b1f2a;
+	--tile-hi: #4a5469;
+	--tile: #3c4457;
+	--tile-lo: #2c3242;
+	--muted: #a9b3c8;
+	--faint: #6f7a90;
+
+	/* What colours mean. */
+	--lime: #7dff4a; /* cash */
+	--gold: #ffd23f; /* a permanent bonus, the wool multiplier */
+	--good: #5ee36a;
+	--bad: #ff6b6b;
+
+	/* Button faces: top, bottom, lip. */
+	--buy-hi: #6cec76; --buy: #2fbf3f; --buy-lo: #1d8a2b;
+	--rbx-hi: #c36bff; --rbx: #9b30ec; --rbx-lo: #5f1a99;
+	--act-hi: #69c2ff; --act: #2f8ff0; --act-lo: #1b5fb0;
+	--dgr-hi: #ff7b7b; --dgr: #e5383b; --dgr-lo: #a01a1d;
+	--gld-hi: #ffe36b; --gld: #ffb81c; --gld-lo: #b87500;
+	--sft-hi: #59637b; --sft: #454e63; --sft-lo: #2b3141;
+	--gry-hi: #a6acb6; --gry: #80868f; --gry-lo: #565b63;
+
+	/* Studs: the game's own tile (Theme.Studs; Shear a Sheep's art/ui/make_studs.py drew it), 32 pt a tile. */
+	--studs: url("/DESIGN/ui/assets/studs.png");
+	--stud-tile: 32px;
+	/* The cards' pattern: little sheep, the way the references tile their own item (an arm, a pickaxe). */
+	--flock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='40' viewBox='0 0 44 40'%3E%3Cg fill='white'%3E%3Cg transform='translate(4 6)'%3E%3Ccircle cx='6' cy='7' r='4.2'/%3E%3Ccircle cx='11' cy='5' r='4.6'/%3E%3Ccircle cx='15.5' cy='7.5' r='4'/%3E%3Ccircle cx='9' cy='10' r='4.2'/%3E%3Ccircle cx='14' cy='10.5' r='3.8'/%3E%3Crect x='17.5' y='4.6' width='5' height='5.4' rx='2.2'/%3E%3Crect x='7' y='12' width='2' height='4.2' rx='1'/%3E%3Crect x='14' y='12' width='2' height='4.2' rx='1'/%3E%3C/g%3E%3Cg transform='translate(24 24) scale(.75)'%3E%3Ccircle cx='6' cy='7' r='4.2'/%3E%3Ccircle cx='11' cy='5' r='4.6'/%3E%3Ccircle cx='15.5' cy='7.5' r='4'/%3E%3Ccircle cx='9' cy='10' r='4.2'/%3E%3Ccircle cx='14' cy='10.5' r='3.8'/%3E%3Crect x='17.5' y='4.6' width='5' height='5.4' rx='2.2'/%3E%3Crect x='7' y='12' width='2' height='4.2' rx='1'/%3E%3Crect x='14' y='12' width='2' height='4.2' rx='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+	--rainbow: linear-gradient(115deg, #ff8a8a, #ffc96b 20%, #f5ee7a 40%, #8be59e 60%, #7ec2ff 80%, #c9a0ff);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+img { display: block; }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* The board around the frames (not part of the game). */
+
+body.board {
+	background: #161b26;
+	color: #e9eef7;
+	font: 17px/1.5 var(--text);
+	font-weight: 700;
+	padding: 40px 48px 64px;
+	width: 1800px;
+}
+body.solo { background: #000; padding: 0; margin: 0; width: auto; }
+.board-head { max-width: 1500px; margin-bottom: 30px; }
+.board-head .kicker { font: 15px/1 var(--display); color: #ffd23f; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.board-head h1 { font: 50px/1.08 var(--display); margin-bottom: 12px; }
+.board-head p { color: #b9c4d6; max-width: 1400px; margin-bottom: 8px; }
+.board-head p b { color: #fff; }
+.section { margin-top: 44px; }
+.section > h2 { font: 30px/1.1 var(--display); margin-bottom: 6px; }
+.section > p { color: #b9c4d6; max-width: 1450px; margin-bottom: 18px; }
+.section > p b { color: #fff; }
+.row { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+figure.shot { margin: 0 0 26px; }
+figure.shot figcaption { color: #b9c4d6; margin-top: 10px; font-size: 15px; max-width: 1600px; }
+figure.shot figcaption b { color: #fff; }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Frames: a PC screen (1600 x 900, UIScale 1.31) or a phone held sideways (844 x 390, UIScale 1). */
+
+.frame {
+	position: relative;
+	overflow: hidden;
+	border-radius: 14px;
+	box-shadow: 0 0 0 3px #0a0d14, 0 12px 34px rgba(0, 0, 0, 0.55);
+	color: #fff;
+	font-family: var(--display);
+	flex: none;
+}
+.frame.phone { border-radius: 34px; }
+body.solo .frame { border-radius: 0; box-shadow: none; }
+.frame > .world { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.frame > .backdrop { position: absolute; inset: 0; background: rgba(9, 12, 22, 0.5); }
+.frame > .backdrop.light { background: rgba(9, 12, 22, 0.36); }
+
+/* The stage centres a panel in the safe area and scales it by the screen's UIScale. */
+.stage {
+	position: absolute;
+	left: 50%;
+	top: var(--cy, 50%);
+	transform: translate(-50%, -50%) scale(var(--u, 1));
+	transform-origin: center;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Text */
+
+.ol { paint-order: stroke fill; -webkit-text-stroke: var(--sw, 5px) var(--sc, var(--ink)); }
+.drop { text-shadow: 0 3px 0 var(--ink); }
+.fit { white-space: nowrap; overflow: hidden; }
+.t-cash { color: var(--lime); }
+.t-gold { color: var(--gold); }
+.t-muted { color: var(--muted); }
+.t-good { color: var(--good); }
+.t-bad { color: var(--bad); }
+.small { font: 800 13px/1.15 var(--text); }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Icons */
+
+.ico { display: inline-block; flex: none; object-fit: contain; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.25)); }
+.robux {
+	display: inline-block;
+	flex: none;
+	background: currentColor;
+	-webkit-mask: url(/rbxtextures/ui/common/robux@3x.png) center/contain no-repeat;
+	mask: url(/rbxtextures/ui/common/robux@3x.png) center/contain no-repeat;
+}
+.robux-ol { position: relative; display: inline-block; flex: none; }
+.robux-ol > .robux { position: absolute; inset: 0; }
+.robux-ol > .robux.edge { color: var(--ink); transform: scale(1.32); }
+
+/* A sheep from the game's picture sheets (art/icons/pictures, 4 x 4 a sheet). */
+.sheep {
+	display: block;
+	flex: none;
+	background-size: 400% 400%;
+	background-repeat: no-repeat;
+	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.22));
+}
+.sheep.shadow { filter: brightness(0) opacity(0.55); }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* The panel: a body with a coloured header on top. One accent per menu sets --a-hi / --a / --a-lo. */
+
+.panel {
+	--hh: 58px; /* header height */
+	position: relative;
+	width: var(--w);
+	height: var(--h);
+	border-radius: 18px;
+	background: linear-gradient(180deg, var(--body-hi), var(--body) 30%, var(--body-lo));
+	box-shadow:
+		0 0 0 3px var(--ink),
+		0 7px 0 3px var(--ink),
+		0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.panel.auto { height: auto; }
+/* The body's own faint pattern: pinstripes, a tiled image in Roblox. */
+.panel::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.028) 0 9px, transparent 9px 18px);
+	pointer-events: none;
+}
+
+.hdr {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: var(--hh);
+	border-radius: 18px 18px 0 0;
+	background: linear-gradient(180deg, var(--a-hi), var(--a) 62%);
+	box-shadow:
+		inset 0 3px 0 rgba(255, 255, 255, 0.38),
+		inset 0 -5px 0 var(--a-lo),
+		0 3px 0 var(--ink);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 0 10px 4px 82px;
+	z-index: 2;
+}
+.hdr::before {
+	content: "";
+	position: absolute;
+	inset: 0 0 5px;
+	border-radius: inherit;
+	background: var(--studs) 0 0 / var(--stud-tile) var(--stud-tile);
+	pointer-events: none;
+}
+/* A rainbow header (a Rainbow mutation's pop-up). */
+.hdr.rainbow { background: var(--rainbow); }
+.hdr .badge {
+	position: absolute;
+	left: -16px;
+	top: -22px;
+	width: 88px;
+	height: 88px;
+	object-fit: contain;
+	transform: rotate(-9deg);
+	filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.35));
+	z-index: 3;
+}
+.hdr .sheep.badge {
+	filter: drop-shadow(3px 0 0 #12131a) drop-shadow(-3px 0 0 #12131a) drop-shadow(0 3px 0 #12131a) drop-shadow(0 -3px 0 #12131a) drop-shadow(0 4px 0 rgba(0, 0, 0, 0.35)) !important;
+}
+.frame.phone .hdr .badge { left: -8px; top: -4px; width: 68px !important; height: 68px !important; }
+.frame.phone .hdr { padding-left: 70px; }
+.hdr .title {
+	position: relative;
+	font: 34px/1 var(--display);
+	color: #fff;
+	--sw: 8px;
+	text-shadow: 0 4px 0 var(--ink);
+	white-space: nowrap;
+	letter-spacing: 0.01em;
+}
+.hdr .spacer { flex: 1; }
+
+/* A chip in the header: cash, pen space, a level. Dark glass on the accent. */
+.hchip {
+	position: relative;
+	height: 36px;
+	padding: 0 12px 0 6px;
+	border-radius: 12px;
+	background: rgba(10, 12, 20, 0.42);
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font: 21px/1 var(--display);
+	color: #fff;
+	white-space: nowrap;
+}
+.hchip .ico { width: 30px; height: 30px; }
+
+/* The close button: always the red studded square, always at the header's right. 44 pt to press. */
+.close {
+	position: relative;
+	width: 46px;
+	height: 44px;
+	border-radius: 12px;
+	background: linear-gradient(180deg, #ff7b7b, #e5383b 65%);
+	box-shadow:
+		0 0 0 2.5px var(--ink),
+		inset 0 -5px 0 #a01a1d,
+		inset 0 3px 0 rgba(255, 255, 255, 0.45);
+	display: grid;
+	place-items: center;
+	flex: none;
+	overflow: hidden;
+}
+.close::before { content: ""; position: absolute; inset: 0 0 5px; background: var(--studs) 0 0 / var(--stud-tile) var(--stud-tile); }
+.close svg { position: relative; width: 26px; height: 26px; margin-bottom: 3px; }
+.close.hover { filter: brightness(1.1); transform: scale(1.06); }
+.close.down { transform: translateY(2px) scale(0.95); box-shadow: 0 0 0 2.5px var(--ink), inset 0 -2px 0 #a01a1d, inset 0 3px 0 rgba(255, 255, 255, 0.45); }
+
+/* The body under the header. */
+.pbody {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: calc(var(--hh) + 3px);
+	bottom: 0;
+	padding: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.panel.auto .pbody { position: relative; top: 0; padding-top: calc(var(--hh) + 15px); }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Tabs: a segmented bar in a well. The page showing takes the menu's accent; the others are flat. */
+
+.tabbar { display: flex; align-items: center; gap: 10px; flex: none; }
+.tabs {
+	display: flex;
+	gap: 4px;
+	padding: 4px;
+	border-radius: 14px;
+	background: var(--well);
+	box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(0, 0, 0, 0.5);
+}
+.tab {
+	position: relative;
+	height: 36px;
+	padding: 0 16px;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	font: 18px/1 var(--display);
+	color: var(--muted);
+	white-space: nowrap;
+}
+.tab .ico { width: 24px; height: 24px; opacity: 0.6; filter: grayscale(0.4); }
+.tab.on {
+	color: #fff;
+	background: linear-gradient(180deg, var(--a-hi), var(--a) 70%);
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 -4px 0 var(--a-lo), inset 0 2px 0 rgba(255, 255, 255, 0.45);
+	padding-bottom: 3px;
+}
+.tab.on .ico { opacity: 1; filter: none; }
+.tab.on .lbl { paint-order: stroke fill; -webkit-text-stroke: 5px var(--ink); }
+.tab.hover:not(.on) { background: rgba(255, 255, 255, 0.07); color: #d7deeb; }
+/* A count on a tab: something new to see there. */
+.tab .dot {
+	position: absolute;
+	right: -6px;
+	top: -8px;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 5px;
+	border-radius: 10px;
+	background: #ff3b47;
+	box-shadow: 0 0 0 2px var(--ink);
+	font: 13px/20px var(--display);
+	color: #fff;
+	text-align: center;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Buttons. Every coloured button: a face with a top shine, studs, a darker lip, an ink outline, white words with an
+   ink edge. Kinds say what pressing does; size says how much it matters. */
+
+.btn {
+	--f-hi: var(--buy-hi);
+	--f: var(--buy);
+	--f-lo: var(--buy-lo);
+	--bh: 46px;
+	position: relative;
+	height: var(--bh);
+	min-width: var(--bh);
+	padding: 0 16px 4px;
+	border-radius: 13px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	font: 22px/1 var(--display);
+	color: #fff;
+	white-space: nowrap;
+	background: linear-gradient(180deg, var(--f-hi), var(--f) 60%);
+	box-shadow:
+		0 0 0 2.5px var(--ink),
+		inset 0 -5px 0 var(--f-lo),
+		inset 0 3px 0 rgba(255, 255, 255, 0.42);
+	overflow: hidden;
+	flex: none;
+}
+.btn::before {
+	content: "";
+	position: absolute;
+	inset: 0 0 5px;
+	background: var(--studs) 0 0 / var(--stud-tile) var(--stud-tile);
+	pointer-events: none;
+}
+.btn > * { position: relative; }
+.btn .lbl { paint-order: stroke fill; -webkit-text-stroke: 5px var(--ink); }
+.btn .ico { width: 30px; height: 30px; margin: -4px 0; }
+.btn .robux-ol { width: 22px; height: 22px; }
+.btn.sm { --bh: 38px; font-size: 18px; padding: 0 12px 4px; border-radius: 11px; }
+.btn.sm .ico { width: 24px; height: 24px; }
+.btn.sm .robux-ol { width: 18px; height: 18px; }
+.btn.hero { --bh: 56px; font-size: 28px; padding: 0 26px 5px; border-radius: 15px; }
+.btn.hero .lbl { -webkit-text-stroke: 6px var(--ink); }
+.btn.hero .ico { width: 38px; height: 38px; }
+.btn.wide { display: flex; width: 100%; }
+
+.btn.buy { --f-hi: var(--buy-hi); --f: var(--buy); --f-lo: var(--buy-lo); }
+.btn.robuxb { --f-hi: var(--rbx-hi); --f: var(--rbx); --f-lo: var(--rbx-lo); }
+.btn.action { --f-hi: var(--act-hi); --f: var(--act); --f-lo: var(--act-lo); }
+.btn.danger { --f-hi: var(--dgr-hi); --f: var(--dgr); --f-lo: var(--dgr-lo); }
+.btn.gold { --f-hi: var(--gld-hi); --f: var(--gld); --f-lo: var(--gld-lo); }
+.btn.soft { --f-hi: var(--sft-hi); --f: var(--sft); --f-lo: var(--sft-lo); }
+.btn.soft::before { opacity: 0.25; }
+/* Short of cash: grey, still pressable (it offers the Robux price instead). */
+.btn.short { --f-hi: var(--gry-hi); --f: var(--gry); --f-lo: var(--gry-lo); }
+/* Can't be pressed at all (maxed, blocked): flat, no lip, no studs, no shine. */
+.btn.off {
+	background: #343b4b;
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+	color: #8590a6;
+	padding-bottom: 0;
+}
+.btn.off::before { display: none; }
+.btn.off .lbl { -webkit-text-stroke: 0; }
+.btn.off .ico { filter: grayscale(1) opacity(0.55); }
+
+/* The states a pointer gives it. */
+.btn.hover { filter: brightness(1.09); transform: translateY(-1px); }
+.btn.down {
+	transform: translateY(3px);
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 -2px 0 var(--f-lo), inset 0 3px 0 rgba(255, 255, 255, 0.42);
+	filter: brightness(0.94);
+	padding-bottom: 1px;
+}
+.btn .dots { display: inline-flex; gap: 6px; }
+.btn .dots i { width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2.5px var(--ink); }
+.btn .dots i:nth-child(2) { opacity: 0.7; }
+.btn .dots i:nth-child(3) { opacity: 0.4; }
+/* A button that is the one thing to press now: a soft pulse of its own colour round it (the Glow, animated). */
+.btn.glow { box-shadow: 0 0 0 2.5px var(--ink), 0 0 0 7px rgba(255, 255, 255, 0.32), 0 0 26px 8px var(--f-hi), inset 0 -5px 0 var(--f-lo), inset 0 3px 0 rgba(255, 255, 255, 0.42); }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Chips: small facts with an icon. */
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	height: 28px;
+	padding: 0 10px 0 6px;
+	border-radius: 10px;
+	background: rgba(10, 12, 20, 0.5);
+	box-shadow: 0 0 0 2px var(--ink);
+	font: 17px/1 var(--display);
+	color: #fff;
+	white-space: nowrap;
+	flex: none;
+}
+.chip.np { padding: 0 10px; }
+.chip .ico { width: 24px; height: 24px; }
+.chip .robux-ol { width: 16px; height: 16px; }
+.chip .lbl { paint-order: stroke fill; -webkit-text-stroke: 4px var(--ink); }
+
+/* Rarity: one colour per tier, used as the card's fill, the label and the gem. */
+.rarity {
+	display: inline-flex;
+	align-items: center;
+	height: 24px;
+	padding: 0 10px;
+	border-radius: 8px;
+	background: linear-gradient(180deg, var(--t-hi), var(--t));
+	box-shadow: 0 0 0 2px var(--ink), inset 0 -3px 0 var(--t-lo);
+	font: 14px/1 var(--display);
+	letter-spacing: 0.05em;
+	color: #fff;
+	text-transform: uppercase;
+	padding-bottom: 3px;
+	white-space: nowrap;
+}
+.rarity .lbl { paint-order: stroke fill; -webkit-text-stroke: 4px var(--ink); }
+.rarity.secret { background: var(--rainbow); }
+
+/* Mutation badge: a foil pill with the multiplier. */
+.mut {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	height: 24px;
+	padding: 0 9px 3px;
+	border-radius: 8px;
+	background: linear-gradient(180deg, var(--m-hi), var(--m));
+	box-shadow: 0 0 0 2px var(--ink), inset 0 -3px 0 var(--m-lo), inset 0 2px 0 rgba(255, 255, 255, 0.6);
+	font: 14px/1 var(--display);
+	letter-spacing: 0.04em;
+	color: #fff;
+	white-space: nowrap;
+}
+.mut .lbl { paint-order: stroke fill; -webkit-text-stroke: 4px var(--ink); }
+.mut.rainbow { background: var(--rainbow); }
+
+.tier-common { --t-hi: #c3ccdb; --t: #8e9bb0; --t-lo: #5d6a80; }
+.tier-uncommon { --t-hi: #52e3c2; --t: #1dae93; --t-lo: #0d7563; }
+.tier-rare { --t-hi: #63c1ff; --t: #1e96e6; --t-lo: #0e5fa1; }
+.tier-epic { --t-hi: #bd91ff; --t: #8b55e8; --t-lo: #562aab; }
+.tier-legendary { --t-hi: #ffe36b; --t: #ffb21c; --t-lo: #b77300; }
+.tier-mythic { --t-hi: #ff86c2; --t: #e6428f; --t-lo: #9e1f5c; }
+.tier-secret { --t-hi: #4b3d76; --t: #2c2347; --t-lo: #17112b; }
+.tier-locked { --t-hi: #3d4352; --t: #2b303c; --t-lo: #1c2029; }
+
+.mut-silver { --m-hi: #f2f6fb; --m: #aab6c8; --m-lo: #6c788c; }
+.mut-gold { --m-hi: #ffe680; --m: #f0a800; --m-lo: #a56b00; }
+.mut-diamond { --m-hi: #c9f8ff; --m: #46c7e8; --m-lo: #1c7f9b; }
+.mut-rainbow { --m-hi: #fff; --m: #fff; --m-lo: #7a5bb5; }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Item cards: the tier's colour, the flock pattern, a glow behind the picture, an ink outline and lip. */
+
+.card {
+	--cw: 108px;
+	--ch: 128px;
+	position: relative;
+	width: var(--cw);
+	height: var(--ch);
+	border-radius: 14px;
+	background:
+		radial-gradient(ellipse 62% 48% at 50% 40%, rgba(255, 255, 255, 0.5), transparent 70%),
+		linear-gradient(180deg, var(--t-hi), var(--t) 58%, var(--t-lo));
+	box-shadow:
+		0 0 0 2.5px var(--ink),
+		0 5px 0 2.5px var(--ink),
+		inset 0 2px 0 rgba(255, 255, 255, 0.5),
+		inset 0 0 0 2px rgba(255, 255, 255, 0.14);
+	flex: none;
+}
+.card::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: var(--flock) 0 0 / 30px 27px;
+	opacity: 0.13;
+	pointer-events: none;
+}
+.card .sheep { position: absolute; left: 50%; top: 4px; width: 84px; height: 84px; transform: translateX(-50%); }
+.card .name {
+	position: absolute;
+	left: 6px;
+	right: 6px;
+	bottom: 33px;
+	text-align: center;
+	font: 15px/1.1 var(--display);
+	--sw: 4.5px;
+	white-space: nowrap;
+}
+.card .price {
+	position: absolute;
+	left: 6px;
+	right: 6px;
+	bottom: 6px;
+	height: 24px;
+	border-radius: 8px;
+	background: rgba(8, 10, 18, 0.55);
+	box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.3);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 3px;
+	font: 16px/1 var(--display);
+	padding-bottom: 1px;
+}
+.card .price .ico { width: 22px; height: 22px; margin-left: -4px; }
+.card .price .lbl { paint-order: stroke fill; -webkit-text-stroke: 4px var(--ink); }
+/* How many the player owns, top left. */
+.card .count {
+	position: absolute;
+	left: -6px;
+	top: -7px;
+	height: 22px;
+	padding: 0 7px;
+	border-radius: 8px;
+	background: linear-gradient(180deg, #4c5670, #2c3242);
+	box-shadow: 0 0 0 2px var(--ink);
+	font: 14px/22px var(--display);
+	color: #fff;
+	z-index: 2;
+}
+.card .count .lbl { paint-order: stroke fill; -webkit-text-stroke: 4px var(--ink); }
+/* NEW: just opened, not looked at yet. */
+.card .new {
+	position: absolute;
+	right: -8px;
+	top: -9px;
+	padding: 3px 7px 5px;
+	border-radius: 8px;
+	background: linear-gradient(180deg, #ff6b74, #ff2f3e);
+	box-shadow: 0 0 0 2px var(--ink), inset 0 -3px 0 #b3121f;
+	font: 13px/1 var(--display);
+	color: #fff;
+	transform: rotate(8deg);
+	z-index: 2;
+}
+.card .new .lbl { paint-order: stroke fill; -webkit-text-stroke: 4px var(--ink); }
+.card .mut { position: absolute; left: 50%; top: 48px; transform: translateX(-50%) scale(0.8); }
+.card .lockico { position: absolute; left: 50%; top: 22px; width: 46px; height: 46px; transform: translateX(-50%); }
+
+/* Selected: lifted, a white ring, a soft glow. */
+.card.sel {
+	transform: translateY(-3px) scale(1.045);
+	box-shadow:
+		0 0 0 3px #fff,
+		0 0 0 5.5px var(--ink),
+		0 0 22px 7px rgba(255, 255, 255, 0.4),
+		0 7px 0 5.5px var(--ink),
+		inset 0 2px 0 rgba(255, 255, 255, 0.5);
+	z-index: 1;
+}
+.card.hover { transform: translateY(-2px); filter: brightness(1.07); }
+.card.down { transform: translateY(2px) scale(0.97); }
+/* Locked: dark, a silhouette, no price. */
+.card.locked { background: linear-gradient(180deg, #3d4352, #2b303c 60%, #20242e); }
+.card.locked::before { opacity: 0.05; }
+.card.locked .name { color: #9aa3b5; }
+.card.locked .price { color: #9aa3b5; font-size: 14px; }
+/* The best tiers shine: a sweep of light across the card (a UIGradient's Offset, animated). */
+.card.shine::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.42) 42%, transparent 54%);
+	pointer-events: none;
+}
+.card.secret { background: radial-gradient(ellipse 62% 48% at 50% 40%, rgba(160, 120, 255, 0.45), transparent 70%), linear-gradient(180deg, #4b3d76, #2c2347 58%, #17112b); }
+.card.secret::after { content: ""; position: absolute; inset: -6px; border-radius: 18px; padding: 3.5px; background: var(--rainbow); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; z-index: 2; }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Wells and scrolling */
+
+.well {
+	position: relative;
+	border-radius: 14px;
+	background: rgba(10, 12, 20, 0.42);
+	box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(0, 0, 0, 0.45);
+	overflow: hidden;
+}
+.well .scroll { position: absolute; inset: 0; padding: 12px 20px 12px 12px; overflow: hidden; }
+.grid { display: grid; gap: 14px 10px; align-content: start; }
+/* More below: the list fades out at the bottom edge. */
+.well .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 34px; background: linear-gradient(transparent, rgba(23, 27, 37, 0.95)); pointer-events: none; }
+.well .bar-y { position: absolute; right: 5px; top: 10px; bottom: 10px; width: 7px; border-radius: 4px; background: rgba(0, 0, 0, 0.35); }
+.well .bar-y i { position: absolute; left: 0; right: 0; top: var(--st, 0%); height: var(--sh, 40%); border-radius: 4px; background: rgba(255, 255, 255, 0.45); }
+
+/* A plain dark tile (requirements, settings rows, list rows). */
+.tile {
+	position: relative;
+	border-radius: 14px;
+	background: linear-gradient(180deg, var(--tile-hi), var(--tile) 55%, var(--tile-lo));
+	box-shadow: 0 0 0 2.5px var(--ink), 0 4px 0 2.5px var(--ink), inset 0 2px 0 rgba(255, 255, 255, 0.14);
+}
+/* A label over a group: small capitals, muted. */
+.eyebrow { font: 14px/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Progress bars */
+
+.pbar {
+	--b-hi: #ffe36b;
+	--b: #ffb81c;
+	--b-lo: #b87500;
+	position: relative;
+	height: 26px;
+	border-radius: 13px;
+	background: #141720;
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 4px 0 rgba(0, 0, 0, 0.45);
+	overflow: hidden;
+}
+.pbar > i {
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: var(--p, 50%);
+	border-radius: 13px;
+	background:
+		repeating-linear-gradient(120deg, rgba(255, 255, 255, 0.16) 0 8px, transparent 8px 16px),
+		linear-gradient(180deg, var(--b-hi), var(--b) 65%);
+	box-shadow: inset 0 -4px 0 var(--b-lo), inset 0 2px 0 rgba(255, 255, 255, 0.55), 2.5px 0 0 var(--ink);
+}
+.pbar > span {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font: 16px/1 var(--display);
+	color: #fff;
+	paint-order: stroke fill;
+	-webkit-text-stroke: 4.5px var(--ink);
+	padding-bottom: 1px;
+}
+.pbar.green { --b-hi: #7cf284; --b: #2fbf3f; --b-lo: #1d8a2b; }
+.pbar.blue { --b-hi: #69c2ff; --b: #2f8ff0; --b-lo: #1b5fb0; }
+.pbar.pink { --b-hi: #ff86c2; --b: #e6428f; --b-lo: #9e1f5c; }
+.pbar.full { box-shadow: 0 0 0 2.5px var(--ink), 0 0 16px 4px rgba(126, 242, 132, 0.6), inset 0 4px 0 rgba(0, 0, 0, 0.45); }
+.pbar.sm { height: 18px; }
+.pbar.sm > span { font-size: 13px; -webkit-text-stroke: 4px var(--ink); }
+
+/* Segmented: one pip a level (upgrades). */
+.pips { display: flex; gap: 3px; height: 16px; padding: 3px; border-radius: 9px; background: #141720; box-shadow: 0 0 0 2.5px var(--ink), inset 0 3px 0 rgba(0, 0, 0, 0.45); }
+.pips i { flex: 1; border-radius: 3px; background: rgba(255, 255, 255, 0.07); }
+.pips i.on { background: linear-gradient(180deg, var(--b-hi, #7cf284), var(--b, #2fbf3f)); box-shadow: inset 0 -2px 0 var(--b-lo, #1d8a2b); }
+.pips i.next { background: rgba(124, 242, 132, 0.32); }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Before -> after (upgrades, rebirth) */
+
+.ba { display: flex; align-items: center; gap: 8px; }
+.ba .v { font: 26px/1 var(--display); color: #fff; paint-order: stroke fill; -webkit-text-stroke: 6px var(--ink); white-space: nowrap; }
+.ba .v.next { color: var(--lime); }
+.arrow {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background: #141720;
+	box-shadow: 0 0 0 2.5px var(--ink);
+	display: grid;
+	place-items: center;
+	flex: none;
+}
+.arrow svg { width: 15px; height: 15px; margin-left: 2px; }
+.plus {
+	display: inline-flex;
+	align-items: center;
+	height: 24px;
+	padding: 0 8px 2px;
+	border-radius: 12px;
+	background: linear-gradient(180deg, #7cf284, #2fbf3f);
+	box-shadow: 0 0 0 2px var(--ink), inset 0 -3px 0 #1d8a2b;
+	font: 15px/1 var(--display);
+	color: #fff;
+}
+.plus .lbl { paint-order: stroke fill; -webkit-text-stroke: 4px var(--ink); }
+
+/* MAX: a gold plate where the price would be. */
+.maxed {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	height: 46px;
+	border-radius: 13px;
+	background: linear-gradient(180deg, #ffe36b, #ffb81c 60%);
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 -5px 0 #b87500, inset 0 3px 0 rgba(255, 255, 255, 0.5);
+	font: 24px/1 var(--display);
+	color: #fff;
+	padding-bottom: 4px;
+}
+.maxed .lbl { paint-order: stroke fill; -webkit-text-stroke: 5px var(--ink); }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Rays and stages behind a hero picture (an image turning slowly in Roblox). */
+
+.stagebox {
+	position: relative;
+	border-radius: 16px;
+	overflow: hidden;
+	background: radial-gradient(ellipse 70% 60% at 50% 55%, var(--t-hi, #6a7590), var(--t, #3c4457) 60%, var(--t-lo, #262c3a));
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 3px 0 rgba(255, 255, 255, 0.3), inset 0 -4px 0 rgba(0, 0, 0, 0.25);
+}
+.rays {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 340px;
+	height: 340px;
+	transform: translate(-50%, -50%);
+	background: repeating-conic-gradient(rgba(255, 255, 255, 0.2) 0 9deg, transparent 9deg 22.5deg);
+	-webkit-mask: radial-gradient(circle, #000 18%, transparent 62%);
+	mask: radial-gradient(circle, #000 18%, transparent 62%);
+}
+.glowdisc {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 150px;
+	height: 150px;
+	transform: translate(-50%, -50%);
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 65%);
+}
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Tooltips and toasts */
+
+.tip {
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+	gap: 3px;
+	padding: 9px 12px 10px;
+	border-radius: 12px;
+	background: rgba(14, 16, 24, 0.94);
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 0 0 1.5px rgba(255, 255, 255, 0.1), 0 8px 18px rgba(0, 0, 0, 0.4);
+	color: #fff;
+	max-width: 230px;
+}
+.tip .tt { font: 17px/1.1 var(--display); }
+.tip .td { font: 800 14px/1.25 var(--text); color: var(--muted); }
+.tip::after {
+	content: "";
+	position: absolute;
+	left: var(--tx, 50%);
+	bottom: -9px;
+	width: 16px;
+	height: 16px;
+	background: rgba(14, 16, 24, 0.94);
+	transform: translateX(-50%) rotate(45deg);
+	box-shadow: 2.5px 2.5px 0 var(--ink);
+	border-radius: 0 0 4px 0;
+}
+
+.toast {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	height: 44px;
+	padding: 0 16px 0 8px;
+	border-radius: 14px;
+	background: linear-gradient(180deg, var(--a-hi), var(--a) 65%);
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 -4px 0 var(--a-lo), inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 8px 18px rgba(0, 0, 0, 0.35);
+	font: 20px/1 var(--display);
+	color: #fff;
+	padding-bottom: 3px;
+}
+.toast .ico { width: 34px; height: 34px; }
+.toast .lbl { paint-order: stroke fill; -webkit-text-stroke: 5px var(--ink); }
+
+/* Settings pieces */
+.toggle {
+	position: relative;
+	width: 92px;
+	height: 38px;
+	border-radius: 11px;
+	display: grid;
+	place-items: center;
+	font: 18px/1 var(--display);
+	color: #fff;
+	padding-bottom: 3px;
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 -4px 0 var(--f-lo), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+	background: linear-gradient(180deg, var(--f-hi), var(--f) 65%);
+}
+.toggle.on { --f-hi: var(--buy-hi); --f: var(--buy); --f-lo: var(--buy-lo); }
+.toggle.offt { --f-hi: #ff7fb0; --f: #e83a7c; --f-lo: #9e1f52; }
+.toggle .lbl { paint-order: stroke fill; -webkit-text-stroke: 4.5px var(--ink); }
+.slider { position: relative; height: 16px; border-radius: 8px; background: #141720; box-shadow: 0 0 0 2.5px var(--ink), inset 0 3px 0 rgba(0, 0, 0, 0.45); }
+.slider > i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--p); border-radius: 8px; background: linear-gradient(180deg, var(--b-hi, #7cf284), var(--b, #2fbf3f)); box-shadow: inset 0 -3px 0 var(--b-lo, #1d8a2b); }
+.slider > b { position: absolute; left: var(--p); top: 50%; width: 22px; height: 30px; border-radius: 7px; transform: translate(-50%, -50%); background: linear-gradient(180deg, #fff, #d8dee9); box-shadow: 0 0 0 2.5px var(--ink), inset 0 -3px 0 #a8b0bf; }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* The HUD, drawn behind the backdrop for context only. */
+
+.hud { position: absolute; inset: 0; }
+.hud .cash { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; font: 40px/1 var(--display); color: var(--lime); }
+.hud .cash .ico { width: 54px; height: 54px; }
+.hud .col { position: absolute; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.hud .pic { display: flex; flex-direction: column; align-items: center; gap: 2px; font: 17px/1 var(--display); color: #fff; }
+.hud .pic img { width: 70px; height: 70px; }
+.rbx { position: absolute; left: 16px; top: 12px; display: flex; gap: 10px; }
+.rbx span { height: 44px; min-width: 44px; padding: 0 12px; border-radius: 22px; background: rgba(15, 18, 25, 0.62); display: flex; align-items: center; gap: 14px; }
+.rbx svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Callouts on the anatomy board */
+.callout { position: absolute; font: 800 15px/1.2 var(--text); color: #ffd23f; white-space: nowrap; }
+.callout::before { content: ""; position: absolute; background: #ffd23f; }
+.callout.l::before { right: calc(100% + 6px); top: 50%; width: var(--len, 40px); height: 2px; }
+.callout.r::before { left: calc(100% + 6px); top: 50%; width: var(--len, 40px); height: 2px; }
+.callout.u::before { left: 50%; bottom: calc(100% + 4px); width: 2px; height: var(--len, 30px); }
+.callout.d::before { left: 50%; top: calc(100% + 4px); width: 2px; height: var(--len, 30px); }
+.dot-num { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #ffd23f; color: #161b26; font: 15px/1 var(--display); box-shadow: 0 0 0 2.5px var(--ink); flex: none; }
+
+/* Interactive pages: the real pointer gives the same states the boards draw. */
+.live .btn:hover { filter: brightness(1.09); transform: translateY(-1px); }
+.live .btn:active { transform: translateY(3px); filter: brightness(0.94); }
+.live .card:hover { transform: translateY(-2px); filter: brightness(1.07); }
+.live .close:hover { filter: brightness(1.1); transform: scale(1.06); }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* The sheep token (UIKit.Token, painted by UIController/SheepIcon): Shear a Sheep's drawing, tinted per family. */
+
+.token { position: relative; display: block; flex: none; }
+.token > svg { width: 100%; height: 100%; overflow: visible; }
+.token .spark { position: absolute; overflow: visible; }
+
+/* ---------------------------------------------------------------------------------------------------------------- */
+/* Steal a Sheep's HUD at the top right (Hud.luau), drawn behind the backdrop for context only. */
+
+.sas-hud { position: absolute; right: 18px; top: 10px; display: flex; gap: 22px; align-items: center; }
+.sas-hud .stat { display: flex; align-items: center; gap: 4px; }
+.sas-hud .stack { display: flex; flex-direction: column; align-items: flex-start; font: 40px/0.95 var(--display); color: #ffd23f; }
+.sas-hud .stack.cash { color: var(--lime); }
+.sas-hud small { font: 17px/1 var(--display); color: #fff; letter-spacing: 0.02em; }
+
+/* A notice sliding up over a panel's bottom edge (UIKit.Notice): good, bad. */
+.notice {
+	position: absolute;
+	left: 50%;
+	bottom: -20px;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	height: 40px;
+	padding: 0 18px 3px 8px;
+	border-radius: 20px;
+	background: linear-gradient(180deg, #7cf284, #2fbf3f 65%);
+	box-shadow: 0 0 0 2.5px var(--ink), inset 0 -4px 0 #1d8a2b, inset 0 2px 0 rgba(255, 255, 255, 0.45), 0 8px 18px rgba(0, 0, 0, 0.35);
+	font: 19px/1 var(--display);
+	color: #fff;
+	white-space: nowrap;
+	z-index: 6;
+}
+.notice .ico { width: 30px; height: 30px; }
+.notice .lbl { paint-order: stroke fill; -webkit-text-stroke: 5px var(--ink); }
+.notice.bad { background: linear-gradient(180deg, #ff7b7b, #e5383b 65%); box-shadow: 0 0 0 2.5px var(--ink), inset 0 -4px 0 #a01a1d, inset 0 2px 0 rgba(255, 255, 255, 0.45), 0 8px 18px rgba(0, 0, 0, 0.35); }

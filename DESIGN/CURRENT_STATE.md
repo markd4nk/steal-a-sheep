@@ -12,6 +12,7 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 | `DESIGN/STUDIO_CONTENT.md` | What the code expects in the place file, and what the place holds now | Before Studio-side work or a publish |
 | `DESIGN/TESTING.md` | This game's test tools and how it was playtested | Before playtesting |
 | `DESIGN/BRAIN_PROPOSALS.md` | Lessons proposed for the shared BRAIN, waiting for the user | When you learn something reusable |
+| `DESIGN/ui/` | HTML mock-ups in the menus' look, from the game's own numbers (`DESIGN/ui/README.md`) | Before showing a new screen |
 
 ## Live
 
@@ -56,6 +57,9 @@ lamb.
 - **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
   gods at one set speed; weight saved and tilting size odds (`Economy.RollWeight`, `SizeOdds`, for the Merge Shrine).
   GAME_DESIGN.md, *Climbing* and *Lamb weight*.
+- **Sell Stall** (`UIController/Screens/SellStall`, `FlockService.Sell`, `Roster.CanSell`): the stall's prompt opens
+  the stored sheep as cards; tap them or Select all, one Sell after a confirm, two minutes of income each. Sheep in the
+  pen never show and the server refuses them; the Flock menu no longer sells.
 - **From Shear a Sheep**: UIKit, Theme, Style (trimmed), Panel, Buttons, Motion, Scale, the sheep rig, add-ons and
   breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds, the Mutation Machine (as the Merge Shrine).
 
@@ -63,10 +67,15 @@ lamb.
 
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
+- **Sell Stall menu: built on branch `t3code/sell-market-mockup`, not merged** (the user asked not to merge branches
+  into main unless asked). Playtested in this session's own Studio (`build/SellPlaytest.rbxl`); DECISIONS.md lists
+  its calls under *To review*.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
 
+- **Sell Stall on a phone and a gamepad**: played on a PC window only (mouse); the layout matches the mock-up's phone
+  frame, not checked in the Device Simulator.
 - **Stair walker with two players**: another player's climb (posed on each device) and the owner-only sign prompts
   were only checked solo; the Robux upgrade can't be bought until its developer products exist.
 
