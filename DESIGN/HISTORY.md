@@ -6,6 +6,54 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Put lambs down anywhere in the pen; sheep roam and graze (2026-10-05)**.
+  The user: instead of the delivery platform and fixed pads you unlock, be like Steal an Egg (bring the lamb into the
+  pen and place it where you choose); sheep walk around on their own like Shear a Sheep's; lambs mostly eat off the
+  floor, looking down and chewing with an eating face; make it fluid.
+  - *Delivery*: the carry lasts until the thief puts the lamb down inside their own plot's fence. `PlotService/Build`
+    makes an invisible `Pen` box filling each plot's fence (measured from the plot model's parts) and a `Keepout` box
+    round the stair walker; the pads, the delivery pad and their decor clearing are gone. `WildService` sets the
+    `InPen` attribute and warns in other plots; `PromptController` makes a local Put down prompt on the carried lamb
+    while the player stands in their own `Pen` (`Utils/PenArea`, the same test on server and client); its
+    `Remotes.PutDown` has the server put the lamb 4 studs ahead (clamped inside the fence) and call
+    `FlockService:Deliver(player, wild, at, from)`.
+  - *Pen sheep* (`FlockService/Pens`): models stand at a spot and stroll with Shear a Sheep's `Utils/Wander` (copied
+    with its tests): the server picks each stroll every 0.25 s (within RoamRadius of home, inside the fence, off the
+    walker, `PlotService:CanStand` (an overlap box, solid parts only, ground and game folders skipped) and
+    `PathClear` (keep-out samples and a spherecast)), and sets `WalkAt` then `Spot`; the model moves on the server only
+    when shown, grown or rebuilt. Arrivals (`DropFrom`, `DroppedAt`) land on the put-down spot or the nearest clear one.
+    Saved sheep gained optional `HomeX`/`HomeZ` (studs from the plot's middle; validated, no migration). Slots still
+    mean "in the pen" (1 to PenSlots), so Roster, Equip Best, merging and income are unchanged.
+  - *Each device* (`AnimController`, rewritten): every penned sheep follows its hop or stroll (re-pivoted when the
+    server moves the model), legs in step with the ground (`SheepClips.Walk`); the nearest 50 in 70 studs graze
+    (`SheepClips.Graze`/`GrazeStage`: body tips 14 degrees, sinks a little, head tips 80 and the neck reaches so the nose
+    touches the grass; bites tug and sweep, chews bob and roll), idle, happy-hop after landing, and swap faces (chew
+    frames, Happy, Baa, Blink). Wild lambs carry `Lamb` and graze too.
+  - *Eating face*: two variants drawn with Shear a Sheep's face helpers (`art/faces/chew_faces.py`, renders in
+    `art/faces/renders/`, ignored), shown as a sheet and then filmed on a grazing tier 8 lamb (pictures loaded from
+    Studio's content folder, nothing uploaded); the user picked A, "Munch". MunchA and MunchB were uploaded through the
+    Studio MCP's `upload_image` (served on 127.0.0.1) as rbxassetid://140615494609777 and 118466923824368 and set as
+    `ChewFaces`. AnimController preloads its face pictures one request each and swaps in only those that have
+    arrived (or whose fetch status says Success), so a picture still in Roblox's review never shows as a blank face.
+    Seen in a fresh Studio: the lamb chews with the uploaded Munch frames (filmed).
+  - *The user's calls after seeing it*: merge it; the pen holds 8 to start, up to 20, very expensive to grow (Pen
+    Space prices x6 a slot from 25K; older saves raised to 8 on load); sheep roam the whole plot at the same pace (the
+    18-stud range round home is gone). Checked with `check.ps1` and the unit tests in Studio.
+  - *A fix found filming*: a sheep made while the player is in the game (every put-down) could reach the client in
+    pieces, its `Sheep` tag before its Motor6Ds and face: AnimController rigged it at once and it walked about stiff,
+    never grazing or changing face (two takes in five). It now takes joints and the face from `DescendantAdded` too;
+    three lambs put down in a row then all grazed, chewed, blinked and baa-ed (25 s face log).
+  - *UI*: objective "Bring it into your pen" / "Put it down where you like" (and the full-pen warning); Flock card "In
+    your pen"; Shop "Pen Space n/20".
+  - *Checked*: `check.ps1` passes; 43 tests pass in Studio (Wander, PlayerData homes). Playtested solo in this session's
+    own Studio on `build/PenPlaytest.rbxl` (main's Studio was in someone's playtest): a stolen lamb carried home, no
+    prompt outside the gate or in another plot (the notice showed), "Put down" pressed with E landed it 4 studs ahead
+    after a 0.47 s hop from head height; 8 then 12 sheep: 560 samples over 40 s found none outside the fence, on the
+    walker or in solid decor, the nearest two 5.7 studs apart, all strolling; grazing seen (nose on the grass, chewing
+    with the stand-in face) and filmed; store, equip (hops back in at home), grow-up rebuilds in place, merge (hops in
+    at the first sheep's home), sell, and a full pen (stored, warning shown). Console clean. Not checked: two players,
+    touch, gamepad, a real rejoin.
+
 - **Coins renamed cash (2026-10-05)**. The user: there are no coins, just cash, all through the game. The nine messages
   that said coins now say cash (selling, the Shop's "Need ... more", Sheepdex rewards, the tutorial reward, the
   welcome-back card, the debug panel). Code names and saved data keep `Coins`; the map and the borrowed assets have

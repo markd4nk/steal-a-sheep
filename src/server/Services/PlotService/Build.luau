@@ -4,17 +4,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
-local Format = require(ReplicatedStorage.Utils.Format)
 
--- The primitive pieces each plot gets at runtime, in the plot's own frame (its middle, +X towards its gate): twelve
--- pen pads in a 4 x 3 grid, the delivery pad just inside the gate, the stair walker by the back fence, and the owner's
--- sign over the gate. Map decor (hay, trees) standing where they go is moved out of the way.
+-- The primitive pieces each plot gets at runtime, in the plot's own frame (its middle, +X towards its gate): the pen
+-- (an invisible box filling the fence, where the owner's sheep live and where a stolen lamb is put down), the stair
+-- walker by the back fence with a keep-out box round it for the sheep, and the owner's sign over the gate. Map decor
+-- (hay, trees) standing where the walker goes is moved out of the way; the rest stays, and the sheep walk round it.
 local Build = {}
 
 export type Pieces = {
 	Folder: Folder,
-	Pads: { BasePart },
-	Delivery: BasePart,
+	Pen: BasePart,
+	Keepouts: { BasePart },
 	Walker: Model,
 	WalkerZone: BasePart,
 	WalkerScreen: TextLabel,
@@ -24,19 +24,13 @@ export type Pieces = {
 	Spawn: CFrame,
 }
 
-local PAD_SIZE = 8.5
-local PAD_GAP = 10.5
-local PAD_COLUMNS = 4
 local FLOOR_Y = 59.5
+local PEN_HEIGHT = 14
+local FENCE_INSET = 1 -- studs from the fence posts' outer faces to the pen's edge
 
 -- Offsets from the plot's middle (x along its length, towards the gate; z across).
-local PADS_FROM = Vector2.new(-27, -10.5)
-local DELIVERY_AT = Vector2.new(44, 0)
 local WALKER_AT = Vector2.new(20, 25)
 local SPAWN_AT = Vector2.new(34, 0)
-
-local PAD_OPEN = Color3.fromRGB(196, 160, 112)
-local PAD_LOCKED = Color3.fromRGB(82, 88, 104)
 
 local function block(parent: Instance, name: string, size: Vector3, cframe: CFrame, color: Color3): Part
 	local part = Instance.new("Part")
@@ -113,6 +107,36 @@ local function clearDecor(center: Vector3, half: Vector3)
 	end
 end
 
+-- The plot's fence lines along the world's axes: the smallest and largest x and z its parts reach.
+local function fenceBox(model: Model): (Vector3, Vector3)
+	local low = Vector3.one * math.huge
+	local high = -low
+	for _, part in model:GetDescendants() do
+		if part:IsA("BasePart") then
+			local cframe, half = part.CFrame, part.Size / 2
+			local reach = Vector3.new(
+				math.abs(cframe.XVector.X) * half.X
+					+ math.abs(cframe.YVector.X) * half.Y
+					+ math.abs(cframe.ZVector.X) * half.Z,
+				0,
+				math.abs(cframe.XVector.Z) * half.X
+					+ math.abs(cframe.YVector.Z) * half.Y
+					+ math.abs(cframe.ZVector.Z) * half.Z
+			)
+			low = low:Min(part.Position - reach)
+			high = high:Max(part.Position + reach)
+		end
+	end
+	return low, high
+end
+
+local function invisible(part: BasePart)
+	part.Transparency = 1
+	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
+end
+
 local function makeWalker(parent: Instance, origin: CFrame): (Model, BasePart, TextLabel, { BasePart })
 	local walker = Instance.new("Model")
 	walker.Name = "StairWalker"
@@ -170,50 +194,24 @@ function Build.Plot(index: number, model: Model, parent: Instance): (Pieces, CFr
 	local folder = Instance.new("Folder")
 	folder.Name = `Plot{index}`
 
-	local pads: { BasePart } = {}
-	for slot = 1, Economy.MaxPens do
-		local column = (slot - 1) % PAD_COLUMNS
-		local row = (slot - 1) // PAD_COLUMNS
-		local at = origin * CFrame.new(PADS_FROM.X + column * PAD_GAP, 0.15, PADS_FROM.Y + row * PAD_GAP)
-		clearDecor(at.Position + Vector3.new(0, 6, 0), Vector3.new(PAD_SIZE / 2, 6, PAD_SIZE / 2))
-		local pad = block(folder, `Pad{slot}`, Vector3.new(PAD_SIZE, 0.3, PAD_SIZE), at, PAD_OPEN)
-		pad.Material = Enum.Material.Grass
-		pad.CanCollide = false
-		pad:SetAttribute("Slot", slot)
-		local tag = label(pad, Enum.NormalId.Top, tostring(slot), Color3.new(1, 1, 1))
-		tag.TextTransparency = 0.5
-		table.insert(pads, pad)
-	end
-
-	local deliveryAt = origin * CFrame.new(DELIVERY_AT.X, 0.2, DELIVERY_AT.Y)
-	clearDecor(deliveryAt.Position + Vector3.new(0, 6, 0), Vector3.new(7, 6, 7))
-	local delivery = block(folder, "Delivery", Vector3.new(12, 0.4, 12), deliveryAt, Color3.fromRGB(90, 200, 120))
-	delivery.Material = Enum.Material.Neon
-	delivery.Transparency = 0.35
-	delivery.CanCollide = false
-	local deliveryShape = Instance.new("CylinderMesh")
-	deliveryShape.Parent = delivery
-	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.fromOffset(200, 50)
-	billboard.StudsOffsetWorldSpace = Vector3.new(0, 5, 0)
-	billboard.MaxDistance = 120
-	billboard.LightInfluence = 0
-	billboard.Parent = delivery
-	local deliverWords = Instance.new("TextLabel")
-	deliverWords.BackgroundTransparency = 1
-	deliverWords.Size = UDim2.fromScale(1, 1)
-	deliverWords.FontFace = Font.fromEnum(Enum.Font.FredokaOne)
-	deliverWords.TextScaled = true
-	deliverWords.TextColor3 = Color3.fromRGB(180, 255, 190)
-	deliverWords.Text = "DELIVER HERE"
-	local deliverStroke = Instance.new("UIStroke")
-	deliverStroke.Thickness = 2.5
-	deliverStroke.Parent = deliverWords
-	deliverWords.Parent = billboard
+	-- The pen fills the fence; clients read it too (am I home with a lamb, where's home).
+	local low, high = fenceBox(model)
+	local pen = block(
+		folder,
+		"Pen",
+		Vector3.new(high.X - low.X - 2 * FENCE_INSET, PEN_HEIGHT, high.Z - low.Z - 2 * FENCE_INSET),
+		CFrame.new((low.X + high.X) / 2, FLOOR_Y + PEN_HEIGHT / 2, (low.Z + high.Z) / 2),
+		Color3.new(1, 1, 1)
+	)
+	invisible(pen)
 
 	local walkerOrigin = origin * CFrame.new(WALKER_AT.X, 0, WALKER_AT.Y)
 	clearDecor(walkerOrigin.Position + Vector3.new(0, 6, 2), Vector3.new(6, 6, 7))
 	local walker, zone, screen, steps = makeWalker(folder, walkerOrigin)
+	-- Sheep keep off the machine, its steps and its screen.
+	local keepout =
+		block(folder, "Keepout", Vector3.new(12, 8, 13), walkerOrigin * CFrame.new(0, 4, 1.5), Color3.new(1, 1, 1))
+	invisible(keepout)
 
 	-- The owner's name over the gate.
 	local gateTop = origin * CFrame.new(size.X / 2 - 1, 38, 0)
@@ -250,8 +248,8 @@ function Build.Plot(index: number, model: Model, parent: Instance): (Pieces, CFr
 	local spawn = origin * CFrame.new(SPAWN_AT.X, 4, SPAWN_AT.Y) * CFrame.Angles(0, math.rad(-90), 0)
 	return {
 		Folder = folder,
-		Pads = pads,
-		Delivery = delivery,
+		Pen = pen,
+		Keepouts = { keepout },
 		Walker = walker,
 		WalkerZone = zone,
 		WalkerScreen = screen,
@@ -261,27 +259,6 @@ function Build.Plot(index: number, model: Model, parent: Instance): (Pieces, CFr
 		Spawn = spawn,
 	},
 		origin
-end
-
--- Pads past the owner's slot count show a padlock and the next one's price.
-function Build.PaintPads(pads: { BasePart }, unlocked: number)
-	for slot, pad in pads do
-		local open = slot <= unlocked
-		pad.Color = if open then PAD_OPEN else PAD_LOCKED
-		pad.Material = if open then Enum.Material.Grass else Enum.Material.Slate
-		local gui = pad:FindFirstChildOfClass("SurfaceGui")
-		local words = gui and gui:FindFirstChild("Label")
-		if words and words:IsA("TextLabel") then
-			if open then
-				words.Text = tostring(slot)
-			elseif slot == unlocked + 1 then
-				local cost = Economy.PenCost(slot)
-				words.Text = if cost then `🔒 {Format.Short(cost)}` else "🔒"
-			else
-				words.Text = "🔒"
-			end
-		end
-	end
 end
 
 -- The machine's accent shows its level: a colour along a ramp from wood to gold.

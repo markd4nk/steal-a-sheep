@@ -24,8 +24,14 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 The MVP built in one pass on 2026-10-05 (HISTORY.md); the user now refines it as they go (GAME_DESIGN.md). Thirty
 tiers: twelve up the commissioned map (Aeolus on its old summit) and eighteen on High Olympus above it, Zeus at the top.
 A god each, four wild lambs each, stair walker training, overhead carrying, the automatic downhill slide with steering,
-braking and slide hits, pursuit, delivery, pens, income, growth, size reveal, Equip Best, locks, selling, merging,
-trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
+braking and slide hits, pursuit, putting lambs down anywhere in your pen, roaming and grazing sheep, income, growth,
+size reveal, Equip Best, locks, selling, merging, trails, pen space, the Sheepdex, offline earnings and the tutorial
+lamb.
+
+- **The pen** (2026-10-05): the whole fenced plot; carry a lamb in and press E to put it down where you like (no
+  delivery pad, no pads). It holds 8 sheep, buyable up to 20. Sheep roam the plot (`FlockService/Pens`,
+  `Utils/Wander`), avoiding trees, hay and the walker; lambs graze nearly all the time with the Munch face, adults now
+  and then (`AnimController`, `Utils/SheepClips`). Where each was put down is saved (`HomeX`/`HomeZ`).
 
 - **High Olympus** (tiers 13-30): one stretch a god, 275 studs along the floor, 32 rising to 52 degrees, from stage 3's
   floor slab and terraces and the stages' decor, recoloured, plus block props; Zeus's throne plaza on top. Built into
@@ -51,6 +57,8 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 ## In progress
 
+- Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
+  (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
@@ -60,7 +68,10 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   store writes and reads, name lookups and the last write on leaving are untested.
 - **Saving**: the place isn't published, so playtests used ProfileStore's mock store; rejoin, offline credit on a real
   rejoin and session locking are untested (the offline maths is unit-tested).
-- **Touch and gamepad**: only keyboard and mouse in Studio. Prompts, HUD buttons and the slide use Roblox's own input.
+- **Touch and gamepad**: only keyboard and mouse in Studio. Prompts (Steal, Put down), HUD buttons and the slide use
+  Roblox's own input.
+- **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
+  teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
 - **Climbing in play**: playtested 2026-10-05 on tiers 1-3 and 6 with one player (TESTING.md); not on tiers 13-30,
   not with two players, not on touch or gamepad.
@@ -88,3 +99,6 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   They load if this game is published under the same owner.
 - **ViewportFrames (the menus' 3D sheep) don't show in Studio MCP screenshots while the window is minimized**; they do
   in play.
+- **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
+  little sunk in the straw.
+- Studio MCP screenshots don't show ProximityPrompt buttons (Steal, Put down); they work in play.

@@ -47,6 +47,17 @@ return function(t: Run.Suite)
 		t.Expect((PlayerData.Validate({ Sheep = { ["2"] = sheep("1") } }))).ToBe(false)
 	end)
 
+	t.Test("accepts a sheep's home spot, and rejects one that isn't a number", function()
+		local placed = sheep("1")
+		placed.HomeX = -12.5
+		placed.HomeZ = 30
+		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = placed } }))).ToBe(true)
+		placed.HomeZ = "here"
+		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = placed } }))).ToBe(false)
+		placed.HomeZ = 0 / 0
+		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = placed } }))).ToBe(false)
+	end)
+
 	t.Test("rejects data from a newer schema", function()
 		t.Expect((PlayerData.Validate({ SchemaVersion = PlayerData.SchemaVersion + 1 }))).ToBe(false)
 	end)
