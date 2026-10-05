@@ -2,7 +2,7 @@
 
 export type Context = {
 	Controllers: { [string]: any },
-	-- Opens a screen; `options` reaches its Open (the Flock menu's sell mode).
+	-- Opens a screen; `options` reaches its Open.
 	Open: (name: string, options: { [string]: any }?) -> (),
 	Close: (name: string) -> (),
 	-- A notice on whatever the player is looking at: the open menu's bottom edge, or the HUD.

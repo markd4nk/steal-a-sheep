@@ -12,6 +12,7 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 | `DESIGN/STUDIO_CONTENT.md` | What the code expects in the place file, and what the place holds now | Before Studio-side work or a publish |
 | `DESIGN/TESTING.md` | This game's test tools and how it was playtested | Before playtesting |
 | `DESIGN/BRAIN_PROPOSALS.md` | Lessons proposed for the shared BRAIN, waiting for the user | When you learn something reusable |
+| `DESIGN/ui/` | HTML mock-ups in the menus' look, from the game's own numbers (`DESIGN/ui/README.md`) | Before showing a new screen |
 
 ## Live
 
@@ -40,11 +41,15 @@ lamb.
 
 - **Free gift** (like + favorite): Climbing and cash once (`Economy.GiftReward`), `GiftService`, `Screens/Gift`, the
   HUD's GIFT button; Claim needs the game favorited (Roblox's prompt, or favorited before). A like can't be seen.
+- **Stair walker**: a StairMaster outside each pen by the gate (`PlotService/Walker`: five looks, the level floating
+  over it, an upgrade sign with cash and Robux prompts); walk in to snap on, jump to get off (`TrainingService`); every
+  client runs the steps and poses climbers' legs on them (`WalkerController`, `Utils/StairClimb`).
+
 - **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
   Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
   `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
 
-- **Server**: `DataService`, `PurchaseService` (pack, no products), `SheepService`, `PlotService`, `FlockService`,
+- **Server**: `DataService`, `PurchaseService` (pack; the walker's Robux levels, no products made yet), `SheepService`, `PlotService`, `FlockService`,
   `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
   `GiftService`, `DebugService` (Studio only).
 - **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Popup,
@@ -54,6 +59,9 @@ lamb.
 - **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
   gods at one set speed; weight saved and tilting size odds (`Economy.RollWeight`, `SizeOdds`, for the Merge Shrine).
   GAME_DESIGN.md, *Climbing* and *Lamb weight*.
+- **Sell Stall** (`UIController/Screens/SellStall`, `FlockService.Sell`, `Roster.CanSell`): the stall's prompt opens
+  the stored sheep as cards; tap them or Select all, one Sell after a confirm, two minutes of income each. Sheep in the
+  pen never show and the server refuses them; the Flock menu no longer sells.
 - **From Shear a Sheep**: UIKit, Theme, Style (trimmed), Panel, Buttons, Motion, Scale, the sheep rig, add-ons and
   breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds, the Mutation Machine (as the Merge Shrine).
 
@@ -64,9 +72,16 @@ lamb.
   lists its calls.
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
+- Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
+  lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
+
+- **Sell Stall on a phone and a gamepad**: played on a PC window only (mouse); the layout matches the mock-up's phone
+  frame, not checked in the Device Simulator.
+- **Stair walker with two players**: another player's climb (posed on each device) and the owner-only sign prompts
+  were only checked solo; the Robux upgrade can't be bought until its developer products exist.
 
 - **Two players**: slide hits and knockback (server checks, client knockback) were never tried with a second player.
 - **All-servers leaderboards**: the place isn't published, so the boards ran on this server's players only; the
@@ -97,10 +112,9 @@ lamb.
 - **Long runs at the top**: about 7.6 minutes' climb to Zeus and about 2.5 minutes' slide home; the user keeps it all on
   foot (DECISIONS.md).
 - **High Olympus is sparse**: the user will add obstacles to the higher levels later.
-- **The economy is generous (2026-10-05 simulation)**: a walker level costs about a minute of one sheep's income
-  from the tier below, at every tier, so Climbing races past the signs (10-70x them) and chases get easy fast. An
-  efficient player reaches Zeus in about 4.3 hours (a real one maybe 2-3x that). Trails stop mattering after about
-  tier 8 (fixed prices). Waiting for the user's call on slowing it (DESIGN/HISTORY.md, Climbing).
+- **Pacing (2026-10-05 simulation)**: with walker upgrades at 10x, an efficient player reaches Zeus in about 6.5 hours
+  (a real one maybe 2-3x that), Climbing about 1.3-5x the next sign. Trail prices are fixed and unreviewed (the user
+  hasn't set them yet).
 - **Very fast slides meet the trees hard**: at 150+ studs/s a slide that clips a tree stops dead and its god catches
   up (seen at x 944 on tier 3). Same decor issue, felt more at high speed.
 - **Plots: 5.** A sixth player is kicked with "server full"; set Maximum Visitor Count to 5 in Creator Hub.

@@ -48,6 +48,94 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     Checked in a playtest: both pictures load from Roblox, Claim gave +500 Climbing and the cash, a second claim was
     refused, 54 tests pass, console clean. Not checked: the real favorite prompt (needs a published place).
 
+- **The Sell Stall's menu, and a two-minute sell price (2026-10-05)**. The user sent Steal an Egg's Sell Pets (and
+  its Free Gift) and asked for mock-ups of the menu the Sell Stall by the plots opens: like the reference, made easier.
+  - *Mock-ups* (`DESIGN/ui/mockups/sell-stall.html`, two rounds): A, the grid four across with a sell tile on the
+    right; B, the reference's layout (sort on the left, the total along the bottom); a pick-everything-stored button;
+    one confirm for the lot.
+  - *The user's calls*: A; it opens with nothing picked and each sheep is tapped; keep Select all; the pen's sheep
+    don't show at the stall at all, so the best can't be sold by mistake (moving the best stored ones into the pen
+    comes later); selling pays two minutes of income to start (Steal an Egg pays about 100 s).
+  - *Server*: `Economy.SellSeconds` 120 (was 15). `Remotes.Sell` (ids, up to the flock's 100; 4 a second) ->
+    `FlockService.Sell`: `Roster.CanSell` (stored only, unlocked, each once, never the whole flock), then every price
+    paid at once and one snapshot. The one-at-a-time `FlockAction "Sell"` is gone.
+  - *Client*: `Screens/SellStall`, built at runtime from UIKit like the other menus: `MenuParts.CardGrid` cards with a
+    red ring and tick when picked and a LAMB / MERGED / size chip, a `SellTile` (fan of picked tokens, total, Select
+    all / Clear, Sell N), the menu's confirm with the count, the Sell accent (`Theme.Fleece.Accent.Sell`). The stall's
+    prompt opens it (`PromptController`); the Flock menu lost its sell mode. UIController mounts screens from an
+    explicit order list: the new screen had to go in it (it was missing at first and never mounted).
+  - *Kit*: `DESIGN/ui/` (README): Shear a Sheep's Prize Fleece CSS, `kit.js` with this game's token and HUD,
+    `export-data.luau` (Lune loads `GameConfig`, `Olympus` and `Economy`, so every price is the game's) and
+    `render.mjs`. The mock-ups were HTML: when they were made, five Studios were open and 2.6 GB of RAM was free.
+  - *Checked*: `check.ps1` passes; 57 tests pass in Studio (new: `CanSell`, the two-minute price). Playtested in this
+    session's own Studio (`build/SellPlaytest.rbxl`, code swapped in from `content/sas/sell-sync.rbxm`), on main's
+    code too after merging it: both bootstraps ready; the stall's prompt (E) opened the menu with only the 8 stored
+    sheep (the 6 in the pen absent); taps picked with ring and tick and summed (120 + 360 = 480); the locked lamb
+    refused with its notice; Select all took the 7 unlocked (5.1K) and turned into Clear; the confirm showed x7 and
+    5.1K; Sell left only the locked lamb, income unchanged (3,865/s), "Sold 7 for 5.1K cash". Called directly, the
+    server refused a pen sheep, a locked one and a missing id, and the old FlockAction Sell. Your Flock has no Sell.
+    Console clean. Not checked: a phone screen, gamepad, two players. The user then said build it and merge it; it
+    was checked again on main's latest code (57 tests, a sale, a pen sheep refused) and merged into main.
+- **Stair walker: a StairMaster outside the pen (2026-10-05)**. After the study below, the user: the first five looks
+  are good, stick with five for now; the level floats over the machine; place it outside the pen, very close, like
+  Steal an Egg's treadmill; an upgrade sign beside it to upgrade directly with cash or Robux. Earlier calls: gym at
+  level 1 getting better each level, snap on like a treadmill, steps faster each level.
+  - *Shared*: `Utils/StairClimb` holds the machine's stair geometry (treads 3 x 0.6 x 1.0, eight steps, those between
+    -1.9 and 3.5 steps from the lower foot on show), `StepSeconds(level)`, `StepAt`/`StepParts` (where each step's
+    three parts are at a given cycle), `Rig(character)` (R15 joints from Motor6Ds or AnimationConstraints, the root's
+    spot from the avatar's leg length; R6 hips), `Pose` (two-bone leg IK, arms forward, lean and bob; R6 swings),
+    `Release`, `ExitAt`, `RobuxOffer`. `GameConfig.StairWalker`: step speed, animation range, Robux offers.
+  - *Server*: `PlotService/Walker` builds the machine (model pivot = machine frame; `Body`, `Steps`, `Zone`,
+    `TagAnchor` with the floating "LV n") and the `UpgradeSign` (two-sided board, `CoinPrompt` E and `RobuxPrompt` R
+    with the owner's id); `Paint` rebuilds the body when the look changes and updates the level, screen, sign and
+    prompts. `Build` places it at plot (61, 25) facing +z and the sign at (65.5, 18.5) facing the gate, clearing map
+    decor there; the old in-pen walker is gone. `TrainingService` snaps the owner on when their root enters the zone
+    (root anchored at the rig's spot, `OnWalker` attribute, the machine's `Climber`), steps them off on
+    `Remotes.LeaveWalker`, death, carrying or being moved, and trains only while on. `ShopService` handles the sign:
+    coins through the shop's own walker purchase, Robux by `PromptProductPurchase` (or the not-on-sale notice);
+    `PurchaseService/Products` grants a level for each configured product. Debug: "Stair walker level (id)".
+  - *Client*: `WalkerController` moves each nearby machine's steps (`BulkMoveTo`, its own cycle advancing only while
+    someone climbs), poses every nearby climber after the Animator, releases their joints when they get off, and sends
+    `LeaveWalker` on a jump. `MovementController`'s walk-on-the-spot is gone. `PromptController` hides other plots'
+    sign prompts.
+  - *Checked*: `check.ps1`; 44 of 44 tests (4 new in `StairClimb.spec`) in Studio; a solo playtest in a copy of the
+    place with this branch's scripts: both bootstraps ready, console clean; walking into the entry snapped on (+2
+    Climbing/s, meter shown), the sign's coin prompt took the machine to level 2 live (look, steps, tag, sign: LV 3,
+    300 coins, R$ 39), the Robux prompt gave the not-on-sale notice, a jump put the player down behind the entry with
+    animations back, walking in again snapped on; levels 3, 4 and 5 shown on the real machine; both sign faces
+    readable; an R6 rig stood on the steps at the right height; empty plots show no tag. Screenshots shown to the user.
+- **Stair walker study: free models, a climbing test, two mock-ups (2026-10-05)**. Not built yet. The user wants a
+  proper StairMaster in place of the MVP machine (a base, five sliding planks, rails), free models first, and the
+  player walking up the steps instead of walking on the spot in front of them.
+  - *Free models*: none fits. Creator Store (stairmaster, stair climber, stepper, gym/cardio packs): treadmills,
+    ellipticals, weights, a granite "Fancy Stairmaster" that isn't one. Sketchfab, Poly Pizza, Free3D, CGTrader,
+    TurboSquid, Meshy, itch.io: none free. The only free genuine stepmills are realistic grey brand replicas on SketchUp
+    3D Warehouse (Spiffysmile "Stair Master", 3.8k polygons, its General Model License allows use inside a game):
+    wrong style for the map, and their steps are one mesh, so they couldn't move.
+  - *Climbing test* (Studio copy, the user's skinned R15 avatar, then a default blocky R15 rig): the root is anchored;
+    each frame after the Animator (`PreSimulation`) a two-bone IK sets hip, knee and ankle `Transform` in the leg's
+    plane from the joints' own attachments (works on Motor6D and AnimationConstraint rigs), so the stance foot rides
+    its step down and back and the other foot lifts onto the next step, toes at the tread's front edge, heel over the
+    edge. Steps scroll one rise and one run per 0.55 s; 8 degrees of lean, a small bob, arms forward and pumping. The
+    root height comes from each avatar's leg length (bottom foot at 96% reach), so feet land on the steps for both
+    rigs. Frozen-phase screen captures made a GIF for the user.
+  - *Mock-ups*: one geometry (treads 3 wide, 0.6 rise, 1.0 run, about 31 degrees; wedge side bodies, entry step, a hood
+    the steps run into, rails at hand height, a console), two looks: A gym machine (light grey, dark trim, yellow
+    accents and tread noses, a tilted screen on a post) and B Olympus (marble, gold trim and rails, two columns holding
+    a marble tablet).
+  - *The user's calls*: A's gym look is level 1 and each upgrade looks better, ending in the Olympus look; snap on
+    like a treadmill; steps faster with each level. Then: mock-ups of levels 1-5.
+  - *Levels 1-5 mock-up* (same shape, five copies in a row on plot 1, each with a climbing copy of the user's avatar,
+    steps at `0.25 + 0.35 x 0.9^(level-1)` s): 1 Starter, plain grey with grey noses and black grips; 2 Sport, white
+    with blue bands, grips and screen, yellow noses, silver rails; 3 Pro, black with red bands, red-and-chrome rails, a
+    glowing red screen frame and a fan; 4 Turbo, black with cyan neon edges, noses, underglow and screen, diamond-plate
+    treads, side vents; 5 Champion, white with a black band and gold trim and rails, glowing white noses, flaming
+    torches either side of the console and a green laurel over it. Bronze and dark gold came out plain orange and
+    yellow under the map's colour correction (saturation +0.7), hence white and gold. Shown as a line-up, close-ups and
+    a 4 s clip filmed from the Studio window.
+  - *Open for production*: every client must run the IK for every training player (`Transform` doesn't replicate) and
+    scroll every machine's steps from a shared clock; the server places and anchors the player on the machine and
+    releases them on jump or move; R6 needs a simpler leg swing.
 - **Put lambs down anywhere in the pen; sheep roam and graze (2026-10-05)**.
   The user: instead of the delivery platform and fixed pads you unlock, be like Steal an Egg (bring the lamb into the
   pen and place it where you choose); sheep walk around on their own like Shear a Sheep's; lambs mostly eat off the
@@ -171,6 +259,13 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   Zeus in 4.3 h; climbs never take over a minute (lower tiers zoom); every tier's numbers are in the same proportion
   (a walker level costs 60 s of one adult from the tier below), so nothing breaks, but Climbing outruns the signs
   10-70x between new tiers, so chases are easy most of the time.
+  The user then raised walker costs (10x: about ten minutes of income per upgrade; simulated 6.5 h to Zeus, Climbing
+  1.3-5x the signs), left trails alone (no prices decided yet), and replaced being sent home after a catch with a punch:
+  the god launches the thief three tiers down (same share along the tier; the foot from tiers 1-3). The server picks
+  the landing (`MountainService:Punch`), the thief's device flies them there on a tumbling arc (Remotes.Punch,
+  MovementController), both movement checks wait for the flight, and the server puts them on the spot if they aren't
+  there by then. Checked in Studio: 52 of 52 tests; caught 81% along tier 6, the thief flew 1.7 s and landed 82% along
+  tier 3, 0.4 studs from the spot, no correction; a tier 3 catch landed at the foot (x 342); no script errors.
 
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9

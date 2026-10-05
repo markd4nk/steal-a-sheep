@@ -425,6 +425,7 @@ local Theme = {
 			Settings = { Hi = rgb(183, 194, 209), Base = rgb(127, 140, 160), Lo = rgb(79, 89, 107) },
 			Confirm = { Hi = rgb(108, 196, 255), Base = rgb(47, 143, 240), Lo = rgb(27, 95, 176) },
 			Warning = { Hi = rgb(255, 138, 122), Base = rgb(232, 70, 60), Lo = rgb(158, 29, 23) },
+			Sell = { Hi = rgb(138, 240, 106), Base = rgb(60, 191, 53), Lo = rgb(34, 125, 32) }, -- the Sell Stall
 			Gold = { Hi = rgb(255, 230, 128), Base = rgb(245, 176, 0), Lo = rgb(165, 107, 0) },
 		} :: { [string]: { Hi: Color3, Base: Color3, Lo: Color3 } },
 		-- A card's fill by its sheep's tier: lit top, face, lip. Secret is night with a rainbow ring.

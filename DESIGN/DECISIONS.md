@@ -30,6 +30,9 @@ confirmed or reversed it.
   as few numbers as possible. No cap on the mountain: more Climbing keeps making you faster. Walking in the safe zone
   (the plots and hub) is capped at 7x normal; tier 1 and the safe zone never go below normal. The sign's number is
   just enough for the lightest lamb on that tier; an average lamb leaves about 95% of the god's speed there.
+- **Caught thieves are punched three tiers down (2026-10-05)**, not sent home, and drop the lamb where they were caught.
+  Walker upgrades are properly expensive (about ten minutes of income each). Most escapes should feel close: tune
+  towards Climbing sitting just over the next sign, not far past it.
 - **Hidden lamb weight (2026-10-05)**: no Light/Stout/Heavy words and no numbers on screen: players feel it. A smooth
   range, not three kinds. Saved with the sheep; heavier lambs tend to grow bigger, but a light one can still grow
   large, just less likely. The carry card shows no speeds.
@@ -40,6 +43,14 @@ confirmed or reversed it.
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
   then don't thin or fill the slide lanes, old stages included.
+- **The stair walker is a real StairMaster the player climbs (the user, 2026-10-05)**: level 1 looks like a plain gym
+  machine and each upgrade looks better, ending in the Olympus look (marble and gold); the player snaps onto it like a
+  treadmill and climbs the moving steps; the steps get faster with each machine level.
+- **Its first five looks are the mock-up's** (Starter, Sport, Pro, Turbo, Champion), "stick with the five for a second";
+  the level floats over the machine; the machine stands outside the pen, very close to it, like Steal an Egg's; its
+  upgrade sign beside it upgrades it directly, for cash or Robux (the user, 2026-10-05).
+- **The stair walker's spot by the gate is right** (the user, 2026-10-05). Its Robux prices are being decided in
+  another session; the ones in `GameConfig.StairWalker.Robux` are placeholders until then.
 - **Put lambs down anywhere in the pen (2026-10-05)**: like Steal an Egg, the thief brings the lamb into their pen and
   places it where they choose; no delivery platform, no fixed pads to unlock and stand sheep on. Sheep walk around on
   their own like Shear a Sheep's; lambs mostly eat off the floor, head down and chewing, with an eating face: the
@@ -54,6 +65,12 @@ confirmed or reversed it.
 - **Leaderboards live on the map's billboards in the safe zone, not behind a HUD icon** (the user, 2026-10-05): This
   Server (the richest here, by income), Top Income (the richest overall, each player's best ever), Most Steals and
   Climb Power (titled CLIMBING since Climbing replaced Climb Power on screen). Titles are words only, no icon; otherwise the boards' look (dark panel, medal rows, headshots) is OK'd.
+- **The Sell Stall shows stored sheep only** (the user, 2026-10-05): sheep in the pen never appear there, so a player
+  can't sell their best by mistake (a way to move the best stored ones into the pen comes later); the server refuses
+  pen sheep too. Layout A of `DESIGN/ui/mockups/sell-stall.html`: the grid with a sell tile on the right, nothing
+  picked when it opens, each sheep tapped, and a Select all (kept, 2026-10-05).
+- **Selling pays two minutes of the sheep's income** (the user, 2026-10-05: "two minutes' worth would be fine", Steal
+  an Egg pays about 100 s; a start, to be tuned later). It was 15 s.
 
 ## To review
 
@@ -72,10 +89,45 @@ Calls made building the free gift (2026-10-05).
   no "LIMITED TIME" (it isn't). Step pictures are Roblox's real game page (another game's, counts hidden), lit up.
   Tapping the favorite card opens the prompt too. A player who favorited the game before can claim without a prompt.
 
+Calls building the Sell Stall (2026-10-05).
+
+- **Order**: cheapest first; the header's button switches to Best (dearest first). Oldest first on a tie.
+- **Locked sheep show**, dark with their padlock, and can't be picked ("Locked: unlock it in Your Flock"); Select all
+  skips them. Select all reads Clear once everything pickable is picked.
+- **Cards**: the family's name, what it sells for, and a chip over the picture's foot: LAMB (green), MERGED or
+  ASCENDED (purple), or the size above Standard (LARGE, GIANT, TITAN). No income on the card (the price is two minutes
+  of it).
+- **The tile**: the four dearest picked as a fan with "+N" for the rest, the total, Select all / Clear, Sell N.
+- **One confirm for the lot**: "Sell 7 sheep?", the dearest one's token with "x7", the cash, "This can't be undone".
+  Afterwards: "Sold 7 for 5.1K cash".
+- **Never the whole flock**: a sale that would leave no sheep is refused (only possible when the pen is empty).
+- **The Flock menu no longer sells**: its Sell button and confirm are gone; the stall is the one place to sell.
+- **The header picture** is the HUD's cash stack (`Theme.Icons.HudCash`); the mock-up had the pack's single bill,
+  which isn't uploaded.
+
+Calls building the stair walker (2026-10-05).
+
+- **Placeholder Robux prices (another session is deciding them; nothing is on sale)**: the next level costs R$ 19 (to
+  level 2), 39, 59, 99, then 149 for every level after. A developer product per price; ids 0 until they're made in Creator Hub, and the Robux
+  prompt says "Robux upgrades aren't on sale yet" meanwhile.
+- **Levels 6-30 keep the Champion look** until more looks are designed.
+- **The sign** stands by the machine's entry, turned to the gate, written on both sides ("UPGRADE", the next level, its
+  price in cash and R$).
+- **On and off**: walking into the entry snaps the owner on (only the owner, not while carrying a lamb); jumping puts
+  them down behind the entry facing away; "Jump to get off" shows the first time each session. Training only counts
+  while snapped on.
+- **The sign's prompts**: E upgrades with cash, R with Robux; only the owner sees them; they go at the top level, and
+  the board says MAX LEVEL. An empty plot's machine shows level 1 with no floating tag.
+- **Step speed by level**: a step takes `0.25 + 0.35 x 0.9^(level-1)` seconds: 0.60 at level 1, 0.48 at 5, 0.40 at
+  10, 0.30 at 20, 0.27 at 30.
+- **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor; the
+  machine's sides, hood, console and the sign are solid, the entry step and stairs aren't.
+
 Calls made building free placement and roaming sheep (2026-10-05):
 
-- **The pen is the whole fenced plot**; sheep keep 3 studs from the fence, off the stair walker, out of the map's trees
-  and hay. The map's hay and trees in the plots now stay where the map has them (only the walker's spot is cleared).
+- **The pen is the whole fenced plot**; sheep keep 3 studs from the fence and out of the map's trees and hay (the stair
+  walker now stands outside the fence, so there's no keep-out box). The map's hay and trees in the plots stay where the
+  map has them (only the walker's and its sign's spots outside the fence are cleared).
 - **Pen Space prices**: room for sheep 9 to 20 costs round(25,000 x 6^(n - 9)): 25K, 150K, 900K, 5.4M, 32M, 194M,
   1.2B, 7B, 42B, 252B, 1.5T, 9T. With eight tier 10 sheep the 13th takes about 9 minutes of income; the 20th is for
   tier 23 and up. A save with less room (the old 3) is raised to 8 when it loads. A lamb put down in a full pen is
@@ -132,8 +184,15 @@ Calls made building Climbing (2026-10-05):
 - **Saved sheep**: schema 2 turns Burden 1/2/3 into Weight 1.05/1.2/1.35; sizes already rolled stay.
 - **Dropped lambs** (the user: a caught thief's lamb stays where it fell, anyone can steal it, its god chases them):
   being caught or dying on the ramp drops it; giving up, falling off the world, resetting or leaving puts it straight
-  back, and the tutorial lamb always goes back. A dropped lamb lies there 30 s, then returns to its pasture. The caught
-  thief reads "<God> caught you! You dropped the lamb" and is sent home. Gods still walk home slowly (the user's call).
+  back, and the tutorial lamb always goes back. A dropped lamb lies there 30 s, then returns to its pasture. Gods still
+  walk home slowly (the user's call).
+- **The punch** (the user: a caught thief is launched down about three or four tiers, not sent home): three tiers
+  down, to the same share along that tier (caught 80% along tier 6, you land 80% along tier 3); from tiers 1-3, the
+  mountain's foot. A tumbling arc of 1 to 2.5 s (longer the further), peaking 12% of its length above the straight line,
+  then 0.5 s held still. The message reads "<God> punched you! You dropped the lamb".
+- **Walker upgrades cost 10x** (the user agreed they should cost more): round(1200 x 2.5^L), about ten minutes of
+  income from the tier below. Simulated, Climbing then sits about 1.3-5x the next sign instead of 10-70x, and an
+  efficient player reaches Zeus in about 6.5 h (was 4.3).
 - **Server ground-speed check**: each player may cover ground at the fastest they could legally go there (walking,
   their escape speed, or a knockback), 30% slack and up to a second banked for lag; anyone faster is put back where they
   were. Server teleports (home after a catch, onto the plot, debug steals) reset it.
@@ -163,7 +222,7 @@ Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls
 - **Numbers, tiers 13-30**: reach about x2.5 a tier from 81M (200M, 500M, 1.3B ... 480T, 1.2Qa at Zeus), Light and Heavy
   at 1.5x and 2.25x as before; income keeps round(2 x 2.5^(tier - 1)) (Zeus ~694B/s); growth 45 + 15 per tier (Zeus 8
   minutes); slide speeds 50-60 (three tiers each at 50, 52 ... 60). Stair walker levels 12-29 added (5M up to 25T a
-  second), each covering the next tier's reach gap in about a minute like levels 0-11; costs keep round(120 x 2.5^L).
+  second), each covering the next tier's reach gap in about a minute like levels 0-11; costs keep round(120 x 2.5^L) (since raised to round(1200 x 2.5^L)).
 - **Families**: Gale (Frost), Wild (Moss + goat horns), Ambrosia (Cupcake, honey frosting), Fortune (Pirate), Potion
   (Slime), Chaos (Glitch), Spirit (Ghost), Slumber (Dream), Starlit (Galaxy), Fright (Wolf in Sheep's Clothing), Dread
   (Black Hole), Bone (Skeleton), Avenger (Mecha), in Shear a Sheep's colours; Prism is a plain sheep in rainbow puffs;
@@ -207,8 +266,7 @@ Calls made while building the MVP on 2026-10-05:
 - **Plots**: the stair walker by the back fence (map hay and trees where it goes are moved out of the way, kept in
   ServerStorage.ClearedDecor). Each penned sheep shows "+X/s" (and a lamb its growth %).
 - **Manual Equip pins a sheep**: Equip Best keeps pinned sheep and refills the rest; Store unpins.
-- **Selling is at the Sell Stall only** (the map's stall at z 175); the Flock menu opened there adds Sell with a
-  confirm showing the coins and the income lost. The Shop is the stall at z 205; the Merge Shrine is Shear a Sheep's Mutation
+- **Selling is at the Sell Stall only** (the map's stall at z 175), in its own menu (Screens/SellStall). The Shop is the stall at z 205; the Merge Shrine is Shear a Sheep's Mutation
   Machine between the stalls (opens after 3 deliveries).
 - **Merge picks the three**: the biggest of the group, then the two that earn least (stored ones first). The preview
   shows the sizes used, the three's income against the result's, and the flock's income before and after.

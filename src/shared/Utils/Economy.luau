@@ -69,7 +69,7 @@ Economy.RankNames = table.freeze({ [0] = "", [1] = "Merged", [2] = "Ascended" })
 Economy.MaxRank = 2
 Economy.LambShare = 0.5 -- a lamb earns this share of its family's base, times its fleece
 Economy.TutorialGrowth = 30
-Economy.SellSeconds = 15
+Economy.SellSeconds = 120 -- the user, 2026-10-05: two minutes of income, near Steal an Egg's 100 s, to start
 Economy.DexRewardSeconds = 30
 Economy.TutorialCoins = 60
 Economy.TutorialClimb = 25
@@ -308,12 +308,13 @@ function Economy.DexReward(tier: number): number
 	return Economy.DexRewardSeconds * Economy.BaseIncome(tier)
 end
 
--- The upgrade from walker level L to L + 1: round(120 x 2.5^L).
+-- The upgrade from walker level L to L + 1: round(1200 x 2.5^L), about ten minutes of income from the tier
+-- below, so Climbing stays near the signs instead of racing past them.
 function Economy.WalkerCost(level: number): number?
 	if level >= Economy.MaxWalker then
 		return nil
 	end
-	return Economy.Round(120 * 2.5 ^ level)
+	return Economy.Round(1200 * 2.5 ^ level)
 end
 
 function Economy.WalkerRate(level: number): number

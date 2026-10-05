@@ -39,7 +39,7 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
 - Gods and pursuit: `GodService` (one state machine, primitive block rigs).
 - Climb speed checks, tier signs, slide hits and knockback: `MountainService`; uphill speed, client slide, steering, braking: `MovementController`.
 - Flock, pen capacity, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging:
-  `FlockService`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
+  `FlockService`; the Sell Stall's menu (stored sheep only, several at once): `UIController/Screens/SellStall`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
 - Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
 - Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climbing): `LeaderboardService`.
@@ -90,7 +90,15 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 
 ## Economy (as built)
 Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling and the free gift, and
-buys stair walker levels, pen space and trails. No Robux products.
+buys stair walker levels, pen space and trails. The one Robux offer: the next stair walker level, at the machine's
+sign (prices being decided in another session; the developer products aren't made yet).
+
+## Stair walker (the user, 2026-10-05)
+A real StairMaster just outside each pen, beside the gate, like Steal an Egg's treadmill. Walk into it and you snap on
+and climb its moving steps (your legs on the steps, any avatar); jump to get off. Its level floats over it, its steps
+run faster each level, and it looks better as it upgrades: Starter, Sport, Pro, Turbo, Champion (levels 6 and up
+keep Champion's look for now, ending in an Olympus look later). The upgrade sign beside it buys the next level
+straight away, for cash or Robux.
 
 ## Climbing (the user, 2026-10-05)
 Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain

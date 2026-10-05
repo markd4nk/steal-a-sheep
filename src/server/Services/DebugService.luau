@@ -86,6 +86,14 @@ local commands: { [string]: Command } = {
 		registry.FlockService:Push(player)
 		return true, nil
 	end,
+	-- value: the stair walker level to show (1 is the free machine).
+	SetWalker = function(player, value)
+		local data = registry.DataService:GetData(player)
+		data.WalkerLevel = math.clamp(math.floor(value or 1) - 1, 0, Economy.MaxWalker)
+		registry.DataService:Replicate(player)
+		registry.FlockService:Push(player)
+		return true, nil
+	end,
 	-- A new player's save again. Receipts stay, so no product is granted twice.
 	WipeSave = function(player)
 		if registry.DataService:Reset(player) then
