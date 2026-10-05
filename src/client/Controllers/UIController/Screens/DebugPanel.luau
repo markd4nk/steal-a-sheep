@@ -28,6 +28,7 @@ local BUTTONS: { Button } = {
 	{ Text = "Give a sheep of tier (id)", Command = "GiveSheep", UsesId = true },
 	{ Text = "Grow every lamb", Command = "GrowAll" },
 	{ Text = "Unlock every tier", Command = "UnlockAll" },
+	{ Text = "Reset free gift", Command = "ResetGift" },
 	{ Text = "Speed x5", Command = "SetSpeed", Value = 5 },
 	{ Text = "Speed normal", Command = "SetSpeed", Value = 1 },
 	{ Text = "Wipe save", Command = "WipeSave", Confirm = true },

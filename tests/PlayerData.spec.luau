@@ -47,6 +47,12 @@ return function(t: Run.Suite)
 		t.Expect((PlayerData.Validate({ Sheep = { ["2"] = sheep("1") } }))).ToBe(false)
 	end)
 
+	t.Test("the free gift is a flag", function()
+		t.Expect(PlayerData.Template.FreeGift).ToBe(false)
+		t.Expect((PlayerData.Validate({ FreeGift = true }))).ToBe(true)
+		t.Expect((PlayerData.Validate({ FreeGift = 1 }))).ToBe(false)
+	end)
+
 	t.Test("rejects data from a newer schema", function()
 		t.Expect((PlayerData.Validate({ SchemaVersion = PlayerData.SchemaVersion + 1 }))).ToBe(false)
 	end)

@@ -447,6 +447,12 @@ local GameConfig = {
 		NoticeQueue = 4,
 		BannerSeconds = 4,
 	},
+	-- The free gift's menu opens by itself once a session, this long after the player could first claim it (after
+	-- their first delivery), as soon as they're off the mountain and no other menu is open.
+	Gift = {
+		AutoOpenSeconds = 30,
+		FavoriteTimeout = 60, -- seconds to wait for Roblox's favorite prompt to answer
+	},
 }
 
 return deepFreeze(GameConfig)

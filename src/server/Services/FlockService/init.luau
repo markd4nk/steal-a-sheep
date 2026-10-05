@@ -99,6 +99,8 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		flock[id] = view(sheep, data.PenSlots)
 	end
 	local state = states[player]
+	local income = Roster.Income(data.Sheep, data.PenSlots)
+	local giftCoins, giftClimb = Economy.GiftReward(data.WalkerLevel, income)
 	return {
 		Sheep = flock,
 		Count = Roster.Count(data.Sheep),
@@ -113,8 +115,11 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		Tutorial = data.Tutorial,
 		Unlocked = Economy.Unlocked(data.ClimbPower, data.Deliveries),
 		MergeReady = Economy.TotalDeliveries(data.Deliveries) >= Economy.MergeAfterDeliveries,
-		Income = Roster.Income(data.Sheep, data.PenSlots),
+		Income = income,
 		Offline = if state then state.Offline else nil,
+		FreeGift = data.FreeGift,
+		GiftCoins = giftCoins,
+		GiftClimb = giftClimb,
 	}
 end
 

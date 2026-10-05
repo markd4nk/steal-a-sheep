@@ -203,4 +203,13 @@ return function(t: Run.Suite)
 			end
 		end
 	end)
+
+	t.Test("the free gift: three minutes of walker and income, at least 500 of each", function()
+		local coins, climb = Economy.GiftReward(0, 0)
+		t.Expect(coins).ToBe(500)
+		t.Expect(climb).ToBe(500)
+		local laterCoins, laterClimb = Economy.GiftReward(2, 13.5)
+		t.Expect(laterCoins).ToBe(2430)
+		t.Expect(laterClimb).ToBe(7200)
+	end)
 end

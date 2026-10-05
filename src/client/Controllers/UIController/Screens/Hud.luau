@@ -119,6 +119,21 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	tiles.Position = UDim2.fromOffset(8, 70)
 	tiles.AutomaticSize = Enum.AutomaticSize.Y
 	UIKit.List(tiles, false, 12, Enum.HorizontalAlignment.Center)
+	-- The free gift, until it's claimed: a red "!" on its corner.
+	local gift = UIKit.PictureButton(tiles, "GiftButton", Theme.Icons.MenuGift, PICTURE_SIZE, "GIFT")
+	gift.LayoutOrder = 0
+	local alert = UIKit.Text(gift, "Alert", "!", 20, Color.Snow, UDim2.fromOffset(26, 26), { Stroke = Color.Line })
+	alert.BackgroundTransparency = 0
+	alert.BackgroundColor3 = Color.Red500
+	alert.AnchorPoint = Vector2.new(0.5, 0.5)
+	alert.Position = UDim2.new(1, -8, 0, 6)
+	alert.ZIndex = 5
+	UIKit.Corner(alert)
+	local ring = Instance.new("UIStroke")
+	ring.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	ring.Color = Color.Line
+	ring.Thickness = Theme.Line.Normal
+	ring.Parent = alert
 	local flock = UIKit.PictureButton(tiles, "FlockButton", Theme.Icons.Wool, PICTURE_SIZE, "FLOCK")
 	flock.LayoutOrder = 1
 	local shop = UIKit.PictureButton(tiles, "ShopButton", Theme.Icons.MenuStore, PICTURE_SIZE, "SHOP")
@@ -440,10 +455,14 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 	end
 
-	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding.
+	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding. The gift's glows until claimed.
+	local giftButton = tiles:FindFirstChild("GiftButton") :: TextButton
 	local function refreshTiles()
 		local data = stateController:Get()
 		tiles.Visible = (data.Tutorial or 0) >= 1
+		local unclaimed = data.FreeGift == false
+		giftButton.Visible = unclaimed
+		Motion.SetGlow(Motion.FindGlow(giftButton), unclaimed and tiles.Visible)
 	end
 
 	-- The carry card.
@@ -519,6 +538,9 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end))
 	refreshTiles()
 
+	trove:Connect(giftButton.Activated, function()
+		context.Open("Gift")
+	end)
 	trove:Connect((tiles:FindFirstChild("FlockButton") :: TextButton).Activated, function()
 		context.Open("Flock")
 	end)

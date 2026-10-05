@@ -15,9 +15,18 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 | `GiveSheep` | tier | An ordinary lamb of that tier straight into the flock, as if delivered |
 | `GrowAll` | - | Every lamb grows up on the next tick (with its reveal) |
 | `UnlockAll` | - | Zeus's Heavy target in Climb Power and one delivery from every tier |
+| `ResetGift` | - | The free gift can be claimed again (its HUD button comes back) |
 | `WipeSave` | - | A new player's save |
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
+
+The free gift in a playtest: `GiveSheep` 1 counts as the first delivery, and the menu opens by itself 30 s later at the
+plot. Claim skips Roblox's favorite prompt while the place is unpublished (PlaceId 0).
+
+UI mock-ups without playing: in Edit, `require` a screen module from `StarterPlayerScripts.UIController.Screens`, call
+its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labels, and set `Root.Scale.Scale` (1.25),
+`Root.Size` (1/scale) and each `UITextSizeConstraint` from its `MaxPoints`/`MinPoints` attributes times the scale, as
+`UIController/Scale` does in play. Delete the `TEMP_` guis after.
 
 ## High Olympus in an open Studio (2026-10-05)
 

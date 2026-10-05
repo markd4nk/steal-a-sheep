@@ -32,10 +32,13 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   the place by `tools/UpperMountain.luau` (Lune, in `build-place.ps1`); `tools/preview-upper-mountain.luau` previews it
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
+- **Free gift** (like + favorite): Climb Power and coins once (`Economy.GiftReward`), `GiftService`, `Screens/Gift`, the
+  HUD's GIFT button; Claim needs Roblox's favorite prompt to say yes. Look waiting on the user's pick (cyan or gold).
 - **Server**: `DataService`, `PurchaseService` (pack, no products), `SheepService`, `PlotService`, `FlockService`,
-  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `DebugService` (Studio only).
-- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Popup, Studio
-  DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
+  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `GiftService`, `DebugService`
+  (Studio only).
+- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Popup,
+  Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
   `Utils/Economy` (every formula), `Utils/Mountain` (ramp height, tiers by position, floor checks).
 - **From Shear a Sheep**: UIKit, Theme, Style (trimmed), Panel, Buttons, Motion, Scale, the sheep rig, add-ons and
@@ -43,7 +46,8 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 ## In progress
 
-- Nothing. High Olympus is merged into main; DECISIONS.md's *To review* lists its calls.
+- **Free gift**: built and playtested on branch `t3code/cf18b902`, not merged; waiting for the user's look pick and
+  their call on rewarding the like (Roblox's rules). DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
 
@@ -52,6 +56,8 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   rejoin and session locking are untested (the offline maths is unit-tested).
 - **Touch and gamepad**: only keyboard and mouse in Studio. Prompts, HUD buttons and the slide use Roblox's own input.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
+- **The free gift's favorite prompt**: skipped in Studio (PlaceId 0); `PromptSetFavorite` on the published place, its
+  answer and the claim after it are untested.
 - **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's
   plaza). By the numbers it's about 7.6 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope).
 - **High Olympus theft to delivery**: a tier-30 slide was measured through all eighteen stretches (no hops, Zeus

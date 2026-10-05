@@ -28,6 +28,19 @@ confirmed or reversed it.
 
 ## To review
 
+Calls made building the free gift (2026-10-05).
+
+- **Reward**: 3 minutes of the player's stair walker (no trail) in Climb Power and 3 minutes of their flock's income in
+  coins, at least 500 of each (a new player: +500 and +500, enough to open tier 2). Once per player, ever.
+- **What unlocks Claim**: favoriting, through Roblox's own favorite prompt that Claim opens. The like is asked (step 1)
+  but can't be checked by any game. Roblox's rules forbid rewards "in exchange for a thumb up"; see the question to the
+  user in this task's summary.
+- **When it shows**: a GIFT button at the top of the left column (red "!", glowing) until claimed; the menu also opens
+  by itself once a session, 30 s after the first delivery (or after joining), when the player is off the mountain, not
+  carrying and in no other menu, every session until claimed.
+- **Look**: the Shop's Prize Fleece menu at Medium size, cyan header like the reference (a gold one was mocked up too),
+  no cash chip in its header, no "LIMITED TIME" (it isn't).
+
 Calls made lengthening High Olympus's stretches to 275 (2026-10-05).
 
 - **Decor density kept**: each stretch's trees, rocks, islands, clouds and scattered props scale with its length

@@ -79,6 +79,13 @@ local commands: { [string]: Command } = {
 		registry.FlockService:Push(player)
 		return true, nil
 	end,
+	-- The free gift can be claimed again.
+	ResetGift = function(player)
+		local data = registry.DataService:GetData(player)
+		data.FreeGift = false
+		registry.FlockService:Push(player)
+		return true, nil
+	end,
 	-- A new player's save again. Receipts stay, so no product is granted twice.
 	WipeSave = function(player)
 		if registry.DataService:Reset(player) then

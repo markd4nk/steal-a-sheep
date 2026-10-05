@@ -22,6 +22,7 @@ deliver -> earn and grow -> upgrade.
 - Climb gates, slide hits and knockback: `MountainService`; client slide, steering, braking: `MovementController`.
 - Flock, pens, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging: `FlockService`.
 - Plots (the map's five), pen pads, delivery pads, stair walkers: `PlotService`.
+- Free gift for liking and favoriting the game (Climb Power and coins, once): `GiftService`, `Screens/Gift`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
 ## The map
@@ -67,7 +68,7 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels, pen slots and trails. Climb Power
+Coins (equipped sheep, first-discovery rewards, selling, the free gift) buy stair walker levels, pen slots and trails. Climb Power
 (stair walker) opens tiers and reduces carrying slowdown. No Robux products.
 
 ## Not built

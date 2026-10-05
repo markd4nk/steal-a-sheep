@@ -6,6 +6,28 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Free gift for liking and favoriting (2026-10-05)**. The user, with a reference from another game (a "Free Gift!"
+  panel: the reward big, numbered steps with a picture of the game page's button, Claim): give players something
+  like climbing speed and cash for liking and favoriting the game (no community to join yet), in the Shop's UI.
+  - *Reward*: `Economy.GiftReward(walkerLevel, income)`: 180 s of the stair walker's rate (no trail) in Climb Power and
+    180 s of the flock's income in coins, at least 500 of each, so it's worth the same few minutes whenever it's
+    claimed. The snapshot carries `FreeGift`, `GiftCoins`, `GiftClimb`; the menu shows those.
+  - *Claim*: `GiftService` (`Remotes.ClaimGift`, no arguments) gives it once per player (saved `FreeGift`) and returns
+    what it gave. Claim first opens Roblox's favorite prompt (`AvatarEditorService:PromptSetFavorite(PlaceId, Asset,
+    true)`) and claims only on `PromptSetFavoriteCompleted` = Success; in an unpublished place (PlaceId 0) the prompt is
+    skipped. No game can see a like, so step 1 is asked, not checked; the server can't check the favorite either and
+    takes the claim on trust, capped at one.
+  - *UI*: `Screens/Gift` (a Medium Prize Fleece menu, cyan `Lab` header, the gift on a stage, the two rewards, two
+    step tiles with a thumb-up row and a Favorite star under red pointers, a green Claim). HUD: `GiftButton` (GIFT,
+    top of the left column) with a red "!" and the hint glow, gone once claimed. It opens by itself once a session, 30 s
+    after it can be claimed (after the first delivery), once the player is off the mountain, not carrying, and no menu
+    is open. Claiming closes it and plays the "FREE GIFT!" celebration with what was given.
+  - *Checked*: `check.ps1` passes. Own Studio on `build/GiftPlaytest.rbxl` (branch code via `rojo build` +
+    `GetObjects`): both bootstraps ready, 38 tests pass, no warnings. After a debug delivery the menu opened by itself
+    at 31 s; Claim gave +500 Climb Power and +500 coins (25 → 525, opening tier 2), celebrated, hid the HUD button; a
+    second claim was refused; `ResetGift` brought the button back and it opened the menu; the coin line then read +900
+    (income 5/s). Two looks rendered as mock-ups (cyan, gold). Not checked: the real favorite prompt (needs a published
+    place), phones.
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9
   (4-5 are 126, 10-12 are 325), and 129-178 across the ground. The user picked 275.

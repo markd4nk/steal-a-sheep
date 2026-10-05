@@ -59,6 +59,9 @@ Economy.TutorialClimb = 25
 Economy.StartPens = 3
 Economy.MaxPens = 12
 Economy.MergeAfterDeliveries = 3
+Economy.GiftSeconds = 180
+Economy.GiftCoins = 500
+Economy.GiftClimb = 500
 
 -- Climb Power a second on the stair walker, by its level (0 is the free one). Each level covers the gap between the
 -- next two tiers' reach in about a minute, and the last carries Zeus's Heavy target.
@@ -260,6 +263,14 @@ end
 function Economy.TrainingRate(walkerLevel: number, trail: string?): number
 	local equipped = Economy.Trail(trail)
 	return Economy.WalkerRate(walkerLevel) * (if equipped then equipped.Multiplier else 1)
+end
+
+-- The free gift for liking and favoriting the game: GiftSeconds of the player's stair walker (no trail) and of their
+-- flock's income, never less than GiftClimb and GiftCoins, so it's worth the same few minutes whenever it's claimed.
+function Economy.GiftReward(walkerLevel: number, income: number): (number, number)
+	local coins = math.max(Economy.GiftCoins, Economy.Round(income * Economy.GiftSeconds))
+	local climb = math.max(Economy.GiftClimb, Economy.Round(Economy.WalkerRate(walkerLevel) * Economy.GiftSeconds))
+	return coins, climb
 end
 
 local function pick(random: Random, weights: { number }): number
