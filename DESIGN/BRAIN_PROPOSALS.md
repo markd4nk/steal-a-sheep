@@ -7,6 +7,14 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 
 ## Waiting
 
+- **S6** (`BRAIN/PATTERNS/testing-studio.md`): "`generate_mesh` reads `partNames` as one comma-separated string: a JSON
+  list passed through it keeps its brackets and quotes in the part names (`[\"head\"_geom`). Pass `head, torso, left
+  arm`. The result is a Model named after the prompt, one Model per part holding a MeshPart `<part>_geom`, dropped
+  far from the map at the camera's focus; the mesh is published to the creator (`publishedAssetId` in the job result),
+  so `insert_asset` brings it back later. Run it with `async` and collect with `wait_job_finished`: two in parallel
+  took about four minutes." Seen 2026-10-05 making Steal a Sheep's Zeus mock-ups.
+- **S7** (`BRAIN/PATTERNS/testing-studio.md`): "`screen_capture` calls sent in parallel to one Studio time out (two of
+  three did); send them one at a time." Seen 2026-10-05.
 - **S1** (`BRAIN/PATTERNS/characters.md`): "PlayerScripts may have no `PlayerModule`: in Studio 2026-10 the default
   control scripts weren't there, so `require(PlayerModule):GetControls():GetMoveVector()` is gone. Read the player's
   input as `Humanoid.MoveDirection` in a RenderStep bound after `Enum.RenderPriority.Character` (it still holds what

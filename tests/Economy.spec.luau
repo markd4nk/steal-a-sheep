@@ -10,7 +10,7 @@ local Run = require(script.Parent.Run)
 local function sheep(fields: { [string]: any }): Economy.Sheep
 	local base: any = {
 		Id = "1",
-		Family = "Meadow",
+		Family = Olympus.Tiers[1].Family,
 		Rarity = 1,
 		Burden = 1,
 		Size = 1,

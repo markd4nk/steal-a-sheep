@@ -1273,7 +1273,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 
 	themes.Hephaestus = {
 		Floor = rgb(78, 70, 70),
-		Cap = rgb(122, 74, 56),
+		Cap = rgb(92, 80, 76),
 		SideA = rgb(58, 52, 54),
 		SideB = rgb(68, 60, 62),
 		Leaves = rgb(96, 82, 76),
@@ -1376,7 +1376,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		Leaves = rgb(96, 158, 92),
 		Trunk = rgb(190, 140, 140),
 		Stone = rgb(242, 220, 224),
-		Plants = { { "BlossomTree", 3 }, { "Bush", 4 } },
+		Plants = { { "BlossomTree", 3, Leaves = rgb(240, 156, 186) }, { "Bush", 4 } },
 		Props = function(c: any)
 			-- Roses.
 			Props.Scatter(c, 40, function(x: number, z: number)
@@ -1402,7 +1402,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 	}
 
 	themes.Artemis = {
-		Floor = rgb(70, 92, 96),
+		Floor = rgb(94, 102, 112),
 		Cap = rgb(226, 232, 240),
 		SideA = rgb(58, 70, 92),
 		SideB = rgb(66, 80, 104),

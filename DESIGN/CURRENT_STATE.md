@@ -45,9 +45,11 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 ## In progress
 
 - **Gods in rank order** (branch `t3code/order-olympian-gods`, not merged): `Config/Olympus` reordered, new High
-  Olympus stretches for the eleven Olympians who moved up. Main (275-stud stretches) merged in, lanes clear. Waiting for the
-  user's OK on the new stretches before merging.
-- **Real god models**: a Zeus mock-up first, for the user's OK before modelling the other 29.
+  Olympus stretches for the eleven Olympians who moved up. Main (275-stud stretches) merged in, lanes clear, playtested.
+  Waiting for the user's OK on the new stretches before merging.
+- **Real god models**: two Zeus mock-ups made with `generate_mesh` (cartoon: asset 84879965895469; heroic:
+  133271949323056), each split into head, torso, arms, legs and bolt so they can take the rig's joints. Waiting for the
+  user's pick and OK before rigging Zeus and modelling the other 29.
 
 ## Not verified
 
