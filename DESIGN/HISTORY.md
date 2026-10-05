@@ -32,7 +32,8 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     refused with its notice; Select all took the 7 unlocked (5.1K) and turned into Clear; the confirm showed x7 and
     5.1K; Sell left only the locked lamb, income unchanged (3,865/s), "Sold 7 for 5.1K cash". Called directly, the
     server refused a pen sheep, a locked one and a missing id, and the old FlockAction Sell. Your Flock has no Sell.
-    Console clean. Not checked: a phone screen, gamepad, two players.
+    Console clean. Not checked: a phone screen, gamepad, two players. The user then said build it and merge it; it
+    was checked again on main's latest code (57 tests, a sale, a pen sheep refused) and merged into main.
 - **Stair walker: a StairMaster outside the pen (2026-10-05)**. After the study below, the user: the first five looks
   are good, stick with five for now; the level floats over the machine; place it outside the pen, very close, like
   Steal an Egg's treadmill; an upgrade sign beside it to upgrade directly with cash or Robux. Earlier calls: gym at

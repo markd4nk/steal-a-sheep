@@ -67,9 +67,8 @@ lamb.
 
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
-- **Sell Stall menu: built on branch `t3code/sell-market-mockup`, not merged** (the user asked not to merge branches
-  into main unless asked). Playtested in this session's own Studio (`build/SellPlaytest.rbxl`); DECISIONS.md lists
-  its calls under *To review*.
+- Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
+  lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
