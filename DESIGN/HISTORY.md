@@ -118,6 +118,17 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   lamb: caught at 200, escaped at 800 (24.9, god 39 studs behind), easy at 3,200 (50.7); at 1e9 Climbing walking on
   the plots stopped at 126, uphill ran 245 with no airborne samples, slides of 200-260 stayed on the floor; the carry
   card shows only the lamb's name. Console clean.
+  Then the user kept gods walking home slowly and asked for dropped lambs: a caught (or dead) thief's lamb lies where
+  they were for 30 s, anyone may steal it and its god chases them. Also a server ground-speed check (a budget refilled
+  at the fastest legal speed; server teleports reset it). Checked in Studio: 45 of 45 tests; a thief caught on tier 3
+  dropped the lamb 5 studs from the catch spot, the player walked back and stole it 16.5 s later and the god ran at
+  them at once; left alone it went back to its pasture; a 200-stud sideways teleport was put back; no pull-backs on
+  legal chases or a 254 studs/s slide.
+  The user asked for a final scaling pass before playtesting. A simulated efficient player (steals once Climbing is
+  1.15x the next sign, buys every walker level, pen and trail it can) reaches tier 10 in 30 min, tier 20 in 1.8 h and
+  Zeus in 4.3 h; climbs never take over a minute (lower tiers zoom); every tier's numbers are in the same proportion
+  (a walker level costs 60 s of one adult from the tier below), so nothing breaks, but Climbing outruns the signs
+  10-70x between new tiers, so chases are easy most of the time.
 
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9

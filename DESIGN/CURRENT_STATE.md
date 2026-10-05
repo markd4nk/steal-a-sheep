@@ -75,8 +75,6 @@ lamb.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
 - **Climbing in play**: playtested 2026-10-05 on tiers 1-3 and 6 with one player (TESTING.md); not on tiers 13-30,
   not with two players, not on touch or gamepad.
-- **Escape speed isn't checked by the server**: a client could slide faster than its escape speed. The uphill check
-  only stops climbing too fast.
 - **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's
   plaza). By the numbers it's about 7.6 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope) at normal speed;
   far under a tier's sign it's about 4 minutes a stretch.
@@ -92,6 +90,10 @@ lamb.
 - **Long runs at the top**: about 7.6 minutes' climb to Zeus and about 2.5 minutes' slide home; the user keeps it all on
   foot (DECISIONS.md).
 - **High Olympus is sparse**: the user will add obstacles to the higher levels later.
+- **The economy is generous (2026-10-05 simulation)**: a walker level costs about a minute of one sheep's income
+  from the tier below, at every tier, so Climbing races past the signs (10-70x them) and chases get easy fast. An
+  efficient player reaches Zeus in about 4.3 hours (a real one maybe 2-3x that). Trails stop mattering after about
+  tier 8 (fixed prices). Waiting for the user's call on slowing it (DESIGN/HISTORY.md, Climbing).
 - **Very fast slides meet the trees hard**: at 150+ studs/s a slide that clips a tree stops dead and its god catches
   up (seen at x 944 on tier 3). Same decor issue, felt more at high speed.
 - **Plots: 5.** A sixth player is kicked with "server full"; set Maximum Visitor Count to 5 in Creator Hub.

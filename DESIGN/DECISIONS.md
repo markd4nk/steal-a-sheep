@@ -115,6 +115,13 @@ Calls made building Climbing (2026-10-05):
 - **Server check**: a player found further up the ramp than their Climbing allows (30% slack, 10 studs or 1 second's
   lead for lag) is put back at their allowed spot.
 - **Saved sheep**: schema 2 turns Burden 1/2/3 into Weight 1.05/1.2/1.35; sizes already rolled stay.
+- **Dropped lambs** (the user: a caught thief's lamb stays where it fell, anyone can steal it, its god chases them):
+  being caught or dying on the ramp drops it; giving up, falling off the world, resetting or leaving puts it straight
+  back, and the tutorial lamb always goes back. A dropped lamb lies there 30 s, then returns to its pasture. The caught
+  thief reads "<God> caught you! You dropped the lamb" and is sent home. Gods still walk home slowly (the user's call).
+- **Server ground-speed check**: each player may cover ground at the fastest they could legally go there (walking,
+  their escape speed, or a knockback), 30% slack and up to a second banked for lag; anyone faster is put back where they
+  were. Server teleports (home after a catch, onto the plot, debug steals) reset it.
 
 Calls made lengthening High Olympus's stretches to 275 (2026-10-05).
 

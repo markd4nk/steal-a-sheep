@@ -116,3 +116,9 @@ Useful measurements:
 - **Measured**: uphill on tier 3 (sign 800): 1.0 studs/s at 0 Climbing, 4.4 at 200, 17.6 along x at 800. Tier 3
   chases (god 25.6): 200 caught in 7 s; 800 with a 1.03 lamb escaped in 29 s, god 39 studs behind; 3,200 in 15 s at
   50.7. At 1e9: 126 on the plots (7x cap), 245 uphill on tiers 1-2, slides of 200-260 on the floor.
+- **Steal a dropped lamb from the MCP**: walk within 10 studs and stop first (at high Climbing the walk overshoots),
+  then `prompt:InputHoldBegin()`, wait past HoldSeconds, `InputHoldEnd()`. Do it inside DropSeconds (30): a slow test
+  script finds the lamb already back in its pasture.
+- **Economy simulation**: an efficient player model (walker, pens, trails, trips timed from `Mountain.SpeedAt` and
+  `Economy.EscapeSpeed`) lived in a throwaway script; its results are in HISTORY.md (Climbing). Rebuild it from
+  Economy and Olympus if the economy changes.
