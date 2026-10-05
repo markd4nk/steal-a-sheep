@@ -23,7 +23,7 @@ local WildService = { Name = "WildService" }
 type Roll = {
 	Family: string,
 	Rarity: number,
-	Burden: number,
+	Weight: number,
 	Size: number,
 	Tutorial: boolean?,
 }
@@ -66,8 +66,8 @@ local function notify(player: Player, message: string, kind: string, sound: stri
 end
 
 local function roll(tier: number): Roll
-	local rarity, burden, size = Economy.RollWild(random)
-	return { Family = Olympus.Tiers[tier].Family, Rarity = rarity, Burden = burden, Size = size }
+	local rarity, weight, size = Economy.RollWild(random)
+	return { Family = Olympus.Tiers[tier].Family, Rarity = rarity, Weight = weight, Size = size }
 end
 
 local function asSheep(rolled: Roll): Economy.Sheep
@@ -75,7 +75,7 @@ local function asSheep(rolled: Roll): Economy.Sheep
 		Id = "",
 		Family = rolled.Family,
 		Rarity = rolled.Rarity,
-		Burden = rolled.Burden,
+		Weight = rolled.Weight,
 		Size = rolled.Size,
 		Grown = 0,
 		Rank = 0,
@@ -86,13 +86,7 @@ local function asSheep(rolled: Roll): Economy.Sheep
 	}
 end
 
-local BURDEN_COLORS = {
-	Color3.fromRGB(140, 235, 120),
-	Color3.fromRGB(255, 214, 90),
-	Color3.fromRGB(255, 120, 100),
-}
-
--- The inspection card over a wild lamb: its name, what it will earn grown up, and how heavy it is to carry.
+-- The inspection card over a wild lamb: its name and what it will earn grown up. Its weight stays hidden.
 local function card(model: Model, rolled: Roll)
 	local root = model.PrimaryPart
 	if not root then
@@ -102,7 +96,7 @@ local function card(model: Model, rolled: Roll)
 	local low, high = Economy.FutureRange(sheep)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "Card"
-	billboard.Size = UDim2.fromOffset(190, 66)
+	billboard.Size = UDim2.fromOffset(190, 46)
 	billboard.StudsOffsetWorldSpace = Vector3.new(0, 4, 0)
 	billboard.MaxDistance = 45
 	billboard.LightInfluence = 0
@@ -126,7 +120,6 @@ local function card(model: Model, rolled: Roll)
 	local rarity = Economy.Rarities[rolled.Rarity]
 	line(Economy.Name(sheep), 24, if rolled.Rarity > 1 then rarity.Color else Color3.new(1, 1, 1))
 	line(`Grows to +{Format.Rate(low)}-{Format.Rate(high)}/s`, 20, Color3.fromRGB(190, 255, 90))
-	line(Economy.Burdens[rolled.Burden].Name, 20, BURDEN_COLORS[rolled.Burden])
 end
 
 local function setCard(model: Model?, visible: boolean)
@@ -161,7 +154,7 @@ local function fill(spawn: Spawn)
 		spawn.Prompt = nil
 	end
 	local rolled = spawn.Roll
-	local scale = GameConfig.SheepSize * Economy.Burdens[rolled.Burden].Scale
+	local scale = GameConfig.SheepSize * Economy.LambScale(rolled.Weight)
 	local model = registry.SheepService:Build(rolled.Family, rolled.Rarity, scale)
 	if not model then
 		return
@@ -196,8 +189,8 @@ end
 local function announceRoyal(spawn: Spawn)
 	local tier = Olympus.Tiers[spawn.Tier]
 	for _, player in Players:GetPlayers() do
-		local unlocked = player:GetAttribute("Unlocked")
-		if type(unlocked) == "number" and unlocked >= spawn.Tier then
+		local reached = player:GetAttribute("ClimbTier")
+		if type(reached) == "number" and reached >= spawn.Tier then
 			notify(player, `A Royal {tier.FamilyName} lamb appeared in {tier.God}'s pasture!`, "Rare", "Reveal")
 		end
 	end
@@ -215,7 +208,7 @@ local function clearAttributes(player: Player)
 	player:SetAttribute("CarriedFamily", nil)
 	player:SetAttribute("CarriedScale", nil)
 	player:SetAttribute("CarryTier", nil)
-	player:SetAttribute("CarryBurden", nil)
+	player:SetAttribute("CarryWeight", nil)
 	player:SetAttribute("CarryTutorial", nil)
 end
 
@@ -296,10 +289,6 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	if not registry.PlotService:GetPlot(player) then
 		return
 	end
-	if Economy.Unlocked(data.ClimbPower, data.Deliveries) < spawn.Tier then
-		notify(player, "Train to climb this slope", "Bad", "Denied")
-		return
-	end
 	if registry.FlockService:Count(player) >= GameConfig.Theft.InventoryLimit then
 		notify(player, "Your flock is full: merge or sell first", "Bad", "Denied")
 		return
@@ -324,7 +313,7 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	player:SetAttribute("CarriedFamily", rolled.Family)
 	player:SetAttribute("CarriedScale", model:GetScale())
 	player:SetAttribute("CarryTier", spawn.Tier)
-	player:SetAttribute("CarryBurden", rolled.Burden)
+	player:SetAttribute("CarryWeight", rolled.Weight)
 	player:SetAttribute("CarryTutorial", if spawn.Owner then true else nil)
 	player:SetAttribute("Carrying", true)
 	local tier = Olympus.Tiers[spawn.Tier]
@@ -342,7 +331,7 @@ local function makeTutorialLamb(player: Player)
 		Tier = 1,
 		At = floorAt(x, Olympus.LaneMiddleZ),
 		State = "Empty",
-		Roll = { Family = tier.Family, Rarity = 1, Burden = 1, Size = 1, Tutorial = true },
+		Roll = { Family = tier.Family, Rarity = 1, Weight = 1, Size = 1, Tutorial = true },
 		Model = nil,
 		Prompt = nil,
 		Carrier = nil,
@@ -558,7 +547,9 @@ function WildService.DebugSteal(_self: any, player: Player, tier: number): boole
 	end
 	for _, spawn in spawns do
 		if spawn.Tier == tier and spawn.State == "Ready" and spawn.Model then
-			character:PivotTo(spawn.At * CFrame.new(0, 4, 3))
+			local at = spawn.At * CFrame.new(0, 4, 3)
+			registry.MountainService:Teleported(player, at.Position.X)
+			character:PivotTo(at)
 			tryPickUp(player, spawn)
 			return carries[player] ~= nil
 		end

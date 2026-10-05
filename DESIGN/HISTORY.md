@@ -50,6 +50,55 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     with the stand-in face) and filmed; store, equip (hops back in at home), grow-up rebuilds in place, merge (hops in
     at the first sheep's home), sell, and a full pen (stored, warning shown). Console clean. Not checked: two players,
     touch, gamepad, a real rejoin.
+- **Climbing: one stat, no walls (2026-10-05)**. The user asked how chaser speed worked, then: climbing and speed
+  should be one thing called Climbing; the steeper the slope the less it works, so going higher needs almost
+  exponentially more; you can still climb when far too weak, just painfully slowly ("crawl", not slip back), and that
+  slowness gets you caught on the way down. Walls removed completely, no delivery lock, no god lunge. For the gods
+  they chose a fixed speed like Steal an Egg's and asked for it to be checked: guides say each zone has its own,
+  faster guardian that never scales with the player, and you escape with enough Speed over the zone's minimum. Ours
+  already did that, so `GodService` is unchanged.
+  How it works: `Economy.ClimbShare` (Climbing / (Climbing + Reach)), `Mountain.ClimbSpeedAt` (18 studs/s times that,
+  at least `Movement.CrawlSpeed` 1), `MovementController` caps the uphill part of a walk to it,
+  `MountainService` keeps a per-player ceiling rising at that speed (x1.3, with 10 studs or 1 s of lead) and puts
+  anyone above it back. `Economy.CarryMultiplier` keeps falling below Reach (to `UnderTrainedFloor` 0.45 of the
+  burden's first value). `Economy.ClimbTier` (highest Reach held) replaces `Unlocked` for HUD goals, the training
+  meter, Royal-lamb notices and the "in reach" notice. Gates became `TierSigns`. Every "Climb Power" on screen now
+  says "Climbing"; the saved field stays `ClimbPower`.
+  Then, after a napkin-maths explanation, the user made the chase "your speed vs its speed" like Steal an Egg: one set
+  speed per god for the whole chase (`Economy.GodSpeed`, 0.8 x the tier's `SlideSpeed`), no god walking speed, and
+  the escape speed from Climbing (`Economy.EscapeSpeed`, with burden weights replacing the old Carry tables), set when
+  a slide starts and kept all the way down because momentum carries you (`MovementController` slideTarget).
+  `Mountain.SlideSpeedAt` and the under-trained floor went. The carry card shows "you N, god N".
+  Then, wanting as few numbers as possible, the user settled on one rule: your ratio is Climbing / (sign x lamb weight),
+  your speed is the ratio below 1 and +1x per 4x above, no cap on the mountain, 7x for walking in the safe zone, tier 1
+  never below normal; the sign is just enough for the lightest lamb, an average one leaving about 95%. Weight became
+  hidden and a smooth range, saved with the sheep and tilting (not deciding) adult size; the Light/Stout/Heavy words
+  and the carry card's speeds went. The Merge Shrine session asked for the weight interface: `Economy.RollWeight(random,
+  luck)`, `SizeOdds(weight)`, `RollSize`, `LambScale`, a placeholder Titan size. Schema 2 migrates Burden to Weight.
+  `Mountain.SpeedAt` replaced `ClimbSpeedAt`; slides now reach their speed in about 2 s.
+  Checked: `check.ps1`; 40 of 40 tests in Studio; a playtest in StealASheep.rbxl with this branch's scripts swapped in
+  (main's put back after, not saved): the server put a client teleport to x 900 back to x 235; tier 3 uphill at 0,
+  200, 800 and 12,800 Climbing measured 1.0, 4.4, 17.6 and ~54 studs/s; chases on tier 3 (god 25.6) with a 1.03
+  lamb: caught at 200, escaped at 800 (24.9, god 39 studs behind), easy at 3,200 (50.7); at 1e9 Climbing walking on
+  the plots stopped at 126, uphill ran 245 with no airborne samples, slides of 200-260 stayed on the floor; the carry
+  card shows only the lamb's name. Console clean.
+
+- **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
+  levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9
+  (4-5 are 126, 10-12 are 325), and 129-178 across the ground. The user picked 275.
+  - *Builder*: `SURFACE_LENGTH` 275 (tiers 13-30 now 169-233 across, summit at x 6721, height 4439, was 3661).
+    Stage 3's terrace unit covers only about 272 studs, so each stretch also takes the ends of the neighbouring
+    copies, 251.16 studs along the floor, the map's own repeat (measured: stage 5 holds two copies that far apart, in
+    their frame 251 along and 9.1 up, the 2 degrees between terrace and slab; shifting by the 9.1 too left the end
+    copies floating 4 studs up). Decor counts scale by 275/210 (`DECOR_SCALE`, `c.Count`). Eris's crystals start at
+    lane + 14 (one leaned 6 studs into the lane). Zeus's floor now stops at the top and the plaza starts flush with
+    it: before, the plaza's edge was a ledge no walker could climb (pre-existing at 210).
+  - *Config*: tiers 13-30's `XStart`/`XEnd` and the `Ramp` points regenerated from `UpperMountain.Layout()` (Lune).
+  - *Checked*: `check.ps1` passes. Lune: no gaps along any stretch's terraces at floor level; at the joints only the
+    terrace's own 2-stud notches. Second Studio on the built place: both bootstraps ready, 36 tests pass, 30 gods and
+    72 High Olympus lambs on the floor, 29 gates, 0 collidable decor in any lane (5,013 checked), 13,519 parts (was
+    10,547). On foot: 15 s a stretch at 17.5-18 studs/s, onto the summit plaza. Zeus theft slid down all eighteen
+    stretches in 93 s, 0 of 843 samples in the air, Zeus falling behind (59 to 473 studs). Joints screenshotted.
 - **High Olympus: thirty gods (2026-10-05)**. The user, liking the map: build out the next tiers from its parts and
   pieces, the top Olympus gods; then a list of thirty ("map parts for all of these gods"), Zeus on the new top, the
   look and studs indistinguishable from the original, each section grouped, the climb no steeper than about 60 degrees,

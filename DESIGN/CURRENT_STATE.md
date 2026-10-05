@@ -33,7 +33,7 @@ lamb.
   (`FlockService/Pens`, `Utils/Wander`), avoiding trees, hay and the walker; lambs graze nearly all the time, adults now
   and then (`AnimController`, `Utils/SheepClips`). Homes are saved (`HomeX`/`HomeZ`).
 
-- **High Olympus** (tiers 13-30): one stretch a god, 210 studs along the floor, 32 rising to 52 degrees, from stage 3's
+- **High Olympus** (tiers 13-30): one stretch a god, 275 studs along the floor, 32 rising to 52 degrees, from stage 3's
   floor slab and terraces and the stages' decor, recoloured, plus block props; Zeus's throne plaza on top. Built into
   the place by `tools/UpperMountain.luau` (Lune, in `build-place.ps1`); `tools/preview-upper-mountain.luau` previews it
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
@@ -44,6 +44,9 @@ lamb.
   DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
   `Utils/Economy` (every formula), `Utils/Mountain` (ramp height, tiers by position, floor checks).
+- **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
+  gods at one set speed; weight saved and tilting size odds (`Economy.RollWeight`, `SizeOdds`, for the Merge Shrine).
+  GAME_DESIGN.md, *Climbing* and *Lamb weight*.
 - **From Shear a Sheep**: UIKit, Theme, Style (trimmed), Panel, Buttons, Motion, Scale, the sheep rig, add-ons and
   breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds, the Mutation Machine (as the Merge Shrine).
 
@@ -53,6 +56,7 @@ lamb.
   review and seen on a chewing lamb in Studio. Until a picture loads, a sheep keeps its own face. Drawn by
   `art/faces/chew_faces.py` with Shear a Sheep's `art/sheep/mock_faces.py` helpers.
 - **Free-roaming pens are on their branch**, not yet merged into main (the user's call).
+- Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
 
@@ -64,10 +68,15 @@ lamb.
 - **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
   teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
-- **Upper tiers by foot**: tiers 7 and up were reached with the debug Unlock; climbing them on foot wasn't timed. By
-  the numbers it's about 6.5 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope).
+- **Climbing in play**: playtested 2026-10-05 on tiers 1-3 and 6 with one player (TESTING.md); not on tiers 13-30,
+  not with two players, not on touch or gamepad.
+- **Escape speed isn't checked by the server**: a client could slide faster than its escape speed. The uphill check
+  only stops climbing too fast.
+- **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's
+  plaza). By the numbers it's about 7.6 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope) at normal speed;
+  far under a tier's sign it's about 4 minutes a stretch.
 - **High Olympus theft to delivery**: a tier-30 slide was measured through all eighteen stretches (no hops, Zeus
-  falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; gates there weren't walked into.
+  falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; and the climb speed check wasn't tried there.
 
 ## Known issues
 
@@ -75,15 +84,17 @@ lamb.
   players steer round them; lanes stay as they are until the user adds obstacles (DECISIONS.md). Every run
   from High Olympus now passes through them: a straight slide from Zeus stuck on stage 6's pavilion (x 1890, mid-lane)
   and was caught. High Olympus's own lane is clear.
-- **Long runs at the top**: about 6.5 minutes' climb to Zeus and over 2 minutes' slide home; the user keeps it all on
+- **Long runs at the top**: about 7.6 minutes' climb to Zeus and about 2.5 minutes' slide home; the user keeps it all on
   foot (DECISIONS.md).
 - **High Olympus is sparse**: the user will add obstacles to the higher levels later.
+- **Very fast slides meet the trees hard**: at 150+ studs/s a slide that clips a tree stops dead and its god catches
+  up (seen at x 944 on tier 3). Same decor issue, felt more at high speed.
 - **Plots: 5.** A sixth player is kicked with "server full"; set Maximum Visitor Count to 5 in Creator Hub.
 - **Asset ownership**: the sheep meshes, faces, UI images and sounds are Shear a Sheep's uploads (Mark's account).
   They load if this game is published under the same owner.
 - **ViewportFrames (the menus' 3D sheep) don't show in Studio MCP screenshots while the window is minimized**; they do
   in play.
-- The map's four leaderboard boards are decoration; the player list shows Income and Climb.
+- The map's four leaderboard boards are decoration; the player list shows Income and Climbing.
 - **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
   little sunk in the straw.
 - Studio MCP screenshots don't show ProximityPrompt buttons (Steal, Put down); they work in play.

@@ -16,8 +16,14 @@ local START_X = 3060
 local START_Y = 1148.8
 -- The corridor's middle (the map's floor slabs are centred here; Config/Olympus.LaneMiddleZ is 191).
 local MIDDLE_Z = 193.45
--- Each stretch's length along its floor, in studs.
-local SURFACE_LENGTH = 210
+-- Each stretch's length along its floor, in studs: a little longer than the map's first stages (about 250), so a god's
+-- stretch takes as long to climb as theirs.
+local SURFACE_LENGTH = 275
+-- The decor counts in Themes were picked for 210-stud stretches; they scale with the length to keep that density.
+local DECOR_SCALE = SURFACE_LENGTH / 210
+-- In the map, stage 3's terrace unit repeats every 251.16 studs along the floor, each copy's ends overlapping the next's.
+-- A stretch longer than one unit takes its ends from the neighbouring copies, laid along its floor like the first.
+local TERRACE_REPEAT = 251.16
 local SLAB_WIDTH = 190
 -- The walkable lane in a stretch's own frame (x across: +x is world -z). Decor stays out of it so slides run clear.
 local LANE_HALF = 56
@@ -456,6 +462,9 @@ function UpperMountain.Build(env: Env, workspace: any)
 
 	local sections = UpperMountain.Layout()
 	local themes = UpperMountain.Themes(rgb)
+	local function count(n: number): number
+		return math.max(1, math.floor(n * DECOR_SCALE + 0.5))
+	end
 
 	for index, section in sections do
 		local theme = themes[section.God]
@@ -475,11 +484,13 @@ function UpperMountain.Build(env: Env, workspace: any)
 		local upright = CFrame.fromEulerAnglesYXZ(0, math.pi / 2, 0)
 		local half = SURFACE_LENGTH / 2
 
-		-- Floor.
+		-- Floor, overlapping its neighbours by 4 at each end. The last stops at the top, where the summit plaza starts
+		-- flush with it: an overhang there is a ledge a walker can't get onto.
 		local floor = slab:Clone()
 		floor.Name = "Floor"
-		floor.Size = Vector3.new(SLAB_WIDTH, slab.Size.Y, SURFACE_LENGTH + 8)
-		floor.CFrame = frame * CFrame.new(0, -slab.Size.Y / 2, 0)
+		local overlapUp = if index == #sections then 0 else 4
+		floor.Size = Vector3.new(SLAB_WIDTH, slab.Size.Y, SURFACE_LENGTH + 4 + overlapUp)
+		floor.CFrame = frame * CFrame.new(0, -slab.Size.Y / 2, (overlapUp - 4) / 2)
 		floor.Color = theme.Floor
 		floor.Parent = model
 
@@ -488,33 +499,36 @@ function UpperMountain.Build(env: Env, workspace: any)
 		terraces.Name = "Terraces"
 		terraces.Parent = model
 		local tops: { { number } } = {}
-		for _, piece in cliffPieces do
-			local localCf = CFrame.new(0, -slab.Size.Y / 2, 0) * piece.Local
-			if math.abs(localCf.Position.Z) > half + 6 then
-				continue
+		for _, copy in { 0, -1, 1 } do
+			local shift = CFrame.new(0, -slab.Size.Y / 2, copy * TERRACE_REPEAT)
+			for _, piece in cliffPieces do
+				local localCf = shift * piece.Local
+				if math.abs(localCf.Position.Z) > half + 6 then
+					continue
+				end
+				local part = piece.Part:Clone()
+				part.CFrame = frame * localCf
+				local source = key(piece.Part.Color)
+				if source == CLIFF_CAP then
+					part.Color = if theme.CapAt then theme.CapAt(localCf.Position, random) else theme.Cap
+				elseif source == CLIFF_SIDE_A then
+					part.Color = theme.SideA
+				elseif source == CLIFF_SIDE_B then
+					part.Color = theme.SideB
+				else
+					part.Color = theme.SideA
+				end
+				part.Parent = terraces
+				local size = part.Size
+				local p = localCf.Position
+				local hx = math.abs(localCf.RightVector.X) * size.X / 2
+					+ math.abs(localCf.UpVector.X) * size.Y / 2
+					+ math.abs(localCf.LookVector.X) * size.Z / 2
+				local hz = math.abs(localCf.RightVector.Z) * size.X / 2
+					+ math.abs(localCf.UpVector.Z) * size.Y / 2
+					+ math.abs(localCf.LookVector.Z) * size.Z / 2
+				table.insert(tops, { p.X - hx, p.X + hx, p.Z - hz, p.Z + hz, p.Y + halfHeight(localCf, size) })
 			end
-			local part = piece.Part:Clone()
-			part.CFrame = frame * localCf
-			local source = key(piece.Part.Color)
-			if source == CLIFF_CAP then
-				part.Color = if theme.CapAt then theme.CapAt(localCf.Position, random) else theme.Cap
-			elseif source == CLIFF_SIDE_A then
-				part.Color = theme.SideA
-			elseif source == CLIFF_SIDE_B then
-				part.Color = theme.SideB
-			else
-				part.Color = theme.SideA
-			end
-			part.Parent = terraces
-			local size = part.Size
-			local p = localCf.Position
-			local hx = math.abs(localCf.RightVector.X) * size.X / 2
-				+ math.abs(localCf.UpVector.X) * size.Y / 2
-				+ math.abs(localCf.LookVector.X) * size.Z / 2
-			local hz = math.abs(localCf.RightVector.Z) * size.X / 2
-				+ math.abs(localCf.UpVector.Z) * size.Y / 2
-				+ math.abs(localCf.LookVector.Z) * size.Z / 2
-			table.insert(tops, { p.X - hx, p.X + hx, p.Z - hz, p.Z + hz, p.Y + halfHeight(localCf, size) })
 		end
 
 		local function ground(x: number, z: number): number
@@ -706,17 +720,18 @@ function UpperMountain.Build(env: Env, workspace: any)
 			NewPart = newPart,
 			Rgb = rgb,
 			Index = index,
+			Count = count,
 		}
 
 		-- Plants on the terraces and the floor's edges.
 		for _, entry in theme.Plants or {} do
-			for _ = 1, entry[2] do
+			for _ = 1, count(entry[2]) do
 				local x, z = sideSpot(entry[3] or LANE_HALF + 9, entry[4])
 				place(entry[1], x, z, { Scale = random.Number(0.85, 1.15), Leaves = entry.Leaves })
 			end
 		end
 		-- Rocks.
-		for _ = 1, theme.Stones or 6 do
+		for _ = 1, count(theme.Stones or 6) do
 			local x, z = sideSpot(LANE_HALF + 2, 100)
 			place(
 				random.Pick({ "Stone1", "Stone2", "Stone3" }),
@@ -726,7 +741,7 @@ function UpperMountain.Build(env: Env, workspace: any)
 			)
 		end
 		-- Floating islands and clouds off to the sides.
-		for i = 1, theme.Islands or 3 do
+		for i = 1, count(theme.Islands or 3) do
 			local side = if i % 2 == 0 then 1 else -1
 			local x = side * random.Number(135, 210)
 			local z = random.Number(-half, half)
@@ -742,7 +757,7 @@ function UpperMountain.Build(env: Env, workspace: any)
 				end,
 			})
 		end
-		for i = 1, theme.Clouds or 2 do
+		for i = 1, count(theme.Clouds or 2) do
 			local side = if i % 2 == 0 then -1 else 1
 			place("Cloud", side * random.Number(170, 320), random.Number(-half, half), {
 				Y = random.Number(40, 120),
@@ -763,7 +778,7 @@ function UpperMountain.Build(env: Env, workspace: any)
 	summit.Parent = folder
 	local zeus = themes.Zeus
 	local plazaLength = 90
-	local plazaCenter = Vector3.new(last.XEnd + plazaLength / 2 - 4, last.YEnd, MIDDLE_Z)
+	local plazaCenter = Vector3.new(last.XEnd + plazaLength / 2, last.YEnd, MIDDLE_Z)
 	local plaza = slab:Clone()
 	plaza.Name = "Plaza"
 	plaza.Size = Vector3.new(SLAB_WIDTH, slab.Size.Y, plazaLength)
@@ -906,7 +921,7 @@ end
 
 -- `count` things on the terraces or the floor's edges, made by `make(x, z)`.
 function Props.Scatter(c: any, count: number, make: (number, number) -> (), minX: number?, maxX: number?)
-	for _ = 1, count do
+	for _ = 1, c.Count(count) do
 		local x, z = c.SideSpot(minX, maxX)
 		make(x, z)
 	end
@@ -959,7 +974,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 				local radius = 92 - (band - 1) * 5.4
 				Props.Arc(c, -14, 0, radius, 26, V.new(5.6, math.pi * radius / 26 + 1.2, 5), rainbow[band])
 			end
-			for _ = 1, 7 do
+			for _ = 1, c.Count(7) do
 				local x, z = c.SideSpot(c.Lane + 6, 98)
 				c.Place("RoundTree", x, z, { Leaves = c.Random.Pick(rainbow), Scale = c.Random.Number(0.9, 1.2) })
 			end
@@ -1161,14 +1176,14 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 			Props.Scatter(c, 3, function(x: number, z: number)
 				c.Sprite("Apple", x, z, 1.8, legend)
 			end, c.Lane + 10, 96)
-			-- Crystals at odd angles.
+			-- Crystals at odd angles, far enough out that the tallest, leaning, stays out of the lane.
 			Props.Scatter(c, 10, function(x: number, z: number)
 				c.Place(c.Random.Pick({ "Spire", "SmallSpire" }), x, z, {
 					Solid = c.Random.Pick(clash),
 					Roll = { c.Random.Number(-28, 28), c.Random.Number(-28, 28) },
 					Sink = 2,
 				})
-			end, c.Lane + 6, 100)
+			end, c.Lane + 14, 100)
 		end,
 	}
 
@@ -1245,7 +1260,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 			local V = c.Vector3
 			local dream = { rgb(255, 150, 210), rgb(130, 230, 255), rgb(255, 236, 130), rgb(160, 255, 200) }
 			-- Shapes drifting over the dream.
-			for _ = 1, 18 do
+			for _ = 1, c.Count(18) do
 				local x = c.Random.Number(60, 150) * c.Random.Side()
 				local z = c.Random.Number(-c.Half, c.Half)
 				local s = c.Random.Number(3, 9)
@@ -1267,7 +1282,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 					{ Lift = c.Random.Number(10, 30), Neon = true, Ghost = true }
 				)
 			end, c.Lane + 10, 110)
-			for _ = 1, 3 do
+			for _ = 1, c.Count(3) do
 				local x = c.Random.Number(130, 190) * c.Random.Side()
 				c.Place("Island", x, c.Random.Number(-c.Half, c.Half), {
 					Y = c.Random.Number(30, 70),
@@ -1382,7 +1397,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 					{ Lift = c.Random.Number(8, 20), Ghost = true }
 				)
 			end, c.Lane + 8, 100)
-			for _ = 1, 10 do
+			for _ = 1, c.Count(10) do
 				local x = c.Random.Number(c.Lane + 4, 110) * c.Random.Side()
 				local z = c.Random.Number(-c.Half, c.Half)
 				local s = c.Random.Number(1.4, 2.6)

@@ -24,7 +24,7 @@ type View = {
 	Id: string,
 	Family: string,
 	Rarity: number,
-	Burden: number,
+	Weight: number,
 	Size: number,
 	Rank: number,
 	Locked: boolean,

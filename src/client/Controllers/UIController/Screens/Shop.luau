@@ -107,12 +107,12 @@ function Shop.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			local cost = Economy.WalkerCost(level)
 			if cost then
 				detailLabel.Text =
-					`Gain {Format.Short(Economy.WalkerRate(level + 1))} Climb Power per second (now {Format.Short(
+					`Gain {Format.Short(Economy.WalkerRate(level + 1))} Climbing per second (now {Format.Short(
 						Economy.WalkerRate(level)
 					)})`
 				price(button, cost, "Upgrade")
 			else
-				detailLabel.Text = `{Format.Short(Economy.WalkerRate(level))} Climb Power per second`
+				detailLabel.Text = `{Format.Short(Economy.WalkerRate(level))} Climbing per second`
 				Buttons.Set(button, "Owned", "MAX")
 				Buttons.SetValue(button, nil)
 			end

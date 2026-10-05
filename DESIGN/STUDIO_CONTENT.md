@@ -9,6 +9,10 @@ here. Newest first.
   walker's spot is cleared); sheep walk round them. The code still expects `workspace.Base.Terrain` to be the ground
   (it's skipped by the sheep's obstacle checks) and each `PlayerPlot`'s parts to outline its fence (the pen box is
   measured from them).
+- **2026-10-05, High Olympus at 275 studs a stretch**. Same instances as below, rebuilt longer by `build-place.ps1`:
+  Zeus's top at x 6721.3, height 4439.1, the plaza from there to x 6811.3. `StealASheep.rbxl` in the main checkout
+  was rebuilt with it; a Studio that had it open still shows the 210 version until reopened without saving.
+
 - **2026-10-05, High Olympus**. `tools/assemble.luau` now runs `tools/UpperMountain.luau` on the map before saving the
   place: `workspace.Stages.HighOlympus` (Folder) holds one Model a god, `Tier13 Iris` ... `Tier30 Zeus` (each `Floor`,
   `Terraces`, `Decor`), and `Summit` (plaza, throne, colonnade). It destroys stage 7's end wall (the Model of 80 parts
@@ -31,6 +35,6 @@ here. Newest first.
     `<Build>Wool` and `<Build>Extras`), `WorldKit.MutationMachine` (the Merge Shrine; a primitive altar if missing).
   - **The code**, from `rojo build default.project.json`.
 - Made at runtime (not in the place): `workspace.Plots`, `Gods`, `WildSheep`, `CarriedSheep`, `PenSheep`,
-  `ClimbGates`, `Stations`, `ReplicatedStorage.SheepLooks`, every ScreenGui.
+  `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`, `ReplicatedStorage.SheepLooks`, every ScreenGui.
 - Before publishing: set Maximum Visitor Count to 5 (one player a plot) in Creator Hub, turn on Studio access to API
   services for saving, and publish under the account that owns Shear a Sheep's assets.

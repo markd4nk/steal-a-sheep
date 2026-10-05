@@ -31,11 +31,11 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
   is stored, not earning (Flock menu: Equip / Store / Equip Best).
 
 ## Systems
-- Climb Power, stair walker, trails: `TrainingService`, `ShopService`.
+- Climbing, stair walker, trails: `TrainingService`, `ShopService`.
 - Wild lambs, theft, carrying, putting down in the pen (delivery), failure rules, tutorial lamb: `WildService`
   (+ `SheepService` for models); the Put down prompt is the client's own (`PromptController`).
 - Gods and pursuit: `GodService` (one state machine, primitive block rigs).
-- Climb gates, slide hits and knockback: `MountainService`; client slide, steering, braking: `MovementController`.
+- Climb speed checks, tier signs, slide hits and knockback: `MountainService`; uphill speed, client slide, steering, braking: `MovementController`.
 - Flock, pen capacity, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging:
   `FlockService`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
@@ -85,8 +85,31 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Coins (sheep in the pen, first-discovery rewards, selling) buy stair walker levels, pen space and trails. Climb Power
-(stair walker) opens tiers and reduces carrying slowdown. No Robux products.
+Coins (sheep in the pen, first-discovery rewards, selling) buy stair walker levels, pen space and trails. No Robux
+products.
+
+## Climbing (the user, 2026-10-05)
+Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain
+and to outrun its gods. No walls: every tier is open to everyone.
+
+**Your ratio on a tier = Climbing / (its sign number x the carried lamb's weight)** (weight 1 empty-handed).
+
+- **Your speed**: the ratio itself below 1 (a quarter of the sign, a quarter of normal speed; never under a 1 stud/s
+  crawl), then +1x normal speed for every 4x above it, no cap on the mountain. Signs grow about 4x a tier, so every
+  tier above you is a quarter speed (two above is a crawl) and every tier you've outgrown is +1x.
+- **Walking and climbing** = 18 studs/s x your speed. Slowed, only the uphill part is held down. Tier 1 and the safe
+  zone (plots, hub) never go below normal; walking in the safe zone stops at 7x.
+- **Sliding away** = the god's speed x your speed (at least walking speed), set when the slide starts and kept all the
+  way down. It reaches it in about 2 seconds.
+- **Gods**: one set speed each for the whole chase, 0.8 x its tier's `SlideSpeed` (19 at tier 1 up to 48 at tier 30),
+  never walking, never scaled by the thief.
+- **So**: at the sign's number the lightest lamb's thief matches the god and the head start gets them away; an
+  average lamb leaves about 95% (caught near the bottom); heavy ones need more.
+
+## Lamb weight (the user, 2026-10-05)
+Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (lightest) up, saved with the sheep
+(`Weight`). Wild lambs: 1-1.1 mostly, 1.1-1.5 for one in twenty. Heavier lambs are slower to carry and tend to grow
+bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look a little bigger as lambs.
 
 ## Not built
 Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.

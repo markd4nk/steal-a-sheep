@@ -34,7 +34,7 @@ export type Ground = {
 	PathClear: (from: Vector3, to: Vector3, radius: number) -> boolean,
 }
 
--- Lambs grow from their burden's size to this share of a Standard adult before their size shows.
+-- Lambs grow from their weight's size to this share of a Standard adult before their size shows.
 local LAMB_GROWN_SHARE = 0.85
 -- A sheep at rig scale 1 is about this many studs from its middle to its wool's edge, nose and tail included.
 local RADIUS_PER_SCALE = 1.1
@@ -51,7 +51,7 @@ function Pens.Scale(sheep: Sheep): number
 	if Economy.IsAdult(sheep) then
 		return Economy.Scale(sheep, GameConfig.SheepSize)
 	end
-	local start = Economy.Burdens[sheep.Burden].Scale
+	local start = Economy.LambScale(sheep.Weight)
 	local share = math.clamp(sheep.Grown / Economy.GrowthSeconds(sheep), 0, 1)
 	return GameConfig.SheepSize * (start + (LAMB_GROWN_SHARE - start) * share)
 end
