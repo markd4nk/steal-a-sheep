@@ -7,24 +7,32 @@ confirmed or reversed it.
 
 ## Confirmed rules
 
-- From the design doc (user confirmed directions): climb uphill, slide downhill carrying a sheep; aimed slides knock back
-  uphill walkers with no damage or sheep transfer; the stair walker replaces the treadmill and Climb Power both opens
-  steeper slopes and reduces carrying slowdown; reach -> Light -> Heavy stages per tier; reuse Shear a Sheep's UI and
-  assets wherever possible; the Sheepdex is a standard MVP collection book.
-- Keep new things MVP primitive; reuse Shear a Sheep's UI and assets (the user, 2026-10-05).
+- **The base design doc is the starting point; the user refines from here (2026-10-05).** The first build followed
+  `DESIGN/BASE_DESIGN_DOC.md`; the user will rework a lot of it as they go. A request that changes what was built is
+  the new rule: don't object that it goes against the base doc, the first build or the calls below; make it and update
+  the docs.
+- The first build reused Shear a Sheep's UI and assets and kept new things primitive (the user, 2026-10-05). That was
+  how the MVP was made, not a limit on later changes.
+- **Thirty gods, Zeus on top (2026-10-05)**: the user's list of thirty, a map part for each above the old summit
+  (High Olympus), each god's section grouped, the new parts indistinguishable from the commissioned map (its own
+  pieces, studs and textures).
+- **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
+  noticeable; then "keep it that").
+- **No shortcut up**: the climb stays on foot, however long (the user turned down a lift to the highest open gate,
+  2026-10-05).
+- **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
+  then don't thin or fill the slide lanes, old stages included.
 
 ## To review
 
-Calls made building High Olympus, thirty gods (2026-10-05). The user's own calls: thirty gods from their list, map parts
-for each, Zeus on the new top, the look indistinguishable from the commissioned map, every section grouped, the climb
-no steeper than about 60 degrees, gradual but noticeable.
+Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls are under Confirmed rules.
 
 - **Climb order**: the old summit is Aeolus's (12, "Windswept Peaks"); then Iris, Pan, Hebe, Eros, Tyche, Asclepius,
   Eris, Hecate, Hypnos, Morpheus, Phobos, Deimos, Thanatos, Nemesis, Themis, Nike, Hestia, Zeus (13-30): bright and wild
   first, then dusk, sleep, dreams, fear and death, then justice, victory and the hearth by Zeus's throne. The user's
   list ranks by fame; the old map's stages already hold the Olympians, so the minor gods are above them.
-- **Grade**: 32 degrees above the old summit, about one more each god, 52 at Zeus (`STRETCHES` in
-  `tools/UpperMountain.luau`). Each stretch is 210 studs along its floor (130-178 across the ground).
+- **Stretch length**: 210 studs along each stretch's floor (130-178 across the ground; grades in `STRETCHES`,
+  `tools/UpperMountain.luau`).
 - **Look**: stage 3's floor slab and terrace blocks for every stretch, recoloured per god; trees, rocks, islands, clouds,
   spires, arches and the pavilion cloned from the stages; block props per god (a rainbow over the path, Pan's pipes and
   toadstools, goblets and a fountain, hearts, coins and a wheel of fortune, the serpent staff and pools, golden apples
@@ -36,7 +44,7 @@ no steeper than about 60 degrees, gradual but noticeable.
 - **Numbers, tiers 13-30**: reach about x2.5 a tier from 81M (200M, 500M, 1.3B ... 480T, 1.2Qa at Zeus), Light and Heavy
   at 1.5x and 2.25x as before; income keeps round(2 x 2.5^(tier - 1)) (Zeus ~694B/s); growth 45 + 15 per tier (Zeus 8
   minutes); slide speeds 50-60 (three tiers each at 50, 52 ... 60). Stair walker levels 12-29 added (5M up to 25T a
-  second), each covering the next tier's reach gap in about a minute like the design's; costs keep round(120 x 2.5^L).
+  second), each covering the next tier's reach gap in about a minute like levels 0-11; costs keep round(120 x 2.5^L).
 - **Families**: Gale (Frost), Wild (Moss + goat horns), Ambrosia (Cupcake, honey frosting), Fortune (Pirate), Potion
   (Slime), Chaos (Glitch), Spirit (Ghost), Slumber (Dream), Starlit (Galaxy), Fright (Wolf in Sheep's Clothing), Dread
   (Black Hole), Bone (Skeleton), Avenger (Mecha), in Shear a Sheep's colours; Prism is a plain sheep in rainbow puffs;
@@ -56,8 +64,8 @@ Calls made while building the MVP on 2026-10-05:
 
 - **God order fits the map's stage themes**: Demeter (meadow), Dionysus (bamboo), Artemis (snow), Hephaestus and Ares
   (lava), Aphrodite and Apollo (rose garden), Athena and Poseidon (marble temple and aqueduct), Hermes, Hera and Zeus
-  (cloud path to the summit). The doc ordered Hermes 3rd and Artemis 7th, Aphrodite 4th and Hephaestus 5th; each tier
-  keeps the doc's numbers (reach, income). Swapping back is a reorder of rows in `Config/Olympus`.
+  (cloud path to the summit). Each tier
+  keeps its numbers (reach, income) in order. Reordering is a reorder of rows in `Config/Olympus`.
 - **Twelve tiers on seven stages**: the long stages hold two or three tiers (stage 4: 2, stage 5: 2, stage 6: 2,
   stage 7: 3). Tier boundaries are x positions on the ramp (`Olympus.Tiers[].XStart`).
 - **Families are Shear a Sheep breeds**: Scarecrow, Moon (silver), Lava, Cotton Candy, Solar System, Ocean, Cloud,
@@ -99,9 +107,4 @@ Calls made while building the MVP on 2026-10-05:
 
 ## Calls left to the user
 
-- Thin the corridor's decor (trees, rocks, arches) on a few slide lanes, or keep it as an obstacle course? It matters
-  more now: every run from High Olympus slides through the old stages.
-- Keep the theme-fitted god order, or the design doc's order?
-- High Olympus's top grade: 52 degrees, or gentler (45 at Zeus)?
-- A shortcut up for the long climb (about 6.5 minutes to Zeus): a shrine that lifts a player to their highest open
-  god's gate, or keep it all on foot?
+- Keep the theme-fitted god order, or change it?

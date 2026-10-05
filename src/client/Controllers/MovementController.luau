@@ -12,7 +12,7 @@ local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
--- How the local character moves. Walking: the design's 18 studs a second, times a carried lamb's burden share. Sliding:
+-- How the local character moves. Walking: 18 studs a second, times a carried lamb's burden share. Sliding:
 -- moving downhill on the ramp starts a slide by itself; it speeds up to the stretch's slide speed (the burden slows it
 -- and its acceleration), steers within a cone either side of straight downhill with the ordinary movement controls,
 -- brakes when pulled back, and runs out to a stop past the safety line. A slider's hit costs it speed; a hit player is

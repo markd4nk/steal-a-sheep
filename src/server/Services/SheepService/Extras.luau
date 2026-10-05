@@ -1,10 +1,9 @@
 --!strict
 
--- The primitive accessories some families wear on top of a Shear a Sheep breed (the design's "primitive visual"):
--- the Grape Sheep's leaf, the War Sheep's helmet and plume, the Laurel Sheep's wreath, the Wingfoot Sheep's ankle
--- wings, the Cupid and Victory sheep's back wings, the Justice Sheep's blindfold and the Hearth Sheep's flame. Built on
--- a sheep dressed at its rig's own size (Looks.Dress at scale 1), welded to the piece they sit on, and scaled with the
--- sheep afterwards.
+-- The primitive accessories some families wear on top of a Shear a Sheep breed: the Grape Sheep's leaf, the War
+-- Sheep's helmet and plume, the Laurel Sheep's wreath, the Wingfoot Sheep's ankle wings, the Cupid and Victory sheep's
+-- back wings, the Justice Sheep's blindfold and the Hearth Sheep's flame. Built on a sheep dressed at its rig's own size
+-- (Looks.Dress at scale 1), welded to the piece they sit on, and scaled with the sheep afterwards.
 local Extras = {}
 
 local function part(

@@ -88,7 +88,7 @@ end
 
 -- A step of `distance` towards `goal` (feet height ignored), along the floor and inside the lane. Distances are
 -- measured along the slope, as a player's Humanoid moves its WalkSpeed along it: on a steep stretch a step covers
--- less ground, so a god keeps the design's share of a slider's speed on every grade.
+-- less ground, so a god keeps the same share of a slider's speed on every grade.
 local function stepTowards(god: God, goal: Vector3, distance: number): number
 	local flat = Vector3.new(goal.X - god.At.X, 0, goal.Z - god.At.Z)
 	local remaining = flat.Magnitude

@@ -321,7 +321,7 @@ local GameConfig = {
 	Breeds = breeds,
 	Mutations = mutations,
 
-	-- Studs per second (Design: "an empty-handed walking baseline around 18 studs/second").
+	-- Studs per second.
 	Movement = {
 		WalkSpeed = 18,
 		JumpPower = 50,
@@ -333,7 +333,7 @@ local GameConfig = {
 		SlideTurnRate = 2.5, -- how fast the heading follows the stick, per second
 	},
 
-	-- Aimed slides into uphill players (Design, "Aimed slide collisions").
+	-- Aimed slides into uphill players.
 	SlideHit = {
 		MinSpeed = 16, -- the slider's speed for a hit to count
 		Reach = 4.5, -- studs between the two roots
@@ -361,7 +361,7 @@ local GameConfig = {
 		TickSeconds = 0.25,
 	},
 
-	-- Offline earnings (Design: two hours at most, a quarter of it).
+	-- Offline earnings: a quarter of at most two hours.
 	Offline = {
 		MaxSeconds = 2 * 60 * 60,
 		Share = 0.25,

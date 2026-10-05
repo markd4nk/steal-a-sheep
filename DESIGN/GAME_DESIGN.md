@@ -1,17 +1,19 @@
 # Game design
 
-Owned by the user. Agents read it and ask before changing it. The full design is
-[`Steal-a-Sheep-Game-Design-Document-Draft.md`](../Steal-a-Sheep-Game-Design-Document-Draft.md) at the repo root
-(draft v0.3, 2026-10-05); this page is its short form and how it maps onto the commissioned map.
+**Where it started, and how it's changing.** The game was built from the user's base design doc,
+[`DESIGN/BASE_DESIGN_DOC.md`](BASE_DESIGN_DOC.md) (draft v0.3, 2026-10-05), which explains why the first build is the
+way it is. From here the user refines the game as they go, and much of what was first built will be reworked and made
+better. So the base doc is background, not a spec, and this page describes the game *as it is now*. When the user asks
+for a change, make it, even where it departs from the base doc or the first build; don't push back on those grounds.
+Then update this page so it stays a true description.
 
 ## Pitch
-Train on a stair walker, climb Olympus, steal a god's lamb, hold it over your head and slide downhill to escape
-(knocking back climbers on the way), then grow your flock into the biggest earners in your pen.
+Climb the mountain, steal a god's lamb, hold it over your head and slide downhill to escape (knocking back climbers
+on the way), then grow your flock into the biggest earners in your pen.
 
-## Core loop
-Train on the stair walker -> climb a steeper route -> steal a lamb -> slide home with the god behind you -> deliver ->
-earn and grow -> upgrade. Each tier has three stages: reach its pasture, escape with Light lambs, then reliably bring
-Heavy ones home.
+## Core loop (as built)
+Train on the stair walker -> climb to a god's pasture -> steal a lamb -> slide home with the god behind you ->
+deliver -> earn and grow -> upgrade.
 
 ## Systems
 - Climb Power, stair walker, trails: `TrainingService`, `ShopService`.
@@ -28,8 +30,8 @@ Thirty gods (the user, 2026-10-05: "build out 25 total ... based on the top Olym
 the plots in seven themed stages of rising grade (2, 7, 12, 17, 22, 29, 31 degrees) holding tiers 1-12, two or three on
 the long stages, gods ordered to fit each stage's theme. Above its old summit, High Olympus (`tools/UpperMountain.luau`)
 carries the corridor on with one stretch a god, built from the map's own pieces, the grade rising a degree or so a god
-from 32 to 52 (the user: no steeper than about 60, a gradual climb that's noticeable), up to Zeus's throne plaza. Every
-tier keeps the design doc's numbers in order, and tiers 13-30 carry its curves on (DECISIONS.md, To review).
+from 32 to 52 (the user: no steeper than about 60, gradual but noticeable; 52 at the top kept), up to Zeus's throne
+plaza. The climb is all on foot. High Olympus is sparse for now: the user will add obstacles to it later.
 
 | Tier | God | Stage | Family (Shear a Sheep breed) |
 | --- | --- | --- | --- |
@@ -64,10 +66,10 @@ tier keeps the design doc's numbers in order, and tiers 13-30 carry its curves o
 | 29 | Hestia | Eternal Hearth | Hearth Sheep (orange Ringlets + flame) |
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
-## Economy
+## Economy (as built)
 Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels, pen slots and trails. Climb Power
-(stair walker) opens tiers and reduces carrying slowdown. No Robux products in the MVP.
+(stair walker) opens tiers and reduces carrying slowdown. No Robux products.
 
-## Out of scope
-Per the design doc: player plot raiding, trading, breeding, rebirth, bespoke god attacks, mutations beyond the
-fleece rarity, premium products.
+## Not built
+Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.
+These are just not built yet, not ruled out: build them if the user asks.

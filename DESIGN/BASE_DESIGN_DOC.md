@@ -1,3 +1,7 @@
+> **The base this game started from (draft v0.3, 2026-10-05).** The first build followed it. The user now refines the
+> game as they go, and much of what was first built will be reworked. Read it for background on why things are as they
+> are, not as a spec: when the user asks for something different, their request wins (`DESIGN/GAME_DESIGN.md`).
+
 # Steal a Sheep Game Design Document Draft
 
 ## Game vision

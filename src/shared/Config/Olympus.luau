@@ -5,8 +5,8 @@
 -- steeper (2, 7, 12, 17, 22, 29 and 31 degrees), long stages holding two or three tiers, gods ordered to fit each
 -- stage's theme (meadow, bamboo, snow, lava, rose garden, marble temple, golden cloud path). Above its old summit,
 -- High Olympus (tools/UpperMountain.luau, built into the place) carries on with one stretch a god, 32 degrees rising
--- to 52, up to Zeus's throne. Every tier keeps the design's numbers in order (reach threshold, income), so swapping
--- two gods is a matter of swapping their rows' names and looks.
+-- to 52, up to Zeus's throne. Every tier keeps its numbers in order (reach threshold, income), so swapping two gods is
+-- a matter of swapping their rows' names and looks.
 
 export type Tier = {
 	Tier: number,

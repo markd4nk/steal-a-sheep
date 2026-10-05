@@ -5,7 +5,8 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 | File | Holds | When to read it |
 | --- | --- | --- |
-| `DESIGN/GAME_DESIGN.md` | The user's design (short form; the full doc is at the repo root) | When the task touches gameplay |
+| `DESIGN/GAME_DESIGN.md` | The game as it is now (the user refines it as they go: their requests win) | When the task touches gameplay |
+| `DESIGN/BASE_DESIGN_DOC.md` | The base design the first build followed: background, not a spec | Why something was built the way it was |
 | `DESIGN/HISTORY.md` | Every finished build, newest first: how it works, the user's calls, how it was checked | Search it for the feature you touch |
 | `DESIGN/DECISIONS.md` | The user's confirmed rules, and agents' calls waiting for review | Before changing anything players notice |
 | `DESIGN/STUDIO_CONTENT.md` | What the code expects in the place file, and what the place holds now | Before Studio-side work or a publish |
@@ -20,11 +21,11 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## The game, and where each part lives
 
-The design doc's MVP, built in one pass on 2026-10-05 (HISTORY.md), now thirty tiers: twelve up the commissioned map
-(Aeolus on its old summit) and eighteen on High Olympus above it, Zeus at the top. A god each, four wild lambs each,
-stair walker training, overhead carrying, the automatic downhill slide with steering, braking and slide hits, pursuit,
-delivery, pens, income, growth, size reveal, Equip Best, locks, selling, merging, trails, pen slots, the Sheepdex,
-offline earnings and the tutorial lamb.
+The MVP built in one pass on 2026-10-05 (HISTORY.md); the user now refines it as they go (GAME_DESIGN.md). Thirty
+tiers: twelve up the commissioned map (Aeolus on its old summit) and eighteen on High Olympus above it, Zeus at the top.
+A god each, four wild lambs each, stair walker training, overhead carrying, the automatic downhill slide with steering,
+braking and slide hits, pursuit, delivery, pens, income, growth, size reveal, Equip Best, locks, selling, merging,
+trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 - **High Olympus** (tiers 13-30): one stretch a god, 210 studs along the floor, 32 rising to 52 degrees, from stage 3's
   floor slab and terraces and the stages' decor, recoloured, plus block props; Zeus's throne plaza on top. Built into
@@ -42,9 +43,7 @@ offline earnings and the tutorial lamb.
 
 ## In progress
 
-- **High Olympus (30 gods)** on branch `t3code/build-25-olympus-gods`, not merged: waiting for the user's OK on its look
-  and grade (DECISIONS.md, To review). The user's Studio holds it unsaved (branch code synced in, map built by the
-  preview); `StealASheep.rbxl` in the main checkout is still main's twelve tiers.
+- Nothing. High Olympus is merged into main; DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
 
@@ -61,11 +60,12 @@ offline earnings and the tutorial lamb.
 ## Known issues
 
 - **The descent is full of the map's own trees, rocks and arches.** A slide that hits one slows, and stops if blocked;
-  players steer round them. Thinning the decor on the main lanes would make slides smoother (DECISIONS.md). Every run
+  players steer round them; lanes stay as they are until the user adds obstacles (DECISIONS.md). Every run
   from High Olympus now passes through them: a straight slide from Zeus stuck on stage 6's pavilion (x 1890, mid-lane)
   and was caught. High Olympus's own lane is clear.
-- **Long runs at the top**: about 6.5 minutes' climb to Zeus and over 2 minutes' slide home. A shortcut up (DECISIONS.md,
-  Calls left to the user) would fix it.
+- **Long runs at the top**: about 6.5 minutes' climb to Zeus and over 2 minutes' slide home; the user keeps it all on
+  foot (DECISIONS.md).
+- **High Olympus is sparse**: the user will add obstacles to the higher levels later.
 - **Plots: 5.** A sixth player is kicked with "server full"; set Maximum Visitor Count to 5 in Creator Hub.
 - **Asset ownership**: the sheep meshes, faces, UI images and sounds are Shear a Sheep's uploads (Mark's account).
   They load if this game is published under the same owner.

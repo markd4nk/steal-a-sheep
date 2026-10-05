@@ -9,7 +9,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 - **High Olympus: thirty gods (2026-10-05)**. The user, liking the map: build out the next tiers from its parts and
   pieces, the top Olympus gods; then a list of thirty ("map parts for all of these gods"), Zeus on the new top, the
   look and studs indistinguishable from the original, each section grouped, the climb no steeper than about 60 degrees,
-  gradual but noticeable. They asked for a preview mid-build and were shown screenshots of every stretch.
+  gradual but noticeable. They asked for a preview mid-build and were shown screenshots of every stretch. Afterwards:
+  keep 52 degrees at the top, no shortcut up the climb, obstacles on the higher levels later (they'll add them; it's
+  barren now), and merge it to main.
   - *Map audit*: each old stage is a 190-wide floor slab (Studs material variant, a 0.9-transparent checker texture,
     tilted to the grade) between terraces of stacked blocks, repeated in 268-stud units (stage 3: a 198-block body
     model and a 67-part caps model holding the slab), plus decor models tilted with the stage. All colours are the
@@ -33,7 +35,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     none; a Light Zeus theft at full training kept ahead of Zeus (gap 48 to 323 studs over High Olympus), then a
     straight-line slide stuck on stage 6's mid-lane pavilion and was caught; Sheepdex shows x/30 and scrolls; 27k parts,
     58 fps. Screenshots of every stretch, the families and the gods in the session.
-
+- **The base design doc kept as background (2026-10-05)**. The user used the draft design doc as the base and will now
+  refine the game as they go; later sessions mustn't hold changes against it. It lives in `DESIGN/BASE_DESIGN_DOC.md`
+  with a note saying so; GAME_DESIGN.md describes the game as it is; DECISIONS.md says the user's requests win.
 - **The MVP in one pass (2026-10-05)**. The user: copy the RobloxPack into the Steal a Sheep folder, read the game
   document, use the map in the folder and as much of Shear a Sheep as possible, keep new things MVP primitive, and
   complete it in one go.
@@ -57,7 +61,7 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   - *Client*: StateController, SoundController (trimmed), UIController (Hud, Flock, Shop, Sheepdex, Merge, Popup),
     CarryController, MovementController (carry speed, slide, knockback, local gates, walker stepping), AnimController
     (sheep idle/carried, god limbs, baas), PromptController.
-  - *Checked*: `check.ps1` passes; 34 unit tests pass in Studio (Economy against the doc's tables, Roster, PlayerData);
+  - *Checked*: `check.ps1` passes; 34 unit tests pass in Studio (Economy formulas, Roster, PlayerData);
     solo playtests in a local copy of the built place through the Studio MCP (driven from a script): all spawns, gods,
     gates and plots built; tutorial lamb stolen by holding E, slid home at 20.1 studs/s (24 x 0.84) with Demeter
     chasing at the gentle rate, escaped at the safety line, delivered (+60 coins, +60 Sheepdex reward, +25 Climb Power),
