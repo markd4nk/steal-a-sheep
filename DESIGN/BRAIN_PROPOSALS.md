@@ -39,20 +39,29 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 - **S8** (`BRAIN/PATTERNS/sessions.md`, Tools on Windows): "Claude Code's Bash tool fails a heredoc whose body has
   backticks ('unexpected EOF while looking for matching'), even with a quoted delimiter: write such files with the
   Write or Edit tools." Seen twice on 2026-10-05.
+- **S9** (`BRAIN/PATTERNS/sessions.md`): "After `git merge`, list what's still conflicted with
+  `git diff --name-only --diff-filter=U` before you commit: a merge's output piped through `tail` hides some of its
+  CONFLICT lines, and `check.ps1` doesn't look for conflict markers in Markdown, so they get committed." Seen
+  2026-10-05 in Steal a Sheep: DECISIONS.md and CURRENT_STATE.md went in with markers after only HISTORY.md was fixed.
+  (Could also become a `check.ps1` test: fail on lines starting `<<<<<<<` or `>>>>>>>` in tracked text files.)
+- **S10** (`BRAIN/PATTERNS/characters.md`): "Humanoids hold up at high WalkSpeed: 245 studs/s up a 7-12 degree ramp and
+  slides of 200-260 down 12-29 degrees stayed on the floor (0 samples below it, 2 of 179 in the air), but anything they
+  clip at 150+ stops them dead. Give a fast movement a short rise (here: reach the target in about 2 s) rather than a
+  fixed acceleration, or high targets take ten seconds to reach." Seen 2026-10-05 playtesting Steal a Sheep's Climbing.
 
-- **S9** (`BRAIN/PATTERNS/characters.md`, Posing from code): "To make a player's feet land on moving things (stair
+- **S11** (`BRAIN/PATTERNS/characters.md`, Posing from code): "To make a player's feet land on moving things (stair
   machines, treadmills, pedals), anchor the root and solve the legs yourself: after the Animator (`PreSimulation`), a
   two-bone IK in the leg's plane sets hip and knee `Transform` (about the joint's X) from the thigh and shin vectors
   read off the joints' C0/C1 or attachments, and the ankle gets minus their sum so the foot stays level. Place the
   root from each avatar's own leg length rather than one height: the same code then fits skinned and blocky avatars
   of different sizes. A baked animation can't, its feet float or sink on other avatars." Seen 2026-10-05 in Steal a
   Sheep's stair walker test.
-- **S10** (`BRAIN/PATTERNS/testing-studio.md`, Screenshots): "To show the user a motion without taking over the
+- **S12** (`BRAIN/PATTERNS/testing-studio.md`, Screenshots): "To show the user a motion without taking over the
   desktop, drive it from a phase you set from `execute_luau`, `screen_capture` each phase from the same camera, and
   join the frames into a GIF (Pillow)." Seen 2026-10-05.
-- **S11** (`BRAIN/GOTCHAS.md`): "A `WedgePart`'s slope rises towards its +Z: low edge at -Z, full height at +Z. Turn
+- **S13** (`BRAIN/GOTCHAS.md`): "A `WedgePart`'s slope rises towards its +Z: low edge at -Z, full height at +Z. Turn
   it 180 degrees about Y for a ramp that rises the way a model faces (-Z)." Measured with raycasts 2026-10-05.
-- **S12** (`BRAIN/PATTERNS/desktop.md`, after the `record` notes): "`record` writes its mp4 into a
+- **S14** (`BRAIN/PATTERNS/desktop.md`, after the `record` notes): "`record` writes its mp4 into a
   `windows-computer-use/` folder in the session's working directory, which is the repo: move the file out (to the
   attachments folder) and delete the folder before committing. To film the game view without taking over the screen,
   pin the camera from a Client `execute_luau` (a RenderStepped that sets `CameraType` Scriptable and the CFrame), turn

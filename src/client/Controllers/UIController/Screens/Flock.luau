@@ -130,11 +130,10 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		rateLabel.Text = `+{Format.Rate(sheep.Income)}/s`
 		local scale = if sheep.Adult
 			then Economy.Sizes[math.max(sheep.Size, 1)].Scale
-			else Economy.Burdens[sheep.Burden].Scale + 0.3 * sheep.Growth
+			else Economy.LambScale(sheep.Weight) + 0.3 * sheep.Growth
 		MenuParts.ShowSheep(view, sheep.Family, scale)
-		local burden = Economy.Burdens[sheep.Burden].Name
 		if sheep.Adult then
-			lines[1].Text = `{Economy.Sizes[sheep.Size].Name} adult - {burden} to carry`
+			lines[1].Text = `{Economy.Sizes[sheep.Size].Name} adult`
 			growthBar.Visible = false
 		else
 			lines[1].Text = `Grows to +{Format.Rate(sheep.Low)}-{Format.Rate(sheep.High)}/s`

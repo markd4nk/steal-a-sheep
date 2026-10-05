@@ -10,7 +10,7 @@ local function sheep(id: string): { [string]: any }
 		Id = id,
 		Family = "Meadow",
 		Rarity = 1,
-		Burden = 2,
+		Weight = 1.2,
 		Size = 3,
 		Grown = 10.5,
 		Rank = 0,
@@ -49,6 +49,29 @@ return function(t: Run.Suite)
 
 	t.Test("rejects data from a newer schema", function()
 		t.Expect((PlayerData.Validate({ SchemaVersion = PlayerData.SchemaVersion + 1 }))).ToBe(false)
+	end)
+
+	t.Test("schema 1 sheep: Burden becomes a Weight, the size kept", function()
+		local old = sheep("1")
+		old.Weight = nil
+		old.Burden = 3
+		local light = sheep("2")
+		light.Weight = nil
+		light.Burden = 1
+		local data: any = { SchemaVersion = 1, Sheep = { ["1"] = old, ["2"] = light } }
+		t.Expect((PlayerData.Validate(data))).ToBe(true)
+		PlayerData.Migrate(data)
+		t.Expect(data.Sheep["1"].Weight).ToBe(1.35)
+		t.Expect(data.Sheep["1"].Burden).ToBe(nil)
+		t.Expect(data.Sheep["1"].Size).ToBe(3)
+		t.Expect(data.Sheep["2"].Weight).ToBe(1.05)
+		t.Expect((PlayerData.Validate(data))).ToBe(true)
+	end)
+
+	t.Test("rejects a sheep lighter than the lightest", function()
+		local bad = sheep("1")
+		bad.Weight = 0.5
+		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = bad } }))).ToBe(false)
 	end)
 
 	t.Test("Migrate stamps the current schema version", function()

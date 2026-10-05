@@ -9,7 +9,7 @@ local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
--- The stair walker: standing on your own plot's machine trains Climb Power at its level's rate times your trail's
+-- The stair walker: standing on your own plot's machine trains Climbing at its level's rate times your trail's
 -- multiplier, while your flock keeps earning. Nothing while carrying a lamb or off the machine. The server checks the
 -- player's spot every tick; the client only plays the stepping.
 local TrainingService = { Name = "TrainingService" }
@@ -30,7 +30,7 @@ local function tick(dt: number)
 		if not training then
 			continue
 		end
-		local before = Economy.Unlocked(data.ClimbPower, data.Deliveries)
+		local before = Economy.ClimbTier(data.ClimbPower)
 		data.ClimbPower += Economy.TrainingRate(data.WalkerLevel, data.Trail) * dt
 		player:SetAttribute("ClimbPower", data.ClimbPower)
 		local stepped = data.Tutorial == 1
@@ -38,7 +38,7 @@ local function tick(dt: number)
 			data.Tutorial = 2
 			player:SetAttribute("Tutorial", 2)
 		end
-		if stepped or Economy.Unlocked(data.ClimbPower, data.Deliveries) ~= before then
+		if stepped or Economy.ClimbTier(data.ClimbPower) ~= before then
 			registry.FlockService:Push(player)
 		end
 	end

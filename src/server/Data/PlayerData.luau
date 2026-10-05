@@ -25,7 +25,7 @@ export type Data = {
 
 local PlayerData = {}
 
-PlayerData.SchemaVersion = 1
+PlayerData.SchemaVersion = 2
 
 PlayerData.Template = {
 	SchemaVersion = PlayerData.SchemaVersion,
@@ -47,6 +47,21 @@ PlayerData.Template = {
 -- migrations[n] upgrades data from schema n to n + 1, in place.
 local migrations: { [number]: (data: any) -> () } = {}
 
+-- Schema 2: a sheep's Burden (1 Light, 2 Stout, 3 Heavy) became a hidden Weight on a smooth range, each burden at its
+-- band's middle. The size each sheep already rolled stays.
+local BURDEN_WEIGHTS = { 1.05, 1.2, 1.35 }
+migrations[1] = function(data: any)
+	if type(data.Sheep) ~= "table" then
+		return
+	end
+	for _, sheep in data.Sheep do
+		if sheep.Weight == nil then
+			sheep.Weight = BURDEN_WEIGHTS[sheep.Burden] or 1.05
+		end
+		sheep.Burden = nil
+	end
+end
+
 local function isNatural(value: any): boolean
 	return type(value) == "number" and value == value and value >= 0 and value < 2 ^ 53 and value % 1 == 0
 end
@@ -65,8 +80,8 @@ local function validSheep(id: any, sheep: any): boolean
 		and sheep.Id == id
 		and type(sheep.Family) == "string"
 		and isWhole(sheep.Rarity, 1, 3)
-		and isWhole(sheep.Burden, 1, 3)
-		and isWhole(sheep.Size, 1, 3)
+		and (isWhole(sheep.Burden, 1, 3) or (isAmount(sheep.Weight) and sheep.Weight >= 1))
+		and isWhole(sheep.Size, 1, #Economy.Sizes)
 		and isAmount(sheep.Grown)
 		and isWhole(sheep.Rank, 0, Economy.MaxRank)
 		and type(sheep.Locked) == "boolean"

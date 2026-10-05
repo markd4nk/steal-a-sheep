@@ -18,6 +18,21 @@ confirmed or reversed it.
   pieces, studs and textures).
 - **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
   noticeable; then "keep it that").
+- **Climbing is one stat, no walls (2026-10-05)**: speed and Climb Power are one thing, "Climbing". Every tier is
+  open; steeper tiers need more and more Climbing to climb at a useful pace. Too little gives a very slow crawl, never
+  a slip back down, so it's technically possible but nobody wants to, and a thief that weak is caught carrying the lamb
+  down. No delivery lock between tiers. No god lunge.
+- **Your speed vs its speed, like Steal an Egg (2026-10-05)**: each god has one set speed for the whole chase (never
+  slower in lower stretches, never a walking speed); the thief's escape speed comes from Climbing; a slide keeps the
+  speed it starts with all the way down (momentum). Checked against Steal an Egg: each zone has its own guardian,
+  faster higher up, never scaled to the player; you escape with enough Speed over the zone's minimum.
+- **One speed rule (2026-10-05)**: your speed on a tier comes from Climbing / (its sign number x the lamb's weight),
+  as few numbers as possible. No cap on the mountain: more Climbing keeps making you faster. Walking in the safe zone
+  (the plots and hub) is capped at 7x normal; tier 1 and the safe zone never go below normal. The sign's number is
+  just enough for the lightest lamb on that tier; an average lamb leaves about 95% of the god's speed there.
+- **Hidden lamb weight (2026-10-05)**: no Light/Stout/Heavy words and no numbers on screen: players feel it. A smooth
+  range, not three kinds. Saved with the sheep; heavier lambs tend to grow bigger, but a light one can still grow
+  large, just less likely. The carry card shows no speeds.
 - **High Olympus's stretches are 275 studs along the floor** (the user, 2026-10-05: at 210 they felt shorter than the
   first levels, about 250, so a bit longer than those). 169-233 across the ground, so the steep ones still look
   shorter than they climb.
@@ -38,6 +53,28 @@ Calls in the stair walker mock-ups (2026-10-05), not built yet.
 - **Levels 1-5 looks**: Starter grey, Sport white and blue, Pro black and red, Turbo black and cyan neon, Champion
   white and gold with torches and a laurel (HISTORY.md has the details).
 - **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor.
+
+Calls made building Climbing (2026-10-05):
+
+- **Speed curve**: below the sign your speed is the ratio itself (a quarter of the sign, a quarter of normal speed),
+  never under a 1 stud/s crawl; above it, +1x normal speed for every 4x (each tier outgrown). Slowed players still
+  cross a slope or come down it at normal speed: only the uphill part is held down.
+- **Weight bands**: wild lambs weigh 1-1.1 (95%) or 1.1-1.5 (5%), about 1.06 on average. The shrine's luck (0-1)
+  raises the heavy chance up to 60% and opens a Huge band, 1.5-3, up to 3%.
+- **Size odds by weight** (Standard / Large / Giant / Titan): 1.0: 85/14/1/0, 1.1: 60/35/5/0, 1.5: 15/60/25/0,
+  3.0: 0/20/50/30, straight lines between. Wild lambs overall come out about 72/25/3 (was 75/23/2.5). Titan (x4 income,
+  2.1 scale, placeholder numbers for the shrine to tune) only from Huge weights, so never wild.
+- **Weight's only visible hint** is the lamb's size: 0.6 of an adult at the lightest, 0.8 at 1.5.
+- **Slides**: the god's speed x your speed factor, at least walking speed, kept all the way down; they reach it in
+  about 2 seconds (speeding up by at least 26 studs/s each second).
+- **Gods**: 0.8 x the tier's SlideSpeed, 19 at tier 1 to 48 at tier 30; the tutorial lamb's god 0.7.
+- **Tier 1's sign is 25** (what the tutorial gives), so a high level speeds you up there too.
+- **On screen**: tier signs "<God>'s <Area> / Climbing N"; the HUD's goals "Train to climb", "Train for heavier
+  sheep", "Ready for the heaviest sheep"; "<God>'s <Area> is in reach!" when Climbing passes the next sign; the player
+  list column is Climbing; the HUD pill reads CLIMBING; the wild lamb's card and the flock menu no longer name a burden.
+- **Server check**: a player found further up the ramp than their Climbing allows (30% slack, 10 studs or 1 second's
+  lead for lag) is put back at their allowed spot.
+- **Saved sheep**: schema 2 turns Burden 1/2/3 into Weight 1.05/1.2/1.35; sizes already rolled stay.
 
 Calls made lengthening High Olympus's stretches to 275 (2026-10-05).
 
@@ -94,9 +131,6 @@ Calls made while building the MVP on 2026-10-05:
 - **Fleece rarity looks**: Rare sheep sparkle blue; Royal sheep have gold wool (Shear a Sheep's Gold paint) and sparkle.
 - **Sizes on screen**: every sheep's base size is 1.6x the rig; lambs are 0.6 / 0.7 / 0.8 of it by burden (a clue to
   the burden) and grow towards 0.85 before the reveal; adults are 1 / 1.35 / 1.7 by size.
-- **Gates**: a tinted force-field wall at the foot of each tier from 2 up, with "<God>'s <Area> / Climb Power N";
-  solid for a player until that tier is open to them. Anyone found past a closed one is put back 10 studs below it
-  ("Train to climb this slope" or "Deliver a lamb from <God> first"), which also ends a theft.
 - **Slides**: start by themselves when moving downhill on the ramp past the safety line (the map's StartingLine,
   x 330); speed per stretch 24, 28, 32, 36, 36, 40, 40, 44, 44, 48, 48, 48 studs/s (tiers 1-12), times the carried
   lamb's burden share; steering within about 35 degrees either side of straight downhill; pulling back brakes; past the

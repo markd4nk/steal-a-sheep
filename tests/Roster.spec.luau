@@ -12,7 +12,7 @@ local function make(id: string, size: number, slot: number, pinned: boolean?): E
 		Id = id,
 		Family = "Meadow",
 		Rarity = 1,
-		Burden = 1,
+		Weight = 1,
 		Size = size,
 		Grown = 0,
 		Rank = 0,
