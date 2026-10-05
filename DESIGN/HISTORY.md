@@ -39,6 +39,14 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     (`rbxasset://sas/gift-*-2.png`) until uploaded. Checked after merging main (pens, leaderboards, cash): 54 tests
     pass, opened at 31 s, the favorite card ticked with "Favorited! Now claim your gift", Claim gave +500 Climbing
     and +500 cash, console clean.
+  - *The user's calls*: variant A (one stage); upload the pictures; it has to really register the like and the
+    favorite and give the gift. No game can see a like (no API: AvatarEditorService covers favorites only; nothing
+    in the docs for votes), so the gift registers the favorite: Claim or the favorite card checks
+    `GetFavoriteAsync` first (someone who favorited before has nothing to say yes to), then prompts, then checks
+    again. Pictures uploaded through the Studio MCP's `upload_image` (served on 127.0.0.1): like
+    rbxassetid://79093897520396, favorite rbxassetid://94266843104437; `art/gift/step-pictures.js` remakes them.
+    Checked in a playtest: both pictures load from Roblox, Claim gave +500 Climbing and the cash, a second claim was
+    refused, 54 tests pass, console clean. Not checked: the real favorite prompt (needs a published place).
 
 - **Put lambs down anywhere in the pen; sheep roam and graze (2026-10-05)**.
   The user: instead of the delivery platform and fixed pads you unlock, be like Steal an Egg (bring the lamb into the

@@ -70,7 +70,7 @@ Calls made building the free gift (2026-10-05).
   carrying and in no other menu, every session until claimed.
 - **Look**: the Shop's Prize Fleece menu (Large, 470 tall), cyan header like the reference, no cash chip in its header,
   no "LIMITED TIME" (it isn't). Step pictures are Roblox's real game page (another game's, counts hidden), lit up.
-  Tapping the favorite card opens the prompt too.
+  Tapping the favorite card opens the prompt too. A player who favorited the game before can claim without a prompt.
 
 Calls made building free placement and roaming sheep (2026-10-05):
 

@@ -39,7 +39,7 @@ lamb.
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
 - **Free gift** (like + favorite): Climbing and cash once (`Economy.GiftReward`), `GiftService`, `Screens/Gift`, the
-  HUD's GIFT button; Claim needs Roblox's favorite prompt to say yes. Redesign waiting on the user's pick (A or B).
+  HUD's GIFT button; Claim needs the game favorited (Roblox's prompt, or favorited before). A like can't be seen.
 - **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
   Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
   `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
@@ -59,8 +59,9 @@ lamb.
 
 ## In progress
 
-- **Free gift**: built and playtested on branch `t3code/favorite-gift-reward`, not merged; waiting for the user's pick (A or B)
-  and their OK to upload the two step pictures (Studio-local until then). DECISIONS.md's *To review* lists its calls.
+- **Free gift**: built and playtested on branch `t3code/favorite-gift-reward`; the user picked the one-stage look and
+  the pictures are uploaded. Not merged: the user is still working on these branches. DECISIONS.md's *To review*
+  lists its calls.
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.

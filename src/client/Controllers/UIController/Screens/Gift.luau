@@ -25,14 +25,12 @@ local Gift = {}
 
 local Color = Theme.Color
 local ACCENT = "Lab"
-local SPLIT_PRIZE = false
 local PANEL_HEIGHT = 470
 local PRIZE_HEIGHT = 96
 local AMOUNT_TEXT = 44
--- The game page's buttons with the one to tap lit up (build/gift-art, from roblox.com in its dark theme). Studio-only
--- files until they're uploaded.
-local LIKE_PICTURE = "rbxasset://sas/gift-like-2.png"
-local FAVORITE_PICTURE = "rbxasset://sas/gift-fav-2.png"
+-- Roblox's game page with the button to tap lit up (art/gift/step-pictures.js makes them).
+local LIKE_PICTURE = "rbxassetid://79093897520396"
+local FAVORITE_PICTURE = "rbxassetid://94266843104437"
 local PICTURE_ASPECT = 912 / 376
 
 -- One reward: its picture, then the amount (`labelName`) over what it is.
@@ -64,11 +62,10 @@ local function reward(parent: Instance, name: string, icon: string, labelName: s
 	return holder
 end
 
--- A stage of rays (UIKit.Stage, its own picture unused) with its rewards in a row across the middle (Line).
-local function prize(parent: Instance, name: string, size: UDim2, order: number, look: string?, accent: string?): Frame
-	local stage = UIKit.Stage(parent, name, size, 10)
-	stage.LayoutOrder = order
-	Style.PaintStage(stage, look, accent)
+-- A stage of rays in the menu's colour (UIKit.Stage, its own picture unused) with the rewards in a row (Line).
+local function prize(parent: Instance): Frame
+	local stage = UIKit.Stage(parent, "Prize", UDim2.fromScale(1, 1), 10)
+	Style.PaintStage(stage, nil, ACCENT)
 	local picture = stage:FindFirstChild("Picture")
 	if picture and picture:IsA("GuiObject") then
 		picture.Visible = false
@@ -143,21 +140,13 @@ function Gift.Build(playerGui: Instance): ScreenGui
 
 	local prizes = UIKit.Frame(page, "Prizes", UDim2.new(1, 0, 0, PRIZE_HEIGHT))
 	prizes.LayoutOrder = 1
-	if SPLIT_PRIZE then
-		UIKit.List(prizes, true, 12)
-		local climb = prize(prizes, "ClimbPrize", UDim2.new(0.5, -6, 1, 0), 1, "Legendary", nil)
-		reward(climb, "ClimbReward", Theme.Icons.HudShoe, "ClimbLabel", Color.Gold300, "CLIMBING")
-		local coins = prize(prizes, "CoinPrize", UDim2.new(0.5, -6, 1, 0), 2, "Uncommon", nil)
-		reward(coins, "CoinReward", Theme.Icons.HudCash, "CoinLabel", Color.Lime, "CASH")
-	else
-		local line = prize(prizes, "Prize", UDim2.fromScale(1, 1), 1, nil, ACCENT)
-		reward(line, "ClimbReward", Theme.Icons.HudShoe, "ClimbLabel", Color.Gold300, "CLIMBING").LayoutOrder = 1
-		UIKit.Text(line, "Plus", "+", 40, Color.Snow, UDim2.fromOffset(30, PRIZE_HEIGHT), {
-			Stroke = Color.Line,
-			Order = 2,
-		})
-		reward(line, "CoinReward", Theme.Icons.HudCash, "CoinLabel", Color.Lime, "CASH").LayoutOrder = 3
-	end
+	local line = prize(prizes)
+	reward(line, "ClimbReward", Theme.Icons.HudShoe, "ClimbLabel", Color.Gold300, "CLIMBING").LayoutOrder = 1
+	UIKit.Text(line, "Plus", "+", 40, Color.Snow, UDim2.fromOffset(30, PRIZE_HEIGHT), {
+		Stroke = Color.Line,
+		Order = 2,
+	})
+	reward(line, "CoinReward", Theme.Icons.HudCash, "CoinLabel", Color.Lime, "CASH").LayoutOrder = 3
 
 	local steps = UIKit.Frame(page, "Steps", UDim2.fromScale(1, 0))
 	steps.LayoutOrder = 2
@@ -209,10 +198,21 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 	end
 
-	-- Roblox's favorite prompt for this game: true once the player says yes. An unpublished place (PlaceId 0, a Studio
-	-- playtest) has nothing to favorite, so there it counts as done.
+	local function isFavorite(): boolean
+		local ok, result = pcall(function()
+			return AvatarEditorService:GetFavoriteAsync(game.PlaceId, Enum.AvatarItemType.Asset)
+		end)
+		return ok and result == true
+	end
+
+	-- Roblox's favorite prompt for this game: true once the player says yes, or if they favorited it before (they'd
+	-- have nothing to say yes to). An unpublished place (PlaceId 0, a Studio playtest) has nothing to favorite, so there
+	-- it counts as done.
 	local function favorite(): boolean
 		if game.PlaceId == 0 then
+			return true
+		end
+		if isFavorite() then
 			return true
 		end
 		local answer: Enum.AvatarPromptResult? = nil
@@ -227,7 +227,7 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			waited += task.wait(0.1)
 		end
 		connection:Disconnect()
-		return answer == Enum.AvatarPromptResult.Success
+		return answer == Enum.AvatarPromptResult.Success or isFavorite()
 	end
 
 	local function claim()
