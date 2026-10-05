@@ -29,6 +29,16 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     (income 5/s). Two looks rendered as mock-ups (cyan, gold). Not checked: the real favorite prompt (needs a published
     place), phones. Then main's Climbing rework merged in: the gift now reads +500 Climbing; replayed on the
     merged build (42 tests pass, opened at 31 s, Claim gave +500 Climbing and +500 coins, console clean).
+  - *Redesign, the user's notes*: no gift picture inside (the header's badge is enough), show off what they get, and
+    the like and favorite steps looked too basic (emoji, plain arrows): make them professional and say exactly what to
+    do. Now a Large panel 470 tall: the rewards ("+500 CLIMBING + +500 CASH") big on one stage of rays (variant B: each
+    on its own gold or green stage, `SPLIT_PRIZE`); each step a numbered card with a picture of Roblox's real game page
+    (roblox.com in its dark theme via Playwright at 4x, vote counts hidden, the other buttons faded, the one to tap
+    glowing green or gold with a 👆 tapping it; `build/gift-art`) and one line ("Tap 👍 on the game's page", "Tap
+    here, or ⭐ on its page"). Tapping the favorite card opens the prompt and ticks it. The pictures are Studio-local
+    (`rbxasset://sas/gift-*-2.png`) until uploaded. Checked after merging main (pens, leaderboards, cash): 54 tests
+    pass, opened at 31 s, the favorite card ticked with "Favorited! Now claim your gift", Claim gave +500 Climbing
+    and +500 cash, console clean.
 
 - **Put lambs down anywhere in the pen; sheep roam and graze (2026-10-05)**.
   The user: instead of the delivery platform and fixed pads you unlock, be like Steal an Egg (bring the lamb into the

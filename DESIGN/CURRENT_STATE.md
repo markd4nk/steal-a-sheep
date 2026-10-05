@@ -59,8 +59,8 @@ lamb.
 
 ## In progress
 
-- **Free gift**: built and playtested on branch `t3code/favorite-gift-reward`, not merged; waiting for the user's look pick and
-  their call on rewarding the like (Roblox's rules). DECISIONS.md's *To review* lists its calls.
+- **Free gift**: built and playtested on branch `t3code/favorite-gift-reward`, not merged; waiting for the user's pick (A or B)
+  and their OK to upload the two step pictures (Studio-local until then). DECISIONS.md's *To review* lists its calls.
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
