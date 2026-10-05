@@ -19,13 +19,15 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- (Economy.EscapeSpeed: Climbing against the lamb's tier and weight) and keeps it all the way down, like momentum;
 -- it steers within a cone either side of straight downhill with the ordinary movement controls,
 -- brakes when pulled back, and runs out to a stop past the safety line. A slider's hit costs it speed; a hit player is
--- moved back down the slope and stunned for a moment. Also: their stair walker steps while they train.
+-- moved back down the slope and stunned for a moment; a god's punch flies them down the mountain (Remotes.Punch).
+-- Also: their stair walker steps while they train.
 local MovementController = { Name = "MovementController" }
 
 local SLIDE_RENDER = "SlideControl"
 local SIT_R15 = "rbxassetid://2506281703"
 local SIT_R6 = "rbxassetid://178130996"
 local STEP_CYCLE = 0.55 -- seconds a stair walker step takes to come down one step
+local PUNCH_ARC = 0.12 -- a punch's arc peaks this share of its length above the straight line (20 to 120 studs)
 
 local registry: Lifecycle.Registry = {}
 local trove = Trove.new()
@@ -37,6 +39,9 @@ local slideTarget = 0
 local heading = Mountain.Downhill
 local knockUntil = 0
 local stunUntil = 0
+-- A god's punch in flight: from where to where, when it started and how long it takes.
+type Flight = { From: Vector3, To: Vector3, Start: number, Seconds: number }
+local flight: Flight? = nil
 local knockDirection = Vector3.zero
 local stuckFor = 0
 local sitTrack: AnimationTrack? = nil
@@ -161,6 +166,30 @@ local function step(dt: number)
 	local walk = GameConfig.Movement.WalkSpeed
 	local boost = speedBoost()
 	local settings = GameConfig.Movement
+
+	-- Punched by a god: tumbling along a high arc down the mountain, then held still for a moment on landing.
+	local punched = flight
+	if punched then
+		setSliding(false, humanoid)
+		humanoid:Move(Vector3.zero, false)
+		local t = (now - punched.Start) / punched.Seconds
+		if t >= 1 then
+			flight = nil
+			humanoid.PlatformStand = false
+			root.CFrame = CFrame.lookAlong(punched.To, Mountain.Downhill)
+			root.AssemblyLinearVelocity = Vector3.zero
+			stunUntil = now + GameConfig.Theft.PunchStun
+			knockUntil = 0
+			return
+		end
+		humanoid.PlatformStand = true
+		local span = (punched.To - punched.From).Magnitude
+		local height = math.clamp(span * PUNCH_ARC, 20, 120) * 4 * t * (1 - t)
+		local at = punched.From:Lerp(punched.To, t) + Vector3.new(0, height, 0)
+		root.CFrame = CFrame.lookAlong(at, Mountain.Downhill) * CFrame.Angles(-t * math.pi * 4, 0, 0)
+		root.AssemblyLinearVelocity = Vector3.zero
+		return
+	end
 
 	-- Knocked back: moved down the slope, then held still until the stun ends.
 	if now < stunUntil then
@@ -327,6 +356,17 @@ function MovementController.Start(_self: any)
 			sound:Play("Scuffle")
 		end
 	end))
+	trove:Add(Remotes.Punch:Connect(function(landing: Vector3, seconds: number)
+		local _, _, root = character()
+		if not root then
+			return
+		end
+		flight = { From = root.Position, To = landing, Start = os.clock(), Seconds = math.max(seconds, 0.3) }
+		local sound = registry.SoundController
+		if sound then
+			sound:Play("Scuffle")
+		end
+	end))
 	trove:Add(Remotes.Knockback:Connect(function(direction: Vector3)
 		local now = os.clock()
 		knockDirection = Vector3.new(direction.X, 0, direction.Z).Unit
@@ -338,6 +378,7 @@ function MovementController.Start(_self: any)
 		end
 	end))
 	trove:Connect(player.CharacterAdded, function()
+		flight = nil
 		sitTrack = nil
 		walkTrack = nil
 		sliding = false
