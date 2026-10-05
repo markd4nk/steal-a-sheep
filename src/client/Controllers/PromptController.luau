@@ -9,7 +9,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- The world's prompts on this device: a station's (Opens: Shop, Sell, Merge) opens its screen, another player's
 -- tutorial lamb can't be stolen here (the server refuses it too), and no lamb offers itself while the player carries
--- one or before they can climb to it.
+-- one.
 local PromptController = { Name = "PromptController" }
 
 local OPENS: { [string]: { Screen: string, Options: { [string]: any }? } } = {
@@ -27,13 +27,9 @@ local function refreshPrompt(prompt: ProximityPrompt)
 		return
 	end
 	local owner = prompt:GetAttribute("OwnerId")
-	local model = prompt:FindFirstAncestorWhichIsA("Model")
-	local tier = model and model:GetAttribute("Tier")
-	local unlocked = player:GetAttribute("Unlocked")
-	local open = (type(unlocked) ~= "number" or type(tier) ~= "number" or tier <= unlocked)
 	local mine = owner == nil or owner == player.UserId
 	local carrying = player:GetAttribute("Carrying") == true
-	prompt.Enabled = mine and open and not carrying
+	prompt.Enabled = mine and not carrying
 end
 
 local function refreshAll()
@@ -80,9 +76,7 @@ function PromptController.Start(_self: any)
 			end
 		end
 	end)
-	for _, name in { "Carrying", "Unlocked" } do
-		trove:Connect(player:GetAttributeChangedSignal(name), refreshAll)
-	end
+	trove:Connect(player:GetAttributeChangedSignal("Carrying"), refreshAll)
 end
 
 function PromptController.Destroy(_self: any)

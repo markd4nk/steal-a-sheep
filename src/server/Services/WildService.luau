@@ -194,8 +194,8 @@ end
 local function announceRoyal(spawn: Spawn)
 	local tier = Olympus.Tiers[spawn.Tier]
 	for _, player in Players:GetPlayers() do
-		local unlocked = player:GetAttribute("Unlocked")
-		if type(unlocked) == "number" and unlocked >= spawn.Tier then
+		local reached = player:GetAttribute("ClimbTier")
+		if type(reached) == "number" and reached >= spawn.Tier then
 			notify(player, `A Royal {tier.FamilyName} lamb appeared in {tier.God}'s pasture!`, "Rare", "Reveal")
 		end
 	end
@@ -288,10 +288,6 @@ tryPickUp = function(player: Player, spawn: Spawn)
 		return
 	end
 	if not registry.PlotService:GetPlot(player) then
-		return
-	end
-	if Economy.Unlocked(data.ClimbPower, data.Deliveries) < spawn.Tier then
-		notify(player, "Train to climb this slope", "Bad", "Denied")
 		return
 	end
 	if registry.FlockService:Count(player) >= GameConfig.Theft.InventoryLimit then
@@ -531,7 +527,9 @@ function WildService.DebugSteal(_self: any, player: Player, tier: number): boole
 	end
 	for _, spawn in spawns do
 		if spawn.Tier == tier and spawn.State == "Ready" and spawn.Model then
-			character:PivotTo(spawn.At * CFrame.new(0, 4, 3))
+			local at = spawn.At * CFrame.new(0, 4, 3)
+			registry.MountainService:Teleported(player, at.Position.X)
+			character:PivotTo(at)
 			tryPickUp(player, spawn)
 			return carries[player] ~= nil
 		end

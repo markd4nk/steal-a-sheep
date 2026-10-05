@@ -2,10 +2,12 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Economy = require(ReplicatedStorage.Utils.Economy)
+local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 
--- Where things are on the ramp: its height along the middle, which tier a spot is in, how fast a slide goes there,
--- and the real floor under a point. Uphill is +X; downhill, towards the plots, is -X.
+-- Where things are on the ramp: its height along the middle, which tier a spot is in, how fast a slide and a climb go
+-- there, and the real floor under a point. Uphill is +X; downhill, towards the plots, is -X.
 local Mountain = {}
 
 Mountain.Downhill = Vector3.new(-1, 0, 0)
@@ -43,6 +45,14 @@ end
 function Mountain.SlideSpeedAt(x: number): number
 	local tier = Mountain.TierAt(x)
 	return if tier > 0 then Olympus.Tiers[tier].SlideSpeed else Olympus.Tiers[1].SlideSpeed
+end
+
+-- How fast a player with `climb` Climbing may go up the slope at `x`, in studs a second: walking speed times the
+-- tier's climb share, never under a crawl. Below the safety line it's walking speed.
+function Mountain.ClimbSpeedAt(x: number, climb: number): number
+	local movement = GameConfig.Movement
+	local share = Economy.ClimbShare(climb, Mountain.TierAt(x))
+	return math.max(movement.CrawlSpeed, movement.WalkSpeed * share)
 end
 
 -- On the ramp between the safety line and the summit, near its floor (not on a roof or cloud above it).

@@ -31,7 +31,7 @@ local commands: { [string]: Command } = {
 		end
 		return false, "the balance would go below 0"
 	end,
-	-- value: how much Climb Power (CLIMB_GRANT if left out).
+	-- value: how much Climbing (CLIMB_GRANT if left out).
 	AddClimb = function(player, value)
 		local data = registry.DataService:GetData(player)
 		data.ClimbPower = math.max(0, data.ClimbPower + (value or CLIMB_GRANT))
@@ -67,7 +67,7 @@ local commands: { [string]: Command } = {
 		end
 		return true, nil
 	end,
-	-- Every tier open: enough Climb Power and one delivery from each.
+	-- Every tier easy: Zeus's Heavy target in Climbing, and one delivery from each tier.
 	UnlockAll = function(player)
 		local data = registry.DataService:GetData(player)
 		data.ClimbPower = math.max(data.ClimbPower, Olympus.Tiers[Olympus.Count].Reach * 2.25)

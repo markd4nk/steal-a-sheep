@@ -39,7 +39,7 @@ type PlayerState = {
 	Shown: { [string]: Pens.Shown },
 	Dirty: boolean,
 	Offline: { Coins: number, Matured: number }?,
-	Unlocked: number,
+	ClimbTier: number,
 }
 
 local TICK = 1
@@ -111,7 +111,7 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		Deliveries = table.clone(data.Deliveries),
 		Dex = table.clone(data.Dex),
 		Tutorial = data.Tutorial,
-		Unlocked = Economy.Unlocked(data.ClimbPower, data.Deliveries),
+		ClimbTier = Economy.ClimbTier(data.ClimbPower),
 		MergeReady = Economy.TotalDeliveries(data.Deliveries) >= Economy.MergeAfterDeliveries,
 		Income = Roster.Income(data.Sheep, data.PenSlots),
 		Offline = if state then state.Offline else nil,
@@ -125,14 +125,14 @@ local function push(player: Player)
 	end
 	state.Dirty = false
 	local snapshot = FlockService:Snapshot(player)
-	local unlocked = snapshot.Unlocked
-	if type(unlocked) == "number" then
-		if unlocked > state.Unlocked then
-			local tier = Olympus.Tiers[unlocked]
-			notify(player, `You can climb to {tier.God}'s {tier.Area}!`, "Rare", "Upgrade")
+	local reached = snapshot.ClimbTier
+	if type(reached) == "number" then
+		if reached > state.ClimbTier then
+			local tier = Olympus.Tiers[reached]
+			notify(player, `{tier.God}'s {tier.Area} is in reach!`, "Rare", "Upgrade")
 		end
-		state.Unlocked = math.max(state.Unlocked, unlocked)
-		player:SetAttribute("Unlocked", unlocked)
+		state.ClimbTier = math.max(state.ClimbTier, reached)
+		player:SetAttribute("ClimbTier", reached)
 	end
 	player:SetAttribute("Income", snapshot.Income)
 	player:SetAttribute("MergeReady", snapshot.MergeReady)
@@ -196,7 +196,7 @@ local function leaderstats(player: Player)
 	end
 	local stats = Instance.new("Folder")
 	stats.Name = "leaderstats"
-	for _, name in { "Income", "Climb" } do
+	for _, name in { "Income", "Climbing" } do
 		local value = Instance.new("StringValue")
 		value.Name = name
 		value.Parent = stats
@@ -207,7 +207,7 @@ end
 local function updateLeaderstats(player: Player, income: number, climbPower: number)
 	local stats = player:FindFirstChild("leaderstats")
 	local incomeValue = stats and stats:FindFirstChild("Income")
-	local climbValue = stats and stats:FindFirstChild("Climb")
+	local climbValue = stats and stats:FindFirstChild("Climbing")
 	if incomeValue and incomeValue:IsA("StringValue") then
 		incomeValue.Value = `{Format.Rate(income)}/s`
 	end
@@ -238,8 +238,7 @@ local function settleOffline(player: Player, data: any)
 end
 
 local function onLoaded(player: Player, data: any)
-	states[player] =
-		{ Shown = {}, Dirty = true, Offline = nil, Unlocked = Economy.Unlocked(data.ClimbPower, data.Deliveries) }
+	states[player] = { Shown = {}, Dirty = true, Offline = nil, ClimbTier = Economy.ClimbTier(data.ClimbPower) }
 	Roster.Normalize(data.Sheep, data.PenSlots)
 	settleOffline(player, data)
 	data.LastSeen = os.time()
@@ -411,7 +410,7 @@ function FlockService.Deliver(_self: any, player: Player, wild: Wild): Sheep?
 		registry.DataService:AdjustCoins(player, Economy.TutorialCoins)
 		data.ClimbPower += Economy.TutorialClimb
 		registry.DataService:Replicate(player)
-		notify(player, `+{Economy.TutorialCoins} coins and +{Economy.TutorialClimb} Climb Power!`, "Rare", "Upgrade")
+		notify(player, `+{Economy.TutorialCoins} coins and +{Economy.TutorialClimb} Climbing!`, "Rare", "Upgrade")
 	end
 	FlockService.Delivered:Fire(player, sheep)
 	refreshPen(player)

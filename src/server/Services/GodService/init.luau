@@ -259,7 +259,7 @@ function GodService.Start(_self: any)
 	-- sheep folders are made by services that start later, so the list is looked up again every second.
 	local function refreshExclusions()
 		local list: { Instance } = { gods_ }
-		for _, name in { "WildSheep", "CarriedSheep", "PenSheep", "ClimbGates" } do
+		for _, name in { "WildSheep", "CarriedSheep", "PenSheep" } do
 			local found = workspace:FindFirstChild(name)
 			if found then
 				table.insert(list, found)

@@ -59,8 +59,9 @@ Economy.TutorialClimb = 25
 Economy.StartPens = 3
 Economy.MaxPens = 12
 Economy.MergeAfterDeliveries = 3
+Economy.UnderTrainedFloor = 0.45 -- the share of a burden's speed left to a thief with almost no Climbing
 
--- Climb Power a second on the stair walker, by its level (0 is the free one).
+-- Climbing a second on the stair walker, by its level (0 is the free one).
 Economy.WalkerRates = table.freeze({ 2, 12, 40, 160, 640, 2200, 9000, 36000, 100000, 300000, 900000, 1800000 })
 Economy.MaxWalker = #Economy.WalkerRates - 1
 
@@ -92,7 +93,7 @@ function Economy.BaseIncome(tier: number): number
 	return Economy.Round(2 * 2.5 ^ (tier - 1))
 end
 
--- Reach, Light and Heavy Climb Power for a tier: Light 1.5x and Heavy 2.25x its reach; Demeter is 0, 25, 60.
+-- Reach, Light and Heavy Climbing for a tier: Light 1.5x and Heavy 2.25x its reach; Demeter is 0, 25, 60.
 function Economy.Targets(tier: number): (number, number, number)
 	if tier == 1 then
 		return 0, 25, 60
@@ -102,11 +103,16 @@ function Economy.Targets(tier: number): (number, number, number)
 end
 
 -- The share of normal speed and acceleration a carrier keeps: the burden's three values at the source tier's Reach,
--- Light and Heavy targets, straight lines between them, the first below Reach and the last above Heavy.
+-- Light and Heavy targets, straight lines between them, and the last above Heavy. Below Reach the share keeps falling
+-- towards UnderTrainedFloor of the first value, so a lamb stolen from a slope the thief can barely climb is slow to
+-- carry and its god catches them.
 function Economy.CarryMultiplier(burden: number, climb: number, tier: number): number
 	local carry = Economy.Burdens[burden].Carry
 	local reach, light, heavy = Economy.Targets(tier)
-	if climb <= reach then
+	if climb < reach then
+		local floor = Economy.UnderTrainedFloor
+		return carry[1] * (floor + (1 - floor) * 2 * climb / (climb + reach))
+	elseif climb <= reach then
 		return carry[1]
 	elseif climb <= light then
 		return carry[1] + (carry[2] - carry[1]) * (climb - reach) / (light - reach)
@@ -116,18 +122,29 @@ function Economy.CarryMultiplier(burden: number, climb: number, tier: number): n
 	return carry[3]
 end
 
--- The highest tier a player may climb into: each needs its reach in Climb Power and one delivery from the tier below.
--- Tier 1 is always open. Neither ever goes down, so a tier stays open.
-function Economy.Unlocked(climb: number, deliveries: { [string]: number }): number
-	local unlocked = 1
+-- The share of walking speed a player keeps going up a tier's slope: Climbing / (Climbing + its Reach), so half speed
+-- at its Reach and 91% at ten times it. Each tier's Reach is about four times the last, so going higher needs about
+-- four times the Climbing for the same pace. Demeter's meadow (Reach 0) is always full speed.
+function Economy.ClimbShare(climb: number, tier: number): number
+	local reach = if tier >= 1 then Olympus.Tiers[math.min(tier, Olympus.Count)].Reach else 0
+	if reach <= 0 then
+		return 1
+	end
+	local power = math.max(climb, 0)
+	return power / (power + reach)
+end
+
+-- The highest tier a Climbing climbs at half speed or better: the one the HUD's goals and the training meter aim at.
+function Economy.ClimbTier(climb: number): number
+	local reached = 1
 	for tier = 2, Olympus.Count do
-		if climb >= Olympus.Tiers[tier].Reach and (deliveries[tostring(tier - 1)] or 0) > 0 then
-			unlocked = tier
+		if climb >= Olympus.Tiers[tier].Reach then
+			reached = tier
 		else
 			break
 		end
 	end
-	return unlocked
+	return reached
 end
 
 function Economy.TotalDeliveries(deliveries: { [string]: number }): number
@@ -138,7 +155,7 @@ function Economy.TotalDeliveries(deliveries: { [string]: number }): number
 	return total
 end
 
--- "Train for Light sheep" and so on: which of a tier's three stages a Climb Power reaches.
+-- "Train for Light sheep" and so on: which of a tier's three stages a Climbing reaches.
 function Economy.Readiness(climb: number, tier: number): string
 	local reach, light, heavy = Economy.Targets(tier)
 	if climb < reach then

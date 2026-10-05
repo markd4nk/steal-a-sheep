@@ -12,12 +12,12 @@ local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
--- How the local character moves. Walking: 18 studs a second, times a carried lamb's burden share. Sliding:
+-- How the local character moves. Walking: 18 studs a second, times a carried lamb's burden share; going up the ramp,
+-- no faster up the slope than the player's Climbing allows there (Mountain.ClimbSpeedAt; the server checks). Sliding:
 -- moving downhill on the ramp starts a slide by itself; it speeds up to the stretch's slide speed (the burden slows it
 -- and its acceleration), steers within a cone either side of straight downhill with the ordinary movement controls,
 -- brakes when pulled back, and runs out to a stop past the safety line. A slider's hit costs it speed; a hit player is
--- moved back down the slope and stunned for a moment. Also: the climb gates a player has opened stop colliding on
--- their own device, and their stair walker steps while they train.
+-- moved back down the slope and stunned for a moment. Also: their stair walker steps while they train.
 local MovementController = { Name = "MovementController" }
 
 local SLIDE_RENDER = "SlideControl"
@@ -49,6 +49,11 @@ local function character(): (Model?, Humanoid?, BasePart?)
 	return nil, nil, nil
 end
 
+local function climbing(): number
+	local climb = player:GetAttribute("ClimbPower")
+	return if type(climb) == "number" then climb else 0
+end
+
 -- The burden share a carried lamb leaves the player (Economy.CarryMultiplier), 1 when empty-handed.
 local function carryShare(): number
 	if player:GetAttribute("Carrying") ~= true then
@@ -56,11 +61,20 @@ local function carryShare(): number
 	end
 	local burden = player:GetAttribute("CarryBurden")
 	local tier = player:GetAttribute("CarryTier")
-	local climb = player:GetAttribute("ClimbPower")
 	if type(burden) ~= "number" or type(tier) ~= "number" then
 		return 1
 	end
-	return Economy.CarryMultiplier(burden, if type(climb) == "number" then climb else 0, tier)
+	return Economy.CarryMultiplier(burden, climbing(), tier)
+end
+
+-- Walking speed, held down when the move heads up the ramp so its uphill part never beats the climb speed there.
+-- Moving across the slope stays at full speed.
+local function walkSpeed(position: Vector3, input: Vector3, walk: number, share: number): number
+	if input.X <= 0 or position.X < Olympus.SafeLineX then
+		return walk
+	end
+	local climb = Mountain.ClimbSpeedAt(position.X, climbing()) * share
+	return math.min(walk, climb / input.X)
 end
 
 -- What the player is asking for, in world space: the Humanoid's MoveDirection as Roblox's own controls set it this
@@ -151,7 +165,7 @@ local function step(dt: number)
 	local input = moveInput(humanoid)
 
 	if not sliding then
-		humanoid.WalkSpeed = walk * boost
+		humanoid.WalkSpeed = walkSpeed(position, input, walk, share) * boost
 		local downhill = -velocity.X
 		local flat = Vector2.new(velocity.X, velocity.Z).Magnitude
 		if
@@ -218,30 +232,6 @@ local function step(dt: number)
 	end
 	humanoid.WalkSpeed = slideSpeed * boost
 	humanoid:Move(heading, false)
-end
-
--- Gates this player has opened stop colliding here (MountainService builds them; the server still checks).
-local function refreshGates()
-	local folder = workspace:FindFirstChild("ClimbGates")
-	local unlocked = player:GetAttribute("Unlocked")
-	local open = if type(unlocked) == "number" then unlocked else 1
-	if not folder then
-		return
-	end
-	for _, gate in folder:GetChildren() do
-		local tier = gate:GetAttribute("Tier")
-		local wall = gate:FindFirstChild("Wall")
-		local sign = gate:FindFirstChild("Sign")
-		if type(tier) == "number" and wall and wall:IsA("BasePart") then
-			local passable = tier <= open
-			wall.CanCollide = not passable
-			wall.Transparency = if passable then 1 else 0.2
-			local gui = sign and sign:FindFirstChildOfClass("SurfaceGui")
-			if gui then
-				gui.Enabled = not passable
-			end
-		end
-	end
 end
 
 -- The player's own stair walker steps down while they train, and they walk on the spot.
@@ -319,14 +309,6 @@ function MovementController.Start(_self: any)
 			sound:Play("Yelp")
 		end
 	end))
-	trove:Connect(player:GetAttributeChangedSignal("Unlocked"), refreshGates)
-	task.spawn(function()
-		local folder = workspace:WaitForChild("ClimbGates", 60)
-		if folder then
-			trove:Connect(folder.ChildAdded, refreshGates)
-			refreshGates()
-		end
-	end)
 	trove:Connect(player.CharacterAdded, function()
 		sitTrack = nil
 		walkTrack = nil

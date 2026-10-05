@@ -4,7 +4,7 @@
 -- (vvs_map) is one corridor climbing east (+X) from the plots, in seven themed stages that get steeper: 2, 7, 12, 17,
 -- 22, 29 and 31 degrees. Long stages hold two or three tiers. Gods are ordered to fit each stage's theme (meadow,
 -- bamboo, snow, lava, rose garden, marble temple, golden cloud path); every tier keeps its numbers in order
--- (reach threshold, income), so swapping two gods is a matter of swapping their rows' names and looks.
+-- (Reach, income), so swapping two gods is a matter of swapping their rows' names and looks.
 
 export type Tier = {
 	Tier: number,
@@ -12,7 +12,7 @@ export type Tier = {
 	Area: string,
 	Family: string, -- GameConfig.Breeds key
 	FamilyName: string,
-	Reach: number, -- Climb Power to climb into this tier
+	Reach: number, -- Climbing that climbs this tier's slope at half walking speed (Economy.ClimbShare)
 	XStart: number, -- the tier's gate on the ramp (studs along +X)
 	XEnd: number,
 	SlideSpeed: number, -- an empty-handed slide's target speed on this stretch
@@ -242,8 +242,6 @@ local Olympus = {
 	-- Where on its tier a god's pasture sits: from this share of the tier's length to its top.
 	PastureFrom = 0.45,
 	SpawnsPerTier = 4,
-	GateHeight = 140,
-	GateWidth = 700, -- z, wide enough to cover every stage's side terraces
 }
 
 return table.freeze(Olympus)

@@ -44,7 +44,7 @@ return function(t: Run.Suite)
 		end
 	end)
 
-	t.Test("reach thresholds and the derived Light and Heavy targets", function()
+	t.Test("Reach values and the derived Light and Heavy targets", function()
 		local reach = { 0, 100, 800, 3200, 12800, 51200, 180000, 720000, 2900000, 9000000, 27000000, 81000000 }
 		for tier, value in reach do
 			t.Expect(Olympus.Tiers[tier].Reach).ToBe(value)
@@ -66,8 +66,10 @@ return function(t: Run.Suite)
 		t.Expect(Economy.CarryMultiplier(3, 1e9, 1)).ToBe(0.94)
 		-- Halfway between Reach (100) and Light (150) for Dionysus.
 		t.Expect(near(Economy.CarryMultiplier(1, 125, 2), 0.88)).ToBe(true)
-		-- Below Reach keeps the first value: never divide by Demeter's 0.
-		t.Expect(Economy.CarryMultiplier(2, 50, 2)).ToBe(0.72)
+		-- Below Reach it keeps falling, to 0.45 of the first value with no Climbing.
+		t.Expect(near(Economy.CarryMultiplier(2, 50, 2), 0.72 * (0.45 + 0.55 * 100 / 150))).ToBe(true)
+		t.Expect(near(Economy.CarryMultiplier(2, 0, 2), 0.72 * 0.45)).ToBe(true)
+		t.Expect(Economy.CarryMultiplier(2, 100, 2)).ToBe(0.72)
 	end)
 
 	t.Test("income: lamb share, fleece, size and merge rank", function()
@@ -143,12 +145,20 @@ return function(t: Run.Suite)
 		t.Expect(capped).ToBe(7200 * 2 * 0.25)
 	end)
 
-	t.Test("a tier opens with its reach and a delivery from the one below", function()
-		t.Expect(Economy.Unlocked(0, {})).ToBe(1)
-		t.Expect(Economy.Unlocked(100, {})).ToBe(1)
-		t.Expect(Economy.Unlocked(100, { ["1"] = 1 })).ToBe(2)
-		t.Expect(Economy.Unlocked(5000, { ["1"] = 1, ["2"] = 1 })).ToBe(3)
-		t.Expect(Economy.Unlocked(5000, { ["1"] = 1, ["2"] = 1, ["3"] = 1 })).ToBe(4)
+	t.Test("a slope's climb share is Climbing / (Climbing + Reach), full on Demeter's meadow", function()
+		t.Expect(Economy.ClimbShare(0, 1)).ToBe(1)
+		t.Expect(Economy.ClimbShare(0, 2)).ToBe(0)
+		t.Expect(Economy.ClimbShare(100, 2)).ToBe(0.5)
+		t.Expect(near(Economy.ClimbShare(512000, 6), 10 / 11)).ToBe(true)
+		t.Expect(Economy.ClimbShare(1e12, 0)).ToBe(1)
+	end)
+
+	t.Test("the climb tier is the highest whose Reach the Climbing has", function()
+		t.Expect(Economy.ClimbTier(0)).ToBe(1)
+		t.Expect(Economy.ClimbTier(99)).ToBe(1)
+		t.Expect(Economy.ClimbTier(100)).ToBe(2)
+		t.Expect(Economy.ClimbTier(5000)).ToBe(4)
+		t.Expect(Economy.ClimbTier(1e12)).ToBe(12)
 	end)
 
 	t.Test("wild rolls stay in range, and Heavy lambs never grow to Standard", function()

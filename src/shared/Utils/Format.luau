@@ -57,7 +57,7 @@ function Format.Cash(value: number): string
 	return "$" .. Format.Short(value)
 end
 
--- An income or a Climb Power: tenths under 100 (12.5 -> "12.5", 3 -> "3"), then like Short.
+-- An income or a Climbing: tenths under 100 (12.5 -> "12.5", 3 -> "3"), then like Short.
 function Format.Rate(value: number): string
 	if value < 100 then
 		local tenths = math.floor(value * 10 + 1e-6)

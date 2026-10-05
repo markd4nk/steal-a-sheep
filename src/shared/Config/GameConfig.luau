@@ -212,6 +212,7 @@ local GameConfig = {
 	-- Studs per second.
 	Movement = {
 		WalkSpeed = 18,
+		CrawlSpeed = 1, -- the slowest a player goes up a slope far too steep for their Climbing
 		JumpPower = 50,
 		SlideMinStart = 6, -- moving downhill at least this fast on the ramp starts a slide
 		SlideAccel = 26, -- studs a second a slide gains each second, before a sheep's burden

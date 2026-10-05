@@ -4,7 +4,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
@@ -13,14 +12,18 @@ local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
--- The climb's rules on the ramp. Gates: a see-through wall at the foot of every tier from the second up, solid for a
--- player until that tier is open to them (clients drop the ones they've opened, MovementController); the server sends
--- anyone found past a closed one back to its approach, which also ends a theft. Slide hits: a player sliding downhill
+-- The climb's rules on the ramp. Climbing: nothing walls a tier off; each player climbs at the speed their Climbing
+-- allows on that tier's slope (Mountain.ClimbSpeedAt, MovementController moves them), down to a crawl. The server
+-- keeps a ceiling per player that rises at that speed (with some slack for lag) and puts anyone found above it back on
+-- it. A sign at the foot of each tier from the second up names it and its Reach. Slide hits: a player sliding downhill
 -- fast enough who reaches a player walking uphill knocks them back down the slope (their client moves them), protects
 -- them for a moment, and loses some speed. No hits below the safety line or on a protected tutorial run.
 local MountainService = { Name = "MountainService" }
 
 local ENFORCE_EVERY = 0.25
+local CLIMB_SLACK = 1.3 -- times the allowed climb speed the ceiling rises
+local LEAD_STUDS = 10 -- how far ahead of a player the ceiling may run, so a lag burst isn't pulled back
+local LEAD_SECONDS = 1 -- or this many seconds of their climb, whichever is more
 local SAFE_MARGIN = 6
 local UPHILL_SPEED = 1.5 -- a target must be moving up the slope at least this fast
 
@@ -30,7 +33,8 @@ local sliders: { [Player]: boolean } = {}
 local protectedUntil: { [Player]: number } = {}
 -- A slider who hit a target can't hit them again until they're SeparateStuds apart.
 local touching: { [Player]: { [Player]: boolean } } = {}
-local blockedNoticeAt: { [Player]: number } = {}
+-- The furthest up the ramp (x) each player may be right now.
+local ceilings: { [Player]: number } = {}
 local sightParams = RaycastParams.new()
 sightParams.FilterType = Enum.RaycastFilterType.Exclude
 
@@ -44,11 +48,11 @@ local function rootOf(player: Player): BasePart?
 	return nil
 end
 
-local function gateSign(parent: Instance, tier: Olympus.Tier): Part
+local function tierSign(parent: Instance, tier: Olympus.Tier): Part
 	local x = tier.XStart - 1.5
 	local y = Mountain.RampY(tier.XStart) + 16
 	local board = Instance.new("Part")
-	board.Name = "Sign"
+	board.Name = `Sign{tier.Tier}`
 	board.Anchored = true
 	board.CanCollide = false
 	board.CanQuery = false
@@ -56,6 +60,7 @@ local function gateSign(parent: Instance, tier: Olympus.Tier): Part
 	board.Transparency = 1
 	board.Size = Vector3.new(0.2, 8, 30)
 	board.CFrame = CFrame.new(x, y, Olympus.LaneMiddleZ)
+	board:SetAttribute("Tier", tier.Tier)
 	local gui = Instance.new("SurfaceGui")
 	gui.Face = Enum.NormalId.Left -- facing downhill (-X), towards climbers
 	gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
@@ -69,7 +74,7 @@ local function gateSign(parent: Instance, tier: Olympus.Tier): Part
 	words.FontFace = Font.fromEnum(Enum.Font.FredokaOne)
 	words.TextScaled = true
 	words.TextColor3 = Color3.new(1, 1, 1)
-	words.Text = `{tier.God}'s {tier.Area}\nClimb Power {Format.Short(tier.Reach)}`
+	words.Text = `{tier.God}'s {tier.Area}\nClimbing {Format.Short(tier.Reach)}`
 	local stroke = Instance.new("UIStroke")
 	stroke.Thickness = 4
 	stroke.Parent = words
@@ -78,83 +83,46 @@ local function gateSign(parent: Instance, tier: Olympus.Tier): Part
 	return board
 end
 
-local function buildGates(): Folder
+local function buildSigns(): Folder
 	local folder = Instance.new("Folder")
-	folder.Name = "ClimbGates"
+	folder.Name = "TierSigns"
 	for _, tier in Olympus.Tiers do
-		if tier.Tier < 2 then
-			continue
+		if tier.Tier >= 2 then
+			tierSign(folder, tier)
 		end
-		local gate = Instance.new("Model")
-		gate.Name = `Gate{tier.Tier}`
-		gate:SetAttribute("Tier", tier.Tier)
-		local wall = Instance.new("Part")
-		wall.Name = "Wall"
-		wall.Anchored = true
-		wall.CanQuery = false
-		wall.CanTouch = false
-		wall.Material = Enum.Material.ForceField
-		wall.Color = tier.Accent
-		wall.Transparency = 0.2
-		local height = Olympus.GateHeight
-		wall.Size = Vector3.new(2, height, Olympus.GateWidth)
-		wall.CFrame = CFrame.new(tier.XStart, Mountain.RampY(tier.XStart) + height / 2 - 15, Olympus.LaneMiddleZ)
-		wall.Parent = gate
-		gateSign(gate, tier)
-		gate.Parent = folder
 	end
 	return folder
 end
 
-local function block(player: Player, root: BasePart, unlocked: number)
-	local next = Olympus.Tiers[unlocked + 1]
-	if not next then
-		return
+-- Studio playtests only: the DebugSpeed attribute (DebugService) multiplies the character's speed.
+local function speedBoost(player: Player): number
+	if not RunService:IsStudio() then
+		return 1
 	end
-	local x = next.XStart - 10
-	local z = Mountain.ClampLane(root.Position.Z)
-	local character = player.Character
-	if character then
-		character:PivotTo(CFrame.lookAlong(Vector3.new(x, Mountain.Floor(x, z) + 4, z), Vector3.new(1, 0, 0)))
-	end
-	if registry.WildService:IsCarrying(player) then
-		registry.WildService:Fail(player, "Blocked")
-	end
-	local now = os.clock()
-	if now - (blockedNoticeAt[player] or 0) > 2 then
-		blockedNoticeAt[player] = now
-		local data = registry.DataService:GetData(player)
-		local below = data and (data.Deliveries[tostring(next.Tier - 1)] or 0) or 0
-		if below == 0 then
-			local previous = Olympus.Tiers[next.Tier - 1]
-			Remotes.Notify:Fire(player, `Deliver a lamb from {previous.God} first`, "Bad", "Denied")
-		else
-			Remotes.Notify:Fire(
-				player,
-				`Train to climb this slope: {Format.Short(next.Reach)} Climb Power`,
-				"Bad",
-				"Denied"
-			)
-		end
-	end
+	local boost = player:GetAttribute("DebugSpeed")
+	return if type(boost) == "number" and boost > 0 then boost else 1
 end
 
-local function enforce()
+-- A new character starts on its plot, below the safety line, so a ceiling never starts higher than that.
+local function enforce(dt: number)
 	for _, player in Players:GetPlayers() do
 		local root = rootOf(player)
 		local data = registry.DataService:GetData(player)
 		if not root or not data then
+			ceilings[player] = nil
 			continue
 		end
 		local position = root.Position
-		local tier = Mountain.TierAt(position.X)
-		-- Only on the ramp's floor: the plots and the sky above aren't climbing.
-		if tier <= 1 or math.abs(position.Y - Mountain.RampY(position.X)) > 60 then
-			continue
-		end
-		local unlocked = Economy.Unlocked(data.ClimbPower, data.Deliveries)
-		if tier > unlocked then
-			block(player, root, unlocked)
+		local ceiling = ceilings[player] or math.min(position.X, Olympus.SafeLineX)
+		local speed = Mountain.ClimbSpeedAt(ceiling, data.ClimbPower) * speedBoost(player)
+		local lead = math.max(LEAD_STUDS, speed * LEAD_SECONDS)
+		ceiling = math.min(ceiling + speed * CLIMB_SLACK * dt, position.X + lead)
+		ceilings[player] = ceiling
+		if position.X > ceiling + 0.5 then
+			local character = player.Character :: Model
+			local z = Mountain.ClampLane(position.Z)
+			local turn = root.CFrame.Rotation
+			character:PivotTo(CFrame.new(ceiling, Mountain.Floor(ceiling, z) + 4, z) * turn)
 		end
 	end
 end
@@ -237,9 +205,9 @@ function MountainService.Init(_self: any, systems: Lifecycle.Registry)
 end
 
 function MountainService.Start(_self: any)
-	local gates = buildGates()
-	gates.Parent = workspace
-	trove:Add(gates)
+	local signs = buildSigns()
+	signs.Parent = workspace
+	trove:Add(signs)
 	trove:Add(Remotes.Slide:Connect(function(player: Player, sliding: boolean)
 		if sliding then
 			sliders[player] = true
@@ -252,7 +220,7 @@ function MountainService.Start(_self: any)
 		sliders[player] = nil
 		protectedUntil[player] = nil
 		touching[player] = nil
-		blockedNoticeAt[player] = nil
+		ceilings[player] = nil
 		for _, list in touching do
 			list[player] = nil
 		end
@@ -261,13 +229,19 @@ function MountainService.Start(_self: any)
 	trove:Connect(RunService.Heartbeat, function(dt: number)
 		sinceEnforce += dt
 		if sinceEnforce >= ENFORCE_EVERY then
+			local elapsed = sinceEnforce
 			sinceEnforce = 0
-			enforce()
+			enforce(elapsed)
 		end
 		if next(sliders) ~= nil then
 			checkHits()
 		end
 	end)
+end
+
+-- The server moved `player` up the ramp to `x` itself (a debug steal): their ceiling starts there.
+function MountainService.Teleported(_self: any, player: Player, x: number)
+	ceilings[player] = x
 end
 
 function MountainService.Destroy(_self: any)
