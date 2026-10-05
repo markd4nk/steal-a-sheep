@@ -46,6 +46,7 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 ## In progress
 
+- Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
 
