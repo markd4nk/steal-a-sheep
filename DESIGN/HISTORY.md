@@ -47,6 +47,8 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     rbxassetid://79093897520396, favorite rbxassetid://94266843104437; `art/gift/step-pictures.js` remakes them.
     Checked in a playtest: both pictures load from Roblox, Claim gave +500 Climbing and the cash, a second claim was
     refused, 54 tests pass, console clean. Not checked: the real favorite prompt (needs a published place).
+  - *Merged into main* on the user's word, after main's StairMaster walker, Sell Stall and punch were merged in and
+    played again (59 tests pass, opened at 31 s, +500 Climbing and +900 cash at 5/s income, second claim refused).
 
 - **The Sell Stall's menu, and a two-minute sell price (2026-10-05)**. The user sent Steal an Egg's Sell Pets (and
   its Free Gift) and asked for mock-ups of the menu the Sell Stall by the plots opens: like the reference, made easier.

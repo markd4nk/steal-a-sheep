@@ -72,13 +72,16 @@ confirmed or reversed it.
 - **Selling pays two minutes of the sheep's income** (the user, 2026-10-05: "two minutes' worth would be fine", Steal
   an Egg pays about 100 s; a start, to be tuned later). It was 15 s.
 
+- **The free gift (2026-10-05)**: worth 3 minutes of the player's stair walker in Climbing and 3 minutes of their
+  income in cash, at least 500 of each, so it keeps up with them (the user: "I do like how the reward size is always
+  adjusting"); the look with both rewards on one cyan stage and the steps as lit-up pictures of Roblox's game page.
+  Only the favorite can register (no game can see a like); the like step is asked, not checked.
+
 ## To review
 
 Calls made building the free gift (2026-10-05).
 
-- **Reward**: 3 minutes of the player's stair walker (no trail) in Climbing and 3 minutes of their flock's income in
-  cash, at least 500 of each. A new player's 25 Climbing becomes 525: about 2.2x speed on tier 2 and two-thirds on
-  tier 3. Once per player, ever.
+- **Once per player, ever**; a new player's 25 Climbing becomes 525.
 - **What unlocks Claim**: favoriting, through Roblox's own favorite prompt that Claim opens. The like is asked (step 1)
   but can't be checked by any game. Roblox's rules forbid rewards "in exchange for a thumb up"; see the question to the
   user in this task's summary.

@@ -67,9 +67,7 @@ lamb.
 
 ## In progress
 
-- **Free gift**: built and playtested on branch `t3code/favorite-gift-reward`; the user picked the one-stage look and
-  the pictures are uploaded. Not merged: the user is still working on these branches. DECISIONS.md's *To review*
-  lists its calls.
+- Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
