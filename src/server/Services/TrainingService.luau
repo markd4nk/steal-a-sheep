@@ -50,7 +50,9 @@ local function stepOff(player: Player, putDown: boolean)
 		root.Anchored = false
 		if putDown then
 			local exit = StairClimb.ExitAt(session.Plot.Pieces.Walker.Model:GetPivot())
-			registry.MountainService:Teleported(player, exit.Position.X)(player.Character :: Model):PivotTo(exit)
+			local character = player.Character :: Model
+			registry.MountainService:Teleported(player, exit.Position.X)
+			character:PivotTo(exit)
 		end
 	end
 end
