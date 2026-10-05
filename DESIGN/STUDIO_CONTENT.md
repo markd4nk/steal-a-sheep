@@ -4,6 +4,11 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, free placement** (branch `t3code/free-roaming-sheep-pens`): no place changes. The plots no longer get
+  pads or a delivery pad, so the map's hay and trees inside the plots stay where the map has them (only the stair
+  walker's spot is cleared); sheep walk round them. The code still expects `workspace.Base.Terrain` to be the ground
+  (it's skipped by the sheep's obstacle checks) and each `PlayerPlot`'s parts to outline its fence (the pen box is
+  measured from them).
 - **2026-10-05, High Olympus**. `tools/assemble.luau` now runs `tools/UpperMountain.luau` on the map before saving the
   place: `workspace.Stages.HighOlympus` (Folder) holds one Model a god, `Tier13 Iris` ... `Tier30 Zeus` (each `Floor`,
   `Terraces`, `Decor`), and `Summit` (plaza, throne, colonnade). It destroys stage 7's end wall (the Model of 80 parts
@@ -16,7 +21,8 @@ here. Newest first.
   - **The map**, `vvs_map(commission) (1).rbxl` (the user's commission), as it is. The code expects:
     `workspace.Base.PlayerPlots` (five `PlayerPlot` models; PlotService sorts them by z), `workspace.Base.Shop` (two
     stall models: the one at z 205 is the Shop, the one at z 175 the Sell Stall), `workspace.Stages.Stage1..7` (the ramp),
-    `workspace.Decors` and `workspace.Base.Foliages`/`HayStacks` (decor PlotService may move out of a pad's way), and
+    `workspace.Decors` and `workspace.Base.Foliages`/`HayStacks` (decor PlotService may move out of the stair
+    walker's way), and
     the ramp's shape in `Config/Olympus.Ramp` (measured; re-measure if the map changes). Workspace.StreamingEnabled is
     off in the map.
   - **Shear a Sheep's pieces**, `assets/ShearASheepAssets.rbxm` (from `tools/extract-assets.luau`), placed in

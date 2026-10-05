@@ -19,6 +19,26 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
 
+## Pens in this session's own Studio (2026-10-05)
+
+- **Own place copy**: with other sessions each in their own Studio and main's mid-playtest, `rojo build
+  default.project.json --output build/game.rbxl` then `lune run tools/assemble.luau 'vvs_map(commission) (1).rbxl'
+  assets/ShearASheepAssets.rbxm build/game.rbxl build/PenPlaytest.rbxl`, opened with `RobloxStudioBeta.exe <path>`, and
+  addressed only by its MCP name. Code updates: `rojo build tools/sync.project.json` into the Studio version's
+  `content/sas/pens-sync.rbxm` (a name of its own: other sessions write `sync.rbxm` there), then the GetObjects swap in
+  Edit.
+- **A theft in one command**: `Debug:Invoke("Steal", tier)`, then `character:PivotTo` into your plot and
+  `Remotes.PutDown:Fire()` in the same `execute_luau` (left standing at the pasture between commands, the god catches
+  you). `Debug UnlockAll` first for tiers above 1. Look for the prompt by name (`PutDownPrompt`): the carried lamb
+  still holds its disabled `StealPrompt`.
+- **Poses held still**: clone a pen sheep on the client, `RemoveTag(clone, "Sheep")` so AnimController leaves it alone,
+  set its Motor6D `Transform`s from `SheepClips` and wait a frame before reading part positions. Ground in the plots is
+  y 59.46; the graze puts the head's lowest corner at 59.56 on a Standard adult.
+- **Filming**: `screen_capture`'s `camera_position` is temporary. To hold a camera for `windows-computer-use` `record`,
+  bind a RenderStep at `Enum.RenderPriority.Last` that sets a Scriptable camera, hide the ScreenGuis, and undo both
+  after. The recorder writes its mp4 into the repo (`windows-computer-use/`): move it out; crop the game view with
+  ffmpeg.
+
 ## High Olympus in an open Studio (2026-10-05)
 
 - **Preview the map**: `lune run tools/preview-upper-mountain.luau "<Studio version folder>/content"`, then in Edit:

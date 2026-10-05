@@ -22,8 +22,34 @@ confirmed or reversed it.
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
   then don't thin or fill the slide lanes, old stages included.
+- **Put lambs down anywhere in the pen (2026-10-05)**: like Steal an Egg, the thief brings the lamb into their pen and
+  places it where they choose; no delivery platform, no fixed pads to unlock and stand sheep on. Sheep walk around on
+  their own like Shear a Sheep's; lambs mostly eat off the floor, head down and chewing, with an eating face (art to
+  be approved).
 
 ## To review
+
+Calls made building free placement and roaming sheep (2026-10-05):
+
+- **The pen is the whole fenced plot**; sheep keep 3 studs from the fence, off the stair walker, out of the map's trees
+  and hay. The map's hay and trees in the plots now stay where the map has them (only the walker's spot is cleared).
+- **Pen capacity stays**: the pen holds 3 sheep, more bought in the Shop as "Pen Space n/12" at the old pad prices. A
+  lamb put down in a full pen is stored; the objective warns "Your pen is full: it'll be stored".
+- **Putting down**: E / tap / ButtonX on "Put down" (the lamb's name under it) anywhere inside your own fence (the server
+  allows 3 studs outside it, for lag); the lamb lands 4 studs in front of you facing your way, or the nearest clear spot
+  (rings 3.5 studs apart), hopping down from your head (0.45 s, 2.5 studs high), then a happy hop and the Happy face for
+  1.2 s. In someone else's plot: "That's not your plot! Yours has your name over the gate." every 3 s. Objective while
+  carrying: "Bring it into your pen" (arrow to your plot), inside "Put it down where you like".
+- **Roaming**: each sheep strolls round where it was put down, within 18 studs (RoamRadius); strolls of 3-12 studs at 3
+  studs/s, every 5-14 s for grown sheep and 12-26 s for lambs; 30% go on for another leg, 20% are a turn on the spot;
+  sheep keep 3.5 studs (or their sizes) apart. Where it was put down is saved and it comes back there on rejoin; one out
+  of storage hops in there; a merge's result hops in where the first merged sheep lived; one with no home yet (Studio's
+  GiveSheep) gets any clear spot.
+- **Grazing**: lambs graze 90% of their standing time, adults 45% (3-9 s apart): bouts of 1-3 bites, each the head down
+  to the grass for 1.6-2.8 s nibbling and tugging, then up a little chewing for 1.8-3 s, the head working side to side;
+  0.4-1.6 s between a lamb's bouts. Wild lambs graze too. Faces: chewing faces while chewing (Blink stands in), Baa while
+  baa-ing, a blink every 2.5-6 s on a plain face.
+- **Flock menu** says "In your pen" (or "(pinned)") instead of "In pen slot N".
 
 Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls are under Confirmed rules.
 
@@ -88,9 +114,8 @@ Calls made while building the MVP on 2026-10-05:
   tier's thieves, gives up at the safety line, then walks home at 16.
 - **Theft card**: a wild lamb shows its name, "Grows to +low-high/s" and its burden (Light green, Stout yellow, Heavy
   red); hold E 0.5 s ("Steal"). Royal lambs are announced to players who have that tier open.
-- **Pens**: twelve pads in a 4 x 3 grid in each plot (3 open, then bought in order), the delivery pad just inside the
-  gate, the stair walker by the back fence; map hay and trees standing where they go are moved out of the way
-  (kept in ServerStorage.ClearedDecor). Each penned sheep shows "+X/s" (and a lamb its growth %).
+- **Plots**: the stair walker by the back fence (map hay and trees where it goes are moved out of the way, kept in
+  ServerStorage.ClearedDecor). Each penned sheep shows "+X/s" (and a lamb its growth %).
 - **Manual Equip pins a sheep**: Equip Best keeps pinned sheep and refills the rest; Store unpins.
 - **Selling is at the Sell Stall only** (the map's stall at z 175); the Flock menu opened there adds Sell with a
   confirm showing the coins and the income lost. The Shop is the stall at z 205; the Merge Shrine is Shear a Sheep's Mutation
@@ -108,3 +133,6 @@ Calls made while building the MVP on 2026-10-05:
 ## Calls left to the user
 
 - Keep the theme-fitted god order, or change it?
+- The eating face: A (Munch) or B (Nom), or changes?
+- Keep the pen's capacity (3, bought up to 12), or let every sheep you own live in the pen and earn?
+- Sheep roam round where you put them (18 studs), or anywhere in the plot?

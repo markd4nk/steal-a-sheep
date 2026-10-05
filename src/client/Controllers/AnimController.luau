@@ -416,7 +416,7 @@ local function animateSheep(entry: Rigged, clock: number, pose: SheepClips.Pose)
 		stage = if stopped then nil else doing
 		-- The idle makes way as the head goes down; it's laid first, so the bout goes on top.
 		SheepClips.Idle(clock, entry.Seed, (1 - math.min(down * weight / 0.3, 1)) * (1 - entry.Pace), pose)
-		level = SheepClips.Graze(grazing.Bout, t, weight, pose)
+		level = SheepClips.Graze(grazing.Bout, t, weight, scale, pose)
 	else
 		SheepClips.Idle(clock, entry.Seed, 1 - entry.Pace, pose)
 	end

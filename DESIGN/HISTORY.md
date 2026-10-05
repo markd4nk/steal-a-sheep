@@ -6,6 +6,42 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Put lambs down anywhere in the pen; sheep roam and graze (2026-10-05, branch `t3code/free-roaming-sheep-pens`)**.
+  The user: instead of the delivery platform and fixed pads you unlock, be like Steal an Egg (bring the lamb into the
+  pen and place it where you choose); sheep walk around on their own like Shear a Sheep's; lambs mostly eat off the
+  floor, looking down and chewing with an eating face; make it fluid.
+  - *Delivery*: the carry lasts until the thief puts the lamb down inside their own plot's fence. `PlotService/Build`
+    makes an invisible `Pen` box filling each plot's fence (measured from the plot model's parts) and a `Keepout` box
+    round the stair walker; the pads, the delivery pad and their decor clearing are gone. `WildService` sets the
+    `InPen` attribute and warns in other plots; `PromptController` makes a local Put down prompt on the carried lamb
+    while the player stands in their own `Pen` (`Utils/PenArea`, the same test on server and client); its
+    `Remotes.PutDown` has the server put the lamb 4 studs ahead (clamped inside the fence) and call
+    `FlockService:Deliver(player, wild, at, from)`.
+  - *Pen sheep* (`FlockService/Pens`): models stand at a spot and stroll with Shear a Sheep's `Utils/Wander` (copied
+    with its tests): the server picks each stroll every 0.25 s (within RoamRadius of home, inside the fence, off the
+    walker, `PlotService:CanStand` (an overlap box, solid parts only, ground and game folders skipped) and
+    `PathClear` (keep-out samples and a spherecast)), and sets `WalkAt` then `Spot`; the model moves on the server only
+    when shown, grown or rebuilt. Arrivals (`DropFrom`, `DroppedAt`) land on the put-down spot or the nearest clear one.
+    Saved sheep gained optional `HomeX`/`HomeZ` (studs from the plot's middle; validated, no migration). Slots still
+    mean "in the pen" (1 to PenSlots), so Roster, Equip Best, merging and income are unchanged.
+  - *Each device* (`AnimController`, rewritten): every penned sheep follows its hop or stroll (re-pivoted when the
+    server moves the model), legs in step with the ground (`SheepClips.Walk`); the nearest 50 in 70 studs graze
+    (`SheepClips.Graze`/`GrazeStage`: body tips 14 degrees, sinks a little, head tips 80 and the neck reaches so the nose
+    touches the grass; bites tug and sweep, chews bob and roll), idle, happy-hop after landing, and swap faces (chew
+    frames, Happy, Baa, Blink). Wild lambs carry `Lamb` and graze too.
+  - *Eating faces*: not built; two variants drawn as mock-ups with Shear a Sheep's face helpers
+    (`art/faces/chew_faces.py`, renders in `art/faces/renders/`, ignored) and shown to the user. Blink stands in
+    (`ChewFaces`).
+  - *UI*: objective "Bring it into your pen" / "Put it down where you like" (and the full-pen warning); Flock card "In
+    your pen"; Shop "Pen Space n/12".
+  - *Checked*: `check.ps1` passes; 43 tests pass in Studio (Wander, PlayerData homes). Playtested solo in this session's
+    own Studio on `build/PenPlaytest.rbxl` (main's Studio was in someone's playtest): a stolen lamb carried home, no
+    prompt outside the gate or in another plot (the notice showed), "Put down" pressed with E landed it 4 studs ahead
+    after a 0.47 s hop from head height; 8 then 12 sheep: 560 samples over 40 s found none outside the fence, on the
+    walker or in solid decor, the nearest two 5.7 studs apart, all strolling; grazing seen (nose on the grass, chewing
+    with the stand-in face) and filmed; store, equip (hops back in at home), grow-up rebuilds in place, merge (hops in
+    at the first sheep's home), sell, and a full pen (stored, warning shown). Console clean. Not checked: two players,
+    touch, gamepad, a real rejoin.
 - **High Olympus: thirty gods (2026-10-05)**. The user, liking the map: build out the next tiers from its parts and
   pieces, the top Olympus gods; then a list of thirty ("map parts for all of these gods"), Zeus on the new top, the
   look and studs indistinguishable from the original, each section grouped, the climb no steeper than about 60 degrees,

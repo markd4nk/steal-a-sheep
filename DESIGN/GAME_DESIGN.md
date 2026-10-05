@@ -13,15 +13,32 @@ on the way), then grow your flock into the biggest earners in your pen.
 
 ## Core loop (as built)
 Train on the stair walker -> climb to a god's pasture -> steal a lamb -> slide home with the god behind you ->
-deliver -> earn and grow -> upgrade.
+carry it into your pen and put it down wherever you like -> it lives there, roaming and grazing, earning and growing ->
+upgrade.
+
+## The pen (the user, 2026-10-05: "just like Steal an Egg ... bring them into the pen and then place them down", and
+the sheep walking around on their own "just like in Shear a Sheep", lambs "mostly eating off the floor")
+- The whole fenced plot is the pen. There's no delivery pad and no pads to stand sheep on or unlock: a thief carries
+  the lamb through their gate and presses E (Put down, on the lamb over their head) anywhere inside their own fence;
+  it hops down in front of them, happy to be home. That's the delivery.
+- Each sheep roams round the spot it was put down (Shear a Sheep's wander: long spells standing, then a short stroll),
+  never into the map's trees, hay or the stair walker, never on top of another sheep. Where it lives is saved.
+- Lambs graze nearly all the time: head down to the grass, nibbling, then up to chew with a chewing face. Grown sheep
+  graze now and then and otherwise stand about, breathe, look round, blink and baa. Wild lambs graze in the pastures
+  too.
+- The pen still holds a number of sheep (3, more bought in the Shop as Pen Space, up to 12); one put down in a full pen
+  is stored, not earning (Flock menu: Equip / Store / Equip Best).
 
 ## Systems
 - Climb Power, stair walker, trails: `TrainingService`, `ShopService`.
-- Wild lambs, theft, carrying, delivery, failure rules, tutorial lamb: `WildService` (+ `SheepService` for models).
+- Wild lambs, theft, carrying, putting down in the pen (delivery), failure rules, tutorial lamb: `WildService`
+  (+ `SheepService` for models); the Put down prompt is the client's own (`PromptController`).
 - Gods and pursuit: `GodService` (one state machine, primitive block rigs).
 - Climb gates, slide hits and knockback: `MountainService`; client slide, steering, braking: `MovementController`.
-- Flock, pens, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging: `FlockService`.
-- Plots (the map's five), pen pads, delivery pads, stair walkers: `PlotService`.
+- Flock, pen capacity, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging:
+  `FlockService`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
+  hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
+- Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
 ## The map
@@ -67,7 +84,7 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels, pen slots and trails. Climb Power
+Coins (sheep in the pen, first-discovery rewards, selling) buy stair walker levels, pen space and trails. Climb Power
 (stair walker) opens tiers and reduces carrying slowdown. No Robux products.
 
 ## Not built

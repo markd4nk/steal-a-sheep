@@ -39,6 +39,21 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 - **S8** (`BRAIN/PATTERNS/sessions.md`, Tools on Windows): "Claude Code's Bash tool fails a heredoc whose body has
   backticks ('unexpected EOF while looking for matching'), even with a quoted delimiter: write such files with the
   Write or Edit tools." Seen twice on 2026-10-05.
+- **S9** (`BRAIN/PATTERNS/sessions.md`, Studio is shared): "Every Studio window of one Roblox version reads the same
+  `content` folder, so a `GetObjects("rbxasset://...")` sync file there is shared between sessions: give yours a name of
+  its own (`content/<game>/<task>-sync.rbxm`), or another session's code can end up in your place." Seen 2026-10-05,
+  Steal a Sheep: three sessions each had their own Studio open on a place copy, one already using `sync.rbxm`.
+- **S10** (`BRAIN/PATTERNS/testing-studio.md`, screenshots and the camera): "A camera set from `execute_luau` on the
+  client is put back by Roblox's camera scripts the next frame, and `screen_capture`'s `camera_position` only lasts
+  for that capture. To hold a shot (a recording), bind a RenderStep at `Enum.RenderPriority.Last` that sets a
+  Scriptable camera every frame; unbind it and set `CameraType` back to Custom after." Seen 2026-10-05 filming
+  grazing sheep.
+- **S11** (`BRAIN/PATTERNS/desktop.md`): "The desktop tools' `record` saves its mp4 under the session's working
+  directory (`windows-computer-use/` in the repo): move it out before committing. With a window target its `region`
+  crop was ignored; crop afterwards with ffmpeg (`-vf crop=w:h:x:y`)." Seen 2026-10-05.
+- **S12** (`BRAIN/PATTERNS/animations.md`): "A Motor6D `Transform` set from a script moves its parts only at the next
+  simulation step: in a test, wait a frame (`task.wait()`) before reading the moved parts' positions." Seen 2026-10-05
+  measuring a grazing pose.
 
 ## Done
 

@@ -24,8 +24,14 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 The MVP built in one pass on 2026-10-05 (HISTORY.md); the user now refines it as they go (GAME_DESIGN.md). Thirty
 tiers: twelve up the commissioned map (Aeolus on its old summit) and eighteen on High Olympus above it, Zeus at the top.
 A god each, four wild lambs each, stair walker training, overhead carrying, the automatic downhill slide with steering,
-braking and slide hits, pursuit, delivery, pens, income, growth, size reveal, Equip Best, locks, selling, merging,
-trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
+braking and slide hits, pursuit, putting lambs down anywhere in your pen, roaming and grazing sheep, income, growth,
+size reveal, Equip Best, locks, selling, merging, trails, pen space, the Sheepdex, offline earnings and the tutorial
+lamb.
+
+- **The pen** (branch `t3code/free-roaming-sheep-pens`, 2026-10-05): the whole fenced plot; carry a lamb in and press
+  E to put it down where you like (no delivery pad, no pads). Sheep roam round where they were put down
+  (`FlockService/Pens`, `Utils/Wander`), avoiding trees, hay and the walker; lambs graze nearly all the time, adults now
+  and then (`AnimController`, `Utils/SheepClips`). Homes are saved (`HomeX`/`HomeZ`).
 
 - **High Olympus** (tiers 13-30): one stretch a god, 210 studs along the floor, 32 rising to 52 degrees, from stage 3's
   floor slab and terraces and the stages' decor, recoloured, plus block props; Zeus's throne plaza on top. Built into
@@ -43,14 +49,21 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 ## In progress
 
-- Nothing. High Olympus is merged into main; DECISIONS.md's *To review* lists its calls.
+- **Eating faces**: two mock-ups shown to the user (A "Munch": eyes shut, cheeks full, a grass sprig in the corner of
+  a mouth working side to side; B "Nom": eyes on the grass, mouth opening on a green mouthful). Waiting for a pick;
+  then upload both frames and set `GameConfig.Sheep.Faces` + `ChewFaces`. Blink stands in. Drawn by
+  `art/faces/chew_faces.py` with Shear a Sheep's `art/sheep/mock_faces.py` helpers.
+- **Free-roaming pens are on their branch**, not yet merged into main (the user's call).
 
 ## Not verified
 
 - **Two players**: slide hits and knockback (server checks, client knockback) were never tried with a second player.
 - **Saving**: the place isn't published, so playtests used ProfileStore's mock store; rejoin, offline credit on a real
   rejoin and session locking are untested (the offline maths is unit-tested).
-- **Touch and gamepad**: only keyboard and mouse in Studio. Prompts, HUD buttons and the slide use Roblox's own input.
+- **Touch and gamepad**: only keyboard and mouse in Studio. Prompts (Steal, Put down), HUD buttons and the slide use
+  Roblox's own input.
+- **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
+  teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
 - **Upper tiers by foot**: tiers 7 and up were reached with the debug Unlock; climbing them on foot wasn't timed. By
   the numbers it's about 6.5 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope).
@@ -72,3 +85,6 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 - **ViewportFrames (the menus' 3D sheep) don't show in Studio MCP screenshots while the window is minimized**; they do
   in play.
 - The map's four leaderboard boards are decoration; the player list shows Income and Climb.
+- **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
+  little sunk in the straw.
+- Studio MCP screenshots don't show ProximityPrompt buttons (Steal, Put down); they work in play.

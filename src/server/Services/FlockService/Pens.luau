@@ -158,7 +158,7 @@ function Pens.Show(
 		Spot = at,
 		Walk = nil,
 		Position = at.Position,
-		NextStroll = if from then os.clock() + Motion.StrollMinWait else nextStroll(sheep),
+		NextStroll = nextStroll(sheep),
 	}
 	setSpot(shown, at)
 	model.Parent = folder

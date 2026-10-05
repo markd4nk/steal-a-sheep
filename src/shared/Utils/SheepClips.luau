@@ -209,8 +209,10 @@ local GRAZE_DOWN = 0.55
 local GRAZE_UP = 0.45
 local GRAZE_END = 0.5
 local CHEW_LEVEL = 0.3 -- how far down the head stays while it chews (1 is nose in the grass)
-local GRAZE_HEAD = 72 -- degrees the head tips down at the grass
-local GRAZE_BODY = 9 -- degrees the body tips forward
+local GRAZE_HEAD = 80 -- degrees the head tips down at the grass
+local GRAZE_BODY = 14 -- degrees the body tips forward
+local GRAZE_SINK = 0.08 -- studs the body sinks at the grass (at rig scale 1), the legs taking it
+local GRAZE_STRETCH = Vector3.new(0, -0.18, -0.14) -- the neck reaching down and forward at the grass (rig scale 1)
 local CHEW_RATE = 2.4 -- chews a second
 
 function SheepClips.GrazeLength(bout: Bout): number
@@ -244,9 +246,9 @@ function SheepClips.GrazeStage(bout: Bout, t: number): (number, string?)
 	return CHEW_LEVEL, "Chew"
 end
 
--- The bout's pose at `t`, `weight` (0 to 1) of it (for fading out a bout cut short), layered on top of the pose.
--- Returns how far down the head is, for the idle to make way.
-function SheepClips.Graze(bout: Bout, t: number, weight: number, pose: Pose): number
+-- The bout's pose at `t`, `weight` (0 to 1) of it (for fading out a bout cut short), on a model of `scale`, layered on
+-- top of the pose. Returns how far down the head is, for the idle to make way.
+function SheepClips.Graze(bout: Bout, t: number, weight: number, scale: number, pose: Pose): number
 	local level, stage = SheepClips.GrazeStage(bout, t)
 	level *= weight
 	if level <= 0 then
@@ -263,11 +265,18 @@ function SheepClips.Graze(bout: Bout, t: number, weight: number, pose: Pose): nu
 	if stage == "Chew" then
 		chew = math.sin(t * TAU * CHEW_RATE) * weight
 	end
-	add(pose, "Body", tip(-GRAZE_BODY * level))
+	add(pose, "Body", CFrame.new(0, -GRAZE_SINK * level * scale, 0) * tip(-GRAZE_BODY * level))
 	for _, leg in { "LegFL", "LegFR", "LegBL", "LegBR" } do
 		add(pose, leg, tip(GRAZE_BODY * level))
 	end
-	add(pose, "Head", turn(sweep) * tip(-GRAZE_HEAD * level + nibble + 2.5 * math.abs(chew)) * roll(5 * chew))
+	add(
+		pose,
+		"Head",
+		CFrame.new(GRAZE_STRETCH * level * scale)
+			* turn(sweep)
+			* tip(-GRAZE_HEAD * level + nibble + 2.5 * math.abs(chew))
+			* roll(5 * chew)
+	)
 	add(pose, "EarL", roll(-14 * level))
 	add(pose, "EarR", roll(14 * level))
 	return level
