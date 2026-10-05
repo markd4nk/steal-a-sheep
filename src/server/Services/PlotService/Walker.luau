@@ -566,17 +566,17 @@ function Walker.Paint(pieces: Pieces, level: number?, ownerId: number?)
 		p:SetAttribute("OwnerId", ownerId)
 		p.Enabled = cost ~= nil
 	end
-	local next, coins, robux = "", "", ""
+	local next, cash, robux = "", "", ""
 	if level and not cost then
 		next = "MAX LEVEL"
 	elseif level and cost then
 		local offer = StairClimb.RobuxOffer(level)
-		next, coins, robux = `LV {shown + 1}`, `{Format.Short(cost)} coins`, `R$ {offer.Price}`
-		pieces.CoinPrompt.ObjectText = coins
+		next, cash, robux = `LV {shown + 1}`, `{Format.Short(cost)} cash`, `R$ {offer.Price}`
+		pieces.CoinPrompt.ObjectText = cash
 		pieces.RobuxPrompt.ObjectText = robux
 	end
 	for _, lines in pieces.SignLines do
-		lines[2].Text, lines[3].Text, lines[4].Text = next, coins, robux
+		lines[2].Text, lines[3].Text, lines[4].Text = next, cash, robux
 	end
 end
 

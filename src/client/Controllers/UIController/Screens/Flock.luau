@@ -141,10 +141,10 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			Style.SetBar(growthBar, sheep.Growth)
 		end
 		lines[2].Text = if sheep.Slot > 0
-			then (if sheep.Pinned then `In pen slot {sheep.Slot} (pinned)` else `In pen slot {sheep.Slot}`)
+			then (if sheep.Pinned then "In your pen (pinned)" else "In your pen")
 			else "Stored - not earning"
 		lines[3].Text = if sellMode
-			then `Sells for {Format.Short(sheep.Sell)} coins`
+			then `Sells for {Format.Short(sheep.Sell)} cash`
 			elseif sheep.Locked then "Locked: can't be sold or merged"
 			else ""
 		Buttons.Set(

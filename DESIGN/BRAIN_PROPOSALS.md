@@ -48,6 +48,41 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   slides of 200-260 down 12-29 degrees stayed on the floor (0 samples below it, 2 of 179 in the air), but anything they
   clip at 150+ stops them dead. Give a fast movement a short rise (here: reach the target in about 2 s) rather than a
   fixed acceleration, or high targets take ten seconds to reach." Seen 2026-10-05 playtesting Steal a Sheep's Climbing.
+- **S11** (`BRAIN/PATTERNS/sessions.md`, Studio is shared): "Every Studio window of one Roblox version reads the same
+  `content` folder, so a `GetObjects("rbxasset://...")` sync file there is shared between sessions: give yours a name of
+  its own (`content/<game>/<task>-sync.rbxm`), or another session's code can end up in your place." Seen 2026-10-05,
+  Steal a Sheep: three sessions each had their own Studio open on a place copy, one already using `sync.rbxm`.
+- **S12** (`BRAIN/PATTERNS/testing-studio.md`, screenshots and the camera): "A camera set from `execute_luau` on the
+  client is put back by Roblox's camera scripts the next frame, and `screen_capture`'s `camera_position` only lasts
+  for that capture. To hold a shot (a recording), bind a RenderStep at `Enum.RenderPriority.Last` that sets a
+  Scriptable camera every frame; unbind it and set `CameraType` back to Custom after." Seen 2026-10-05 filming
+  grazing sheep.
+- **S13** (`BRAIN/PATTERNS/leaderboards.md`, Store): "An OrderedDataStore holds whole numbers below 2^63, and an
+  exponential economy's numbers head past that (Steal a Sheep: a full pen at the top earns about 5e14 cash a second,
+  and its Climbing stat passes 1e15; Luau is exact only to 2^53 anyway). Store `math.floor(math.log10(1 + value) * 1e13)`
+  instead: the order holds, it stays under 2^53 up to 1e300, and `math.floor(10 ^ (stored / 1e13) - 1 + 0.5)` gives
+  whole numbers back exactly below about 2e12 and to twelve digits above." Seen 2026-10-05 building Steal a Sheep's
+  boards.
+- **S14** (`BRAIN/PATTERNS/ui.md`): "A map's board panel can be modelled lying on its side (its RightVector pointing
+  down), and a SurfaceGui on it then reads sideways; SurfaceGuis have no rotation. Put the GUI on an invisible
+  upright part just in front of the panel's face instead (`CFrame.lookAt(centre, centre + normal)`, sized from the
+  panel's extents along world up and across)." Seen 2026-10-05 on Steal a Sheep's commissioned map.
+- **S15** (`BRAIN/PATTERNS/desktop.md`): "The desktop tools' `record` saves its mp4 under the session's working
+  directory (`windows-computer-use/` in the repo): move it out before committing. With a window target its `region`
+  crop was ignored; crop afterwards with ffmpeg (`-vf crop=w:h:x:y`)." Seen 2026-10-05.
+- **S16** (`BRAIN/PATTERNS/animations.md`): "A Motor6D `Transform` set from a script moves its parts only at the next
+  simulation step: in a test, wait a frame (`task.wait()`) before reading the moved parts' positions." Seen 2026-10-05
+  measuring a grazing pose.
+- **S17** (`BRAIN/PATTERNS/components.md`): "A tagged model the server makes while players are in the game can reach
+  a client in pieces: `CollectionService`'s added signal (and a Binder's) fires for the model before all its
+  descendants have arrived. Code that collects a model's parts, joints or decals when its tag appears must also take
+  them from `DescendantAdded`, or it keeps a partial set for good." Seen 2026-10-05, Steal a Sheep: lambs put down in
+  the pen walked about stiff and never changed face in two takes of five; models made before the player joined were
+  never affected.
+- **S18** (`BRAIN/PATTERNS/testing-studio.md`): "A picture uploaded through `upload_image` reports
+  `AssetFetchStatus.Failure` until Roblox's review clears it (minutes), and a Studio that fetched it before then may go
+  on reporting Failure from `PreloadAsync` after it's cleared: check in a freshly opened Studio. In game code, swap in a
+  new picture only once it has arrived, or a Decal shows nothing meanwhile." Seen 2026-10-05.
 
 - **S11** (`BRAIN/PATTERNS/characters.md`, Posing from code): "To make a player's feet land on moving things (stair
   machines, treadmills, pedals), anchor the root and solve the legs yourself: after the Animator (`PreSimulation`), a

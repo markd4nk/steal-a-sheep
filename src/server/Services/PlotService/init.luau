@@ -4,14 +4,18 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Format = require(ReplicatedStorage.Utils.Format)
+local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
+local PenArea = require(ReplicatedStorage.Utils.PenArea)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Build = require(script.Build)
 local Walker = require(script.Walker)
 
 -- The map's five player plots (workspace.Base.PlayerPlots): one per player, first come first served, with the pieces
--- Build adds to each (pen pads, delivery pad, stair walker, sign). Players spawn inside their own plot's gate.
+-- Build adds to each (the pen, stair walker, sign). Players spawn inside their own plot's gate. Also answers where a
+-- sheep may stand in a pen: inside the fence, off the walker, clear of the map's trees and hay (the plot's decor stays
+-- where the map put it, and the sheep walk round it).
 local PlotService = {
 	Name = "PlotService",
 	PlotAssigned = Signal.new() :: Signal.Signal<Player, Plot>,
@@ -25,10 +29,53 @@ export type Plot = {
 	Owner: Player?,
 }
 
+local PATH_STEP = 1.5 -- studs between the keep-out checks along a stroll
+
 local registry: Lifecycle.Registry = {}
 local trove = Trove.new()
 local plots: { Plot } = {}
 local byPlayer: { [Player]: Plot } = {}
+local overlap = OverlapParams.new()
+overlap.FilterType = Enum.RaycastFilterType.Exclude
+overlap.RespectCanCollide = true
+local sweep = RaycastParams.new()
+sweep.FilterType = Enum.RaycastFilterType.Exclude
+sweep.RespectCanCollide = true
+
+-- What a sheep can't stand in or walk through: anything solid but the ground, the game's own sheep, gods, gates and
+-- plot pieces (the walker has its keep-out box), and players.
+local function refreshFilters()
+	local skip: { Instance } = {}
+	local base = workspace:FindFirstChild("Base")
+	local ground = base and base:FindFirstChild("Terrain")
+	if ground then
+		table.insert(skip, ground)
+	end
+	for _, name in { "Plots", "PenSheep", "WildSheep", "CarriedSheep", "Gods", "ClimbGates", "Stations" } do
+		local folder = workspace:FindFirstChild(name)
+		if folder then
+			table.insert(skip, folder)
+		end
+	end
+	for _, player in Players:GetPlayers() do
+		if player.Character then
+			table.insert(skip, player.Character)
+		end
+	end
+	overlap.FilterDescendantsInstances = skip
+	sweep.FilterDescendantsInstances = skip
+end
+
+local function inKeepout(plot: Plot, position: Vector3, radius: number): boolean
+	for _, box in plot.Pieces.Keepouts do
+		local offset = box.CFrame:PointToObjectSpace(position)
+		local half = box.Size / 2
+		if math.abs(offset.X) <= half.X + radius and math.abs(offset.Z) <= half.Z + radius then
+			return true
+		end
+	end
+	return false
+end
 
 local function setSign(plot: Plot)
 	local owner = plot.Owner
@@ -44,6 +91,7 @@ local function spawnAt(player: Player, character: Model)
 	-- After the character's own spawn placement.
 	task.defer(function()
 		if character.Parent and byPlayer[player] == plot then
+			registry.MountainService:Teleported(player, plot.Pieces.Spawn.Position.X)
 			character:PivotTo(plot.Pieces.Spawn)
 		end
 	end)
@@ -76,7 +124,6 @@ local function release(player: Player)
 		byPlayer[player] = nil
 		plot.Owner = nil
 		setSign(plot)
-		Build.PaintPads(plot.Pieces.Pads, 0)
 		Walker.Paint(plot.Pieces.Walker, nil, nil)
 	end
 end
@@ -109,7 +156,6 @@ function PlotService.Start(_self: any)
 	for index, model in models do
 		local pieces, origin = Build.Plot(index, model, folder)
 		local plot: Plot = { Index = index, Model = model, Origin = origin, Pieces = pieces, Owner = nil }
-		Build.PaintPads(pieces.Pads, 0)
 		Walker.Paint(pieces.Walker, nil, nil)
 		setSign(plot)
 		table.insert(plots, plot)
@@ -141,22 +187,71 @@ function PlotService.Plots(_self: any): { Plot }
 	return plots
 end
 
--- Where a pen slot's sheep stands, facing the gate.
-function PlotService.SlotCFrame(_self: any, plot: Plot, slot: number): CFrame?
-	local pad = plot.Pieces.Pads[slot]
-	if not pad then
-		return nil
+-- The plot whose pen `position` is in (`margin` studs inside its fence; negative reaches past it), or nil.
+function PlotService.PenAt(_self: any, position: Vector3, margin: number): Plot?
+	for _, plot in plots do
+		if PenArea.Contains(plot.Pieces.Pen, position, margin) then
+			return plot
+		end
 	end
-	return CFrame.new(pad.Position + Vector3.new(0, pad.Size.Y / 2, 0))
-		* CFrame.Angles(0, math.rad(-90 + (slot * 37) % 21 - 10), 0)
+	return nil
 end
 
-function PlotService.Refresh(_self: any, player: Player, penSlots: number, walkerLevel: number, income: number)
+-- A spot on the plot's floor, from studs off its middle (+X towards the gate), and back.
+function PlotService.ToWorld(_self: any, plot: Plot, x: number, z: number): Vector3
+	return plot.Origin:PointToWorldSpace(Vector3.new(x, 0, z))
+end
+
+function PlotService.ToLocal(_self: any, plot: Plot, position: Vector3): (number, number)
+	local offset = plot.Origin:PointToObjectSpace(position)
+	return offset.X, offset.Z
+end
+
+-- The nearest point on the plot's floor to `position` that's at least `margin` inside the fence.
+function PlotService.ClampToPen(_self: any, plot: Plot, position: Vector3, margin: number): Vector3
+	local inside = PenArea.Clamp(plot.Pieces.Pen, position, margin)
+	return Vector3.new(inside.X, plot.Origin.Y, inside.Z)
+end
+
+-- Whether a sheep `radius` studs round could stand at `position` (its feet, on the plot's floor): inside the fence by
+-- WanderFenceGap, off the walker and clear of anything solid.
+function PlotService.CanStand(_self: any, plot: Plot, position: Vector3, radius: number): boolean
+	if not PenArea.Contains(plot.Pieces.Pen, position, GameConfig.SheepMotion.WanderFenceGap + radius) then
+		return false
+	end
+	if inKeepout(plot, position, radius) then
+		return false
+	end
+	refreshFilters()
+	local height = radius * 2
+	local box = CFrame.new(position + Vector3.new(0, 0.4 + height / 2, 0))
+	return #workspace:GetPartBoundsInBox(box, Vector3.new(radius * 2, height, radius * 2), overlap) == 0
+end
+
+-- Whether a sheep `radius` studs round can walk straight from `from` to `to` (both on the floor) without going
+-- through the walker or anything solid.
+function PlotService.PathClear(_self: any, plot: Plot, from: Vector3, to: Vector3, radius: number): boolean
+	local flat = Vector3.new(to.X - from.X, 0, to.Z - from.Z)
+	local length = flat.Magnitude
+	if length < 0.05 then
+		return true
+	end
+	for step = 1, math.ceil(length / PATH_STEP) do
+		local along = from + flat * math.min(step * PATH_STEP / length, 1)
+		if inKeepout(plot, along, radius) then
+			return false
+		end
+	end
+	refreshFilters()
+	local lift = Vector3.new(0, radius + 0.4, 0)
+	return workspace:Spherecast(from + lift, radius, flat, sweep) == nil
+end
+
+function PlotService.Refresh(_self: any, player: Player, walkerLevel: number, income: number)
 	local plot = byPlayer[player]
 	if not plot then
 		return
 	end
-	Build.PaintPads(plot.Pieces.Pads, penSlots)
 	Walker.Paint(plot.Pieces.Walker, walkerLevel, player.UserId)
 	plot.Pieces.SignIncome.Text = if income > 0 then `+{Format.Rate(income)}/s` else ""
 end
@@ -180,6 +275,7 @@ function PlotService.SendHome(_self: any, player: Player)
 	local plot = byPlayer[player]
 	local character = player.Character
 	if plot and character then
+		registry.MountainService:Teleported(player, plot.Pieces.Spawn.Position.X)
 		character:PivotTo(plot.Pieces.Spawn)
 	end
 end

@@ -20,6 +20,42 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
 
+## Pens in this session's own Studio (2026-10-05)
+
+- **Own place copy**: with other sessions each in their own Studio and main's mid-playtest, `rojo build
+  default.project.json --output build/game.rbxl` then `lune run tools/assemble.luau 'vvs_map(commission) (1).rbxl'
+  assets/ShearASheepAssets.rbxm build/game.rbxl build/PenPlaytest.rbxl`, opened with `RobloxStudioBeta.exe <path>`, and
+  addressed only by its MCP name. Code updates: `rojo build tools/sync.project.json` into the Studio version's
+  `content/sas/pens-sync.rbxm` (a name of its own: other sessions write `sync.rbxm` there), then the GetObjects swap in
+  Edit.
+- **A theft in one command**: `Debug:Invoke("Steal", tier)`, then `character:PivotTo` into your plot and
+  `Remotes.PutDown:Fire()` in the same `execute_luau` (left standing at the pasture between commands, the god catches
+  you). `Debug UnlockAll` first for tiers above 1. Look for the prompt by name (`PutDownPrompt`): the carried lamb
+  still holds its disabled `StealPrompt`.
+- **Poses held still**: clone a pen sheep on the client, `RemoveTag(clone, "Sheep")` so AnimController leaves it alone,
+  set its Motor6D `Transform`s from `SheepClips` and wait a frame before reading part positions. Ground in the plots is
+  y 59.46; the graze puts the head's lowest corner at 59.56 on a Standard adult.
+- **Filming**: `screen_capture`'s `camera_position` is temporary. To hold a camera for `windows-computer-use` `record`,
+  bind a RenderStep at `Enum.RenderPriority.Last` that sets a Scriptable camera, hide the ScreenGuis, and undo both
+  after. The recorder writes its mp4 into the repo (`windows-computer-use/`): move it out; crop the game view with
+  ffmpeg. To film a face, follow the sheep's front each frame (`pivot + LookVector * 5 * scale`), finding the model by
+  its `SheepId` (a lamb that grows up is rebuilt as a new model).
+- **Face art before it's uploaded**: copy the PNGs into the Studio version's `content/sas-pens/faces/`, and in Edit
+  point the place's own `GameConfig` Source at them (`MunchA = "rbxasset://sas-pens/faces/MunchA.png"`, `ChewFaces`);
+  only that Studio sees them. Put the Source back after (compare its length with the file on disk).
+- **Lambs grow up during a take**: a lamb is grown after 45 + 15 x (tier - 1) seconds in the pen (tier 2: a minute),
+  and grown sheep graze far less. Film a tier 8+ lamb (150 s or more), or film soon after putting it down.
+- **Is a sheep animating?** Log its `Head.Face.Texture` every RenderStepped for 20-30 s (and its `Spot` changes): a
+  grazing lamb shows the chew frames about a third of the time, blinks every few seconds and baas now and then. Part
+  positions read from a script don't show the animation (AnimController puts the joints back after each step).
+- **Uploading pictures**: the Studio MCP's `upload_image` needs a Studio with a place open; serve the PNGs with
+  `python -m http.server <free port> --bind 127.0.0.1` and stop it after. A new picture fails to load until Roblox's
+  review clears it (a few minutes); a Studio that tried before then may keep reporting Failure, so check in a freshly
+  opened Studio, or draw it in an ImageLabel (`IsLoaded`).
+- **Closing your Studio**: other sessions' "Save changes to ...?" dialogs look the same as yours. `window list` with
+  `details`, screenshot the dialog by its `hwnd`, `focus` that hwnd, then click Don't Save. Close the old window
+  before opening a rebuilt copy of the same file, or its save prompt meets "file in use".
+
 ## High Olympus in an open Studio (2026-10-05)
 
 - **Preview the map**: `lune run tools/preview-upper-mountain.luau "<Studio version folder>/content"`, then in Edit:
@@ -67,6 +103,17 @@ Useful measurements:
   playtest after using it. The world and ViewportFrames only render in captures while the Studio window isn't
   minimized.
 
+## Leaderboards (2026-10-05)
+
+- In an unpublished place the boards rank the players in the playtest only and say "This server". A new save is 0 in
+  everything, so a board reads "No one yet" until the debug panel adds Climbing or sheep (`GiveSheep` gives
+  income and counts as a steal); boards redraw every 5 s. Selling through `Remotes.FlockAction:Invoke("Sell", id)`
+  checks This Server drops while Top Income keeps the best.
+- To see full boards, set rows 2-10's `Visible`, `PlayerName.Text`, `Value.Text` and `Picture.Image` from a Client
+  `execute_luau` (`workspace.Base.Leaderboard.<model>.<Id>Board.Screen.Back.Row<n>`): the server leaves rows it
+  hides alone, so they stay until Stop. Hold the camera with a RenderStep bound after `RenderPriority.Last` (setting
+  it once is undone by the camera scripts), and unbind it after.
+
 ## Climbing playtest (2026-10-05)
 
 - **Swap a branch's scripts into the open place**: `rojo build tools/sync.project.json` into the Studio version's
@@ -81,3 +128,9 @@ Useful measurements:
 - **Measured**: uphill on tier 3 (sign 800): 1.0 studs/s at 0 Climbing, 4.4 at 200, 17.6 along x at 800. Tier 3
   chases (god 25.6): 200 caught in 7 s; 800 with a 1.03 lamb escaped in 29 s, god 39 studs behind; 3,200 in 15 s at
   50.7. At 1e9: 126 on the plots (7x cap), 245 uphill on tiers 1-2, slides of 200-260 on the floor.
+- **Steal a dropped lamb from the MCP**: walk within 10 studs and stop first (at high Climbing the walk overshoots),
+  then `prompt:InputHoldBegin()`, wait past HoldSeconds, `InputHoldEnd()`. Do it inside DropSeconds (30): a slow test
+  script finds the lamb already back in its pasture.
+- **Economy simulation**: an efficient player model (walker, pens, trails, trips timed from `Mountain.SpeedAt` and
+  `Economy.EscapeSpeed`) lived in a throwaway script; its results are in HISTORY.md (Climbing). Rebuild it from
+  Economy and Olympus if the economy changes.

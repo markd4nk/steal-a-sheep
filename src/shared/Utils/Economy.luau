@@ -16,9 +16,13 @@ export type Sheep = {
 	Grown: number, -- seconds it has grown (only while it's in a pen slot)
 	Rank: number, -- merge rank, 0 to 2
 	Locked: boolean,
-	Slot: number, -- its pen slot, 0 when stored
-	Pinned: boolean, -- kept in its slot by Equip Best
+	Slot: number, -- its place in the pen (1 to PenSlots: it stands in the plot and earns), 0 when stored
+	Pinned: boolean, -- kept in the pen by Equip Best
 	Tutorial: boolean?, -- the first lamb, which grows faster
+	-- Where it was put down, in studs from its owner's plot's middle (+X towards the gate): it roams round this spot.
+	-- Nil until it's been put down; such a sheep gets a free spot in the pen.
+	HomeX: number?,
+	HomeZ: number?,
 }
 
 export type Rarity = { Name: string, Multiplier: number, Chance: number, Color: Color3 }
@@ -69,8 +73,10 @@ Economy.SellSeconds = 15
 Economy.DexRewardSeconds = 30
 Economy.TutorialCoins = 60
 Economy.TutorialClimb = 25
-Economy.StartPens = 3
-Economy.MaxPens = 12
+-- How many sheep the pen holds: 8 to start, bought one at a time up to 20 (the user, 2026-10-05: like Steal a
+-- Brainrot's base, and very expensive to grow).
+Economy.StartPens = 8
+Economy.MaxPens = 20
 Economy.MergeAfterDeliveries = 3
 Economy.GodShare = 0.8 -- a god's set speed, as a share of its tier's SlideSpeed
 Economy.SafeZoneCap = 7 -- the most times normal speed anyone walks below the safety line
@@ -311,12 +317,12 @@ function Economy.WalkerRate(level: number): number
 	return Economy.WalkerRates[math.clamp(level, 0, Economy.MaxWalker) + 1]
 end
 
--- Pen slot n (4 to 12): round(300 x 2.5^(n - 4)).
+-- Room for sheep n (9 to 20): round(25,000 x 6^(n - 9)): 25K, 150K, 900K, 5.4M ... about 9 trillion for the 20th.
 function Economy.PenCost(slot: number): number?
-	if slot > Economy.MaxPens then
+	if slot > Economy.MaxPens or slot <= Economy.StartPens then
 		return nil
 	end
-	return Economy.Round(300 * 2.5 ^ (slot - 4))
+	return Economy.Round(25000 * 6 ^ (slot - 9))
 end
 
 function Economy.Trail(id: string?): Trail?

@@ -75,7 +75,7 @@ function Popup.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		celebrate(if size == "Standard" then "Grown up!" else `{string.upper(size)}!`, name)
 	end))
 	trove:Add(stateController.Offline:Connect(function(coins: number, matured: number)
-		coinsLabel.Text = `+{Format.Short(coins)} coins`
+		coinsLabel.Text = `+{Format.Short(coins)} cash`
 		detailLabel.Text = if matured > 0
 			then `{matured} lambs grew up while you were away`
 			else "Your flock kept earning"

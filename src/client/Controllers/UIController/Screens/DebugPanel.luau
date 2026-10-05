@@ -20,8 +20,8 @@ type Button = {
 }
 
 local BUTTONS: { Button } = {
-	{ Text = "Coins +1,000", Command = "AddCash", Value = 1000 },
-	{ Text = "Coins +100,000", Command = "AddCash", Value = 100000 },
+	{ Text = "Cash +1,000", Command = "AddCash", Value = 1000 },
+	{ Text = "Cash +100,000", Command = "AddCash", Value = 100000 },
 	{ Text = "Climbing +100", Command = "AddClimb", Value = 100 },
 	{ Text = "Climbing +10,000", Command = "AddClimb", Value = 10000 },
 	{ Text = "Steal from tier (id)", Command = "Steal", UsesId = true },

@@ -16,7 +16,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- Coin purchases (the next stair walker level, the next pen slot, trails in order) and the hub's three stations: the
 -- map's two stalls become the Shop and the Sell Stall, and the Merge Shrine stands between them. A station's prompt
 -- carries an Opens attribute; the client opens that screen (PromptController). Trails train faster and show on the
--- player as a coloured trail. Each stair walker's sign upgrades it straight away, for coins or Robux (a developer
+-- player as a coloured trail. Each stair walker's sign upgrades it straight away, for cash or Robux (a developer
 -- product per price, PurchaseService/Products).
 local ShopService = { Name = "ShopService" }
 
@@ -157,7 +157,7 @@ local function buy(player: Player, item: string, which: string?): (boolean, stri
 			return false, "Your stair walker is maxed"
 		end
 		if not registry.DataService:AdjustCoins(player, -cost) then
-			return false, `Need {Format.Short(cost - data.Coins)} more coins`
+			return false, `Need {Format.Short(cost - data.Coins)} more cash`
 		end
 		data.WalkerLevel += 1
 		registry.DataService:Replicate(player)
@@ -171,7 +171,7 @@ local function buy(player: Player, item: string, which: string?): (boolean, stri
 			return false, "Your pen is as big as it gets"
 		end
 		if not registry.DataService:AdjustCoins(player, -cost) then
-			return false, `Need {Format.Short(cost - data.Coins)} more coins`
+			return false, `Need {Format.Short(cost - data.Coins)} more cash`
 		end
 		data.PenSlots = slot
 		registry.DataService:Replicate(player)
@@ -191,7 +191,7 @@ local function buy(player: Player, item: string, which: string?): (boolean, stri
 				return false, `Buy the {previous.Name} first`
 			end
 			if not registry.DataService:AdjustCoins(player, -trail.Cost) then
-				return false, `Need {Format.Short(trail.Cost - data.Coins)} more coins`
+				return false, `Need {Format.Short(trail.Cost - data.Coins)} more cash`
 			end
 			data.Trails[trail.Id] = true
 			data.Trail = trail.Id
