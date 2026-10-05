@@ -17,132 +17,164 @@ local Panel = require(script.Parent.Parent.Panel)
 local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
--- The free gift, in the Shop's look (a Prize Fleece menu): the gift on a stage beside what it gives, the two steps
--- (like the game, favorite it) each with a picture of the button to press on the game's page, and Claim. Claim opens
--- Roblox's own favorite prompt and claims once that says yes. No game can see a like, so the like is asked, not
--- checked. Opens by itself once a session until it's claimed (GameConfig.Gift).
+-- The free gift, in the Shop's look (a Prize Fleece menu): what it gives, big on a stage of rays; the two steps (like
+-- the game, favorite it), each a picture of Roblox's own game page with the button to tap lit up; and Claim. Claim (or
+-- tapping the favorite step) opens Roblox's favorite prompt and claims once that says yes. No game can see a like, so
+-- the like is asked, not checked. Opens by itself once a session until it's claimed (GameConfig.Gift).
 local Gift = {}
 
 local Color = Theme.Color
 local ACCENT = "Lab"
-local TOP_HEIGHT = 110
-local STEP_HEIGHT = 104
-local REWARD_TEXT = 34
+local SPLIT_PRIZE = false
+local PANEL_HEIGHT = 470
+local PRIZE_HEIGHT = 96
+local AMOUNT_TEXT = 44
+-- The game page's buttons with the one to tap lit up (build/gift-art, from roblox.com in its dark theme). Studio-only
+-- files until they're uploaded.
+local LIKE_PICTURE = "rbxasset://sas/gift-like-2.png"
+local FAVORITE_PICTURE = "rbxasset://sas/gift-fav-2.png"
+local PICTURE_ASPECT = 912 / 376
 
-local function reward(parent: Instance, name: string, icon: string, labelName: string, color: Color3, order: number)
-	local line = UIKit.Frame(parent, name, UDim2.fromOffset(0, 48))
-	line.AutomaticSize = Enum.AutomaticSize.X
-	line.LayoutOrder = order
-	UIKit.List(line, true, 8)
-	UIKit.Icon(line, "Icon", icon, 46)
-	local label = UIKit.Text(line, labelName, "", REWARD_TEXT, color, UDim2.fromOffset(0, 44), {
+-- One reward: its picture, then the amount (`labelName`) over what it is.
+local function reward(parent: Instance, name: string, icon: string, labelName: string, color: Color3, word: string)
+	local holder = UIKit.Frame(parent, name, UDim2.fromOffset(0, PRIZE_HEIGHT))
+	holder.AutomaticSize = Enum.AutomaticSize.X
+	UIKit.List(holder, true, 6)
+	UIKit.Icon(holder, "Icon", icon, 74)
+	local column = UIKit.Frame(holder, "Column", UDim2.fromOffset(0, 74))
+	column.AutomaticSize = Enum.AutomaticSize.X
+	column.LayoutOrder = 1
+	UIKit.List(column, false, -8).VerticalAlignment = Enum.VerticalAlignment.Center
+	local amount = UIKit.Text(column, labelName, "", AMOUNT_TEXT, color, UDim2.fromOffset(0, AMOUNT_TEXT + 6), {
+		Stroke = Color.Line,
+		Auto = Enum.AutomaticSize.X,
+		AlignX = Enum.TextXAlignment.Left,
+		Order = 1,
+	})
+	local stroke = amount:FindFirstChild("TextStroke")
+	if stroke and stroke:IsA("UIStroke") then
+		stroke.Thickness = 4.5
+	end
+	UIKit.Text(column, "WordLabel", word, 20, Color.Snow, UDim2.fromOffset(0, 24), {
+		Stroke = Color.Line,
+		Auto = Enum.AutomaticSize.X,
+		AlignX = Enum.TextXAlignment.Left,
+		Order = 2,
+	})
+	return holder
+end
+
+-- A stage of rays (UIKit.Stage, its own picture unused) with its rewards in a row across the middle (Line).
+local function prize(parent: Instance, name: string, size: UDim2, order: number, look: string?, accent: string?): Frame
+	local stage = UIKit.Stage(parent, name, size, 10)
+	stage.LayoutOrder = order
+	Style.PaintStage(stage, look, accent)
+	local picture = stage:FindFirstChild("Picture")
+	if picture and picture:IsA("GuiObject") then
+		picture.Visible = false
+	end
+	local line = UIKit.Frame(stage, "Line", UDim2.fromScale(1, 1))
+	line.ZIndex = 2
+	UIKit.List(line, true, 14, Enum.HorizontalAlignment.Center)
+	return line
+end
+
+-- A step: its number and title, the game page's picture (Picture, a check on its corner once done), and one line.
+local function step(parent: Instance, name: string, number: string, title: string, picture: string, line: string)
+	local tile = UIKit.Tile(parent, name, UDim2.new(0.5, -6, 1, 0))
+	tile.LayoutOrder = tonumber(number) or 0
+	UIKit.Padding(tile, 10, 10, 8, 8)
+	UIKit.List(tile, false, 6, Enum.HorizontalAlignment.Center)
+	local head = UIKit.Frame(tile, "Head", UDim2.fromOffset(0, 30))
+	head.AutomaticSize = Enum.AutomaticSize.X
+	head.LayoutOrder = 1
+	UIKit.List(head, true, 8)
+	local accent = UIKit.Accent(ACCENT)
+	local disc = UIKit.Frame(head, "Number", UDim2.fromOffset(28, 28), accent.Base)
+	UIKit.Corner(disc)
+	UIKit.Surface(disc, accent.Lo, 2, Color.Line, Theme.Line.Normal)
+	UIKit.Text(disc, "Label", number, 18, Color.Snow, UDim2.fromScale(1, 1), { Stroke = Color.Line })
+	UIKit.Text(head, "TitleLabel", title, 22, Color.Snow, UDim2.fromOffset(0, 30), {
 		Stroke = Color.Line,
 		Auto = Enum.AutomaticSize.X,
 		Order = 1,
 	})
-	local stroke = label:FindFirstChild("TextStroke")
-	if stroke and stroke:IsA("UIStroke") then
-		stroke.Thickness = 4
-	end
-end
-
--- A red pointer at the button to press (UIKit.Pointer is drawn pointing down; -90 points it right).
-local function pointer(parent: Instance, position: UDim2)
-	local arrow = UIKit.Pointer(parent, "Pointer", 34, Color.Red500)
-	arrow.AnchorPoint = Vector2.new(0.5, 0.5)
-	arrow.Position = position
-	arrow.Rotation = -90
-	arrow.ZIndex = 4
-end
-
--- A step: its title over a dark well holding the picture (Picture), with a check (Done) at its right once it's done.
-local function step(parent: Instance, name: string, title: string, order: number): Frame
-	local tile = UIKit.Tile(parent, name, UDim2.new(0.5, -6, 1, 0))
-	tile.LayoutOrder = order
-	UIKit.Padding(tile, 10, 10, 6, 10)
-	UIKit.List(tile, false, 4, Enum.HorizontalAlignment.Center)
-	UIKit.Text(tile, "TitleLabel", title, 20, Color.Snow, UDim2.new(1, 0, 0, 26), {
-		Stroke = Color.Line,
-		Fit = true,
-		Order = 1,
-	})
-	local well = UIKit.Well(tile, "Picture", UDim2.new(1, 0, 1, -30))
-	well.LayoutOrder = 2
-	local done = UIKit.Icon(well, "Done", Theme.Icons.HudCheck, 34)
+	local shot = UIKit.Icon(tile, "Picture", picture, 100)
+	shot.LayoutOrder = 2
+	shot.Size = UDim2.fromScale(1, 1)
+	shot.ScaleType = Enum.ScaleType.Stretch
+	UIKit.Grow(shot)
+	local aspect = Instance.new("UIAspectRatioConstraint")
+	aspect.AspectRatio = PICTURE_ASPECT
+	aspect.Parent = shot
+	UIKit.Corner(shot, 10)
+	local edge = Instance.new("UIStroke")
+	edge.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	edge.Color = Color.Line
+	edge.Thickness = Theme.Line.Normal
+	edge.Parent = shot
+	local done = UIKit.Icon(shot, "Done", Theme.Icons.HudCheck, 40)
 	done.AnchorPoint = Vector2.new(0.5, 0.5)
-	done.Position = UDim2.new(1, -24, 0.5, 0)
+	done.Position = UDim2.new(1, -6, 0, 6)
 	done.ZIndex = 5
 	done.Visible = false
-	return well
-end
-
--- The game page's vote buttons: a thumb up, the bar, a thumb down; the pointer at the thumb up.
-local function likePicture(well: Frame)
-	local row = UIKit.Frame(well, "Row", UDim2.fromScale(1, 1))
-	UIKit.List(row, true, 8, Enum.HorizontalAlignment.Center)
-	UIKit.Text(row, "Up", "👍", 34, Color.Snow, UDim2.fromOffset(40, 44), { Order = 1 })
-	local bar = UIKit.Frame(row, "Bar", UDim2.fromOffset(60, 7), Color.Snow)
-	bar.LayoutOrder = 2
-	bar.BackgroundTransparency = 0.55
-	UIKit.Corner(bar)
-	local filled = UIKit.Frame(bar, "Fill", UDim2.fromScale(0.85, 1), Color.Snow)
-	UIKit.Corner(filled)
-	UIKit.Text(row, "Down", "👎", 34, Color.Snow, UDim2.fromOffset(40, 44), { Order = 3 }).TextTransparency = 0.5
-	pointer(well, UDim2.new(0.5, -100, 0.5, 0))
-end
-
--- The game page's Favorite button: the star over its word; the pointer at it.
-local function favoritePicture(well: Frame)
-	local button = UIKit.Frame(well, "Button", UDim2.fromOffset(90, 58))
-	button.AnchorPoint = Vector2.new(0.5, 0.5)
-	button.Position = UDim2.fromScale(0.5, 0.5)
-	UIKit.List(button, false, 0, Enum.HorizontalAlignment.Center).VerticalAlignment = Enum.VerticalAlignment.Center
-	UIKit.TintedIcon(button, "Star", "Star", 42, Color.Snow).LayoutOrder = 1
-	UIKit.Text(button, "Word", "Favorite", 16, Color.Snow, UDim2.fromOffset(90, 18), {
+	UIKit.Text(tile, "LineLabel", line, 16, Theme.Fleece.Muted, UDim2.new(1, 0, 0, 20), {
 		Font = Theme.Font.TextHeavy,
-		Order = 2,
+		Fit = true,
+		Order = 3,
 	})
-	pointer(well, UDim2.new(0.5, -66, 0.5, 0))
+	return shot
 end
 
 function Gift.Build(playerGui: Instance): ScreenGui
 	local gui, window = UIKit.MenuGui("Gift", "Day", "Free Gift!", nil, false, nil, {
 		Accent = ACCENT,
 		Badge = Theme.Icons.MenuGift,
-		Size = "Medium",
+		Size = "Large",
 	})
+	window:SetAttribute("PanelHeight", PANEL_HEIGHT)
 	-- The gift is about what it gives, not the balance: no cash chip in this header.
 	local cash = window:FindFirstChild("CashChip", true)
 	if cash and cash:IsA("GuiObject") then
 		cash.Visible = false
 	end
 	local page = window:FindFirstChild("Pages") :: Frame
-	local layout = UIKit.List(page, false, 10, Enum.HorizontalAlignment.Center)
-	layout.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIKit.List(page, false, 10, Enum.HorizontalAlignment.Center)
 
-	local top = UIKit.Frame(page, "Top", UDim2.new(1, 0, 0, TOP_HEIGHT))
-	top.LayoutOrder = 1
-	UIKit.List(top, true, 12)
-	local stage = UIKit.Stage(top, "Stage", UDim2.fromOffset(150, TOP_HEIGHT), 100)
-	stage.LayoutOrder = 1
-	Style.PaintStage(stage, nil, ACCENT)
-	local picture = stage:FindFirstChild("Picture") :: ImageLabel
-	picture.Image = Theme.Icons.MenuGift
-	picture.Position = UDim2.fromScale(0.5, 0.5)
-	local rewards = UIKit.Frame(top, "Rewards", UDim2.new(1, -162, 1, 0))
-	rewards.LayoutOrder = 2
-	UIKit.Grow(rewards)
-	UIKit.List(rewards, false, 2, Enum.HorizontalAlignment.Center).VerticalAlignment = Enum.VerticalAlignment.Center
-	reward(rewards, "ClimbLine", Theme.Icons.HudShoe, "ClimbLabel", Color.Gold300, 1)
-	reward(rewards, "CoinLine", Theme.Icons.HudCash, "CoinLabel", Color.Lime, 2)
+	local prizes = UIKit.Frame(page, "Prizes", UDim2.new(1, 0, 0, PRIZE_HEIGHT))
+	prizes.LayoutOrder = 1
+	if SPLIT_PRIZE then
+		UIKit.List(prizes, true, 12)
+		local climb = prize(prizes, "ClimbPrize", UDim2.new(0.5, -6, 1, 0), 1, "Legendary", nil)
+		reward(climb, "ClimbReward", Theme.Icons.HudShoe, "ClimbLabel", Color.Gold300, "CLIMBING")
+		local coins = prize(prizes, "CoinPrize", UDim2.new(0.5, -6, 1, 0), 2, "Uncommon", nil)
+		reward(coins, "CoinReward", Theme.Icons.HudCash, "CoinLabel", Color.Lime, "COINS")
+	else
+		local line = prize(prizes, "Prize", UDim2.fromScale(1, 1), 1, nil, ACCENT)
+		reward(line, "ClimbReward", Theme.Icons.HudShoe, "ClimbLabel", Color.Gold300, "CLIMBING").LayoutOrder = 1
+		UIKit.Text(line, "Plus", "+", 40, Color.Snow, UDim2.fromOffset(30, PRIZE_HEIGHT), {
+			Stroke = Color.Line,
+			Order = 2,
+		})
+		reward(line, "CoinReward", Theme.Icons.HudCash, "CoinLabel", Color.Lime, "COINS").LayoutOrder = 3
+	end
 
-	local steps = UIKit.Frame(page, "Steps", UDim2.new(1, 0, 0, STEP_HEIGHT))
+	local steps = UIKit.Frame(page, "Steps", UDim2.fromScale(1, 0))
 	steps.LayoutOrder = 2
+	UIKit.Grow(steps)
 	UIKit.List(steps, true, 12)
-	likePicture(step(steps, "LikeStep", "1. Like the game!", 1))
-	favoritePicture(step(steps, "FavoriteStep", "2. Favorite the game!", 2))
+	step(steps, "LikeStep", "1", "Like the game", LIKE_PICTURE, "Tap 👍 on the game's page")
+	local favorite =
+		step(steps, "FavoriteStep", "2", "Favorite the game", FAVORITE_PICTURE, "Tap here, or ⭐ on its page")
+	local tap = Instance.new("TextButton")
+	tap.Name = "FavoriteButton"
+	tap.Text = ""
+	tap.BackgroundTransparency = 1
+	tap.Size = UDim2.fromScale(1, 1)
+	tap.ZIndex = 6
+	tap.Parent = favorite
 
-	local claim = UIKit.Button(page, "ClaimButton", "Buy", 260, Theme.ButtonHeight.Hero, "Claim!")
+	local claim = UIKit.Button(page, "ClaimButton", "Buy", 280, Theme.ButtonHeight.Hero, "Claim!")
 	claim.LayoutOrder = 3
 	UIKit.LightText(window)
 	gui.Parent = playerGui
@@ -161,13 +193,14 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local claimButton = window:FindFirstChild("ClaimButton", true) :: TextButton
 	local favoriteStep = window:FindFirstChild("FavoriteStep", true) :: Frame
 	local favoriteDone = favoriteStep:FindFirstChild("Done", true) :: ImageLabel
+	local favoriteButton = favoriteStep:FindFirstChild("FavoriteButton", true) :: TextButton
 	local busy = false
 	local favorited = false
 
 	local function refresh()
 		local data = stateController:Get()
-		climbLabel.Text = `+{Format.Short(data.GiftClimb or Economy.GiftClimb)} Climbing`
-		coinLabel.Text = `+{Format.Short(data.GiftCoins or Economy.GiftCoins)} Coins`
+		climbLabel.Text = `+{Format.Short(data.GiftClimb or Economy.GiftClimb)}`
+		coinLabel.Text = `+{Format.Short(data.GiftCoins or Economy.GiftCoins)}`
 		favoriteDone.Visible = favorited
 		if data.FreeGift == true then
 			Buttons.Set(claimButton, "Owned", "Claimed")
@@ -236,6 +269,19 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end
 
 	trove:Connect(claimButton.Activated, claim)
+	trove:Connect(favoriteButton.Activated, function()
+		if busy or favorited then
+			return
+		end
+		busy = true
+		favorited = favorite()
+		busy = false
+		refresh()
+		if favorited then
+			panel.Status("Favorited! Now claim your gift", "Good")
+			sound:Play("StepDone")
+		end
+	end)
 	if panel.CloseButton then
 		trove:Connect(panel.CloseButton.Activated, function()
 			context.Close("Gift")
