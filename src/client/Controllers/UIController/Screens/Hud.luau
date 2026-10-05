@@ -362,7 +362,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			}
 		end
 		if data.Tutorial == 0 then
-			return { Title = "Steal Demeter's lamb", Sub = "Hold E next to it", Target = tutorialLamb() or pasture(1) }
+			return { Title = `Steal {Olympus.Tiers[1].God}'s lamb`, Sub = "Hold E next to it", Target = tutorialLamb() or pasture(1) }
 		end
 		if data.Tutorial == 1 then
 			local walker = plotPiece("Zone")

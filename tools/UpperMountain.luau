@@ -38,23 +38,23 @@ export type Section = {
 
 -- The stretches in climbing order: tier, god, area, grade.
 local STRETCHES: { { any } } = {
-	{ 13, "Iris", "Rainbow Bridge", 32 },
-	{ 14, "Pan", "Wild Grove", 33 },
-	{ 15, "Hebe", "Ambrosia Orchard", 34 },
-	{ 16, "Eros", "Heart Garden", 36 },
-	{ 17, "Tyche", "Fortune Terraces", 37 },
-	{ 18, "Asclepius", "Healing Springs", 38 },
-	{ 19, "Eris", "Discord Rift", 39 },
-	{ 20, "Hecate", "Torchlit Crossroads", 40 },
-	{ 21, "Hypnos", "Poppy Fields", 41 },
-	{ 22, "Morpheus", "Dream Steps", 43 },
-	{ 23, "Phobos", "Fear Moon", 44 },
-	{ 24, "Deimos", "Dread Moon", 45 },
-	{ 25, "Thanatos", "Asphodel Meadow", 46 },
-	{ 26, "Nemesis", "Reckoning Ridge", 47 },
-	{ 27, "Themis", "Court of Justice", 48 },
-	{ 28, "Nike", "Victory Stair", 49 },
-	{ 29, "Hestia", "Eternal Hearth", 51 },
+	{ 13, "Hypnos", "Poppy Fields", 32 },
+	{ 14, "Morpheus", "Dream Steps", 33 },
+	{ 15, "Deimos", "Dread Moon", 34 },
+	{ 16, "Thanatos", "Asphodel Meadow", 36 },
+	{ 17, "Nemesis", "Reckoning Ridge", 37 },
+	{ 18, "Dionysus", "Vineyard Terraces", 38 },
+	{ 19, "Hermes", "Messenger's Road", 39 },
+	{ 20, "Hephaestus", "Great Forge", 40 },
+	{ 21, "Ares", "War Camp", 41 },
+	{ 22, "Aphrodite", "Rose Garden", 43 },
+	{ 23, "Artemis", "Moonlit Forest", 44 },
+	{ 24, "Apollo", "Sun Terrace", 45 },
+	{ 25, "Athena", "Olive Grove", 46 },
+	{ 26, "Demeter", "Harvest Fields", 47 },
+	{ 27, "Hestia", "Eternal Hearth", 48 },
+	{ 28, "Poseidon", "Cloudwater Falls", 49 },
+	{ 29, "Hera", "Royal Courtyard", 51 },
 	{ 30, "Zeus", "Throne of Olympus", 52 },
 }
 
@@ -148,18 +148,6 @@ local SPRITES: { [string]: { string } } = {
 		".GGGGGG.",
 		"..GG.GG.",
 	},
-	Trophy = {
-		"GGGGGGGGG",
-		"G.GGGGG.G",
-		"G.GGGGG.G",
-		".GGGGGGG.",
-		"..GGGGG..",
-		"...GGG...",
-		"....G....",
-		"....G....",
-		"..GGGGG..",
-		".BBBBBBB.",
-	},
 	Sword = {
 		"..G..",
 		"..H..",
@@ -173,17 +161,6 @@ local SPRITES: { [string]: { string } } = {
 		".SSS.",
 		".SSS.",
 		"..S..",
-	},
-	Scales = {
-		".....G.....",
-		"GGGGGGGGGGG",
-		"G....G....G",
-		"G....G....G",
-		"G....G....G",
-		"GGG..G..GGG",
-		".....G.....",
-		".....G.....",
-		"...GGGGG...",
 	},
 	Star = {
 		"...S...",
@@ -203,24 +180,6 @@ local SPRITES: { [string]: { string } } = {
 		"WWWWWWW",
 		"W.W.W.W",
 	},
-	Clover = {
-		".GG...GG.",
-		"GGGG.GGGG",
-		"GGGGGGGGG",
-		".GGGGGGG.",
-		"...GGG...",
-		".GGGGGGG.",
-		"GGGGGGGGG",
-		"GGGG.GGGG",
-		".GG.T.GG.",
-	},
-	Eye = {
-		"...WWW...",
-		".WWRRRWW.",
-		"WWRRKRRWW",
-		".WWRRRWW.",
-		"...WWW...",
-	},
 	Wing = {
 		"WWWWW...",
 		".WWWWWW.",
@@ -228,6 +187,73 @@ local SPRITES: { [string]: { string } } = {
 		"...WWWWW",
 		"....WWWW",
 		".....WWW",
+	},
+	Grapes = {
+		"....LL.",
+		"...L...",
+		".PPPPP.",
+		"PPPPPPP",
+		".PPPPP.",
+		"..PPPP.",
+		"..PPP..",
+		"...P...",
+	},
+	Helmet = {
+		"..RRRRRR.",
+		".RRRRRRRR",
+		"...BBBBB.",
+		"..BBBBBBB",
+		".BBBBBBBB",
+		".B..BBBBB",
+		".BB.BBBBB",
+		".BB..BBB.",
+		"..B...BB.",
+	},
+	Lyre = {
+		"GG.......GG",
+		".G.......G.",
+		".GG.....GG.",
+		"..GGGGGGG..",
+		"..G.S.S.G..",
+		"..G.S.S.G..",
+		"..G.S.S.G..",
+		"..G.S.S.G..",
+		"..GGGGGGG..",
+		"...GGGGG...",
+	},
+	Owl = {
+		"B.....B",
+		"BB...BB",
+		"BBBBBBB",
+		"WWBBBWW",
+		"WKWBWKW",
+		"WWBYBWW",
+		".BBYBB.",
+		".BLLLB.",
+		".BLLLB.",
+		"..BBB..",
+		"..Y.Y..",
+	},
+	Trident = {
+		"G...G...G",
+		"G...G...G",
+		"GG..G..GG",
+		".GGGGGGG.",
+		"....G....",
+		"....G....",
+		"....G....",
+		"....G....",
+		"....G....",
+		"....G....",
+		"....G....",
+		"...GGG...",
+	},
+	Crown = {
+		"G...G...G",
+		"GG.GGG.GG",
+		"GGGGGGGGG",
+		"GRGGBGGRG",
+		"GGGGGGGGG",
 	},
 	Zzz = {
 		"ZZZZ",
@@ -875,17 +901,6 @@ function Props.Crater(c: any, x: number, z: number, rim: any, inside: any, radiu
 	end
 end
 
--- Blocks round an arc standing across the path at (y, z): a rainbow's band.
-function Props.Arc(c: any, y: number, z: number, radius: number, count: number, size: any, color: any)
-	for i = 0, count - 1 do
-		local a = math.pi * (i + 0.5) / count
-		c.Block(math.cos(a) * radius, y + math.sin(a) * radius, z, size, color, {
-			Turn = c.CFrame.Angles(0, 0, a),
-			CanCollide = false,
-		})
-	end
-end
-
 -- A wheel on a post at a terrace's edge, its face towards the lane.
 function Props.Wheel(c: any, x: number, z: number, colors: { any }, hub: any)
 	local y = c.Ground(x, z)
@@ -902,6 +917,21 @@ function Props.Wheel(c: any, x: number, z: number, colors: { any }, hub: any)
 		c.Block(x, center, z, V.new(1.4, 24, 1.4), hub, { Turn = c.CFrame.Angles(math.rad(i * 45), 0, 0) })
 	end
 	c.Block(x, center, z, V.new(2.6, 4, 4), hub)
+end
+
+-- A fan of ribs standing at (x, z) from a hinge at height y, facing the path: a shell, a peacock's tail.
+function Props.Fan(c: any, x: number, y: number, z: number, ribs: number, length: number, colors: { any }, tip: any?)
+	local V = c.Vector3
+	for i = 0, ribs - 1 do
+		local a = math.rad(-75 + i * 150 / (ribs - 1))
+		local dy, dz = math.cos(a), math.sin(a)
+		c.Block(x, y + dy * length / 2, z + dz * length / 2, V.new(0.8, length, 2.6), colors[i % #colors + 1], {
+			Turn = c.CFrame.Angles(a, 0, 0),
+		})
+		if tip then
+			c.Block(x, y + dy * length, z + dz * length, V.new(2.4, 2.4, 2.4), tip, { Shape = c.Enum.PartType.Ball })
+		end
+	end
 end
 
 -- `count` things on the terraces or the floor's edges, made by `make(x, z)`.
@@ -926,279 +956,7 @@ end
 -- Each god's stretch: colours before the map's colour grading (Lighting.ColorCorrection, saturation +0.7, which
 -- brightens them a lot), plants as { template, count, nearest x, farthest x }, and props.
 function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]: any }
-	local rainbow = {
-		rgb(206, 104, 104),
-		rgb(214, 152, 96),
-		rgb(214, 202, 104),
-		rgb(116, 192, 116),
-		rgb(104, 160, 214),
-		rgb(128, 116, 204),
-		rgb(184, 116, 204),
-	}
 	local themes: { [string]: any } = {}
-
-	themes.Iris = {
-		Floor = rgb(226, 226, 234),
-		CapAt = function(p: any): any
-			return rainbow[math.floor((p.Z + 120) / 34) % 7 + 1]
-		end,
-		Cap = rainbow[1],
-		SideA = rgb(204, 204, 220),
-		SideB = rgb(218, 218, 232),
-		Leaves = rgb(200, 200, 230),
-		Trunk = rgb(200, 190, 214),
-		Stone = rgb(214, 214, 228),
-		Cloud = rgb(226, 226, 236),
-		Islands = 4,
-		Clouds = 3,
-		Plants = { { "BlossomTree", 3 } },
-		Props = function(c: any)
-			local V = c.Vector3
-			-- A rainbow over the path, and rainbow-leaved trees.
-			for band = 1, 7 do
-				local radius = 92 - (band - 1) * 5.4
-				Props.Arc(c, -14, 0, radius, 26, V.new(5.6, math.pi * radius / 26 + 1.2, 5), rainbow[band])
-			end
-			for _ = 1, 7 do
-				local x, z = c.SideSpot(c.Lane + 6, 98)
-				c.Place("RoundTree", x, z, { Leaves = c.Random.Pick(rainbow), Scale = c.Random.Number(0.9, 1.2) })
-			end
-		end,
-	}
-
-	themes.Pan = {
-		Floor = rgb(72, 142, 72),
-		Cap = rgb(86, 156, 76),
-		SideA = rgb(122, 92, 62),
-		SideB = rgb(142, 106, 72),
-		Leaves = rgb(62, 142, 70),
-		Trunk = rgb(122, 86, 62),
-		Stone = rgb(126, 126, 116),
-		Stones = 8,
-		Plants = { { "Pine", 5 }, { "Pine2", 4 }, { "Pine3", 3 }, { "RoundTree", 4 }, { "Bamboo", 8 } },
-		Props = function(c: any)
-			local V = c.Vector3
-			-- Pan's pipes: seven reeds, tallest first, tied with a band.
-			for _, side in { -1, 1 } do
-				local x, z = side * 84, c.Random.Number(-60, 60)
-				local y = c.Ground(x, z)
-				for i = 0, 6 do
-					local h = 16 - i * 1.6
-					c.Block(x, y + h / 2, z - 8 + i * 2.6, V.new(2.4, h, 2.4), rgb(206, 176, 112))
-				end
-				c.Block(x, y + 9, z, V.new(2.8, 2, 19), rgb(142, 92, 62))
-			end
-			-- Toadstools.
-			Props.Scatter(c, 10, function(x: number, z: number)
-				local y = c.Ground(x, z)
-				local k = c.Random.Number(0.8, 1.6)
-				c.Block(x, y + 1.5 * k, z, V.new(1.6 * k, 3 * k, 1.6 * k), rgb(236, 226, 206))
-				c.Block(x, y + 3.5 * k, z, V.new(5 * k, 1.6 * k, 5 * k), rgb(204, 62, 52))
-				c.Block(x + 1.2 * k, y + 4.4 * k, z, V.new(1 * k, 0.4 * k, 1 * k), rgb(246, 240, 230))
-			end)
-		end,
-	}
-
-	themes.Hebe = {
-		Floor = rgb(238, 226, 186),
-		Cap = rgb(236, 196, 110),
-		SideA = rgb(222, 200, 150),
-		SideB = rgb(234, 214, 170),
-		Leaves = rgb(140, 196, 110),
-		Trunk = rgb(150, 112, 80),
-		Stone = rgb(230, 220, 196),
-		Plants = { { "RoundTree", 5 }, { "BlossomTree", 3, Leaves = rgb(250, 240, 236) }, { "Bush", 3 } },
-		Props = function(c: any)
-			local V = c.Vector3
-			local gold = rgb(226, 186, 82)
-			-- Golden goblets of ambrosia.
-			Props.Scatter(c, 5, function(x: number, z: number)
-				local y = c.Ground(x, z)
-				c.Block(x, y + 0.5, z, V.new(5, 1, 5), gold)
-				c.Block(x, y + 3, z, V.new(1.6, 4, 1.6), gold)
-				c.Block(x, y + 7, z, V.new(6, 4.4, 6), gold)
-				c.Block(x, y + 9.3, z, V.new(4.6, 0.3, 4.6), rgb(244, 168, 196), { Material = c.Enum.Material.Neon })
-			end, c.Lane + 8, 96)
-			-- A fountain on one terrace.
-			local x, z = 86 * c.Random.Side(), c.Random.Number(-50, 50)
-			local y = c.Ground(x, z)
-			local white = rgb(244, 240, 236)
-			for i = 0, 3 do
-				local a = math.rad(i * 90)
-				c.Block(x + math.cos(a) * 7, y + 1.5, z + math.sin(a) * 7, V.new(2, 3, 16), white, { Yaw = -i * 90 })
-			end
-			c.Block(x, y + 2.2, z, V.new(13, 0.4, 13), rgb(120, 200, 236), { Material = c.Enum.Material.Neon })
-			c.Block(x, y + 5, z, V.new(2.4, 8, 2.4), white)
-			c.Block(x, y + 9.4, z, V.new(7, 1.2, 7), gold)
-		end,
-	}
-
-	themes.Eros = {
-		Floor = rgb(232, 174, 190),
-		Cap = rgb(216, 112, 138),
-		SideA = rgb(236, 198, 208),
-		SideB = rgb(246, 216, 224),
-		Leaves = rgb(226, 96, 126),
-		Trunk = rgb(202, 142, 152),
-		Stone = rgb(240, 202, 212),
-		Plants = { { "BlossomTree", 4 }, { "RoundTree", 3 } },
-		Props = function(c: any)
-			local legend = { R = rgb(222, 62, 92), W = rgb(255, 224, 232) }
-			Props.Scatter(c, 6, function(x: number, z: number)
-				c.Sprite("Heart", x, z, c.Random.Number(1.8, 2.8), legend, { Lift = c.Random.Pick({ 0, 0, 8, 16 }) })
-			end, c.Lane + 10, 96)
-			Props.Scatter(c, 4, function(x: number, z: number)
-				c.Place("SmallArch", x, z, { Solid = rgb(232, 120, 150), Yaw = 0 })
-			end, c.Lane + 14, 90)
-		end,
-	}
-
-	themes.Tyche = {
-		Floor = rgb(72, 152, 102),
-		Cap = rgb(214, 184, 84),
-		SideA = rgb(62, 120, 82),
-		SideB = rgb(80, 138, 96),
-		Leaves = rgb(92, 172, 92),
-		Trunk = rgb(152, 122, 72),
-		Stone = rgb(202, 182, 102),
-		Plants = { { "Bush", 4 }, { "RoundTree", 3 } },
-		Props = function(c: any)
-			local V = c.Vector3
-			local gold = rgb(232, 192, 72)
-			-- Stacks of coins.
-			Props.Scatter(c, 7, function(x: number, z: number)
-				local y = c.Ground(x, z)
-				for i = 1, c.Random.Int(3, 8) do
-					c.Block(
-						x + c.Random.Number(-0.4, 0.4),
-						y + (i - 0.5) * 1.1,
-						z + c.Random.Number(-0.4, 0.4),
-						V.new(1, 6, 6),
-						gold,
-						{
-							Shape = c.Enum.PartType.Cylinder,
-							Turn = c.CFrame.Angles(0, 0, math.pi / 2),
-						}
-					)
-				end
-			end, c.Lane + 6, 98)
-			-- The wheel of fortune.
-			Props.Wheel(
-				c,
-				78 * c.Random.Side(),
-				c.Random.Number(-40, 40),
-				{ gold, rgb(204, 72, 62), rgb(82, 162, 92) },
-				rgb(150, 112, 62)
-			)
-			Props.Scatter(c, 4, function(x: number, z: number)
-				c.Sprite("Clover", x, z, 1.6, { G = rgb(84, 172, 84), T = rgb(62, 122, 62) })
-			end, c.Lane + 10, 96)
-		end,
-	}
-
-	themes.Asclepius = {
-		Floor = rgb(206, 236, 222),
-		Cap = rgb(152, 212, 184),
-		SideA = rgb(226, 236, 230),
-		SideB = rgb(208, 222, 216),
-		Leaves = rgb(112, 190, 142),
-		Trunk = rgb(170, 150, 122),
-		Stone = rgb(230, 236, 232),
-		Plants = { { "Bush", 6 }, { "SmallPine", 3 }, { "Pine", 2 } },
-		Props = function(c: any)
-			local V = c.Vector3
-			local white = rgb(246, 248, 246)
-			Props.Edges(c, 70, function(x: number, z: number)
-				Props.Column(c, x, z, white, rgb(150, 210, 182))
-			end)
-			-- The rod of Asclepius: a staff with a serpent round it.
-			for _, side in { -1, 1 } do
-				local x, z = side * 88, c.Random.Number(-70, 70)
-				local y = c.Ground(x, z)
-				c.Block(x, y + 14, z, V.new(2, 28, 2), rgb(150, 110, 72))
-				for i = 0, 15 do
-					local a = i * 0.9
-					c.Block(
-						x + math.cos(a) * 1.8,
-						y + 4 + i * 1.4,
-						z + math.sin(a) * 1.8,
-						V.new(1.4, 1.4, 1.4),
-						rgb(84, 172, 92)
-					)
-				end
-				c.Block(x + math.cos(14) * 2.2, y + 26, z + math.sin(14) * 2.2, V.new(2.2, 1.8, 2.6), rgb(84, 172, 92))
-			end
-			-- Healing pools.
-			Props.Scatter(c, 3, function(x: number, z: number)
-				local y = c.Ground(x, z)
-				for i = 0, 3 do
-					local a = math.rad(i * 90)
-					c.Block(x + math.cos(a) * 6, y + 1, z + math.sin(a) * 6, V.new(2, 2, 14), white, { Yaw = -i * 90 })
-				end
-				c.Block(x, y + 1.4, z, V.new(11, 0.4, 11), rgb(110, 212, 222), { Material = c.Enum.Material.Neon })
-			end, 72, 96)
-		end,
-	}
-
-	local clash = { rgb(212, 82, 172), rgb(162, 212, 72), rgb(232, 142, 62), rgb(92, 192, 212) }
-	themes.Eris = {
-		Floor = rgb(70, 64, 80),
-		CapAt = function(_p: any, random: any): any
-			return random.Pick(clash)
-		end,
-		Cap = clash[1],
-		SideA = rgb(52, 48, 60),
-		SideB = rgb(62, 56, 72),
-		Leaves = rgb(162, 212, 72),
-		Trunk = rgb(60, 52, 70),
-		Stone = rgb(110, 100, 120),
-		Islands = 5,
-		Plants = { { "TwinTree", 3 } },
-		Props = function(c: any)
-			local legend = { G = rgb(238, 198, 72), L = rgb(98, 172, 72), W = rgb(255, 244, 200) }
-			-- The golden apple of discord, hanging over the path, and more on the terraces.
-			c.Sprite("Apple", 0, 0, 3.2, legend, { Y = 46, Yaw = 0, Ghost = true })
-			Props.Scatter(c, 3, function(x: number, z: number)
-				c.Sprite("Apple", x, z, 1.8, legend)
-			end, c.Lane + 10, 96)
-			-- Crystals at odd angles.
-			Props.Scatter(c, 10, function(x: number, z: number)
-				c.Place(c.Random.Pick({ "Spire", "SmallSpire" }), x, z, {
-					Solid = c.Random.Pick(clash),
-					Roll = { c.Random.Number(-28, 28), c.Random.Number(-28, 28) },
-					Sink = 2,
-				})
-			end, c.Lane + 6, 100)
-		end,
-	}
-
-	themes.Hecate = {
-		Floor = rgb(60, 66, 112),
-		Cap = rgb(100, 92, 160),
-		SideA = rgb(46, 50, 82),
-		SideB = rgb(54, 58, 94),
-		Leaves = rgb(70, 70, 120),
-		Trunk = rgb(50, 48, 64),
-		Stone = rgb(90, 90, 124),
-		Plants = { { "Pine", 4 }, { "SnowPine", 3 }, { "SmallPine", 3 } },
-		Props = function(c: any)
-			local V = c.Vector3
-			local wood = rgb(92, 70, 60)
-			Props.Edges(c, 52, function(x: number, z: number)
-				Props.Fire(c, x, z, rgb(72, 66, 86), rgb(70, 60, 74))
-			end)
-			-- Crossroads signposts.
-			for _, side in { -1, 1 } do
-				local x, z = side * 80, c.Random.Number(-60, 60)
-				local y = c.Ground(x, z)
-				c.Block(x, y + 8, z, V.new(2, 16, 2), wood)
-				for i = 0, 2 do
-					c.Block(x, y + 10 + i * 2.6, z, V.new(10, 2, 0.8), rgb(150, 120, 92), { Yaw = i * 60 + 20 })
-				end
-			end
-			c.Sprite("Moon", -150, 30, 7, { M = rgb(232, 232, 255) }, { Y = 70, Yaw = -90, Neon = true, Ghost = true })
-		end,
-	}
 
 	themes.Hypnos = {
 		Floor = rgb(174, 154, 214),
@@ -1278,76 +1036,40 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
-	local function moon(name: string, colors: { any }, planetX: number, planetSize: number): any
-		local floor, cap, sideA, sideB, stone, planet, spire = table.unpack(colors)
-		return {
-			Floor = floor,
-			Cap = cap,
-			SideA = sideA,
-			SideB = sideB,
-			Leaves = cap,
-			Trunk = sideA,
-			Stone = stone,
-			Stones = 14,
-			Islands = 2,
-			Plants = {},
-			Props = function(c: any)
-				Props.Scatter(c, 7, function(x: number, z: number)
-					Props.Crater(c, x, z, cap, sideA, c.Random.Number(4, 7))
-				end, c.Lane + 8, 96)
-				Props.Scatter(c, 6, function(x: number, z: number)
-					c.Place(c.Random.Pick({ "Spire", "SmallSpire" }), x, z, { Solid = spire, Sink = 1 })
-				end, c.Lane + 8, 100)
-				-- Mars, which both moons go round.
-				if planetSize > 0 then
-					c.Block(planetX, 150, 0, c.Vector3.new(planetSize, planetSize, planetSize), planet, {
-						Shape = c.Enum.PartType.Ball,
-						CanCollide = false,
-						CastShadow = false,
-					})
-				end
-				if name == "Phobos" then
-					Props.Scatter(c, 3, function(x: number, z: number)
-						c.Sprite(
-							"Eye",
-							x,
-							z,
-							1.4,
-							{ W = rgb(240, 240, 240), R = rgb(204, 42, 42), K = rgb(20, 20, 24) },
-							{ Lift = 8 }
-						)
-					end, 72, 100)
-				else
-					for _, side in { -1, 1 } do
-						c.Place(
-							"Pyramid",
-							side * 160,
-							c.Random.Number(-40, 40),
-							{ Solid = sideB, Y = -30, Scale = 0.6 }
-						)
-					end
-				end
-			end,
-		}
-	end
-	themes.Phobos = moon("Phobos", {
-		rgb(140, 140, 140),
-		rgb(166, 166, 166),
-		rgb(104, 104, 106),
-		rgb(120, 120, 122),
-		rgb(118, 118, 120),
-		rgb(0, 0, 0),
-		rgb(66, 66, 70),
-	}, 0, 0)
-	themes.Deimos = moon("Deimos", {
-		rgb(154, 104, 88),
-		rgb(174, 118, 98),
-		rgb(114, 78, 68),
-		rgb(128, 88, 76),
-		rgb(142, 96, 82),
-		rgb(170, 100, 82),
-		rgb(122, 62, 52),
-	}, 520, 200)
+	themes.Deimos = {
+		Floor = rgb(154, 104, 88),
+		Cap = rgb(174, 118, 98),
+		SideA = rgb(114, 78, 68),
+		SideB = rgb(128, 88, 76),
+		Leaves = rgb(174, 118, 98),
+		Trunk = rgb(114, 78, 68),
+		Stone = rgb(142, 96, 82),
+		Stones = 14,
+		Islands = 2,
+		Plants = {},
+		Props = function(c: any)
+			Props.Scatter(c, 7, function(x: number, z: number)
+				Props.Crater(c, x, z, rgb(174, 118, 98), rgb(114, 78, 68), c.Random.Number(4, 7))
+			end, c.Lane + 8, 96)
+			Props.Scatter(c, 6, function(x: number, z: number)
+				c.Place(c.Random.Pick({ "Spire", "SmallSpire" }), x, z, { Solid = rgb(122, 62, 52), Sink = 1 })
+			end, c.Lane + 8, 100)
+			-- Mars, which Deimos goes round.
+			c.Block(520, 150, 0, c.Vector3.new(200, 200, 200), rgb(170, 100, 82), {
+				Shape = c.Enum.PartType.Ball,
+				CanCollide = false,
+				CastShadow = false,
+			})
+			for _, side in { -1, 1 } do
+				c.Place(
+					"Pyramid",
+					side * 160,
+					c.Random.Number(-40, 40),
+					{ Solid = rgb(128, 88, 76), Y = -30, Scale = 0.6 }
+				)
+			end
+		end,
+	}
 
 	themes.Thanatos = {
 		Floor = rgb(54, 56, 64),
@@ -1419,58 +1141,415 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
-	themes.Themis = {
-		Floor = rgb(238, 235, 228),
-		Cap = rgb(224, 194, 104),
-		SideA = rgb(218, 213, 203),
-		SideB = rgb(231, 227, 218),
-		Leaves = rgb(112, 162, 92),
-		Trunk = rgb(152, 122, 92),
-		Stone = rgb(232, 228, 220),
-		Plants = { { "Bush", 4 } },
+	themes.Dionysus = {
+		Floor = rgb(150, 128, 96),
+		Cap = rgb(112, 152, 72),
+		SideA = rgb(122, 96, 72),
+		SideB = rgb(138, 110, 82),
+		Leaves = rgb(92, 152, 72),
+		Trunk = rgb(112, 82, 62),
+		Stone = rgb(150, 132, 112),
+		Plants = { { "RoundTree", 3 }, { "Bush", 3 } },
 		Props = function(c: any)
-			local marble, gold = rgb(240, 238, 232), rgb(224, 190, 92)
-			Props.Edges(c, 46, function(x: number, z: number)
-				Props.Column(c, x, z, marble, gold, 30)
-			end)
-			for _, side in { -1, 1 } do
-				c.Sprite("Scales", side * 86, c.Random.Number(-50, 50), 2.4, { G = gold })
-			end
-			c.Place("Pavilion", 84 * c.Random.Side(), c.Random.Number(-80, 80), { Solid = marble, Yaw = 0 })
+			local V = c.Vector3
+			local wood, leaf, grape = rgb(122, 88, 62), rgb(92, 156, 72), rgb(122, 62, 154)
+			-- Rows of vines on posts, running beside the path, heavy with grapes.
+			Props.Scatter(c, 6, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				for _, dz in { -7, 7 } do
+					c.Block(x, y + 4, z + dz, V.new(1.2, 8, 1.2), wood)
+				end
+				c.Block(x, y + 8.4, z, V.new(1, 0.8, 16), wood)
+				c.Block(x, y + 6.8, z, V.new(3, 3, 16), leaf)
+				for i = -2, 2 do
+					c.Block(
+						x + c.Random.Number(-0.8, 0.8),
+						y + 4.6,
+						z + i * 3,
+						V.new(2, 2, 2),
+						grape,
+						{ Shape = c.Enum.PartType.Ball }
+					)
+				end
+			end, c.Lane + 6, 90)
+			-- Barrels of wine.
+			local barrel = { Shape = c.Enum.PartType.Cylinder, Turn = c.CFrame.Angles(0, 0, math.pi / 2) }
+			Props.Scatter(c, 5, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 2.5, z, V.new(5, 4.4, 4.4), rgb(150, 104, 66), barrel)
+				for _, h in { 1, 4 } do
+					c.Block(x, y + h, z, V.new(0.5, 4.7, 4.7), rgb(70, 60, 56), barrel)
+				end
+			end, c.Lane + 6, 92)
+			Props.Scatter(c, 4, function(x: number, z: number)
+				c.Sprite("Grapes", x, z, 1.6, { P = grape, L = leaf })
+			end, c.Lane + 10, 96)
 		end,
 	}
 
-	themes.Nike = {
-		Floor = rgb(234, 216, 158),
-		Cap = rgb(218, 178, 74),
-		SideA = rgb(242, 237, 223),
-		SideB = rgb(228, 218, 194),
-		Leaves = rgb(92, 152, 82),
-		Trunk = rgb(152, 122, 82),
-		Stone = rgb(236, 226, 202),
-		Plants = { { "Bush", 3 } },
+	themes.Hermes = {
+		Floor = rgb(214, 204, 178),
+		Cap = rgb(132, 192, 226),
+		SideA = rgb(170, 160, 140),
+		SideB = rgb(186, 176, 154),
+		Leaves = rgb(120, 182, 112),
+		Trunk = rgb(140, 112, 82),
+		Stone = rgb(200, 192, 172),
+		Cloud = rgb(236, 240, 248),
+		Clouds = 4,
+		Plants = { { "Pine2", 3 }, { "RoundTree", 3, 70 } },
 		Props = function(c: any)
 			local V = c.Vector3
-			local gold = rgb(228, 186, 70)
-			-- A laurel arch over the path.
-			c.Place("BigArch", 0, 0, { Y = -6, Yaw = 0, Scale = 1.25, Solid = rgb(96, 158, 84), Ghost = true })
-			Props.Scatter(c, 4, function(x: number, z: number)
-				c.Sprite("Trophy", x, z, 1.5, { G = gold, B = rgb(110, 80, 60) })
-			end, c.Lane + 10, 96)
-			-- Winged victory: a pair of wings on a plinth, each side.
+			local stone, gold, white = rgb(214, 210, 200), rgb(228, 190, 82), rgb(250, 250, 255)
+			-- Herms, the travellers' waymarkers: a pillar with Hermes's head and hat.
+			Props.Edges(c, 64, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 5, z, V.new(3, 10, 3), stone)
+				c.Block(x, y + 11.5, z, V.new(2.6, 3, 2.6), stone)
+				c.Block(x, y + 13.3, z, V.new(3.6, 0.6, 3.6), gold)
+			end)
+			-- His caduceus: a golden staff, two serpents and a pair of wings.
 			for _, side in { -1, 1 } do
-				local x, z = side * 88, c.Random.Number(-60, 60)
+				local x, z = side * 86, c.Random.Number(-70, 70)
 				local y = c.Ground(x, z)
 				local face = if side > 0 then 90 else -90
-				c.Block(x, y + 3, z, V.new(8, 6, 8), rgb(242, 237, 223))
-				c.Sprite("Wing", x, z - 4.5, 1.4, { W = rgb(250, 250, 255) }, { Y = y + 6, Yaw = face })
-				c.Sprite("Wing", x, z + 4.5, 1.4, { W = rgb(250, 250, 255) }, { Y = y + 6, Yaw = face + 180 })
+				c.Block(x, y + 13, z, V.new(1.6, 26, 1.6), gold)
+				for i = 0, 13 do
+					for _, phase in { 0, math.pi } do
+						local a = i * 0.9 + phase
+						c.Block(
+							x + math.cos(a) * 1.8,
+							y + 4 + i * 1.3,
+							z + math.sin(a) * 1.8,
+							V.new(1.2, 1.2, 1.2),
+							rgb(84, 150, 92)
+						)
+					end
+				end
+				c.Block(x, y + 26.6, z, V.new(2.6, 2.6, 2.6), gold, { Shape = c.Enum.PartType.Ball })
+				c.Sprite("Wing", x, z - 3, 0.8, { W = white }, { Y = y + 21, Yaw = face })
+				c.Sprite("Wing", x, z + 3, 0.8, { W = white }, { Y = y + 21, Yaw = face + 180 })
 			end
-			Props.Edges(c, 60, function(x: number, z: number)
+			-- Winged sandals on plinths.
+			Props.Scatter(c, 3, function(x: number, z: number)
 				local y = c.Ground(x, z)
-				c.Block(x, y + 9, z, V.new(1, 18, 1), gold)
-				c.Block(x, y + 14, z + 3.4, V.new(0.4, 8, 6), rgb(206, 62, 62))
+				local face = if x > 0 then 90 else -90
+				c.Block(x, y + 2, z, V.new(6, 4, 8), stone)
+				c.Block(x, y + 4.6, z, V.new(2.4, 1.2, 5), rgb(150, 104, 66))
+				c.Sprite("Wing", x, z - 1.6, 0.6, { W = white }, { Y = y + 5, Yaw = face })
+				c.Sprite("Wing", x, z + 1.6, 0.6, { W = white }, { Y = y + 5, Yaw = face + 180 })
+			end, c.Lane + 10, 90)
+			-- Coins, for the god of trade.
+			Props.Scatter(c, 5, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				for i = 1, c.Random.Int(3, 7) do
+					c.Block(
+						x + c.Random.Number(-0.4, 0.4),
+						y + (i - 0.5) * 1.1,
+						z + c.Random.Number(-0.4, 0.4),
+						V.new(1, 6, 6),
+						gold,
+						{ Shape = c.Enum.PartType.Cylinder, Turn = c.CFrame.Angles(0, 0, math.pi / 2) }
+					)
+				end
+			end, c.Lane + 6, 96)
+		end,
+	}
+
+	themes.Hephaestus = {
+		Floor = rgb(78, 70, 70),
+		Cap = rgb(122, 74, 56),
+		SideA = rgb(58, 52, 54),
+		SideB = rgb(68, 60, 62),
+		Leaves = rgb(96, 82, 76),
+		Trunk = rgb(52, 44, 44),
+		Stone = rgb(92, 84, 84),
+		Cloud = rgb(80, 76, 80),
+		Stones = 10,
+		Islands = 2,
+		Plants = {},
+		Props = function(c: any)
+			local V = c.Vector3
+			local iron, brick, glow = rgb(62, 60, 66), rgb(110, 70, 58), rgb(255, 120, 40)
+			local neon = { Material = c.Enum.Material.Neon, CanCollide = false }
+			Props.Edges(c, 52, function(x: number, z: number)
+				Props.Fire(c, x, z, iron, rgb(90, 70, 60))
 			end)
+			-- His forges: a furnace glowing towards the path, and its chimney.
+			for _, side in { -1, 1 } do
+				local x, z = side * 84, c.Random.Number(-60, 60)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 6, z, V.new(12, 12, 14), brick)
+				c.Block(x - side * 6.1, y + 4, z, V.new(0.4, 5, 6), glow, neon)
+				c.Block(x + side * 2, y + 20, z, V.new(5, 16, 5), brick)
+				c.Block(x + side * 2, y + 28.4, z, V.new(6, 0.8, 6), iron)
+			end
+			-- Anvils.
+			Props.Scatter(c, 4, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 1, z, V.new(4, 2, 6), iron)
+				c.Block(x, y + 3, z, V.new(2, 2, 3), iron)
+				c.Block(x, y + 5, z, V.new(4, 2, 8), iron)
+				c.Block(x, y + 5.3, z + 5, V.new(2.4, 1.4, 2), iron)
+			end, c.Lane + 8, 92)
+			-- Pools of molten metal.
+			Props.Scatter(c, 5, function(x: number, z: number)
+				local radius = c.Random.Number(4, 6)
+				Props.Crater(c, x, z, rgb(96, 70, 62), iron, radius)
+				c.Block(x, c.Ground(x, z) + 0.4, z, V.new(radius * 1.5, 0.3, radius * 1.5), glow, {
+					Material = c.Enum.Material.Neon,
+					CanCollide = false,
+					Yaw = 45,
+				})
+			end, c.Lane + 10, 90)
+		end,
+	}
+
+	themes.Ares = {
+		Floor = rgb(150, 96, 78),
+		Cap = rgb(160, 58, 50),
+		SideA = rgb(112, 76, 64),
+		SideB = rgb(126, 86, 72),
+		Leaves = rgb(122, 112, 72),
+		Trunk = rgb(92, 70, 56),
+		Stone = rgb(132, 102, 92),
+		Stones = 8,
+		Plants = { { "Bush", 3 }, { "Pine3", 2 } },
+		Props = function(c: any)
+			local V = c.Vector3
+			local bronze, red, wood, canvas = rgb(196, 146, 72), rgb(184, 44, 40), rgb(110, 82, 60), rgb(196, 176, 140)
+			-- War banners along the path.
+			Props.Edges(c, 56, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 9, z, V.new(1, 18, 1), wood)
+				c.Block(x, y + 14, z + 3.4, V.new(0.4, 8, 6), red)
+			end)
+			-- The camp: a tent each side, a red pennant on its ridge.
+			for _, side in { -1, 1 } do
+				local x, z = side * 82, c.Random.Number(-60, 60)
+				local y = c.Ground(x, z)
+				for _, s in { -1, 1 } do
+					c.Block(x + s * 3.2, y + 4, z, V.new(0.6, 9.5, 14), canvas, {
+						Turn = c.CFrame.Angles(0, 0, s * math.rad(40)),
+					})
+				end
+				c.Block(x, y + 9, z + 6, V.new(0.4, 4, 0.4), wood)
+				c.Block(x, y + 10.4, z + 7.2, V.new(0.3, 1.4, 2.4), red)
+			end
+			-- Round bronze shields propped facing the path, a spear beside each.
+			Props.Scatter(c, 6, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				local out = if x > 0 then 1 else -1
+				local disc = { Shape = c.Enum.PartType.Cylinder }
+				c.Block(x, y + 3.2, z, V.new(0.8, 6, 6), bronze, disc)
+				c.Block(x - out * 0.5, y + 3.2, z, V.new(0.4, 2, 2), red, disc)
+				c.Block(x + out * 1.5, y + 7, z + 3.5, V.new(0.6, 14, 0.6), wood, {
+					Turn = c.CFrame.Angles(math.rad(12), 0, 0),
+				})
+			end, c.Lane + 8, 92)
+			Props.Scatter(c, 3, function(x: number, z: number)
+				c.Sprite("Helmet", x, z, 1.4, { R = red, B = bronze })
+			end, c.Lane + 10, 96)
+		end,
+	}
+
+	themes.Aphrodite = {
+		Floor = rgb(236, 196, 204),
+		Cap = rgb(222, 118, 142),
+		SideA = rgb(240, 214, 220),
+		SideB = rgb(248, 226, 230),
+		Leaves = rgb(96, 158, 92),
+		Trunk = rgb(190, 140, 140),
+		Stone = rgb(242, 220, 224),
+		Plants = { { "BlossomTree", 3 }, { "Bush", 4 } },
+		Props = function(c: any)
+			-- Roses.
+			Props.Scatter(c, 40, function(x: number, z: number)
+				Props.Flower(c, x, z, rgb(214, 44, 72), rgb(150, 20, 46))
+			end, c.Lane + 1, 102)
+			Props.Scatter(c, 5, function(x: number, z: number)
+				c.Sprite("Heart", x, z, c.Random.Number(1.8, 2.6), { R = rgb(222, 62, 92), W = rgb(255, 224, 232) }, {
+					Lift = c.Random.Pick({ 0, 8, 14 }),
+				})
+			end, c.Lane + 10, 96)
+			Props.Scatter(c, 3, function(x: number, z: number)
+				c.Place("SmallArch", x, z, { Solid = rgb(232, 120, 150), Yaw = 0 })
+			end, c.Lane + 14, 90)
+			-- The scallop shell she rose from the sea on, and its pearl.
+			local side = c.Random.Side()
+			local x, z = side * 84, c.Random.Number(-50, 50)
+			local y = c.Ground(x, z)
+			Props.Fan(c, x, y + 1, z, 9, 12, { rgb(250, 226, 214), rgb(240, 196, 190) })
+			c.Block(x - side * 1.5, y + 3, z, c.Vector3.new(3, 3, 3), rgb(250, 248, 240), {
+				Shape = c.Enum.PartType.Ball,
+			})
+		end,
+	}
+
+	themes.Artemis = {
+		Floor = rgb(70, 92, 96),
+		Cap = rgb(226, 232, 240),
+		SideA = rgb(58, 70, 92),
+		SideB = rgb(66, 80, 104),
+		Leaves = rgb(52, 104, 86),
+		Trunk = rgb(70, 60, 58),
+		Stone = rgb(150, 160, 176),
+		Cloud = rgb(120, 130, 160),
+		Plants = { { "SnowPine", 4, 70 }, { "Pine", 4 }, { "Pine3", 3 }, { "SmallPine", 4 } },
+		Props = function(c: any)
+			local V = c.Vector3
+			local wood = rgb(120, 92, 66)
+			c.Sprite("Moon", -150, 30, 7, { M = rgb(236, 240, 255) }, { Y = 70, Yaw = -90, Neon = true, Ghost = true })
+			-- Archery targets facing the path, an arrow in each.
+			local rings =
+				{ rgb(240, 240, 236), rgb(40, 40, 44), rgb(70, 130, 210), rgb(214, 60, 52), rgb(240, 204, 70) }
+			Props.Scatter(c, 5, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				local out = if x > 0 then 1 else -1
+				for _, dz in { -2.5, 2.5 } do
+					c.Block(x + out * 0.8, y + 3, z + dz, V.new(0.8, 6, 0.8), wood)
+				end
+				for i, color in rings do
+					local d = 8 - (i - 1) * 1.5
+					c.Block(x - out * (i - 1) * 0.12, y + 6.5, z, V.new(0.6, d, d), color, {
+						Shape = c.Enum.PartType.Cylinder,
+					})
+				end
+				c.Block(x - out * 1.6, y + 6.8, z + 0.5, V.new(3, 0.3, 0.3), wood)
+			end, c.Lane + 8, 92)
+			-- Silver lights drifting between the trees.
+			Props.Scatter(c, 8, function(x: number, z: number)
+				c.Block(x, c.Ground(x, z) + c.Random.Number(5, 16), z, V.new(1.2, 1.2, 1.2), rgb(220, 236, 255), {
+					Shape = c.Enum.PartType.Ball,
+					Material = c.Enum.Material.Neon,
+					CanCollide = false,
+				})
+			end, c.Lane + 4, 100)
+		end,
+	}
+
+	themes.Apollo = {
+		Floor = rgb(240, 222, 170),
+		Cap = rgb(236, 176, 64),
+		SideA = rgb(240, 232, 214),
+		SideB = rgb(230, 220, 198),
+		Leaves = rgb(96, 158, 82),
+		Trunk = rgb(150, 116, 80),
+		Stone = rgb(238, 226, 200),
+		Plants = { { "RoundTree", 4 }, { "Bush", 2 } },
+		Props = function(c: any)
+			local V = c.Vector3
+			local gold = rgb(236, 186, 62)
+			local light = { Material = c.Enum.Material.Neon, CanCollide = false, CastShadow = false }
+			-- The sun low over one side, its rays round it.
+			local sx, sy, sz = 170 * c.Random.Side(), 80, c.Random.Number(-40, 40)
+			c.Block(sx, sy, sz, V.new(36, 36, 36), rgb(255, 214, 90), {
+				Shape = c.Enum.PartType.Ball,
+				Material = light.Material,
+				CanCollide = false,
+				CastShadow = false,
+			})
+			for i = 0, 11 do
+				local a = i * math.pi / 6
+				c.Block(sx, sy + math.cos(a) * 27, sz + math.sin(a) * 27, V.new(2, 12, 4), rgb(255, 170, 60), {
+					Turn = c.CFrame.Angles(a, 0, 0),
+					Material = light.Material,
+					CanCollide = false,
+					CastShadow = false,
+				})
+			end
+			-- A laurel arch over the path, golden tripods along it, and his lyres.
+			c.Place("BigArch", 0, 0, { Y = -6, Yaw = 0, Scale = 1.25, Solid = rgb(96, 158, 84), Ghost = true })
+			Props.Edges(c, 54, function(x: number, z: number)
+				Props.Fire(c, x, z, gold, gold)
+			end)
+			Props.Scatter(c, 4, function(x: number, z: number)
+				c.Sprite("Lyre", x, z, 1.5, { G = gold, S = rgb(250, 246, 236) })
+			end, c.Lane + 10, 96)
+		end,
+	}
+
+	themes.Athena = {
+		Floor = rgb(226, 222, 212),
+		Cap = rgb(138, 156, 96),
+		SideA = rgb(206, 200, 188),
+		SideB = rgb(220, 214, 202),
+		Leaves = rgb(132, 152, 104),
+		Trunk = rgb(128, 108, 88),
+		Stone = rgb(222, 218, 208),
+		Plants = { { "RoundTree", 6 }, { "Bush", 2 } },
+		Props = function(c: any)
+			local V = c.Vector3
+			local marble, blue = rgb(240, 238, 232), rgb(70, 104, 170)
+			Props.Edges(c, 46, function(x: number, z: number)
+				Props.Column(c, x, z, marble, blue, 30)
+			end)
+			c.Place("Pavilion", 84 * c.Random.Side(), c.Random.Number(-80, 80), { Solid = marble, Yaw = 0 })
+			-- Her owl on a plinth, each side.
+			local owl = {
+				B = rgb(150, 120, 92),
+				L = rgb(206, 184, 150),
+				W = rgb(244, 236, 214),
+				K = rgb(30, 28, 30),
+				Y = rgb(236, 186, 62),
+			}
+			for _, side in { -1, 1 } do
+				local x, z = side * 86, c.Random.Number(-50, 50)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 2, z, V.new(6, 4, 6), marble)
+				c.Sprite("Owl", x, z, 1.2, owl, { Y = y + 4 })
+			end
+			-- Jars of olive oil.
+			Props.Scatter(c, 6, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 2.2, z, V.new(4.4, 4.4, 4.4), rgb(200, 120, 72), { Shape = c.Enum.PartType.Ball })
+				c.Block(x, y + 4.8, z, V.new(1.8, 2, 1.8), rgb(200, 120, 72))
+				c.Block(x, y + 5.9, z, V.new(2.4, 0.4, 2.4), rgb(40, 34, 32))
+			end, c.Lane + 6, 94)
+		end,
+	}
+
+	themes.Demeter = {
+		Floor = rgb(196, 176, 104),
+		Cap = rgb(222, 186, 82),
+		SideA = rgb(150, 122, 82),
+		SideB = rgb(166, 136, 92),
+		Leaves = rgb(110, 162, 72),
+		Trunk = rgb(130, 98, 70),
+		Stone = rgb(176, 156, 118),
+		Plants = { { "RoundTree", 3 } },
+		Props = function(c: any)
+			local V = c.Vector3
+			local wheat, stalk, hay, wood = rgb(236, 196, 92), rgb(196, 170, 84), rgb(222, 190, 96), rgb(122, 92, 62)
+			local soft = { CanCollide = false }
+			-- Fields of wheat.
+			Props.Scatter(c, 26, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				for _ = 1, 5 do
+					local wx, wz = x + c.Random.Number(-1.5, 1.5), z + c.Random.Number(-1.5, 1.5)
+					local h = c.Random.Number(4, 6)
+					c.Block(wx, y + h / 2, wz, V.new(0.4, h, 0.4), stalk, soft)
+					c.Block(wx, y + h + 0.6, wz, V.new(0.8, 1.6, 0.8), wheat, soft)
+				end
+			end, c.Lane + 3, 100)
+			-- Hay bales.
+			Props.Scatter(c, 5, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 1.5, z, V.new(4, 3, 7), hay)
+				c.Block(x, y + 1.5, z + 6, V.new(4, 3, 4), hay, { Yaw = 30 })
+				c.Block(x + 0.2, y + 4.5, z + 2, V.new(4, 3, 6), hay)
+			end, c.Lane + 8, 92)
+			-- A scarecrow each side, like her flock.
+			for _, side in { -1, 1 } do
+				local x, z = side * 84, c.Random.Number(-60, 60)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 6, z, V.new(1, 12, 1), wood)
+				c.Block(x, y + 9, z, V.new(1, 1, 10), wood)
+				c.Block(x, y + 8, z, V.new(2.6, 4, 4), rgb(176, 70, 56))
+				c.Block(x, y + 11.6, z, V.new(2.6, 2.6, 2.6), rgb(214, 190, 140))
+				c.Block(x, y + 13.1, z, V.new(5, 0.4, 5), rgb(150, 116, 62))
+				c.Block(x, y + 14, z, V.new(2.6, 1.6, 2.6), rgb(150, 116, 62))
+			end
 		end,
 	}
 
@@ -1503,6 +1582,94 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 				)
 			end
 			Props.Fire(c, x, z, rgb(150, 100, 80), rgb(182, 122, 62), true)
+		end,
+	}
+
+	themes.Poseidon = {
+		Floor = rgb(206, 196, 160),
+		Cap = rgb(72, 168, 182),
+		SideA = rgb(150, 170, 172),
+		SideB = rgb(166, 186, 188),
+		Leaves = rgb(72, 162, 132),
+		Trunk = rgb(150, 122, 92),
+		Stone = rgb(180, 196, 196),
+		Cloud = rgb(230, 244, 248),
+		Islands = 4,
+		Plants = { { "Bush", 3 }, { "RoundTree", 2 } },
+		Props = function(c: any)
+			local V = c.Vector3
+			local water, foam, gold = rgb(52, 150, 210), rgb(220, 244, 250), rgb(232, 192, 76)
+			local neon = c.Enum.Material.Neon
+			-- Waterfalls from floating rocks either side.
+			for _, side in { -1, 1 } do
+				local x, z = side * c.Random.Number(140, 170), c.Random.Number(-60, 60)
+				local top = c.Random.Number(40, 60)
+				c.Place("Island", x, z, { Y = top - 10, Scale = 1.2, Solid = rgb(150, 170, 172) })
+				c.Block(x, top - 70, z, V.new(6, 120, 14), water, {
+					Material = neon,
+					Transparency = 0.3,
+					CanCollide = false,
+					CastShadow = false,
+				})
+				c.Block(x, top - 3, z, V.new(10, 2, 18), foam, { Material = neon, CanCollide = false })
+			end
+			-- Rock pools, coral and his trident.
+			Props.Scatter(c, 4, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				for i = 0, 3 do
+					local a = math.rad(i * 90)
+					c.Block(x + math.cos(a) * 6, y + 1, z + math.sin(a) * 6, V.new(2, 2, 14), foam, { Yaw = -i * 90 })
+				end
+				c.Block(x, y + 1.4, z, V.new(11, 0.4, 11), water, { Material = neon })
+			end, 72, 94)
+			local coral = { rgb(236, 112, 102), rgb(244, 160, 120), rgb(214, 92, 150) }
+			Props.Scatter(c, 6, function(x: number, z: number)
+				c.Place(c.Random.Pick({ "Spire", "SmallSpire" }), x, z, { Solid = c.Random.Pick(coral), Sink = 1 })
+			end, c.Lane + 14, 100)
+			for _, side in { -1, 1 } do
+				c.Sprite("Trident", side * 86, c.Random.Number(-60, 60), 2, { G = gold })
+			end
+		end,
+	}
+
+	themes.Hera = {
+		Floor = rgb(200, 186, 214),
+		Cap = rgb(226, 190, 86),
+		SideA = rgb(158, 128, 182),
+		SideB = rgb(172, 142, 194),
+		Leaves = rgb(80, 150, 110),
+		Trunk = rgb(120, 92, 82),
+		Stone = rgb(214, 204, 224),
+		Plants = { { "RoundTree", 3 }, { "BlossomTree", 2 } },
+		Props = function(c: any)
+			local V = c.Vector3
+			local gold, purple, marble = rgb(232, 192, 76), rgb(122, 72, 160), rgb(242, 238, 236)
+			-- Golden urns of flowers along the courtyard.
+			Props.Edges(c, 50, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 1, z, V.new(4, 2, 4), marble)
+				c.Block(x, y + 3.4, z, V.new(4.4, 2.8, 4.4), gold)
+				c.Block(x, y + 5.4, z, V.new(3.6, 1.4, 3.6), purple, { CanCollide = false })
+			end)
+			-- Peacocks, her birds, their tails fanned open.
+			local tail = { rgb(52, 150, 132), rgb(62, 120, 190) }
+			Props.Scatter(c, 3, function(x: number, z: number)
+				local y = c.Ground(x, z)
+				local out = if x > 0 then 1 else -1
+				Props.Fan(c, x + out * 1.5, y + 2, z, 11, 11, tail, rgb(40, 60, 150))
+				c.Block(x, y + 2.4, z, V.new(2.4, 3, 3), rgb(52, 92, 180))
+				c.Block(x - out * 0.6, y + 5, z, V.new(1, 3, 1), rgb(52, 92, 180))
+			end, c.Lane + 12, 90)
+			-- Her crown, and the golden apples she was given at her wedding.
+			for _, side in { -1, 1 } do
+				local x, z = side * 86, c.Random.Number(-60, 60)
+				local y = c.Ground(x, z)
+				c.Block(x, y + 2, z, V.new(6, 4, 10), marble)
+				c.Sprite("Crown", x, z, 1.4, { G = gold, R = rgb(204, 52, 62), B = rgb(62, 92, 200) }, { Y = y + 4 })
+			end
+			Props.Scatter(c, 3, function(x: number, z: number)
+				c.Sprite("Apple", x, z, 1.8, { G = gold, L = rgb(98, 172, 72), W = rgb(255, 244, 200) })
+			end, c.Lane + 10, 96)
 		end,
 	}
 

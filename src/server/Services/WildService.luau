@@ -16,7 +16,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- The gods' wild lambs: four spawns a tier, each rolled once (fleece, burden, and the adult size it will grow to) and
 -- kept until someone delivers it; a failed theft puts the same lamb back. A theft: hold Interact on a lamb, it goes
 -- over your head, its god gives chase (GodService), and you either reach your own delivery pad or lose it (caught,
--- dead, reset, left, gave up, blocked at a gate). New players also get one private, Light, ordinary Demeter lamb of
+-- dead, reset, left, gave up, blocked at a gate). New players also get one private, Light, ordinary tier 1 lamb of
 -- their own for the tutorial.
 local WildService = { Name = "WildService" }
 

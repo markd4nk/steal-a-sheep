@@ -29,7 +29,8 @@ Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session 
   ReplicatedStorage, ServerScriptService, StarterPlayerScripts, Tests) into `content/sas/sync.rbxm`, then in Edit
   `GetObjects` it and swap each container's children.
 - **Lane check**: every collidable part under a stretch's `Decor` in its frame (x across, y up from the floor) must have
-  |x| >= 56 or sit 16+ studs up; 0 found.
+  |x| >= 56 or sit 16+ studs up. `lune run tools/check-lanes.luau` checks the built `StealASheep.rbxl` without Studio
+  (exits 1 and lists the parts if any are in the lane); rerun it after changing a theme or the stretches' layout.
 - **Slides on the steep stretches**: bind a RenderStep at `Input + 1` that calls `Humanoid:Move(-X)` (the slide reads
   MoveDirection) and sample `FloorMaterial` and height over `Mountain.RampY`. Measured from Zeus's pasture: 60 studs/s
   along the floor is 37 across it at 52 degrees; 0 of 74 samples in the air with the ramp hold, 29% without.
@@ -47,8 +48,8 @@ StarterPlayerScripts and Tests, written into Studio's `content\sas\` folder, the
 
 Useful measurements:
 
-- Slide: tier 1 Light lamb 20.1 studs/s, Stout 17.3; tier 7 Light at full training ~38.8. Gods: 21.1 (Demeter
-  chasing a slider), 35.2 (Apollo), 12.6 (Demeter on the tutorial run, walking target).
+- Slide: tier 1 Light lamb 20.1 studs/s, Stout 17.3; tier 7 Light at full training ~38.8. Gods: 21.1 (tier 1's
+  chasing a slider), 35.2 (tier 7's), 12.6 (tier 1's on the tutorial run, walking target).
 - Holding E for 0.7-0.9 s through `user_keyboard_input` steals a lamb; W held with the camera turned downhill starts a
   slide.
 - Screenshots: `screen_capture` with `camera_position` turns on Freecam, which then eats the mouse; restart the

@@ -124,7 +124,7 @@ function Economy.BaseIncome(tier: number): number
 	return Economy.Round(2 * 2.5 ^ (tier - 1))
 end
 
--- Reach, Light and Heavy Climb Power for a tier: Light 1.5x and Heavy 2.25x its reach; Demeter is 0, 25, 60.
+-- Reach, Light and Heavy Climb Power for a tier: Light 1.5x and Heavy 2.25x its reach; tier 1 is 0, 25, 60.
 function Economy.Targets(tier: number): (number, number, number)
 	if tier == 1 then
 		return 0, 25, 60

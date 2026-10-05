@@ -16,6 +16,11 @@ confirmed or reversed it.
 - **Thirty gods, Zeus on top (2026-10-05)**: the user's list of thirty, a map part for each above the old summit
   (High Olympus), each god's section grouped, the new parts indistinguishable from the commissioned map (its own
   pieces, studs and textures).
+- **Gods climb in mythological rank, Zeus's family at the top (2026-10-05)**: the user, "the Zeus family should end up
+  at the top". The minor gods on the commissioned map, each on a stage that suits them; on High Olympus five more, then
+  the thirteen Olympians youngest first: Dionysus, Hermes, Hephaestus, Ares, Aphrodite, Artemis, Apollo, Athena,
+  Demeter, Hestia, Poseidon, Hera, Zeus. The user kept that order of 18-30 ("if in Greek mythology they don't have a
+  hierarchy, then it doesn't really matter").
 - **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
   noticeable; then "keep it that").
 - **No shortcut up**: the climb stays on foot, however long (the user turned down a lift to the highest open gate,
@@ -25,20 +30,34 @@ confirmed or reversed it.
 
 ## To review
 
+Calls made ordering the gods by rank (2026-10-05):
+
+- **Which minor god takes which stage**: Pan on the meadow (the shepherds' god), Tyche on the bamboo, Hecate on the
+  moonlit snow, Phobos and Eris on the lava, Eros and Hebe in the rose garden, Themis at the marble temple, Asclepius at
+  the aqueduct, Iris and Nike on the cloud path, Aeolus on the old summit; Hypnos, Morpheus, Deimos, Thanatos and
+  Nemesis on High Olympus 13-17, as before.
+- **New area names**: Shepherd's Meadow, Moonlit Crossroads, Fear Ledge, Ambrosia Garden, Messenger's Road, Great
+  Forge, War Camp, Moonlit Forest, Olive Grove, Harvest Fields; the others kept theirs.
+- **Each god keeps their sheep family and look**, so families move with them: Wild Sheep are tier 1's now, Meadow
+  (Scarecrow) Sheep tier 26's. Plain-looking families (Scarecrow, Merino) now come late and flashy ones (Galaxy, Black
+  Hole) mid-climb.
+- **The Olympians' High Olympus stretches** (new): Dionysus's vines, wine barrels and grapes; Hermes's herms,
+  caduceus, winged sandals and coins; Hephaestus's furnaces, anvils, molten pools and braziers; Ares's banners, tents,
+  shields and spears and helmets; Aphrodite's roses, hearts, pink arches and a scallop shell with its pearl; Artemis's
+  dark pines, the moon, archery targets and silver lights; Apollo's sun, laurel arch, golden tripods and lyres;
+  Athena's columns, temple, owls and oil jars; Demeter's wheat, hay bales and scarecrows; Poseidon's waterfalls from
+  floating rocks, rock pools, coral and tridents; Hera's golden urns, peacocks, crown and golden apples. The minor gods
+  who moved down lost their stretches' props (rainbow, pipes, fountain, wheel of fortune, serpent staff, crystals,
+  crossroads, fear moon, scales, laurel arch): the commission's stages are as they were.
+
 Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls are under Confirmed rules.
 
-- **Climb order**: the old summit is Aeolus's (12, "Windswept Peaks"); then Iris, Pan, Hebe, Eros, Tyche, Asclepius,
-  Eris, Hecate, Hypnos, Morpheus, Phobos, Deimos, Thanatos, Nemesis, Themis, Nike, Hestia, Zeus (13-30): bright and wild
-  first, then dusk, sleep, dreams, fear and death, then justice, victory and the hearth by Zeus's throne. The user's
-  list ranks by fame; the old map's stages already hold the Olympians, so the minor gods are above them.
 - **Stretch length**: 210 studs along each stretch's floor (130-178 across the ground; grades in `STRETCHES`,
   `tools/UpperMountain.luau`).
 - **Look**: stage 3's floor slab and terrace blocks for every stretch, recoloured per god; trees, rocks, islands, clouds,
-  spires, arches and the pavilion cloned from the stages; block props per god (a rainbow over the path, Pan's pipes and
-  toadstools, goblets and a fountain, hearts, coins and a wheel of fortune, the serpent staff and pools, golden apples
-  and crystals, torches and a moon, poppies, floating dream shapes and stars, craters, Mars beside Deimos, eyes,
-  gravestones, ghosts and wisps, swords, columns and scales, trophies, wings and banners and a laurel arch, braziers and
-  a hearth, lightning bolts and storm clouds). Decor stays out of the lane (no slide snags); trees stand upright, not
+  spires, arches and the pavilion cloned from the stages; block props per god (poppies, floating dream shapes and
+  stars, craters and Mars beside Deimos, gravestones, ghosts and wisps, swords and a wheel, the Olympians' props above,
+  braziers and a hearth, lightning bolts and storm clouds). Decor stays out of the lane (no slide snags); trees stand upright, not
   tilted with the slope as the old stages' are. The old summit's end wall (stage 7's 80-block terrace) is removed.
 - **Summit**: a flat 90-stud plaza past Zeus's stretch with his gold throne, steps and a marble colonnade.
 - **Numbers, tiers 13-30**: reach about x2.5 a tier from 81M (200M, 500M, 1.3B ... 480T, 1.2Qa at Zeus), Light and Heavy
@@ -62,10 +81,6 @@ Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls
 
 Calls made while building the MVP on 2026-10-05:
 
-- **God order fits the map's stage themes**: Demeter (meadow), Dionysus (bamboo), Artemis (snow), Hephaestus and Ares
-  (lava), Aphrodite and Apollo (rose garden), Athena and Poseidon (marble temple and aqueduct), Hermes, Hera and Zeus
-  (cloud path to the summit). Each tier
-  keeps its numbers (reach, income) in order. Reordering is a reorder of rows in `Config/Olympus`.
 - **Twelve tiers on seven stages**: the long stages hold two or three tiers (stage 4: 2, stage 5: 2, stage 6: 2,
   stage 7: 3). Tier boundaries are x positions on the ramp (`Olympus.Tiers[].XStart`).
 - **Families are Shear a Sheep breeds**: Scarecrow, Moon (silver), Lava, Cotton Candy, Solar System, Ocean, Cloud,
@@ -100,11 +115,7 @@ Calls made while building the MVP on 2026-10-05:
 - **HUD**: menu buttons (Flock, Shop, Sheepdex) appear after the first delivery; the objective line always shows the
   next useful step (steal, slide home, train, put sheep to work, train for Light/Heavy, climb to the next god), with a
   guide arrow to it; a training meter shows the next Climb Power target while on the walker.
-- **Tutorial**: a new player's private, Light, ordinary Demeter lamb sits in the meadow (others can't take it); its
+- **Tutorial**: a new player's private, Light, ordinary tier 1 lamb (Pan's) sits in the meadow (others can't take it); its
   run is protected from slide hits; any first delivery gives +60 coins and +25 Climb Power and removes it.
 - **Sounds**: Shear a Sheep's cues: the danger music during a chase, WolfScare on the alert, IntroWhip on a slide,
   Yelp/Scuffle on hits, Coin/DexReward/Upgrade/Reveal on rewards.
-
-## Calls left to the user
-
-- Keep the theme-fitted god order, or change it?

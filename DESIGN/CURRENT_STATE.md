@@ -22,7 +22,8 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 ## The game, and where each part lives
 
 The MVP built in one pass on 2026-10-05 (HISTORY.md); the user now refines it as they go (GAME_DESIGN.md). Thirty
-tiers: twelve up the commissioned map (Aeolus on its old summit) and eighteen on High Olympus above it, Zeus at the top.
+tiers, the gods in mythological rank: twelve minor gods up the commissioned map (Pan first, Aeolus on its old summit),
+then five more and the thirteen Olympians on High Olympus above it, Zeus at the top.
 A god each, four wild lambs each, stair walker training, overhead carrying, the automatic downhill slide with steering,
 braking and slide hits, pursuit, delivery, pens, income, growth, size reveal, Equip Best, locks, selling, merging,
 trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
@@ -43,7 +44,10 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 ## In progress
 
-- Nothing. High Olympus is merged into main; DECISIONS.md's *To review* lists its calls.
+- **Gods in rank order** (branch `t3code/order-olympian-gods`, not merged): `Config/Olympus` reordered, new High
+  Olympus stretches for the eleven Olympians who moved up. Waiting for the user's OK on the new stretches; needs main's
+  275-stud stretches (another session's branch) merged in, then `tools/check-lanes.luau` and a rebuild.
+- **Real god models**: a Zeus mock-up first, for the user's OK before modelling the other 29.
 
 ## Not verified
 

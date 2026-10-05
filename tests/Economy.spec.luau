@@ -102,9 +102,9 @@ return function(t: Run.Suite)
 		t.Expect(Economy.CarryMultiplier(3, 0, 1)).ToBe(0.6)
 		t.Expect(Economy.CarryMultiplier(3, 25, 1)).ToBe(0.76)
 		t.Expect(Economy.CarryMultiplier(3, 1e9, 1)).ToBe(0.94)
-		-- Halfway between Reach (100) and Light (150) for Dionysus.
+		-- Halfway between Reach (100) and Light (150) for tier 2.
 		t.Expect(near(Economy.CarryMultiplier(1, 125, 2), 0.88)).ToBe(true)
-		-- Below Reach keeps the first value: never divide by Demeter's 0.
+		-- Below Reach keeps the first value: never divide by tier 1's 0.
 		t.Expect(Economy.CarryMultiplier(2, 50, 2)).ToBe(0.72)
 	end)
 
