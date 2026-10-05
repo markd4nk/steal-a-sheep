@@ -38,14 +38,14 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
   `Utils/Economy` (every formula), `Utils/Mountain` (ramp height, tiers by position, floor checks).
+- **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
+  gods at one set speed; weight saved and tilting size odds (`Economy.RollWeight`, `SizeOdds`, for the Merge Shrine).
+  GAME_DESIGN.md, *Climbing* and *Lamb weight*.
 - **From Shear a Sheep**: UIKit, Theme, Style (trimmed), Panel, Buttons, Motion, Scale, the sheep rig, add-ons and
   breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds, the Mutation Machine (as the Merge Shrine).
 
 ## In progress
 
-- **Climbing** (branch `t3code/climbing-slope-scaling`): one stat, no walls, one speed rule from Climbing and the
-  lamb's hidden weight; gods at one set speed; weight saved and tilting size odds (`Economy.RollWeight`, `SizeOdds`,
-  for the Merge Shrine). GAME_DESIGN.md, *Climbing*.
 
 ## Not verified
 
