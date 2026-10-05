@@ -1,9 +1,11 @@
 # Game design
 
-**The user directs this game.** Since 2026-10-05 they are taking it in their own direction, so this page describes the
-game *as it is now*, not a plan to defend. When the user asks for a change, make it: don't push back because it
-differs from what was built before or from earlier plans (the first build followed a draft design doc that the user
-has since deleted; it is not a requirement). After the change, update this page so it stays a true description.
+**Where it started, and how it's changing.** The game was built from the user's base design doc,
+[`DESIGN/BASE_DESIGN_DOC.md`](BASE_DESIGN_DOC.md) (draft v0.3, 2026-10-05), which explains why the first build is the
+way it is. From here the user refines the game as they go, and much of what was first built will be reworked and made
+better. So the base doc is background, not a spec, and this page describes the game *as it is now*. When the user asks
+for a change, make it, even where it departs from the base doc or the first build; don't push back on those grounds.
+Then update this page so it stays a true description.
 
 ## Pitch
 Climb the mountain, steal a god's lamb, hold it over your head and slide downhill to escape (knocking back climbers

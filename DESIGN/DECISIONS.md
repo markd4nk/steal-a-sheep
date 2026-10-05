@@ -7,9 +7,10 @@ confirmed or reversed it.
 
 ## Confirmed rules
 
-- **The user directs the game from here (2026-10-05).** They deleted the draft design doc the first build followed and
-  are taking the game their own way: a request that changes what was built is the new rule. Don't object that it goes
-  against earlier plans, the old doc, or the calls below; just make it and update the docs.
+- **The base design doc is the starting point; the user refines from here (2026-10-05).** The first build followed
+  `DESIGN/BASE_DESIGN_DOC.md`; the user will rework a lot of it as they go. A request that changes what was built is
+  the new rule: don't object that it goes against the base doc, the first build or the calls below; make it and update
+  the docs.
 - The first build reused Shear a Sheep's UI and assets and kept new things primitive (the user, 2026-10-05). That was
   how the MVP was made, not a limit on later changes.
 

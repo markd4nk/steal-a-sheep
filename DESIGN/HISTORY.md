@@ -6,9 +6,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
-- **The draft design doc deleted (2026-10-05)**. The user is taking the game their own way and asked that later sessions
-  not hold changes against the old plan. GAME_DESIGN.md now describes the game as it is; DECISIONS.md says the user's
-  requests win; code comments no longer cite the doc.
+- **The base design doc kept as background (2026-10-05)**. The user used the draft design doc as the base and will now
+  refine the game as they go; later sessions mustn't hold changes against it. It lives in `DESIGN/BASE_DESIGN_DOC.md`
+  with a note saying so; GAME_DESIGN.md describes the game as it is; DECISIONS.md says the user's requests win.
 - **The MVP in one pass (2026-10-05)**. The user: copy the RobloxPack into the Steal a Sheep folder, read the game
   document, use the map in the folder and as much of Shear a Sheep as possible, keep new things MVP primitive, and
   complete it in one go.
