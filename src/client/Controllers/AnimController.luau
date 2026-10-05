@@ -1,6 +1,7 @@
 --!strict
 
 local CollectionService = game:GetService("CollectionService")
+local ContentProvider = game:GetService("ContentProvider")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -79,7 +80,8 @@ local touched: { Motor6D } = {}
 local befores: { CFrame } = {}
 local sincePick = math.huge
 local nextBaa = 0
-local arrived: { [string]: boolean } = {} -- face pictures this device has downloaded: only those are swapped in
+local arrived: { [string]: boolean } = {} -- face pictures this device has: only those are swapped in
+local askedAt: { [string]: number } = {} -- when a missing picture's fetch status was last asked for
 
 local function smooth(x: number): number
 	local t = math.clamp(x, 0, 1)
@@ -182,6 +184,24 @@ local function addSheep(instance: Instance)
 	end
 	local entry = rig(instance)
 	sheep[instance] = entry
+	-- A sheep made while this player is here can arrive in pieces, its tag before its joints and face: take those as
+	-- they come, or it walks about stiff and never changes face.
+	table.insert(
+		entry.Connections,
+		instance.DescendantAdded:Connect(function(descendant: Instance)
+			if descendant:IsA("Motor6D") then
+				entry.Joints[descendant.Name] = descendant
+			elseif
+				descendant:IsA("Decal")
+				and descendant.Name == "Face"
+				and descendant.Parent == instance:FindFirstChild("Head")
+			then
+				entry.Face = descendant
+				entry.OwnFace = descendant.Texture
+				entry.FaceShown = nil
+			end
+		end)
+	)
 	local spot = instance:GetAttribute("Spot")
 	if typeof(spot) ~= "CFrame" then
 		return
@@ -385,10 +405,25 @@ local function faceFor(entry: Rigged, clock: number, stage: string?): string?
 	return nil
 end
 
+-- Whether this device has the picture: the preload said so, or it arrived some other way since (the preload's answer
+-- can lag behind, as for a picture fresh out of Roblox's review).
+local function hasPicture(id: string?): boolean
+	if not id then
+		return false
+	end
+	if not arrived[id] and os.clock() - (askedAt[id] or -math.huge) >= 1 then
+		askedAt[id] = os.clock()
+		if ContentProvider:GetAssetFetchStatus(id) == Enum.AssetFetchStatus.Success then
+			arrived[id] = true
+		end
+	end
+	return arrived[id] == true
+end
+
 local function showFace(entry: Rigged, wanted: string?)
 	local decal = entry.Face
 	-- A picture still on its way would show a blank face: the sheep keeps its own until it's here.
-	local face = if wanted and arrived[Pictures[wanted] or ""] then wanted else nil
+	local face = if wanted and hasPicture(Pictures[wanted]) then wanted else nil
 	if not decal or face == entry.FaceShown then
 		return
 	end

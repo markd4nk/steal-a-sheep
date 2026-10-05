@@ -54,6 +54,16 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 - **S12** (`BRAIN/PATTERNS/animations.md`): "A Motor6D `Transform` set from a script moves its parts only at the next
   simulation step: in a test, wait a frame (`task.wait()`) before reading the moved parts' positions." Seen 2026-10-05
   measuring a grazing pose.
+- **S13** (`BRAIN/PATTERNS/components.md`): "A tagged model the server makes while players are in the game can reach
+  a client in pieces: `CollectionService`'s added signal (and a Binder's) fires for the model before all its
+  descendants have arrived. Code that collects a model's parts, joints or decals when its tag appears must also take
+  them from `DescendantAdded`, or it keeps a partial set for good." Seen 2026-10-05, Steal a Sheep: lambs put down in
+  the pen walked about stiff and never changed face in two takes of five; models made before the player joined were
+  never affected.
+- **S14** (`BRAIN/PATTERNS/testing-studio.md`): "A picture uploaded through `upload_image` reports
+  `AssetFetchStatus.Failure` until Roblox's review clears it (minutes), and a Studio that fetched it before then may go
+  on reporting Failure from `PreloadAsync` after it's cleared: check in a freshly opened Studio. In game code, swap in a
+  new picture only once it has arrived, or a Decal shows nothing meanwhile." Seen 2026-10-05.
 
 ## Done
 

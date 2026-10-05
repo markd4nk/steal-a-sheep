@@ -34,7 +34,12 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     Studio's content folder, nothing uploaded); the user picked A, "Munch". MunchA and MunchB were uploaded through the
     Studio MCP's `upload_image` (served on 127.0.0.1) as rbxassetid://140615494609777 and 118466923824368 and set as
     `ChewFaces`. AnimController preloads its face pictures one request each and swaps in only those that have
-    arrived, so a picture still in Roblox's review never shows as a blank face.
+    arrived (or whose fetch status says Success), so a picture still in Roblox's review never shows as a blank face.
+    Seen in a fresh Studio: the lamb chews with the uploaded Munch frames (filmed).
+  - *A fix found filming*: a sheep made while the player is in the game (every put-down) could reach the client in
+    pieces, its `Sheep` tag before its Motor6Ds and face: AnimController rigged it at once and it walked about stiff,
+    never grazing or changing face (two takes in five). It now takes joints and the face from `DescendantAdded` too;
+    three lambs put down in a row then all grazed, chewed, blinked and baa-ed (25 s face log).
   - *UI*: objective "Bring it into your pen" / "Put it down where you like" (and the full-pen warning); Flock card "In
     your pen"; Shop "Pen Space n/12".
   - *Checked*: `check.ps1` passes; 43 tests pass in Studio (Wander, PlayerData homes). Playtested solo in this session's

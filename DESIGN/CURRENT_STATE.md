@@ -49,9 +49,9 @@ lamb.
 
 ## In progress
 
-- **The eating face is A ("Munch")**, uploaded 2026-10-05 (`Faces.MunchA`/`MunchB`, `ChewFaces`) and waiting on
-  Roblox's image review: until a picture loads, a sheep keeps its own face (AnimController only swaps in pictures that
-  have arrived). Drawn by `art/faces/chew_faces.py` with Shear a Sheep's `art/sheep/mock_faces.py` helpers.
+- **The eating face is A ("Munch")**, uploaded 2026-10-05 (`Faces.MunchA`/`MunchB`, `ChewFaces`), cleared by Roblox's
+  review and seen on a chewing lamb in Studio. Until a picture loads, a sheep keeps its own face. Drawn by
+  `art/faces/chew_faces.py` with Shear a Sheep's `art/sheep/mock_faces.py` helpers.
 - **Free-roaming pens are on their branch**, not yet merged into main (the user's call).
 
 ## Not verified

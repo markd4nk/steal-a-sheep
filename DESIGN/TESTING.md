@@ -44,6 +44,16 @@ Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session 
   only that Studio sees them. Put the Source back after (compare its length with the file on disk).
 - **Lambs grow up during a take**: a lamb is grown after 45 + 15 x (tier - 1) seconds in the pen (tier 2: a minute),
   and grown sheep graze far less. Film a tier 8+ lamb (150 s or more), or film soon after putting it down.
+- **Is a sheep animating?** Log its `Head.Face.Texture` every RenderStepped for 20-30 s (and its `Spot` changes): a
+  grazing lamb shows the chew frames about a third of the time, blinks every few seconds and baas now and then. Part
+  positions read from a script don't show the animation (AnimController puts the joints back after each step).
+- **Uploading pictures**: the Studio MCP's `upload_image` needs a Studio with a place open; serve the PNGs with
+  `python -m http.server <free port> --bind 127.0.0.1` and stop it after. A new picture fails to load until Roblox's
+  review clears it (a few minutes); a Studio that tried before then may keep reporting Failure, so check in a freshly
+  opened Studio, or draw it in an ImageLabel (`IsLoaded`).
+- **Closing your Studio**: other sessions' "Save changes to ...?" dialogs look the same as yours. `window list` with
+  `details`, screenshot the dialog by its `hwnd`, `focus` that hwnd, then click Don't Save. Close the old window
+  before opening a rebuilt copy of the same file, or its save prompt meets "file in use".
 
 ## High Olympus in an open Studio (2026-10-05)
 
