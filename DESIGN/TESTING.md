@@ -37,7 +37,13 @@ Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session 
 - **Filming**: `screen_capture`'s `camera_position` is temporary. To hold a camera for `windows-computer-use` `record`,
   bind a RenderStep at `Enum.RenderPriority.Last` that sets a Scriptable camera, hide the ScreenGuis, and undo both
   after. The recorder writes its mp4 into the repo (`windows-computer-use/`): move it out; crop the game view with
-  ffmpeg.
+  ffmpeg. To film a face, follow the sheep's front each frame (`pivot + LookVector * 5 * scale`), finding the model by
+  its `SheepId` (a lamb that grows up is rebuilt as a new model).
+- **Face art before it's uploaded**: copy the PNGs into the Studio version's `content/sas-pens/faces/`, and in Edit
+  point the place's own `GameConfig` Source at them (`MunchA = "rbxasset://sas-pens/faces/MunchA.png"`, `ChewFaces`);
+  only that Studio sees them. Put the Source back after (compare its length with the file on disk).
+- **Lambs grow up during a take**: a lamb is grown after 45 + 15 x (tier - 1) seconds in the pen (tier 2: a minute),
+  and grown sheep graze far less. Film a tier 8+ lamb (150 s or more), or film soon after putting it down.
 
 ## High Olympus in an open Studio (2026-10-05)
 
