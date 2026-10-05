@@ -15,7 +15,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- The world's prompts on this device: a station's (Opens: Shop, Sell, Merge) opens its screen, another player's
 -- tutorial lamb can't be stolen here (the server refuses it too), and no lamb offers itself while the player carries
 -- one. Inside their own fence with a lamb, the lamb on their head offers Put down: a prompt only this device has, which
--- asks the server (Remotes.PutDown) to deliver it there.
+-- asks the server (Remotes.PutDown) to deliver it there. Only the owner sees their stair walker sign's upgrade prompts.
 local PromptController = { Name = "PromptController" }
 
 local OPENS: { [string]: { Screen: string, Options: { [string]: any }? } } = {
@@ -38,6 +38,26 @@ local function refreshPrompt(prompt: ProximityPrompt)
 	local mine = owner == nil or owner == player.UserId
 	local carrying = player:GetAttribute("Carrying") == true
 	prompt.Enabled = mine and not carrying
+end
+
+-- The walker sign's prompts carry their owner's id: hidden from everyone else. The server turns them on and off for
+-- the owner; this device only ever turns them off.
+local OWNED = { CoinPrompt = true, RobuxPrompt = true }
+
+local function refreshOwned(prompt: ProximityPrompt)
+	if prompt:GetAttribute("OwnerId") ~= player.UserId and prompt.Enabled then
+		prompt.Enabled = false
+	end
+end
+
+local function watchOwned(prompt: ProximityPrompt)
+	refreshOwned(prompt)
+	trove:Connect(prompt:GetPropertyChangedSignal("Enabled"), function()
+		task.defer(refreshOwned, prompt)
+	end)
+	trove:Connect(prompt:GetAttributeChangedSignal("OwnerId"), function()
+		task.defer(refreshOwned, prompt)
+	end)
 end
 
 local function refreshAll()
@@ -150,6 +170,22 @@ function PromptController.Start(_self: any)
 		end
 	end)
 	trove:Connect(player:GetAttributeChangedSignal("Carrying"), refreshAll)
+	task.spawn(function()
+		local plots = workspace:WaitForChild("Plots", 60)
+		if not plots then
+			return
+		end
+		trove:Connect(plots.DescendantAdded, function(descendant: Instance)
+			if descendant:IsA("ProximityPrompt") and OWNED[descendant.Name] then
+				watchOwned(descendant)
+			end
+		end)
+		for _, descendant in plots:GetDescendants() do
+			if descendant:IsA("ProximityPrompt") and OWNED[descendant.Name] then
+				watchOwned(descendant)
+			end
+		end
+	end)
 	local sinceCheck = 0
 	trove:Connect(RunService.Heartbeat, function(dt: number)
 		sinceCheck += dt

@@ -40,6 +40,14 @@ confirmed or reversed it.
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
   then don't thin or fill the slide lanes, old stages included.
+- **The stair walker is a real StairMaster the player climbs (the user, 2026-10-05)**: level 1 looks like a plain gym
+  machine and each upgrade looks better, ending in the Olympus look (marble and gold); the player snaps onto it like a
+  treadmill and climbs the moving steps; the steps get faster with each machine level.
+- **Its first five looks are the mock-up's** (Starter, Sport, Pro, Turbo, Champion), "stick with the five for a second";
+  the level floats over the machine; the machine stands outside the pen, very close to it, like Steal an Egg's; its
+  upgrade sign beside it upgrades it directly, for cash or Robux (the user, 2026-10-05).
+- **The stair walker's spot by the gate is right** (the user, 2026-10-05). Its Robux prices are being decided in
+  another session; the ones in `GameConfig.StairWalker.Robux` are placeholders until then.
 - **Put lambs down anywhere in the pen (2026-10-05)**: like Steal an Egg, the thief brings the lamb into their pen and
   places it where they choose; no delivery platform, no fixed pads to unlock and stand sheep on. Sheep walk around on
   their own like Shear a Sheep's; lambs mostly eat off the floor, head down and chewing, with an eating face: the
@@ -57,10 +65,29 @@ confirmed or reversed it.
 
 ## To review
 
+Calls building the stair walker (2026-10-05).
+
+- **Placeholder Robux prices (another session is deciding them; nothing is on sale)**: the next level costs R$ 19 (to
+  level 2), 39, 59, 99, then 149 for every level after. A developer product per price; ids 0 until they're made in Creator Hub, and the Robux
+  prompt says "Robux upgrades aren't on sale yet" meanwhile.
+- **Levels 6-30 keep the Champion look** until more looks are designed.
+- **The sign** stands by the machine's entry, turned to the gate, written on both sides ("UPGRADE", the next level, its
+  price in cash and R$).
+- **On and off**: walking into the entry snaps the owner on (only the owner, not while carrying a lamb); jumping puts
+  them down behind the entry facing away; "Jump to get off" shows the first time each session. Training only counts
+  while snapped on.
+- **The sign's prompts**: E upgrades with cash, R with Robux; only the owner sees them; they go at the top level, and
+  the board says MAX LEVEL. An empty plot's machine shows level 1 with no floating tag.
+- **Step speed by level**: a step takes `0.25 + 0.35 x 0.9^(level-1)` seconds: 0.60 at level 1, 0.48 at 5, 0.40 at
+  10, 0.30 at 20, 0.27 at 30.
+- **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor; the
+  machine's sides, hood, console and the sign are solid, the entry step and stairs aren't.
+
 Calls made building free placement and roaming sheep (2026-10-05):
 
-- **The pen is the whole fenced plot**; sheep keep 3 studs from the fence, off the stair walker, out of the map's trees
-  and hay. The map's hay and trees in the plots now stay where the map has them (only the walker's spot is cleared).
+- **The pen is the whole fenced plot**; sheep keep 3 studs from the fence and out of the map's trees and hay (the stair
+  walker now stands outside the fence, so there's no keep-out box). The map's hay and trees in the plots stay where the
+  map has them (only the walker's and its sign's spots outside the fence are cleared).
 - **Pen Space prices**: room for sheep 9 to 20 costs round(25,000 x 6^(n - 9)): 25K, 150K, 900K, 5.4M, 32M, 194M,
   1.2B, 7B, 42B, 252B, 1.5T, 9T. With eight tier 10 sheep the 13th takes about 9 minutes of income; the 20th is for
   tier 23 and up. A save with less room (the old 3) is raised to 8 when it loads. A lamb put down in a full pen is

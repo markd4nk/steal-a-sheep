@@ -371,6 +371,24 @@ local GameConfig = {
 		TickSeconds = 0.25,
 	},
 
+	-- The stair walker machine outside each pen. A step takes StepSeconds + StepRange x StepDecay^(level - 1) seconds
+	-- (level 1 is the free machine), so each upgrade runs faster.
+	StairWalker = {
+		StepSeconds = 0.25,
+		StepRange = 0.35,
+		StepDecay = 0.9,
+		AnimateRange = 220, -- studs from the camera within which machines and climbers move
+		-- Robux for the next level, by the level bought: 2, 3, 4, 5, then every level after. A product id of 0 isn't on
+		-- sale yet: make the developer products in Creator Hub and put their ids here.
+		Robux = {
+			{ Price = 19, ProductId = 0 },
+			{ Price = 39, ProductId = 0 },
+			{ Price = 59, ProductId = 0 },
+			{ Price = 99, ProductId = 0 },
+			{ Price = 149, ProductId = 0 },
+		} :: { { Price: number, ProductId: number } },
+	},
+
 	-- Offline earnings: a quarter of at most two hours.
 	Offline = {
 		MaxSeconds = 2 * 60 * 60,

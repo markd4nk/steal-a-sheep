@@ -51,6 +51,8 @@ local Remotes = {
 	Buy = Net.Request("Buy", { Guard.OneOf(BUY_ITEMS), Guard.Optional(Guard.String(16)) }, { Count = 8, Window = 1 }) :: Net.Request<(string, string?), (boolean, string?)>,
 	-- Give up a run: the carried sheep goes back to its pasture.
 	ReturnSheep = Net.ToServer("ReturnSheep", {}, { Count = 2, Window = 1 }) :: Net.ToServer<()>,
+	-- Off the stair walker (the player jumped while on it).
+	LeaveWalker = Net.ToServer("LeaveWalker", {}, { Count = 4, Window = 1 }) :: Net.ToServer<()>,
 	-- Put the carried lamb down here, in the player's own pen: that delivers it (the server checks where they stand).
 	PutDown = Net.ToServer("PutDown", {}, { Count = 4, Window = 1 }) :: Net.ToServer<()>,
 	-- The client's slide state (MovementController): the server checks hits only for sliders it has heard from.

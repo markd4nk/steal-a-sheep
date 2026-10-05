@@ -10,6 +10,7 @@ local PenArea = require(ReplicatedStorage.Utils.PenArea)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Build = require(script.Build)
+local Walker = require(script.Walker)
 
 -- The map's five player plots (workspace.Base.PlayerPlots): one per player, first come first served, with the pieces
 -- Build adds to each (the pen, stair walker, sign). Players spawn inside their own plot's gate. Also answers where a
@@ -123,6 +124,7 @@ local function release(player: Player)
 		byPlayer[player] = nil
 		plot.Owner = nil
 		setSign(plot)
+		Walker.Paint(plot.Pieces.Walker, nil, nil)
 	end
 end
 
@@ -154,7 +156,7 @@ function PlotService.Start(_self: any)
 	for index, model in models do
 		local pieces, origin = Build.Plot(index, model, folder)
 		local plot: Plot = { Index = index, Model = model, Origin = origin, Pieces = pieces, Owner = nil }
-		Build.PaintWalker(pieces.Walker, 0)
+		Walker.Paint(pieces.Walker, nil, nil)
 		setSign(plot)
 		table.insert(plots, plot)
 	end
@@ -250,20 +252,19 @@ function PlotService.Refresh(_self: any, player: Player, walkerLevel: number, in
 	if not plot then
 		return
 	end
-	Build.PaintWalker(plot.Pieces.Walker, walkerLevel)
+	Walker.Paint(plot.Pieces.Walker, walkerLevel, player.UserId)
 	plot.Pieces.SignIncome.Text = if income > 0 then `+{Format.Rate(income)}/s` else ""
-	plot.Pieces.WalkerScreen.Text = `STAIR WALKER LV {walkerLevel + 1}`
 end
 
--- Whether the player stands on their own stair walker's base.
-function PlotService.IsOnWalker(_self: any, player: Player): boolean
+-- Whether the player is at the entry of their own stair walker, where they step on.
+function PlotService.AtWalker(_self: any, player: Player): boolean
 	local plot = byPlayer[player]
 	local character = player.Character
 	local root = character and character:FindFirstChild("HumanoidRootPart")
 	if not plot or not root or not root:IsA("BasePart") then
 		return false
 	end
-	local zone = plot.Pieces.WalkerZone
+	local zone = plot.Pieces.Walker.Zone
 	local offset = zone.CFrame:PointToObjectSpace(root.Position)
 	local half = zone.Size / 2
 	return math.abs(offset.X) <= half.X and math.abs(offset.Y) <= half.Y and math.abs(offset.Z) <= half.Z
