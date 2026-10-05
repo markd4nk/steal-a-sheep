@@ -23,6 +23,9 @@ confirmed or reversed it.
   hierarchy, then it doesn't really matter").
 - **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
   noticeable; then "keep it that").
+- **High Olympus's stretches are 275 studs along the floor** (the user, 2026-10-05: at 210 they felt shorter than the
+  first levels, about 250, so a bit longer than those). 169-233 across the ground, so the steep ones still look
+  shorter than they climb.
 - **No shortcut up**: the climb stays on foot, however long (the user turned down a lift to the highest open gate,
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
@@ -50,10 +53,15 @@ Calls made ordering the gods by rank (2026-10-05):
   who moved down lost their stretches' props (rainbow, pipes, fountain, wheel of fortune, serpent staff, crystals,
   crossroads, fear moon, scales, laurel arch): the commission's stages are as they were.
 
+Calls made lengthening High Olympus's stretches to 275 (2026-10-05).
+
+- **Decor density kept**: each stretch's trees, rocks, islands, clouds and scattered props scale with its length
+  (x275/210), so the longer stretches look as full as the ones the user saw.
+- **Zeus's summit plaza starts flush with the top of his stretch**: before, its edge was a chest-high ledge a walker
+  couldn't get onto, so nobody could reach the throne on foot.
+
 Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls are under Confirmed rules.
 
-- **Stretch length**: 210 studs along each stretch's floor (130-178 across the ground; grades in `STRETCHES`,
-  `tools/UpperMountain.luau`).
 - **Look**: stage 3's floor slab and terrace blocks for every stretch, recoloured per god; trees, rocks, islands, clouds,
   spires, arches and the pavilion cloned from the stages; block props per god (poppies, floating dream shapes and
   stars, craters and Mars beside Deimos, gravestones, ghosts and wisps, swords and a wheel, the Olympians' props above,
