@@ -404,14 +404,14 @@ function FlockService.Deliver(_self: any, player: Player, wild: Wild): Sheep?
 		data.Dex[wild.Family] = true
 		local reward = Economy.DexReward(tier.Tier)
 		registry.DataService:AdjustCoins(player, reward)
-		notify(player, `New in your Sheepdex! +{Format.Short(reward)} coins`, "Rare", "DexReward")
+		notify(player, `New in your Sheepdex! +{Format.Short(reward)} cash`, "Rare", "DexReward")
 	end
 	if data.Tutorial == 0 then
 		data.Tutorial = 1
 		registry.DataService:AdjustCoins(player, Economy.TutorialCoins)
 		data.ClimbPower += Economy.TutorialClimb
 		registry.DataService:Replicate(player)
-		notify(player, `+{Economy.TutorialCoins} coins and +{Economy.TutorialClimb} Climb Power!`, "Rare", "Upgrade")
+		notify(player, `+{Economy.TutorialCoins} cash and +{Economy.TutorialClimb} Climb Power!`, "Rare", "Upgrade")
 	end
 	FlockService.Delivered:Fire(player, sheep)
 	refreshPen(player)
@@ -456,7 +456,7 @@ local function act(player: Player, data: any, action: string, id: string?): (boo
 		local value = Economy.SellValue(sheep)
 		data.Sheep[sheep.Id] = nil
 		registry.DataService:AdjustCoins(player, value)
-		return true, `Sold for {Format.Short(value)} coins`
+		return true, `Sold for {Format.Short(value)} cash`
 	end
 	return false, "Unknown action"
 end

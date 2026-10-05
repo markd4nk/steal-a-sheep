@@ -68,8 +68,9 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels, pen slots and trails. Climb Power
-(stair walker) opens tiers and reduces carrying slowdown. No Robux products.
+Cash, the only currency (code calls it `Coins`), comes from equipped sheep, first-discovery rewards and selling, and
+buys stair walker levels, pen slots and trails. Climb Power (stair walker) opens tiers and reduces carrying slowdown.
+No Robux products.
 
 ## Not built
 Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.

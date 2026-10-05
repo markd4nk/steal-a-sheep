@@ -25,7 +25,8 @@ confirmed or reversed it.
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
   then don't thin or fill the slide lanes, old stages included.
-- **The game's money is cash, not coins** (the user, 2026-10-05). Code still calls it `Coins`.
+- **The game's money is cash, the only currency** (the user, 2026-10-05: no coins anywhere). Every word players see
+  says cash; the code and saved data still call it `Coins`.
 - **Leaderboards live on the map's billboards in the safe zone, not behind a HUD icon** (the user, 2026-10-05): This
   Server (the richest here, by income), Top Income (the richest overall, each player's best ever), Most Steals and
   Climb Power. Titles are words only, no icon; otherwise the boards' look (dark panel, medal rows, headshots) is OK'd.

@@ -6,6 +6,11 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Coins renamed cash (2026-10-05)**. The user: there are no coins, just cash, all through the game. The nine messages
+  that said coins now say cash (selling, the Shop's "Need ... more", Sheepdex rewards, the tutorial reward, the
+  welcome-back card, the debug panel). Code names and saved data keep `Coins`; the map and the borrowed assets have
+  no coin text (scanned with Lune). Tyche's crown of coins and the coin-clink sounds stay: decoration, not money.
+
 - **World leaderboards (2026-10-05)**. The user: make the leaderboard actually work, on the map's billboard in the safe
   zone rather than inside a HUD icon. The map has four boards (`workspace.Base.Leaderboard`, two pairs at x 280, z
   28-66 and 303-341, facing the plots), so each ranks one thing. The first mock-up (Coins Earned, Top Income, Most
