@@ -28,6 +28,22 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   Checked: `check.ps1`; formula tests (climb share, climb tier, escape level points, god speed). Not playtested: the
   shared Studio was in another session's playtest.
 
+- **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
+  levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9
+  (4-5 are 126, 10-12 are 325), and 129-178 across the ground. The user picked 275.
+  - *Builder*: `SURFACE_LENGTH` 275 (tiers 13-30 now 169-233 across, summit at x 6721, height 4439, was 3661).
+    Stage 3's terrace unit covers only about 272 studs, so each stretch also takes the ends of the neighbouring
+    copies, 251.16 studs along the floor, the map's own repeat (measured: stage 5 holds two copies that far apart, in
+    their frame 251 along and 9.1 up, the 2 degrees between terrace and slab; shifting by the 9.1 too left the end
+    copies floating 4 studs up). Decor counts scale by 275/210 (`DECOR_SCALE`, `c.Count`). Eris's crystals start at
+    lane + 14 (one leaned 6 studs into the lane). Zeus's floor now stops at the top and the plaza starts flush with
+    it: before, the plaza's edge was a ledge no walker could climb (pre-existing at 210).
+  - *Config*: tiers 13-30's `XStart`/`XEnd` and the `Ramp` points regenerated from `UpperMountain.Layout()` (Lune).
+  - *Checked*: `check.ps1` passes. Lune: no gaps along any stretch's terraces at floor level; at the joints only the
+    terrace's own 2-stud notches. Second Studio on the built place: both bootstraps ready, 36 tests pass, 30 gods and
+    72 High Olympus lambs on the floor, 29 gates, 0 collidable decor in any lane (5,013 checked), 13,519 parts (was
+    10,547). On foot: 15 s a stretch at 17.5-18 studs/s, onto the summit plaza. Zeus theft slid down all eighteen
+    stretches in 93 s, 0 of 843 samples in the air, Zeus falling behind (59 to 473 studs). Joints screenshotted.
 - **High Olympus: thirty gods (2026-10-05)**. The user, liking the map: build out the next tiers from its parts and
   pieces, the top Olympus gods; then a list of thirty ("map parts for all of these gods"), Zeus on the new top, the
   look and studs indistinguishable from the original, each section grouped, the climb no steeper than about 60 degrees,

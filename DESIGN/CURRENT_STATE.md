@@ -27,7 +27,7 @@ A god each, four wild lambs each, stair walker training, overhead carrying, the 
 braking and slide hits, pursuit, delivery, pens, income, growth, size reveal, Equip Best, locks, selling, merging,
 trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
-- **High Olympus** (tiers 13-30): one stretch a god, 210 studs along the floor, 32 rising to 52 degrees, from stage 3's
+- **High Olympus** (tiers 13-30): one stretch a god, 275 studs along the floor, 32 rising to 52 degrees, from stage 3's
   floor slab and terraces and the stages' decor, recoloured, plus block props; Zeus's throne plaza on top. Built into
   the place by `tools/UpperMountain.luau` (Lune, in `build-place.ps1`); `tools/preview-upper-mountain.luau` previews it
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
@@ -54,6 +54,7 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   rejoin and session locking are untested (the offline maths is unit-tested).
 - **Touch and gamepad**: only keyboard and mouse in Studio. Prompts, HUD buttons and the slide use Roblox's own input.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
+<<<<<<< HEAD
 - **Climbing and escapes in play**: not playtested (Studio was in use by another session). The crawl, the uphill cap,
   the server's put-back, kept slide speeds and set god speeds are unit-tested in their formulas only.
 - **Escape speed isn't checked by the server**: a client could slide faster than its escape speed (as before, when it
@@ -61,6 +62,10 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 - **Upper tiers by foot**: tiers 7 and up were reached with the debug Unlock; climbing them on foot wasn't timed. By
   the numbers it's about 6.5 minutes from the plots to Zeus at full Climbing (a Humanoid walks its 18 studs/s along
   the slope); far under a tier's Reach it's about 4 minutes a stretch.
+=======
+- **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's
+  plaza). By the numbers it's about 7.6 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope).
+>>>>>>> main
 - **High Olympus theft to delivery**: a tier-30 slide was measured through all eighteen stretches (no hops, Zeus
   falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; and the climb speed check wasn't tried there.
 
@@ -70,7 +75,7 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   players steer round them; lanes stay as they are until the user adds obstacles (DECISIONS.md). Every run
   from High Olympus now passes through them: a straight slide from Zeus stuck on stage 6's pavilion (x 1890, mid-lane)
   and was caught. High Olympus's own lane is clear.
-- **Long runs at the top**: about 6.5 minutes' climb to Zeus and over 2 minutes' slide home; the user keeps it all on
+- **Long runs at the top**: about 7.6 minutes' climb to Zeus and about 2.5 minutes' slide home; the user keeps it all on
   foot (DECISIONS.md).
 - **High Olympus is sparse**: the user will add obstacles to the higher levels later.
 - **Plots: 5.** A sixth player is kicked with "server full"; set Maximum Visitor Count to 5 in Creator Hub.

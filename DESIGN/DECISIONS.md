@@ -18,6 +18,7 @@ confirmed or reversed it.
   pieces, studs and textures).
 - **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
   noticeable; then "keep it that").
+<<<<<<< HEAD
 - **Climbing is one stat, no walls (2026-10-05)**: speed and Climb Power are one thing, "Climbing". Every tier is
   open; steeper tiers need more and more Climbing to climb at a useful pace. Too little gives a very slow crawl, never
   a slip back down, so it's technically possible but nobody wants to, and a thief that weak is caught carrying the lamb
@@ -26,6 +27,11 @@ confirmed or reversed it.
   slower in lower stretches, never a walking speed); the thief's escape speed comes from Climbing; a slide keeps the
   speed it starts with all the way down (momentum). Checked against Steal an Egg: each zone has its own guardian,
   faster higher up, never scaled to the player; you escape with enough Speed over the zone's minimum.
+=======
+- **High Olympus's stretches are 275 studs along the floor** (the user, 2026-10-05: at 210 they felt shorter than the
+  first levels, about 250, so a bit longer than those). 169-233 across the ground, so the steep ones still look
+  shorter than they climb.
+>>>>>>> main
 - **No shortcut up**: the climb stays on foot, however long (the user turned down a lift to the highest open gate,
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
@@ -33,6 +39,7 @@ confirmed or reversed it.
 
 ## To review
 
+<<<<<<< HEAD
 Calls made building Climbing (2026-10-05):
 
 - **Climb speed**: `18 x Climbing / (Climbing + Reach)` uphill, each tier's old gate number as its Reach (half speed
@@ -50,6 +57,15 @@ Calls made building Climbing (2026-10-05):
   CLIMBING.
 - **Server check**: a player found further up than their Climbing allows (30% slack, 10 studs or 1 second's lead for
   lag) is put back at their allowed spot.
+=======
+Calls made lengthening High Olympus's stretches to 275 (2026-10-05).
+
+- **Decor density kept**: each stretch's trees, rocks, islands, clouds and scattered props scale with its length
+  (x275/210), so the longer stretches look as full as the ones the user saw.
+- **Eris's crystals start 14 studs outside the lane** (was 6): a leaning one reached 6 studs into the lane.
+- **Zeus's summit plaza starts flush with the top of his stretch**: before, its edge was a chest-high ledge a walker
+  couldn't get onto, so nobody could reach the throne on foot.
+>>>>>>> main
 
 Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls are under Confirmed rules.
 
@@ -57,8 +73,6 @@ Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls
   Eris, Hecate, Hypnos, Morpheus, Phobos, Deimos, Thanatos, Nemesis, Themis, Nike, Hestia, Zeus (13-30): bright and wild
   first, then dusk, sleep, dreams, fear and death, then justice, victory and the hearth by Zeus's throne. The user's
   list ranks by fame; the old map's stages already hold the Olympians, so the minor gods are above them.
-- **Stretch length**: 210 studs along each stretch's floor (130-178 across the ground; grades in `STRETCHES`,
-  `tools/UpperMountain.luau`).
 - **Look**: stage 3's floor slab and terrace blocks for every stretch, recoloured per god; trees, rocks, islands, clouds,
   spires, arches and the pavilion cloned from the stages; block props per god (a rainbow over the path, Pan's pipes and
   toadstools, goblets and a fountain, hearts, coins and a wheel of fortune, the serpent staff and pools, golden apples
