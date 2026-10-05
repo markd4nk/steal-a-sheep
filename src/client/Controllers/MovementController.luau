@@ -12,12 +12,14 @@ local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
--- How the local character moves. Walking: 18 studs a second, times a carried lamb's burden share. Sliding:
--- moving downhill on the ramp starts a slide by itself; it speeds up to the stretch's slide speed (the burden slows it
--- and its acceleration), steers within a cone either side of straight downhill with the ordinary movement controls,
+-- How the local character moves. Walking: as fast as the player's Climbing allows here, for the lamb's hidden weight
+-- (Mountain.SpeedAt; the server checks the uphill part): slower than normal only up a slope too steep for them,
+-- faster the more they've outgrown it. Sliding:
+-- moving downhill on the ramp starts a slide by itself; it speeds up to the escape speed set when it starts
+-- (Economy.EscapeSpeed: Climbing against the lamb's tier and weight) and keeps it all the way down, like momentum;
+-- it steers within a cone either side of straight downhill with the ordinary movement controls,
 -- brakes when pulled back, and runs out to a stop past the safety line. A slider's hit costs it speed; a hit player is
--- moved back down the slope and stunned for a moment. Also: the climb gates a player has opened stop colliding on
--- their own device, and their stair walker steps while they train.
+-- moved back down the slope and stunned for a moment. Also: their stair walker steps while they train.
 local MovementController = { Name = "MovementController" }
 
 local SLIDE_RENDER = "SlideControl"
@@ -31,6 +33,7 @@ local player = Players.LocalPlayer
 
 local sliding = false
 local slideSpeed = 0
+local slideTarget = 0
 local heading = Mountain.Downhill
 local knockUntil = 0
 local stunUntil = 0
@@ -49,18 +52,48 @@ local function character(): (Model?, Humanoid?, BasePart?)
 	return nil, nil, nil
 end
 
--- The burden share a carried lamb leaves the player (Economy.CarryMultiplier), 1 when empty-handed.
-local function carryShare(): number
-	if player:GetAttribute("Carrying") ~= true then
-		return 1
-	end
-	local burden = player:GetAttribute("CarryBurden")
-	local tier = player:GetAttribute("CarryTier")
+local function climbing(): number
 	local climb = player:GetAttribute("ClimbPower")
-	if type(burden) ~= "number" or type(tier) ~= "number" then
-		return 1
+	return if type(climb) == "number" then climb else 0
+end
+
+-- The carried lamb's tier and hidden weight, or nil when empty-handed.
+local function carried(): (number?, number?)
+	if player:GetAttribute("Carrying") ~= true then
+		return nil, nil
 	end
-	return Economy.CarryMultiplier(burden, if type(climb) == "number" then climb else 0, tier)
+	local tier = player:GetAttribute("CarryTier")
+	local weight = player:GetAttribute("CarryWeight")
+	if type(tier) ~= "number" or type(weight) ~= "number" then
+		return nil, nil
+	end
+	return tier, weight
+end
+
+-- The speed a slide starting at `x` keeps all the way down (Economy.EscapeSpeed), never under walking speed so a
+-- player too weak for the slope still gets home.
+local function escapeSpeed(x: number): number
+	local tier, weight = carried()
+	local speed = if tier and weight
+		then Economy.EscapeSpeed(climbing(), tier, weight)
+		else Economy.EscapeSpeed(climbing(), math.max(Mountain.TierAt(x), 1), 1)
+	return math.max(speed, GameConfig.Movement.WalkSpeed)
+end
+
+-- Walking speed here (Mountain.SpeedAt, for the carried weight). Faster than normal it's the same every way; slower,
+-- only the move's uphill part is held down to it, so a player on a slope too steep for them can still cross it or
+-- come back down at normal speed.
+local function walkSpeed(position: Vector3, input: Vector3): number
+	local _, weight = carried()
+	local speed = Mountain.SpeedAt(position.X, climbing(), weight or 1)
+	local normal = GameConfig.Movement.WalkSpeed
+	if speed >= normal then
+		return speed
+	end
+	if input.X <= 0 then
+		return normal
+	end
+	return math.min(normal, speed / input.X)
 end
 
 -- What the player is asking for, in world space: the Humanoid's MoveDirection as Roblox's own controls set it this
@@ -125,8 +158,7 @@ local function step(dt: number)
 		return
 	end
 	local now = os.clock()
-	local share = carryShare()
-	local walk = GameConfig.Movement.WalkSpeed * share
+	local walk = GameConfig.Movement.WalkSpeed
 	local boost = speedBoost()
 	local settings = GameConfig.Movement
 
@@ -151,7 +183,7 @@ local function step(dt: number)
 	local input = moveInput(humanoid)
 
 	if not sliding then
-		humanoid.WalkSpeed = walk * boost
+		humanoid.WalkSpeed = walkSpeed(position, input) * boost
 		local downhill = -velocity.X
 		local flat = Vector2.new(velocity.X, velocity.Z).Magnitude
 		if
@@ -163,6 +195,7 @@ local function step(dt: number)
 			and input.X < 0
 		then
 			slideSpeed = math.max(flat, walk)
+			slideTarget = escapeSpeed(position.X)
 			heading = Vector3.new(
 				-1,
 				0,
@@ -181,7 +214,7 @@ local function step(dt: number)
 		humanoid.WalkSpeed = walk * boost
 		return
 	end
-	local target = if pastLine then 0 else Mountain.SlideSpeedAt(position.X) * share
+	local target = if pastLine then 0 else slideTarget
 	local braking = input.X > 0.35
 	if braking or pastLine then
 		-- Past the safety line the slide runs out more gently than a pulled-back brake.
@@ -189,7 +222,8 @@ local function step(dt: number)
 		slideSpeed = math.max(0, slideSpeed - brake * dt)
 	elseif grounded then
 		if slideSpeed < target then
-			slideSpeed = math.min(target, slideSpeed + settings.SlideAccel * share * dt)
+			local accel = math.max(settings.SlideAccel, target / settings.SlideRiseSeconds)
+			slideSpeed = math.min(target, slideSpeed + accel * dt)
 		else
 			slideSpeed = math.max(target, slideSpeed - settings.SlideAccel * 0.5 * dt)
 		end
@@ -224,30 +258,6 @@ local function step(dt: number)
 		local follow = -Vector2.new(velocity.X, velocity.Z).Magnitude * Mountain.RampSlope(position.X) * boost
 		if velocity.Y * boost > follow then
 			root.AssemblyLinearVelocity = Vector3.new(velocity.X * boost, follow, velocity.Z * boost)
-		end
-	end
-end
-
--- Gates this player has opened stop colliding here (MountainService builds them; the server still checks).
-local function refreshGates()
-	local folder = workspace:FindFirstChild("ClimbGates")
-	local unlocked = player:GetAttribute("Unlocked")
-	local open = if type(unlocked) == "number" then unlocked else 1
-	if not folder then
-		return
-	end
-	for _, gate in folder:GetChildren() do
-		local tier = gate:GetAttribute("Tier")
-		local wall = gate:FindFirstChild("Wall")
-		local sign = gate:FindFirstChild("Sign")
-		if type(tier) == "number" and wall and wall:IsA("BasePart") then
-			local passable = tier <= open
-			wall.CanCollide = not passable
-			wall.Transparency = if passable then 1 else 0.2
-			local gui = sign and sign:FindFirstChildOfClass("SurfaceGui")
-			if gui then
-				gui.Enabled = not passable
-			end
 		end
 	end
 end
@@ -327,14 +337,6 @@ function MovementController.Start(_self: any)
 			sound:Play("Yelp")
 		end
 	end))
-	trove:Connect(player:GetAttributeChangedSignal("Unlocked"), refreshGates)
-	task.spawn(function()
-		local folder = workspace:WaitForChild("ClimbGates", 60)
-		if folder then
-			trove:Connect(folder.ChildAdded, refreshGates)
-			refreshGates()
-		end
-	end)
 	trove:Connect(player.CharacterAdded, function()
 		sitTrack = nil
 		walkTrack = nil

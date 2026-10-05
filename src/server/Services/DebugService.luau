@@ -31,7 +31,7 @@ local commands: { [string]: Command } = {
 		end
 		return false, "the balance would go below 0"
 	end,
-	-- value: how much Climb Power (CLIMB_GRANT if left out).
+	-- value: how much Climbing (CLIMB_GRANT if left out).
 	AddClimb = function(player, value)
 		local data = registry.DataService:GetData(player)
 		data.ClimbPower = math.max(0, data.ClimbPower + (value or CLIMB_GRANT))
@@ -56,7 +56,7 @@ local commands: { [string]: Command } = {
 	GiveSheep = function(player, value)
 		local tier = Olympus.Tiers[math.clamp(math.floor(value or 1), 1, Olympus.Count)]
 		local size = math.random(1, 3)
-		registry.FlockService:Deliver(player, { Family = tier.Family, Rarity = 1, Burden = 1, Size = size })
+		registry.FlockService:Deliver(player, { Family = tier.Family, Rarity = 1, Weight = 1.05, Size = size })
 		return true, nil
 	end,
 	-- Every lamb in the pen grows up now.
@@ -67,7 +67,7 @@ local commands: { [string]: Command } = {
 		end
 		return true, nil
 	end,
-	-- Every tier open: enough Climb Power and one delivery from each.
+	-- Every tier easy: Zeus's Heavy target in Climbing, and one delivery from each tier.
 	UnlockAll = function(player)
 		local data = registry.DataService:GetData(player)
 		data.ClimbPower = math.max(data.ClimbPower, Olympus.Tiers[Olympus.Count].Reach * 2.25)

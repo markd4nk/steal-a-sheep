@@ -6,7 +6,7 @@ local Economy = require(ReplicatedStorage.Utils.Economy)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Remotes = require(ReplicatedStorage.Remotes)
 
--- The free gift for liking and favoriting the game: Climb Power and coins (Economy.GiftReward), once per player.
+-- The free gift for liking and favoriting the game: Climbing and coins (Economy.GiftReward), once per player.
 -- Roblox tells only the client whether a favorite went through (AvatarEditorService) and nobody whether a like did, so
 -- the server can't check either: it takes the claim on trust and allows one per player, which caps what a forged
 -- claim gets to what an honest one does.

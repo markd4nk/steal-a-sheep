@@ -46,7 +46,7 @@ local Remotes = {
 	Merge = Net.Request("Merge", { Guard.Array(SHEEP_ID, 3) }, { Count = 4, Window = 1 }) :: Net.Request<({ string }), (boolean, string?, string?)>,
 	-- The shop: the next stair walker, the next pen slot, or a trail by id (bought, or equipped if owned).
 	Buy = Net.Request("Buy", { Guard.OneOf(BUY_ITEMS), Guard.Optional(Guard.String(16)) }, { Count = 8, Window = 1 }) :: Net.Request<(string, string?), (boolean, string?)>,
-	-- The free gift, once per player: (ok, message, coins given, Climb Power given).
+	-- The free gift, once per player: (ok, message, coins given, Climbing given).
 	ClaimGift = Net.Request("ClaimGift", {}, { Count = 2, Window = 2 }) :: Net.Request<(), (boolean, string?, number?, number?)>,
 	-- Give up a run: the carried sheep goes back to its pasture.
 	ReturnSheep = Net.ToServer("ReturnSheep", {}, { Count = 2, Window = 1 }) :: Net.ToServer<()>,

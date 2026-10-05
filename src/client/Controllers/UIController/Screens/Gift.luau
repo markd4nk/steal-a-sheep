@@ -166,7 +166,7 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 
 	local function refresh()
 		local data = stateController:Get()
-		climbLabel.Text = `+{Format.Short(data.GiftClimb or Economy.GiftClimb)} Climb Power`
+		climbLabel.Text = `+{Format.Short(data.GiftClimb or Economy.GiftClimb)} Climbing`
 		coinLabel.Text = `+{Format.Short(data.GiftCoins or Economy.GiftCoins)} Coins`
 		favoriteDone.Visible = favorited
 		if data.FreeGift == true then
@@ -231,7 +231,7 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		context.Close("Gift")
 		context.Controllers.UIController:Celebrate(
 			"FREE GIFT!",
-			`+{Format.Short(climb or 0)} Climb Power  +{Format.Short(coins or 0)} Coins`
+			`+{Format.Short(climb or 0)} Climbing  +{Format.Short(coins or 0)} Coins`
 		)
 	end
 
