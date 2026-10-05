@@ -352,6 +352,7 @@ local GameConfig = {
 		HoldSeconds = 0.5,
 		HeadStart = 1.5, -- seconds before the god sets off
 		RefillSeconds = 15, -- an empty spawn after a delivery
+		DropSeconds = 30, -- a lamb a caught thief dropped lies there this long, then goes back to its pasture
 		PromptDistance = 10,
 		CatchStuds = 3.5,
 		CatchCheckEvery = 0.1,

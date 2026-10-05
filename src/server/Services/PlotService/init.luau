@@ -43,6 +43,7 @@ local function spawnAt(player: Player, character: Model)
 	-- After the character's own spawn placement.
 	task.defer(function()
 		if character.Parent and byPlayer[player] == plot then
+			registry.MountainService:Teleported(player, plot.Pieces.Spawn.Position.X)
 			character:PivotTo(plot.Pieces.Spawn)
 		end
 	end)
@@ -179,6 +180,7 @@ function PlotService.SendHome(_self: any, player: Player)
 	local plot = byPlayer[player]
 	local character = player.Character
 	if plot and character then
+		registry.MountainService:Teleported(player, plot.Pieces.Spawn.Position.X)
 		character:PivotTo(plot.Pieces.Spawn)
 	end
 end

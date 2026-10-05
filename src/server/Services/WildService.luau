@@ -13,11 +13,12 @@ local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
--- The gods' wild lambs: four spawns a tier, each rolled once (fleece, burden, and the adult size it will grow to) and
--- kept until someone delivers it; a failed theft puts the same lamb back. A theft: hold Interact on a lamb, it goes
--- over your head, its god gives chase (GodService), and you either reach your own delivery pad or lose it (caught,
--- dead, reset, left, gave up, blocked at a gate). New players also get one private, Light, ordinary Demeter lamb of
--- their own for the tutorial.
+-- The gods' wild lambs: four spawns a tier, each rolled once (fleece, hidden weight, and the adult size it will grow
+-- to) and kept until someone delivers it. A theft: hold Interact on a lamb, it goes over your head, its god gives chase
+-- (GodService), and you either reach your own delivery pad or lose it. A thief who's caught or dies on the ramp drops
+-- it where they were: anyone can steal it from there (its god then chases them), and it goes back to its pasture after
+-- DropSeconds. Giving up, falling off the world or leaving puts it straight back. New players also get one private,
+-- light, ordinary tier 1 lamb of their own for the tutorial.
 local WildService = { Name = "WildService" }
 
 type Roll = {
@@ -37,6 +38,7 @@ type Spawn = {
 	Prompt: ProximityPrompt?,
 	Carrier: Player?,
 	RefillAt: number,
+	ReturnAt: number, -- os.clock() a dropped lamb goes back to its pasture, 0 when it's there
 	Owner: Player?, -- a tutorial lamb's only thief
 }
 
@@ -46,6 +48,8 @@ type Carry = {
 }
 
 local DELIVERY_CHECK = 0.1
+-- How a theft ended -> whether the lamb is left lying where the thief was.
+local DROPS: { [string]: boolean } = { Caught = true, Died = true }
 local WRONG_PLOT_EVERY = 3
 local FALL_Y = -50
 
@@ -130,10 +134,11 @@ local function setCard(model: Model?, visible: boolean)
 	end
 end
 
-local function place(spawn: Spawn)
+-- Puts the lamb down, ready to steal: at its pasture spot, or at `at` (dropped by a thief).
+local function place(spawn: Spawn, at: CFrame?)
 	local model = spawn.Model
 	if model then
-		registry.SheepService:Place(model, spawn.At)
+		registry.SheepService:Place(model, at or spawn.At)
 		model.Parent = wildFolder
 		setCard(model, true)
 	end
@@ -221,17 +226,37 @@ local function endCarry(player: Player): Carry?
 	return carry
 end
 
--- A theft that didn't make it home: the same lamb goes back to its spawn, rolls and all.
+-- Where a thief who lost their lamb drops it: on the floor under them, if they're on the ramp.
+local function dropSpot(player: Player): CFrame?
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	if not root or not root:IsA("BasePart") then
+		return nil
+	end
+	local position = root.Position
+	if position.X < Olympus.SafeLineX or math.abs(position.Y - Mountain.RampY(position.X)) > 18 then
+		return nil
+	end
+	return floorAt(position.X, Mountain.ClampLane(position.Z))
+end
+
+-- A theft that didn't make it home: the same lamb, rolls and all, lies where the thief was caught or died, or goes
+-- back to its pasture.
 function WildService.Fail(_self: any, player: Player, reason: string)
+	local drop = if DROPS[reason] then dropSpot(player) else nil
 	local carry = endCarry(player)
 	if not carry then
 		return
 	end
 	local spawn = carry.Spawn
 	local tier = Olympus.Tiers[spawn.Tier]
-	place(spawn)
+	if spawn.Owner then
+		drop = nil
+	end
+	place(spawn, drop)
+	spawn.ReturnAt = if drop then os.clock() + GameConfig.Theft.DropSeconds else 0
 	if reason == "Caught" then
-		notify(player, `{tier.God} took their lamb back!`, "Bad", "Denied")
+		notify(player, `{tier.God} caught you! You dropped the lamb`, "Bad", "Denied")
 		registry.PlotService:SendHome(player)
 	elseif reason == "Returned" then
 		notify(player, `The lamb ran back to {tier.God}`, "Bad", "Notice")
@@ -293,6 +318,7 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	end
 	spawn.State = "Carried"
 	spawn.Carrier = player
+	spawn.ReturnAt = 0
 	if spawn.Prompt then
 		spawn.Prompt.Enabled = false
 	end
@@ -330,6 +356,7 @@ local function makeTutorialLamb(player: Player)
 		Prompt = nil,
 		Carrier = nil,
 		RefillAt = 0,
+		ReturnAt = 0,
 		Owner = player,
 	}
 	tutorialSpawns[player] = spawn
@@ -380,7 +407,10 @@ end
 local function refill()
 	local now = os.clock()
 	for _, spawn in spawns do
-		if spawn.State == "Empty" and now >= spawn.RefillAt then
+		if spawn.State == "Ready" and spawn.ReturnAt > 0 and now >= spawn.ReturnAt then
+			spawn.ReturnAt = 0
+			place(spawn)
+		elseif spawn.State == "Empty" and now >= spawn.RefillAt then
 			spawn.Roll = roll(spawn.Tier)
 			fill(spawn)
 			if spawn.Roll.Rarity >= 3 then
@@ -429,6 +459,7 @@ function WildService.Start(_self: any)
 					Prompt = nil,
 					Carrier = nil,
 					RefillAt = 0,
+					ReturnAt = 0,
 					Owner = nil,
 				}
 				table.insert(spawns, spawn)
