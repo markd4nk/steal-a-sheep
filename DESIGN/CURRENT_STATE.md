@@ -47,10 +47,11 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 - **Gods in rank order** (branch `t3code/order-olympian-gods`, not merged): `Config/Olympus` reordered, new High
   Olympus stretches for the eleven Olympians who moved up. Main (275-stud stretches) merged in, lanes clear, playtested.
   Waiting for the user's OK on the new stretches before merging.
-- **Real god models**: whole, fully clothed gods (the user's pick after Roblox removed two bare limb meshes). Zeus: the
-  user chose the muscular toga look (their reference: stern, red-trimmed white, not cute) at a 6,000-triangle cap with
-  a neon-block bolt in his raised fist. Three takes, ~5.8-5.9k triangles and one 1024 texture each: A 128349340607566,
-  B 75217420741789, C 107258528122394. Waiting for the user's pick before modelling the other 29.
+- **Real god models**: whole, fully clothed gods (the user's pick after Roblox removed two bare limb meshes). Zeus
+  candidate: asset 136717806015343 (muscular toga, angry, two arms, 5,760 triangles, one 1024 texture) with a neon-block
+  bolt welded in his raised right fist; shown in a playtest in place of the block Zeus (body hidden, mesh welded to
+  the root). The take the user liked first (107258528122394) had a third arm; cutting it out left a ragged stump.
+  Waiting for the user's OK before building it into GodService and modelling the other 29.
 
 ## Not verified
 
