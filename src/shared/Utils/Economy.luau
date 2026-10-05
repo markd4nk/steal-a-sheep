@@ -73,8 +73,10 @@ Economy.SellSeconds = 15
 Economy.DexRewardSeconds = 30
 Economy.TutorialCoins = 60
 Economy.TutorialClimb = 25
-Economy.StartPens = 3
-Economy.MaxPens = 12
+-- How many sheep the pen holds: 8 to start, bought one at a time up to 20 (the user, 2026-10-05: like Steal a
+-- Brainrot's base, and very expensive to grow).
+Economy.StartPens = 8
+Economy.MaxPens = 20
 Economy.MergeAfterDeliveries = 3
 Economy.GodShare = 0.8 -- a god's set speed, as a share of its tier's SlideSpeed
 Economy.SafeZoneCap = 7 -- the most times normal speed anyone walks below the safety line
@@ -315,12 +317,12 @@ function Economy.WalkerRate(level: number): number
 	return Economy.WalkerRates[math.clamp(level, 0, Economy.MaxWalker) + 1]
 end
 
--- Pen slot n (4 to 12): round(300 x 2.5^(n - 4)).
+-- Room for sheep n (9 to 20): round(25,000 x 6^(n - 9)): 25K, 150K, 900K, 5.4M ... about 9 trillion for the 20th.
 function Economy.PenCost(slot: number): number?
-	if slot > Economy.MaxPens then
+	if slot > Economy.MaxPens or slot <= Economy.StartPens then
 		return nil
 	end
-	return Economy.Round(300 * 2.5 ^ (slot - 4))
+	return Economy.Round(25000 * 6 ^ (slot - 9))
 end
 
 function Economy.Trail(id: string?): Trail?

@@ -14,7 +14,7 @@ export type Data = {
 	WalkerLevel: number,
 	Trails: { [string]: boolean }, -- owned, by Economy.Trails id
 	Trail: string, -- the equipped one, "" for none
-	PenSlots: number, -- how many sheep the pen holds (they earn), 3 to 12
+	PenSlots: number, -- how many sheep the pen holds (they earn), StartPens to MaxPens
 	Sheep: { [string]: Sheep }, -- every owned sheep by id, equipped or stored
 	NextId: number,
 	Deliveries: { [string]: number }, -- successful deliveries by source tier ("1" to "12")

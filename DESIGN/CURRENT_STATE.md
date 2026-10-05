@@ -28,10 +28,10 @@ braking and slide hits, pursuit, putting lambs down anywhere in your pen, roamin
 size reveal, Equip Best, locks, selling, merging, trails, pen space, the Sheepdex, offline earnings and the tutorial
 lamb.
 
-- **The pen** (branch `t3code/free-roaming-sheep-pens`, 2026-10-05): the whole fenced plot; carry a lamb in and press
-  E to put it down where you like (no delivery pad, no pads). Sheep roam round where they were put down
-  (`FlockService/Pens`, `Utils/Wander`), avoiding trees, hay and the walker; lambs graze nearly all the time, adults now
-  and then (`AnimController`, `Utils/SheepClips`). Homes are saved (`HomeX`/`HomeZ`).
+- **The pen** (2026-10-05): the whole fenced plot; carry a lamb in and press E to put it down where you like (no
+  delivery pad, no pads). It holds 8 sheep, buyable up to 20. Sheep roam the plot (`FlockService/Pens`,
+  `Utils/Wander`), avoiding trees, hay and the walker; lambs graze nearly all the time with the Munch face, adults now
+  and then (`AnimController`, `Utils/SheepClips`). Where each was put down is saved (`HomeX`/`HomeZ`).
 
 - **High Olympus** (tiers 13-30): one stretch a god, 275 studs along the floor, 32 rising to 52 degrees, from stage 3's
   floor slab and terraces and the stages' decor, recoloured, plus block props; Zeus's throne plaza on top. Built into
@@ -55,7 +55,6 @@ lamb.
 - **The eating face is A ("Munch")**, uploaded 2026-10-05 (`Faces.MunchA`/`MunchB`, `ChewFaces`), cleared by Roblox's
   review and seen on a chewing lamb in Studio. Until a picture loads, a sheep keeps its own face. Drawn by
   `art/faces/chew_faces.py` with Shear a Sheep's `art/sheep/mock_faces.py` helpers.
-- **Free-roaming pens are on their branch**, not yet merged into main (the user's call).
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified

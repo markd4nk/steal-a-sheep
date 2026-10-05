@@ -9,8 +9,8 @@ local Wander = require(ReplicatedStorage.Utils.Wander)
 
 type Sheep = Economy.Sheep
 
--- The sheep living in a plot: one model per sheep in the pen, standing where its owner put it down and strolling
--- round that spot like Shear a Sheep's (Utils/Wander), with a small label over it (its income, and a lamb's growth).
+-- The sheep living in a plot: one model per sheep in the pen, put down where its owner chose and strolling about the
+-- plot from there like Shear a Sheep's (Utils/Wander), with a small label over it (its income, and a lamb's growth).
 -- The server picks every stroll and keeps where the sheep is along it (Position); the model itself only moves when it
 -- is shown, grows or is rebuilt, and clients walk it from the Spot and WalkAt attributes (AnimController). Plain
 -- functions over FlockService's per-player models.
@@ -21,7 +21,6 @@ export type Shown = {
 	Scale: number,
 	Adult: boolean,
 	Label: TextLabel,
-	Home: Vector3, -- where it was put down, on the floor: it strolls round this
 	Spot: CFrame, -- where it stands, or where the stroll it's on ends
 	Walk: Wander.Walk?, -- the stroll it's on, on the server's clock (workspace:GetServerTimeNow())
 	Position: Vector3, -- where it is now, along any stroll
@@ -154,7 +153,6 @@ function Pens.Show(
 		Scale = scale,
 		Adult = Economy.IsAdult(sheep),
 		Label = label,
-		Home = at.Position,
 		Spot = at,
 		Walk = nil,
 		Position = at.Position,
@@ -262,24 +260,17 @@ function Pens.FreeSpot(flock: { [string]: Shown }, ground: Ground, pick: () -> V
 	return nil
 end
 
-local function flatDistance(a: Vector3, b: Vector3): number
-	return Vector3.new(a.X - b.X, 0, a.Z - b.Z).Magnitude
-end
-
--- Where a stroll from where it stands could end: inside the pen, off the walker, clear of the decor and the flock, and
--- within RoamRadius of home (or closer to it than now), or nil if no roll fitted.
+-- Where a stroll from where it stands could end: inside the pen, off the walker, clear of the decor and the flock, or
+-- nil if no roll fitted.
 local function pickStroll(flock: { [string]: Shown }, shown: Shown, ground: Ground): CFrame?
 	if random:NextNumber() < Motion.TurnAroundChance then
 		return Wander.TurnAround(shown.Spot, random:NextNumber())
 	end
 	local radius = Pens.Radius(shown.Scale)
-	local away = flatDistance(shown.Spot.Position, shown.Home)
 	for _ = 1, Motion.StrollTries do
 		local spot = Wander.Stroll(shown.Spot, random:NextNumber(), random:NextNumber())
-		local fromHome = flatDistance(spot.Position, shown.Home)
 		if
-			(fromHome <= Motion.RoamRadius or fromHome < away)
-			and not crowded(flock, shown, spot.Position, radius)
+			not crowded(flock, shown, spot.Position, radius)
 			and ground.CanStand(spot.Position, radius)
 			and ground.PathClear(shown.Spot.Position, spot.Position, radius)
 		then

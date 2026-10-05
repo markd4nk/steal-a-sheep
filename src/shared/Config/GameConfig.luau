@@ -412,8 +412,8 @@ local GameConfig = {
 	SheepMotion = {
 		-- Like Shear a Sheep's pens: a sheep stands about for StrollMinWait to StrollMaxWait seconds (a lamb, which
 		-- mostly grazes, LambStrollMinWait to LambStrollMaxWait), then strolls StrollMinDistance to StrollMaxDistance
-		-- studs any way, staying within RoamRadius of where its owner put it down, inside the fence and clear of the
-		-- plot's trees, hay and stair walker. ChainChance of strolls go on for another leg after a short pause;
+		-- studs any way, anywhere in its owner's plot (the user, 2026-10-05: the full plot, at this easy pace), inside
+		-- the fence and clear of the plot's trees, hay and stair walker. ChainChance of strolls go on for another leg after a short pause;
 		-- TurnAroundChance of them are only a turn on the spot. A stroll that ends within SheepGap of another of the
 		-- owner's sheep, or off limits, is rolled again, StrollTries times at most.
 		StrollMinWait = 5,
@@ -429,7 +429,6 @@ local GameConfig = {
 		TurnAroundSeconds = 0.8,
 		SheepGap = 3.5,
 		StrollTries = 8,
-		RoamRadius = 18,
 		WanderSpeed = 3, -- studs per second it walks
 		EaseSeconds = 0.4, -- it speeds up and slows down over this long at each end of a stroll
 		WanderTurnSeconds = 0.35, -- it turns to face where it's going first

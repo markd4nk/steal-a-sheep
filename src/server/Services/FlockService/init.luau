@@ -321,6 +321,8 @@ local function onLoaded(player: Player, data: any)
 		Offline = nil,
 		ClimbTier = Economy.ClimbTier(data.ClimbPower),
 	}
+	-- A save from when the pen started smaller is brought up to today's start.
+	data.PenSlots = math.clamp(data.PenSlots, Economy.StartPens, Economy.MaxPens)
 	Roster.Normalize(data.Sheep, data.PenSlots)
 	settleOffline(player, data)
 	data.LastSeen = os.time()

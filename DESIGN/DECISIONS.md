@@ -45,6 +45,10 @@ confirmed or reversed it.
   their own like Shear a Sheep's; lambs mostly eat off the floor, head down and chewing, with an eating face: the
   user picked A, "Munch" (eyes shut, cheeks full, a grass sprig in the corner of a mouth working side to side), over B
   (eyes on the grass, mouth opening on a green mouthful), after seeing both on a grazing lamb (2026-10-05).
+- **The pen holds 8 sheep to start, up to 20, and growing it is very expensive** (the user, 2026-10-05, from Steal a
+  Brainrot: its base starts at 10 and is very expensive to upgrade).
+- **Sheep roam the full plot**, at the easy stroll pace they have (the user, 2026-10-05: "they can roam the full plot
+  ... I wouldn't change much about that").
 
 ## To review
 
@@ -52,18 +56,19 @@ Calls made building free placement and roaming sheep (2026-10-05):
 
 - **The pen is the whole fenced plot**; sheep keep 3 studs from the fence, off the stair walker, out of the map's trees
   and hay. The map's hay and trees in the plots now stay where the map has them (only the walker's spot is cleared).
-- **Pen capacity stays**: the pen holds 3 sheep, more bought in the Shop as "Pen Space n/12" at the old pad prices. A
-  lamb put down in a full pen is stored; the objective warns "Your pen is full: it'll be stored".
+- **Pen Space prices**: room for sheep 9 to 20 costs round(25,000 x 6^(n - 9)): 25K, 150K, 900K, 5.4M, 32M, 194M,
+  1.2B, 7B, 42B, 252B, 1.5T, 9T. With eight tier 10 sheep the 13th takes about 9 minutes of income; the 20th is for
+  tier 23 and up. A save with less room (the old 3) is raised to 8 when it loads. A lamb put down in a full pen is
+  stored; the objective warns "Your pen is full: it'll be stored".
 - **Putting down**: E / tap / ButtonX on "Put down" (the lamb's name under it) anywhere inside your own fence (the server
   allows 3 studs outside it, for lag); the lamb lands 4 studs in front of you facing your way, or the nearest clear spot
   (rings 3.5 studs apart), hopping down from your head (0.45 s, 2.5 studs high), then a happy hop and the Happy face for
   1.2 s. In someone else's plot: "That's not your plot! Yours has your name over the gate." every 3 s. Objective while
   carrying: "Bring it into your pen" (arrow to your plot), inside "Put it down where you like".
-- **Roaming**: each sheep strolls round where it was put down, within 18 studs (RoamRadius); strolls of 3-12 studs at 3
-  studs/s, every 5-14 s for grown sheep and 12-26 s for lambs; 30% go on for another leg, 20% are a turn on the spot;
-  sheep keep 3.5 studs (or their sizes) apart. Where it was put down is saved and it comes back there on rejoin; one out
-  of storage hops in there; a merge's result hops in where the first merged sheep lived; one with no home yet (Studio's
-  GiveSheep) gets any clear spot.
+- **Roaming**: strolls of 3-12 studs at 3 studs/s, anywhere in the plot, every 5-14 s for grown sheep and 12-26 s for
+  lambs; 30% go on for another leg, 20% are a turn on the spot; sheep keep 3.5 studs (or their sizes) apart. Where it was
+  put down is saved and it comes back there on rejoin; one out of storage hops in there; a merge's result hops in where
+  the first merged sheep was put down; one with no home yet (Studio's GiveSheep) gets any clear spot.
 - **Grazing**: lambs graze 90% of their standing time, adults 45% (3-9 s apart): bouts of 1-3 bites, each the head down
   to the grass for 1.6-2.8 s nibbling and tugging, then up a little chewing for 1.8-3 s, the head working side to side;
   0.4-1.6 s between a lamb's bouts. Wild lambs graze too. Faces: Munch's two frames in turn (0.22 s each) while
@@ -177,5 +182,3 @@ Calls made while building the MVP on 2026-10-05:
 ## Calls left to the user
 
 - Keep the theme-fitted god order, or change it?
-- Keep the pen's capacity (3, bought up to 12), or let every sheep you own live in the pen and earn?
-- Sheep roam round where you put them (18 studs), or anywhere in the plot?

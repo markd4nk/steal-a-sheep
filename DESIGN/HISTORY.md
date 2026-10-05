@@ -36,6 +36,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     `ChewFaces`. AnimController preloads its face pictures one request each and swaps in only those that have
     arrived (or whose fetch status says Success), so a picture still in Roblox's review never shows as a blank face.
     Seen in a fresh Studio: the lamb chews with the uploaded Munch frames (filmed).
+  - *The user's calls after seeing it*: merge it; the pen holds 8 to start, up to 20, very expensive to grow (Pen
+    Space prices x6 a slot from 25K; older saves raised to 8 on load); sheep roam the whole plot at the same pace (the
+    18-stud range round home is gone). Checked with `check.ps1` and the unit tests in Studio.
   - *A fix found filming*: a sheep made while the player is in the game (every put-down) could reach the client in
     pieces, its `Sheep` tag before its Motor6Ds and face: AnimController rigged it at once and it walked about stiff,
     never grazing or changing face (two takes in five). It now takes joints and the face from `DescendantAdded` too;

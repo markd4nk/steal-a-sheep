@@ -21,14 +21,16 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
 - The whole fenced plot is the pen. There's no delivery pad and no pads to stand sheep on or unlock: a thief carries
   the lamb through their gate and presses E (Put down, on the lamb over their head) anywhere inside their own fence;
   it hops down in front of them, happy to be home. That's the delivery.
-- Each sheep roams round the spot it was put down (Shear a Sheep's wander: long spells standing, then a short stroll),
-  never into the map's trees, hay or the stair walker, never on top of another sheep. Where it lives is saved.
+- Each sheep roams the whole plot from where it was put down, at an easy pace (Shear a Sheep's wander: long spells
+  standing, then a short stroll), never into the map's trees, hay or the stair walker, never on top of another sheep.
+  Where it was put down is saved: it's back there after a rejoin.
 - Lambs graze nearly all the time: head down to the grass, nibbling, then up to chew with the "Munch" face (eyes
   shut, cheeks full, a grass sprig working side to side). Grown sheep
   graze now and then and otherwise stand about, breathe, look round, blink and baa. Wild lambs graze in the pastures
   too.
-- The pen still holds a number of sheep (3, more bought in the Shop as Pen Space, up to 12); one put down in a full pen
-  is stored, not earning (Flock menu: Equip / Store / Equip Best).
+- The pen holds 8 sheep to start; more room is bought in the Shop as Pen Space, one at a time and very expensive, up
+  to 20 (the user: like Steal a Brainrot's base). One put down in a full pen is stored, not earning (Flock menu: Equip /
+  Store / Equip Best).
 
 ## Systems
 - Climbing, stair walker, trails: `TrainingService`, `ShopService`.
