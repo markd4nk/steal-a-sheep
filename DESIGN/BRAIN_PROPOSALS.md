@@ -40,6 +40,24 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   backticks ('unexpected EOF while looking for matching'), even with a quoted delimiter: write such files with the
   Write or Edit tools." Seen twice on 2026-10-05.
 
+- **S9** (`BRAIN/PATTERNS/characters.md`, Posing from code): "To make a player's feet land on moving things (stair
+  machines, treadmills, pedals), anchor the root and solve the legs yourself: after the Animator (`PreSimulation`), a
+  two-bone IK in the leg's plane sets hip and knee `Transform` (about the joint's X) from the thigh and shin vectors
+  read off the joints' C0/C1 or attachments, and the ankle gets minus their sum so the foot stays level. Place the
+  root from each avatar's own leg length rather than one height: the same code then fits skinned and blocky avatars
+  of different sizes. A baked animation can't, its feet float or sink on other avatars." Seen 2026-10-05 in Steal a
+  Sheep's stair walker test.
+- **S10** (`BRAIN/PATTERNS/testing-studio.md`, Screenshots): "To show the user a motion without taking over the
+  desktop, drive it from a phase you set from `execute_luau`, `screen_capture` each phase from the same camera, and
+  join the frames into a GIF (Pillow)." Seen 2026-10-05.
+- **S11** (`BRAIN/GOTCHAS.md`): "A `WedgePart`'s slope rises towards its +Z: low edge at -Z, full height at +Z. Turn
+  it 180 degrees about Y for a ramp that rises the way a model faces (-Z)." Measured with raycasts 2026-10-05.
+- **S12** (`BRAIN/PATTERNS/desktop.md`, after the `record` notes): "`record` writes its mp4 into a
+  `windows-computer-use/` folder in the session's working directory, which is the repo: move the file out (to the
+  attachments folder) and delete the folder before committing. To film the game view without taking over the screen,
+  pin the camera from a Client `execute_luau` (a RenderStepped that sets `CameraType` Scriptable and the CFrame), turn
+  off the core UI, define a viewport over the 3D view, and record that with `foreground: false`." Seen 2026-10-05.
+
 ## Done
 
 - None yet.

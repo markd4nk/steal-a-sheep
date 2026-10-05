@@ -36,6 +36,17 @@ Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session 
 - `require` of a game module from `execute_luau` gets a fresh copy, not the running one (SheepService:Build returned
   nil): to look at families or gods side by side, clone the running game's own wild lambs and gods instead.
 
+## Stair walker climbing test (2026-10-05)
+
+- **Avatars measured**: the user's (a skinned R15 cat with the Avatar Joint Upgrade: AnimationConstraints, arms rest
+  in a T-pose) has thigh 0.64, shin 0.56 (hip-to-ankle reach 1.2), foot 1.29 long, hip height 1.57. A default blocky
+  R15 rig (`CreateHumanoidModelFromDescription` on the server) has reach 1.93 and a 1.0 foot. With 0.6 x 1.0 steps
+  both reach the upper step comfortably.
+- **Showing motion without the desktop tools**: drive the animation from a phase variable, set it from Client
+  `execute_luau` (0, 0.25 ... 1.75), `screen_capture` from a fixed camera after each, and join the frames into a GIF
+  with Pillow (140 ms a frame is real speed for a 0.55 s step).
+- A side view hides the far leg; a camera a little in front of the side shows both.
+
 ## Playtesting through the Studio MCP from a script (2026-10-05)
 
 The build session drove a second Studio holding a copy of the built place (`build/Playtest.rbxl`, opened with

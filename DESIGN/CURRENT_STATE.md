@@ -43,7 +43,9 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 ## In progress
 
-- Nothing. High Olympus is merged into main; DECISIONS.md's *To review* lists its calls.
+- **Stair walker redesign** (branch `t3code/research-stairmaster-model`): no usable free model found; climbing on the
+  steps proven with code-driven leg IK; the user picked gym at level 1 rising to Olympus, snap-on, faster steps per
+  level; mock-ups of levels 1-5 shown, waiting for the user's OK. Nothing built yet (HISTORY.md, stair walker study).
 
 ## Not verified
 

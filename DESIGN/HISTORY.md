@@ -6,6 +6,39 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Stair walker study: free models, a climbing test, two mock-ups (2026-10-05)**. Not built yet. The user wants a
+  proper StairMaster in place of the MVP machine (a base, five sliding planks, rails), free models first, and the
+  player walking up the steps instead of walking on the spot in front of them.
+  - *Free models*: none fits. Creator Store (stairmaster, stair climber, stepper, gym/cardio packs): treadmills,
+    ellipticals, weights, a granite "Fancy Stairmaster" that isn't one. Sketchfab, Poly Pizza, Free3D, CGTrader,
+    TurboSquid, Meshy, itch.io: none free. The only free genuine stepmills are realistic grey brand replicas on SketchUp
+    3D Warehouse (Spiffysmile "Stair Master", 3.8k polygons, its General Model License allows use inside a game):
+    wrong style for the map, and their steps are one mesh, so they couldn't move.
+  - *Climbing test* (Studio copy, the user's skinned R15 avatar, then a default blocky R15 rig): the root is anchored;
+    each frame after the Animator (`PreSimulation`) a two-bone IK sets hip, knee and ankle `Transform` in the leg's
+    plane from the joints' own attachments (works on Motor6D and AnimationConstraint rigs), so the stance foot rides
+    its step down and back and the other foot lifts onto the next step, toes at the tread's front edge, heel over the
+    edge. Steps scroll one rise and one run per 0.55 s; 8 degrees of lean, a small bob, arms forward and pumping. The
+    root height comes from each avatar's leg length (bottom foot at 96% reach), so feet land on the steps for both
+    rigs. Frozen-phase screen captures made a GIF for the user.
+  - *Mock-ups*: one geometry (treads 3 wide, 0.6 rise, 1.0 run, about 31 degrees; wedge side bodies, entry step, a hood
+    the steps run into, rails at hand height, a console), two looks: A gym machine (light grey, dark trim, yellow
+    accents and tread noses, a tilted screen on a post) and B Olympus (marble, gold trim and rails, two columns holding
+    a marble tablet).
+  - *The user's calls*: A's gym look is level 1 and each upgrade looks better, ending in the Olympus look; snap on
+    like a treadmill; steps faster with each level. Then: mock-ups of levels 1-5.
+  - *Levels 1-5 mock-up* (same shape, five copies in a row on plot 1, each with a climbing copy of the user's avatar,
+    steps at `0.25 + 0.35 x 0.9^(level-1)` s): 1 Starter, plain grey with grey noses and black grips; 2 Sport, white
+    with blue bands, grips and screen, yellow noses, silver rails; 3 Pro, black with red bands, red-and-chrome rails, a
+    glowing red screen frame and a fan; 4 Turbo, black with cyan neon edges, noses, underglow and screen, diamond-plate
+    treads, side vents; 5 Champion, white with a black band and gold trim and rails, glowing white noses, flaming
+    torches either side of the console and a green laurel over it. Bronze and dark gold came out plain orange and
+    yellow under the map's colour correction (saturation +0.7), hence white and gold. Shown as a line-up, close-ups and
+    a 4 s clip filmed from the Studio window.
+  - *Open for production*: every client must run the IK for every training player (`Transform` doesn't replicate) and
+    scroll every machine's steps from a shared clock; the server places and anchors the player on the machine and
+    releases them on jump or move; R6 needs a simpler leg swing.
+
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9
   (4-5 are 126, 10-12 are 325), and 129-178 across the ground. The user picked 275.

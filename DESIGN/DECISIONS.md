@@ -25,8 +25,19 @@ confirmed or reversed it.
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
   then don't thin or fill the slide lanes, old stages included.
+- **The stair walker is a real StairMaster the player climbs (the user, 2026-10-05)**: level 1 looks like a plain gym
+  machine and each upgrade looks better, ending in the Olympus look (marble and gold); the player snaps onto it like a
+  treadmill and climbs the moving steps; the steps get faster with each machine level.
 
 ## To review
+
+Calls in the stair walker mock-ups (2026-10-05), not built yet.
+
+- **Step speed by level**: a step takes `0.25 + 0.35 x 0.9^(level-1)` seconds: 0.60 at level 1, 0.48 at 5, 0.40 at
+  10, 0.30 at 20, 0.27 at 30.
+- **Levels 1-5 looks**: Starter grey, Sport white and blue, Pro black and red, Turbo black and cyan neon, Champion
+  white and gold with torches and a laurel (HISTORY.md has the details).
+- **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor.
 
 Calls made lengthening High Olympus's stretches to 275 (2026-10-05).
 
