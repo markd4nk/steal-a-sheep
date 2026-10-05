@@ -23,6 +23,21 @@ confirmed or reversed it.
   hierarchy, then it doesn't really matter").
 - **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
   noticeable; then "keep it that").
+- **Climbing is one stat, no walls (2026-10-05)**: speed and Climb Power are one thing, "Climbing". Every tier is
+  open; steeper tiers need more and more Climbing to climb at a useful pace. Too little gives a very slow crawl, never
+  a slip back down, so it's technically possible but nobody wants to, and a thief that weak is caught carrying the lamb
+  down. No delivery lock between tiers. No god lunge.
+- **Your speed vs its speed, like Steal an Egg (2026-10-05)**: each god has one set speed for the whole chase (never
+  slower in lower stretches, never a walking speed); the thief's escape speed comes from Climbing; a slide keeps the
+  speed it starts with all the way down (momentum). Checked against Steal an Egg: each zone has its own guardian,
+  faster higher up, never scaled to the player; you escape with enough Speed over the zone's minimum.
+- **One speed rule (2026-10-05)**: your speed on a tier comes from Climbing / (its sign number x the lamb's weight),
+  as few numbers as possible. No cap on the mountain: more Climbing keeps making you faster. Walking in the safe zone
+  (the plots and hub) is capped at 7x normal; tier 1 and the safe zone never go below normal. The sign's number is
+  just enough for the lightest lamb on that tier; an average lamb leaves about 95% of the god's speed there.
+- **Hidden lamb weight (2026-10-05)**: no Light/Stout/Heavy words and no numbers on screen: players feel it. A smooth
+  range, not three kinds. Saved with the sheep; heavier lambs tend to grow bigger, but a light one can still grow
+  large, just less likely. The carry card shows no speeds.
 - **High Olympus's stretches are 275 studs along the floor** (the user, 2026-10-05: at 210 they felt shorter than the
   first levels, about 250, so a bit longer than those). 169-233 across the ground, so the steep ones still look
   shorter than they climb.
@@ -30,6 +45,20 @@ confirmed or reversed it.
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
   then don't thin or fill the slide lanes, old stages included.
+- **Put lambs down anywhere in the pen (2026-10-05)**: like Steal an Egg, the thief brings the lamb into their pen and
+  places it where they choose; no delivery platform, no fixed pads to unlock and stand sheep on. Sheep walk around on
+  their own like Shear a Sheep's; lambs mostly eat off the floor, head down and chewing, with an eating face: the
+  user picked A, "Munch" (eyes shut, cheeks full, a grass sprig in the corner of a mouth working side to side), over B
+  (eyes on the grass, mouth opening on a green mouthful), after seeing both on a grazing lamb (2026-10-05).
+- **The pen holds 8 sheep to start, up to 20, and growing it is very expensive** (the user, 2026-10-05, from Steal a
+  Brainrot: its base starts at 10 and is very expensive to upgrade).
+- **Sheep roam the full plot**, at the easy stroll pace they have (the user, 2026-10-05: "they can roam the full plot
+  ... I wouldn't change much about that").
+- **The game's money is cash, the only currency** (the user, 2026-10-05: no coins anywhere). Every word players see
+  says cash; the code and saved data still call it `Coins`.
+- **Leaderboards live on the map's billboards in the safe zone, not behind a HUD icon** (the user, 2026-10-05): This
+  Server (the richest here, by income), Top Income (the richest overall, each player's best ever), Most Steals and
+  Climb Power (titled CLIMBING since Climbing replaced Climb Power on screen). Titles are words only, no icon; otherwise the boards' look (dark panel, medal rows, headshots) is OK'd.
 
 ## To review
 
@@ -52,6 +81,72 @@ Calls made ordering the gods by rank (2026-10-05):
   floating rocks, rock pools, coral and tridents; Hera's golden urns, peacocks, crown and golden apples. The minor gods
   who moved down lost their stretches' props (rainbow, pipes, fountain, wheel of fortune, serpent staff, crystals,
   crossroads, fear moon, scales, laurel arch): the commission's stages are as they were.
+
+Calls made building free placement and roaming sheep (2026-10-05):
+
+- **The pen is the whole fenced plot**; sheep keep 3 studs from the fence, off the stair walker, out of the map's trees
+  and hay. The map's hay and trees in the plots now stay where the map has them (only the walker's spot is cleared).
+- **Pen Space prices**: room for sheep 9 to 20 costs round(25,000 x 6^(n - 9)): 25K, 150K, 900K, 5.4M, 32M, 194M,
+  1.2B, 7B, 42B, 252B, 1.5T, 9T. With eight tier 10 sheep the 13th takes about 9 minutes of income; the 20th is for
+  tier 23 and up. A save with less room (the old 3) is raised to 8 when it loads. A lamb put down in a full pen is
+  stored; the objective warns "Your pen is full: it'll be stored".
+- **Putting down**: E / tap / ButtonX on "Put down" (the lamb's name under it) anywhere inside your own fence (the server
+  allows 3 studs outside it, for lag); the lamb lands 4 studs in front of you facing your way, or the nearest clear spot
+  (rings 3.5 studs apart), hopping down from your head (0.45 s, 2.5 studs high), then a happy hop and the Happy face for
+  1.2 s. In someone else's plot: "That's not your plot! Yours has your name over the gate." every 3 s. Objective while
+  carrying: "Bring it into your pen" (arrow to your plot), inside "Put it down where you like".
+- **Roaming**: strolls of 3-12 studs at 3 studs/s, anywhere in the plot, every 5-14 s for grown sheep and 12-26 s for
+  lambs; 30% go on for another leg, 20% are a turn on the spot; sheep keep 3.5 studs (or their sizes) apart. Where it was
+  put down is saved and it comes back there on rejoin; one out of storage hops in there; a merge's result hops in where
+  the first merged sheep was put down; one with no home yet (Studio's GiveSheep) gets any clear spot.
+- **Grazing**: lambs graze 90% of their standing time, adults 45% (3-9 s apart): bouts of 1-3 bites, each the head down
+  to the grass for 1.6-2.8 s nibbling and tugging, then up a little chewing for 1.8-3 s, the head working side to side;
+  0.4-1.6 s between a lamb's bouts. Wild lambs graze too. Faces: Munch's two frames in turn (0.22 s each) while
+  chewing, Baa while baa-ing, a blink every 2.5-6 s on a plain face.
+- **Flock menu** says "In your pen" (or "(pinned)") instead of "In pen slot N".
+
+Calls made building the world leaderboards (2026-10-05); the user's own calls are under Confirmed rules.
+
+- **Where each board stands**: the north pair has This Server (outer) and Top Income (inner), the south pair Most
+  Steals (inner) and Climbing (outer). The inner ones stand nearest the hub.
+- **This Server ranks income right now**, so it drops when a player sells; Top Income keeps their best.
+- **Top 10 across all servers**, read once a minute, with this server's players redrawn every 5 s so a player sees
+  their own rise at once. Players at 0 aren't listed; an empty board reads "No one yet".
+- **Most Steals counts every delivery**, the tutorial lamb included.
+- **A row**: rank badge (gold, silver, bronze for the top three, rows tinted to match), avatar headshot, display name,
+  value in the board's colour (lime for income, gold for Climbing, white for steals). A small line at the bottom
+  says "Right now" on This Server, and "All servers" on the others ("This server" where DataStores aren't available).
+- **Studio uses its own stores** (`_Studio`), so playtests never reach the live boards. The player list (Income,
+  Climbing) stays as it was.
+
+Calls made building Climbing (2026-10-05):
+
+- **Speed curve**: below the sign your speed is the ratio itself (a quarter of the sign, a quarter of normal speed),
+  never under a 1 stud/s crawl; above it, +1x normal speed for every 4x (each tier outgrown). Slowed players still
+  cross a slope or come down it at normal speed: only the uphill part is held down.
+- **Weight bands**: wild lambs weigh 1-1.1 (95%) or 1.1-1.5 (5%), about 1.06 on average. The shrine's luck (0-1)
+  raises the heavy chance up to 60% and opens a Huge band, 1.5-3, up to 3%.
+- **Size odds by weight** (Standard / Large / Giant / Titan): 1.0: 85/14/1/0, 1.1: 60/35/5/0, 1.5: 15/60/25/0,
+  3.0: 0/20/50/30, straight lines between. Wild lambs overall come out about 72/25/3 (was 75/23/2.5). Titan (x4 income,
+  2.1 scale, placeholder numbers for the shrine to tune) only from Huge weights, so never wild.
+- **Weight's only visible hint** is the lamb's size: 0.6 of an adult at the lightest, 0.8 at 1.5.
+- **Slides**: the god's speed x your speed factor, at least walking speed, kept all the way down; they reach it in
+  about 2 seconds (speeding up by at least 26 studs/s each second).
+- **Gods**: 0.8 x the tier's SlideSpeed, 19 at tier 1 to 48 at tier 30; the tutorial lamb's god 0.7.
+- **Tier 1's sign is 25** (what the tutorial gives), so a high level speeds you up there too.
+- **On screen**: tier signs "<God>'s <Area> / Climbing N"; the HUD's goals "Train to climb", "Train for heavier
+  sheep", "Ready for the heaviest sheep"; "<God>'s <Area> is in reach!" when Climbing passes the next sign; the player
+  list column is Climbing; the HUD pill reads CLIMBING; the wild lamb's card and the flock menu no longer name a burden.
+- **Server check**: a player found further up the ramp than their Climbing allows (30% slack, 10 studs or 1 second's
+  lead for lag) is put back at their allowed spot.
+- **Saved sheep**: schema 2 turns Burden 1/2/3 into Weight 1.05/1.2/1.35; sizes already rolled stay.
+- **Dropped lambs** (the user: a caught thief's lamb stays where it fell, anyone can steal it, its god chases them):
+  being caught or dying on the ramp drops it; giving up, falling off the world, resetting or leaving puts it straight
+  back, and the tutorial lamb always goes back. A dropped lamb lies there 30 s, then returns to its pasture. The caught
+  thief reads "<God> caught you! You dropped the lamb" and is sent home. Gods still walk home slowly (the user's call).
+- **Server ground-speed check**: each player may cover ground at the fastest they could legally go there (walking,
+  their escape speed, or a knockback), 30% slack and up to a second banked for lag; anyone faster is put back where they
+  were. Server teleports (home after a catch, onto the plot, debug steals) reset it.
 
 Calls made lengthening High Olympus's stretches to 275 (2026-10-05).
 
@@ -97,9 +192,6 @@ Calls made while building the MVP on 2026-10-05:
 - **Fleece rarity looks**: Rare sheep sparkle blue; Royal sheep have gold wool (Shear a Sheep's Gold paint) and sparkle.
 - **Sizes on screen**: every sheep's base size is 1.6x the rig; lambs are 0.6 / 0.7 / 0.8 of it by burden (a clue to
   the burden) and grow towards 0.85 before the reveal; adults are 1 / 1.35 / 1.7 by size.
-- **Gates**: a tinted force-field wall at the foot of each tier from 2 up, with "<God>'s <Area> / Climb Power N";
-  solid for a player until that tier is open to them. Anyone found past a closed one is put back 10 studs below it
-  ("Train to climb this slope" or "Deliver a lamb from <God> first"), which also ends a theft.
 - **Slides**: start by themselves when moving downhill on the ramp past the safety line (the map's StartingLine,
   x 330); speed per stretch 24, 28, 32, 36, 36, 40, 40, 44, 44, 48, 48, 48 studs/s (tiers 1-12), times the carried
   lamb's burden share; steering within about 35 degrees either side of straight downhill; pulling back brakes; past the
@@ -111,9 +203,8 @@ Calls made while building the MVP on 2026-10-05:
   tier's thieves, gives up at the safety line, then walks home at 16.
 - **Theft card**: a wild lamb shows its name, "Grows to +low-high/s" and its burden (Light green, Stout yellow, Heavy
   red); hold E 0.5 s ("Steal"). Royal lambs are announced to players who have that tier open.
-- **Pens**: twelve pads in a 4 x 3 grid in each plot (3 open, then bought in order), the delivery pad just inside the
-  gate, the stair walker by the back fence; map hay and trees standing where they go are moved out of the way
-  (kept in ServerStorage.ClearedDecor). Each penned sheep shows "+X/s" (and a lamb its growth %).
+- **Plots**: the stair walker by the back fence (map hay and trees where it goes are moved out of the way, kept in
+  ServerStorage.ClearedDecor). Each penned sheep shows "+X/s" (and a lamb its growth %).
 - **Manual Equip pins a sheep**: Equip Best keeps pinned sheep and refills the rest; Store unpins.
 - **Selling is at the Sell Stall only** (the map's stall at z 175); the Flock menu opened there adds Sell with a
   confirm showing the coins and the income lost. The Shop is the stall at z 205; the Merge Shrine is Shear a Sheep's Mutation

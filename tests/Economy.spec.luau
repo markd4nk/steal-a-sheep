@@ -12,7 +12,7 @@ local function sheep(fields: { [string]: any }): Economy.Sheep
 		Id = "1",
 		Family = Olympus.Tiers[1].Family,
 		Rarity = 1,
-		Burden = 1,
+		Weight = 1,
 		Size = 1,
 		Grown = 0,
 		Rank = 0,
@@ -45,22 +45,20 @@ return function(t: Run.Suite)
 		end
 	end)
 
-	t.Test("reach thresholds and the derived Light and Heavy targets", function()
-		local reach = { 0, 100, 800, 3200, 12800, 51200, 180000, 720000, 2900000, 9000000, 27000000, 81000000 }
+	t.Test("Reach values and the derived Light and Heavy targets", function()
+		local reach = { 25, 100, 800, 3200, 12800, 51200, 180000, 720000, 2900000, 9000000, 27000000, 81000000 }
 		for tier, value in reach do
 			t.Expect(Olympus.Tiers[tier].Reach).ToBe(value)
 		end
 		local _, light1, heavy1 = Economy.Targets(1)
 		t.Expect(light1).ToBe(25)
-		t.Expect(heavy1).ToBe(60)
+		t.Expect(heavy1).ToBe(37.5)
 		local _, light4, heavy4 = Economy.Targets(4)
-		t.Expect(light4).ToBe(4800)
-		t.Expect(heavy4).ToBe(7200)
-		local _, _, heavy12 = Economy.Targets(12)
-		t.Expect(heavy12).ToBe(182250000)
+		t.Expect(light4).ToBe(3200)
+		t.Expect(heavy4).ToBe(4800)
 		local reach30, _, heavy30 = Economy.Targets(30)
 		t.Expect(reach30).ToBe(1.2e15)
-		t.Expect(heavy30).ToBe(2.7e15)
+		t.Expect(heavy30).ToBe(1.8e15)
 	end)
 
 	t.Test("thirty tiers, each further up the ramp, harder to reach, with its own family", function()
@@ -97,15 +95,26 @@ return function(t: Run.Suite)
 		t.Expect(Economy.WalkerRate(Economy.MaxWalker) * 60 >= heavy - reach).ToBe(true)
 	end)
 
-	t.Test("carry multipliers interpolate between the three targets", function()
-		t.Expect(Economy.CarryMultiplier(1, 0, 1)).ToBe(0.84)
-		t.Expect(Economy.CarryMultiplier(3, 0, 1)).ToBe(0.6)
-		t.Expect(Economy.CarryMultiplier(3, 25, 1)).ToBe(0.76)
-		t.Expect(Economy.CarryMultiplier(3, 1e9, 1)).ToBe(0.94)
-		-- Halfway between Reach (100) and Light (150) for tier 2.
-		t.Expect(near(Economy.CarryMultiplier(1, 125, 2), 0.88)).ToBe(true)
-		-- Below Reach keeps the first value: never divide by tier 1's 0.
-		t.Expect(Economy.CarryMultiplier(2, 50, 2)).ToBe(0.72)
+	t.Test("speed: the ratio below 1, one more for every 4x above, never under 1 on tier 1", function()
+		t.Expect(Economy.SpeedFactor(0.25, 5)).ToBe(0.25)
+		t.Expect(Economy.SpeedFactor(1, 5)).ToBe(1)
+		t.Expect(near(Economy.SpeedFactor(4, 5), 2)).ToBe(true)
+		t.Expect(near(Economy.SpeedFactor(64, 5), 4)).ToBe(true)
+		t.Expect(Economy.SpeedFactor(0, 1)).ToBe(1)
+		t.Expect(near(Economy.SpeedFactor(16, 1), 3)).ToBe(true)
+		t.Expect(Economy.Ratio(200, 2, 1)).ToBe(2)
+		t.Expect(Economy.Ratio(200, 2, 2)).ToBe(1)
+	end)
+
+	t.Test("escape: the lightest lamb at the Reach matches the god, an average one leaves about 95%", function()
+		local tier6 = Olympus.Tiers[6]
+		t.Expect(near(Economy.GodSpeed(6), tier6.SlideSpeed * 0.8)).ToBe(true)
+		t.Expect(near(Economy.EscapeSpeed(tier6.Reach, 6, 1), Economy.GodSpeed(6))).ToBe(true)
+		local average = Economy.EscapeSpeed(tier6.Reach, 6, 1.06) / Economy.GodSpeed(6)
+		t.Expect(average > 0.93 and average < 0.96).ToBe(true)
+		t.Expect(near(Economy.EscapeSpeed(tier6.Reach * 4, 6, 1), Economy.GodSpeed(6) * 2)).ToBe(true)
+		-- Tier 1's lambs never leave less than the god's speed.
+		t.Expect(Economy.EscapeSpeed(0, 1, 1.5)).ToBe(Economy.GodSpeed(1))
 	end)
 
 	t.Test("income: lamb share, fleece, size and merge rank", function()
@@ -131,23 +140,54 @@ return function(t: Run.Suite)
 		t.Expect(Economy.WalkerCost(11)).ToBe(2861023)
 		t.Expect(Economy.WalkerCost(29)).ToBe(nil)
 		t.Expect(Economy.WalkerRate(1)).ToBe(12)
-		t.Expect(Economy.PenCost(4)).ToBe(300)
-		t.Expect(Economy.PenCost(7)).ToBe(4688)
-		t.Expect(Economy.PenCost(13)).ToBe(nil)
+		t.Expect(Economy.PenCost(8)).ToBe(nil)
+		t.Expect(Economy.PenCost(9)).ToBe(25000)
+		t.Expect(Economy.PenCost(12)).ToBe(5400000)
+		t.Expect(Economy.PenCost(20)).ToBe(9069926400000)
+		t.Expect(Economy.PenCost(21)).ToBe(nil)
 		t.Expect(Economy.TrainingRate(2, "Laurel")).ToBe(60)
 	end)
 
-	t.Test("the burden size odds add up to 74.8 / 22.75 / 2.45 overall", function()
-		local totals = { 0, 0, 0 }
-		for _, burden in Economy.Burdens do
-			for size, chance in burden.Sizes do
-				totals[size] += burden.Chance * chance / 100
+	t.Test("size odds add to 100 at every weight, heavier means bigger, Titan only from Huge", function()
+		for _, weight in { 0.9, 1, 1.05, 1.1, 1.3, 1.5, 2, 3, 5 } do
+			local odds = Economy.SizeOdds(weight)
+			t.Expect(#odds).ToBe(#Economy.Sizes)
+			local total = 0
+			for _, chance in odds do
+				total += chance
 			end
+			t.Expect(near(total, 100)).ToBe(true)
 		end
-		t.Expect(near(totals[1], 74.8)).ToBe(true)
-		t.Expect(near(totals[2], 22.75)).ToBe(true)
-		t.Expect(near(totals[3], 2.45)).ToBe(true)
+		t.Expect(Economy.SizeOdds(1)[2] > 0).ToBe(true)
+		t.Expect(Economy.SizeOdds(1.5)[1] < Economy.SizeOdds(1.05)[1]).ToBe(true)
+		t.Expect(Economy.SizeOdds(1.5)[4]).ToBe(0)
+		t.Expect(Economy.SizeOdds(2)[4] > 0).ToBe(true)
 	end)
+
+	t.Test(
+		"weights: wild ones 1 to 1.5 averaging about 1.06; luck makes them heavier and opens the Huge tail",
+		function()
+			local random = Random.new(11)
+			local total, most = 0, 0
+			for _ = 1, 4000 do
+				local weight = Economy.RollWeight(random)
+				t.Expect(weight >= 1 and weight <= 1.5).ToBe(true)
+				total += weight
+			end
+			local mean = total / 4000
+			t.Expect(mean > 1.05 and mean < 1.08).ToBe(true)
+			local lucky = 0
+			for _ = 1, 4000 do
+				local weight = Economy.RollWeight(random, 1)
+				lucky += weight
+				most = math.max(most, weight)
+			end
+			t.Expect(lucky / 4000 > mean + 0.1).ToBe(true)
+			t.Expect(most > 1.5).ToBe(true)
+			t.Expect(Economy.LambScale(1)).ToBe(0.6)
+			t.Expect(near(Economy.LambScale(1.5), 0.8)).ToBe(true)
+		end
+	)
 
 	t.Test("merging: three of a kind, the biggest size, one rank up, never less income", function()
 		local a = adult({ Id = "1", Size = 1 })
@@ -183,24 +223,21 @@ return function(t: Run.Suite)
 		t.Expect(capped).ToBe(7200 * 2 * 0.25)
 	end)
 
-	t.Test("a tier opens with its reach and a delivery from the one below", function()
-		t.Expect(Economy.Unlocked(0, {})).ToBe(1)
-		t.Expect(Economy.Unlocked(100, {})).ToBe(1)
-		t.Expect(Economy.Unlocked(100, { ["1"] = 1 })).ToBe(2)
-		t.Expect(Economy.Unlocked(5000, { ["1"] = 1, ["2"] = 1 })).ToBe(3)
-		t.Expect(Economy.Unlocked(5000, { ["1"] = 1, ["2"] = 1, ["3"] = 1 })).ToBe(4)
+	t.Test("the climb tier is the highest whose Reach the Climbing has", function()
+		t.Expect(Economy.ClimbTier(0)).ToBe(1)
+		t.Expect(Economy.ClimbTier(99)).ToBe(1)
+		t.Expect(Economy.ClimbTier(100)).ToBe(2)
+		t.Expect(Economy.ClimbTier(5000)).ToBe(4)
+		t.Expect(Economy.ClimbTier(1e18)).ToBe(Olympus.Count)
 	end)
 
-	t.Test("wild rolls stay in range, and Heavy lambs never grow to Standard", function()
+	t.Test("wild rolls stay in range, and no wild lamb grows to Titan", function()
 		local random = Random.new(7)
 		for _ = 1, 500 do
-			local rarity, burden, size = Economy.RollWild(random)
+			local rarity, weight, size = Economy.RollWild(random)
 			t.Expect(rarity >= 1 and rarity <= 3).ToBe(true)
-			t.Expect(burden >= 1 and burden <= 3).ToBe(true)
+			t.Expect(weight >= 1 and weight <= 1.5).ToBe(true)
 			t.Expect(size >= 1 and size <= 3).ToBe(true)
-			if burden == 3 then
-				t.Expect(size >= 2).ToBe(true)
-			end
 		end
 	end)
 end

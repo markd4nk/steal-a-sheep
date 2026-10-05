@@ -11,18 +11,22 @@ export type Sheep = {
 	Id: string,
 	Family: string,
 	Rarity: number, -- 1 Ordinary, 2 Rare, 3 Royal
-	Burden: number, -- 1 Light, 2 Stout, 3 Heavy
-	Size: number, -- 1 Standard, 2 Large, 3 Giant: rolled when the wild lamb is made, hidden until it's grown
+	Weight: number, -- hidden, 1 (lightest) and up: slows its carrier and tilts its size odds (Economy.RollWeight)
+	Size: number, -- 1 Standard to 4 Titan: rolled from its weight's odds when the lamb is made, hidden until grown
 	Grown: number, -- seconds it has grown (only while it's in a pen slot)
 	Rank: number, -- merge rank, 0 to 2
 	Locked: boolean,
-	Slot: number, -- its pen slot, 0 when stored
-	Pinned: boolean, -- kept in its slot by Equip Best
+	Slot: number, -- its place in the pen (1 to PenSlots: it stands in the plot and earns), 0 when stored
+	Pinned: boolean, -- kept in the pen by Equip Best
 	Tutorial: boolean?, -- the first lamb, which grows faster
+	-- Where it was put down, in studs from its owner's plot's middle (+X towards the gate): it roams round this spot.
+	-- Nil until it's been put down; such a sheep gets a free spot in the pen.
+	HomeX: number?,
+	HomeZ: number?,
 }
 
 export type Rarity = { Name: string, Multiplier: number, Chance: number, Color: Color3 }
-export type Burden = { Name: string, Chance: number, Carry: { number }, Sizes: { number }, Scale: number }
+export type WeightBand = { From: number, To: number, Chance: number, LuckyChance: number }
 export type Size = { Name: string, Multiplier: number, Scale: number }
 export type Trail = { Id: string, Name: string, Cost: number, Multiplier: number, Color: Color3 }
 
@@ -34,18 +38,31 @@ Economy.Rarities = table.freeze({
 	{ Name = "Royal", Multiplier = 2.5, Chance = 2, Color = Color3.fromRGB(255, 196, 40) },
 } :: { Rarity })
 
--- Carry: the movement multiplier at the sheep's tier's Reach, Light and Heavy targets. Sizes: percent odds of a
--- Standard, Large and Giant adult. Scale: the wild lamb's size, a clue to its burden.
-Economy.Burdens = table.freeze({
-	{ Name = "Light", Chance = 70, Carry = { 0.84, 0.92, 0.97 }, Sizes = { 89, 10, 1 }, Scale = 0.6 },
-	{ Name = "Stout", Chance = 25, Carry = { 0.72, 0.84, 0.95 }, Sizes = { 50, 47, 3 }, Scale = 0.7 },
-	{ Name = "Heavy", Chance = 5, Carry = { 0.60, 0.76, 0.94 }, Sizes = { 0, 80, 20 }, Scale = 0.8 },
-} :: { Burden })
+-- A lamb's hidden weight: players never see it, they feel it. The carried lamb's tier's Reach counts that many times
+-- bigger in its carrier's speed (Economy.Ratio), and heavier lambs tend to grow bigger (Economy.SizeOdds). A roll
+-- lands in Huge with its chance, Heavy with its, otherwise Normal; `luck` (0 to 1, Economy.RollWeight) moves each
+-- chance towards its LuckyChance. Wild lambs roll with no luck: never Huge, about 1.06 on average, so an average lamb
+-- leaves its thief about 95% of the god's speed at the tier's Reach and only the lightest one matches it.
+Economy.WeightBands = table.freeze({
+	Normal = { From = 1, To = 1.1, Chance = 0, LuckyChance = 0 },
+	Heavy = { From = 1.1, To = 1.5, Chance = 0.05, LuckyChance = 0.6 },
+	Huge = { From = 1.5, To = 3, Chance = 0, LuckyChance = 0.03 },
+} :: { [string]: WeightBand })
+
+-- Percent odds of a Standard, Large, Giant and Titan adult at each anchor weight, straight lines between them and the
+-- last above it. A light lamb can still grow Large or Giant, just less often; Titan needs a Huge one.
+Economy.SizeAnchors = table.freeze({
+	{ Weight = 1, Odds = { 85, 14, 1, 0 } },
+	{ Weight = 1.1, Odds = { 60, 35, 5, 0 } },
+	{ Weight = 1.5, Odds = { 15, 60, 25, 0 } },
+	{ Weight = 3, Odds = { 0, 20, 50, 30 } },
+} :: { { Weight: number, Odds: { number } } })
 
 Economy.Sizes = table.freeze({
 	{ Name = "Standard", Multiplier = 1, Scale = 1 },
 	{ Name = "Large", Multiplier = 1.5, Scale = 1.35 },
 	{ Name = "Giant", Multiplier = 2.5, Scale = 1.7 },
+	{ Name = "Titan", Multiplier = 4, Scale = 2.1 },
 } :: { Size })
 
 Economy.RankNames = table.freeze({ [0] = "", [1] = "Merged", [2] = "Ascended" }) :: { [number]: string }
@@ -56,11 +73,15 @@ Economy.SellSeconds = 15
 Economy.DexRewardSeconds = 30
 Economy.TutorialCoins = 60
 Economy.TutorialClimb = 25
-Economy.StartPens = 3
-Economy.MaxPens = 12
+-- How many sheep the pen holds: 8 to start, bought one at a time up to 20 (the user, 2026-10-05: like Steal a
+-- Brainrot's base, and very expensive to grow).
+Economy.StartPens = 8
+Economy.MaxPens = 20
 Economy.MergeAfterDeliveries = 3
+Economy.GodShare = 0.8 -- a god's set speed, as a share of its tier's SlideSpeed
+Economy.SafeZoneCap = 7 -- the most times normal speed anyone walks below the safety line
 
--- Climb Power a second on the stair walker, by its level (0 is the free one). Each level covers the gap between the
+-- Climbing a second on the stair walker, by its level (0 is the free one). Each level covers the gap between the
 -- next two tiers' reach in about a minute, and the last carries Zeus's Heavy target.
 Economy.WalkerRates = table.freeze({
 	2,
@@ -124,42 +145,93 @@ function Economy.BaseIncome(tier: number): number
 	return Economy.Round(2 * 2.5 ^ (tier - 1))
 end
 
--- Reach, Light and Heavy Climb Power for a tier: Light 1.5x and Heavy 2.25x its reach; tier 1 is 0, 25, 60.
+-- Reach, Light and Heavy Climbing for a tier: from its Reach the lightest lamb's thief matches its god, from Reach
+-- times the heaviest wild weight (1.5) any wild lamb's does.
 function Economy.Targets(tier: number): (number, number, number)
-	if tier == 1 then
-		return 0, 25, 60
-	end
 	local reach = Olympus.Tiers[tier].Reach
-	return reach, reach * 1.5, reach * 2.25
+	return reach, reach * Economy.WeightBands.Normal.From, reach * Economy.WeightBands.Heavy.To
 end
 
--- The share of normal speed and acceleration a carrier keeps: the burden's three values at the source tier's Reach,
--- Light and Heavy targets, straight lines between them, the first below Reach and the last above Heavy.
-function Economy.CarryMultiplier(burden: number, climb: number, tier: number): number
-	local carry = Economy.Burdens[burden].Carry
-	local reach, light, heavy = Economy.Targets(tier)
-	if climb <= reach then
-		return carry[1]
-	elseif climb <= light then
-		return carry[1] + (carry[2] - carry[1]) * (climb - reach) / (light - reach)
-	elseif climb <= heavy then
-		return carry[2] + (carry[3] - carry[2]) * (climb - light) / (heavy - light)
+-- How many times their need a player has on a tier: Climbing / (its Reach x the weight carried, 1 empty-handed).
+function Economy.Ratio(climb: number, tier: number, weight: number): number
+	local reach = Olympus.Tiers[math.clamp(tier, 1, Olympus.Count)].Reach
+	return math.max(climb, 0) / math.max(reach * weight, 1e-9)
+end
+
+-- Times normal speed a ratio gives: the ratio itself below 1, then one more for every 4x (each tier outgrown, as each
+-- Reach is about four times the last). Tier 1 never gives less than normal speed.
+function Economy.SpeedFactor(ratio: number, tier: number): number
+	local factor = if ratio < 1 then ratio else 1 + math.log(ratio, 4)
+	return if tier <= 1 then math.max(factor, 1) else factor
+end
+
+-- A god's one set speed for the whole chase.
+function Economy.GodSpeed(tier: number): number
+	return Olympus.Tiers[math.clamp(tier, 1, Olympus.Count)].SlideSpeed * Economy.GodShare
+end
+
+-- A slide's speed, set when it starts and kept all the way down: the god's speed times the speed factor, for the
+-- carried lamb's tier and weight, or the tier slid from (weight 1) empty-handed. At the Reach the lightest lamb's thief
+-- matches the god and its head start gets them away; an average lamb leaves about 95%.
+function Economy.EscapeSpeed(climb: number, tier: number, weight: number): number
+	return Economy.GodSpeed(tier) * Economy.SpeedFactor(Economy.Ratio(climb, tier, weight), tier)
+end
+
+-- A hidden weight: Normal, Heavy or Huge band (Economy.WeightBands), anywhere in it, luck also leaning it towards the
+-- band's top. `luck` 0 (nil) is a wild lamb's; up to 1 makes heavy ones likelier and opens the Huge tail.
+function Economy.RollWeight(random: Random, luck: number?): number
+	local lucky = math.clamp(luck or 0, 0, 1)
+	local bands = Economy.WeightBands
+	local function chance(band: WeightBand): number
+		return band.Chance + (band.LuckyChance - band.Chance) * lucky
 	end
-	return carry[3]
+	local roll = random:NextNumber()
+	local band = bands.Normal
+	if roll < chance(bands.Huge) then
+		band = bands.Huge
+	elseif roll < chance(bands.Huge) + chance(bands.Heavy) then
+		band = bands.Heavy
+	end
+	local share = random:NextNumber() ^ (1 / (1 + 2 * lucky))
+	return band.From + (band.To - band.From) * share
 end
 
--- The highest tier a player may climb into: each needs its reach in Climb Power and one delivery from the tier below.
--- Tier 1 is always open. Neither ever goes down, so a tier stays open.
-function Economy.Unlocked(climb: number, deliveries: { [string]: number }): number
-	local unlocked = 1
+-- Percent odds of each size (Economy.Sizes) for a weight, from Economy.SizeAnchors.
+function Economy.SizeOdds(weight: number): { number }
+	local anchors = Economy.SizeAnchors
+	if weight <= anchors[1].Weight then
+		return table.clone(anchors[1].Odds)
+	end
+	for index = 1, #anchors - 1 do
+		local a, b = anchors[index], anchors[index + 1]
+		if weight <= b.Weight then
+			local t = (weight - a.Weight) / (b.Weight - a.Weight)
+			local odds = {}
+			for size, chance in a.Odds do
+				odds[size] = chance + (b.Odds[size] - chance) * t
+			end
+			return odds
+		end
+	end
+	return table.clone(anchors[#anchors].Odds)
+end
+
+-- A lamb's size before it grows, a clue to its weight: 0.6 of an adult at the lightest, 0.8 at 1.5, at most 1.
+function Economy.LambScale(weight: number): number
+	return math.min(0.6 + 0.4 * (weight - 1), 1)
+end
+
+-- The highest tier whose Reach a Climbing has (normal speed there or better): what the HUD's goals aim at.
+function Economy.ClimbTier(climb: number): number
+	local reached = 1
 	for tier = 2, Olympus.Count do
-		if climb >= Olympus.Tiers[tier].Reach and (deliveries[tostring(tier - 1)] or 0) > 0 then
-			unlocked = tier
+		if climb >= Olympus.Tiers[tier].Reach then
+			reached = tier
 		else
 			break
 		end
 	end
-	return unlocked
+	return reached
 end
 
 function Economy.TotalDeliveries(deliveries: { [string]: number }): number
@@ -170,7 +242,7 @@ function Economy.TotalDeliveries(deliveries: { [string]: number }): number
 	return total
 end
 
--- "Train for Light sheep" and so on: which of a tier's three stages a Climb Power reaches.
+-- Which of a tier's stages a Climbing reaches: below its Reach, the lightest lambs, the heaviest wild ones.
 function Economy.Readiness(climb: number, tier: number): string
 	local reach, light, heavy = Economy.Targets(tier)
 	if climb < reach then
@@ -209,9 +281,9 @@ function Economy.Income(sheep: Sheep): number
 	return if Economy.IsAdult(sheep) then Economy.AdultIncome(sheep) else Economy.LambIncome(sheep)
 end
 
--- A lamb's adult income from its smallest to its biggest possible size, for its burden (its size stays hidden).
+-- A lamb's adult income from its smallest to its biggest possible size, for its weight (its size stays hidden).
 function Economy.FutureRange(sheep: Sheep): (number, number)
-	local odds = Economy.Burdens[sheep.Burden].Sizes
+	local odds = Economy.SizeOdds(sheep.Weight)
 	local low, high = math.huge, 0
 	for size, chance in odds do
 		if chance > 0 then
@@ -245,12 +317,12 @@ function Economy.WalkerRate(level: number): number
 	return Economy.WalkerRates[math.clamp(level, 0, Economy.MaxWalker) + 1]
 end
 
--- Pen slot n (4 to 12): round(300 x 2.5^(n - 4)).
+-- Room for sheep n (9 to 20): round(25,000 x 6^(n - 9)): 25K, 150K, 900K, 5.4M ... about 9 trillion for the 20th.
 function Economy.PenCost(slot: number): number?
-	if slot > Economy.MaxPens then
+	if slot > Economy.MaxPens or slot <= Economy.StartPens then
 		return nil
 	end
-	return Economy.Round(300 * 2.5 ^ (slot - 4))
+	return Economy.Round(25000 * 6 ^ (slot - 9))
 end
 
 function Economy.Trail(id: string?): Trail?
@@ -283,12 +355,16 @@ local function pick(random: Random, weights: { number }): number
 	return 1
 end
 
--- A wild lamb's rolls: fleece rarity, burden, and its adult size (from its burden's odds).
+-- A size from a weight's odds (Economy.SizeOdds).
+function Economy.RollSize(random: Random, weight: number): number
+	return pick(random, Economy.SizeOdds(weight))
+end
+
+-- A wild lamb's rolls: fleece rarity, weight (no luck), and its adult size (from its weight's odds).
 function Economy.RollWild(random: Random): (number, number, number)
 	local rarity = pick(random, { Economy.Rarities[1].Chance, Economy.Rarities[2].Chance, Economy.Rarities[3].Chance })
-	local burden = pick(random, { Economy.Burdens[1].Chance, Economy.Burdens[2].Chance, Economy.Burdens[3].Chance })
-	local size = pick(random, Economy.Burdens[burden].Sizes)
-	return rarity, burden, size
+	local weight = Economy.RollWeight(random)
+	return rarity, weight, Economy.RollSize(random, weight)
 end
 
 -- Three sheep merge when they're unlocked adults of one family, fleece and rank below the top. Returns why not.
@@ -330,7 +406,7 @@ function Economy.MergeResult(sheep: { Sheep }): Sheep
 		Id = "",
 		Family = first.Family,
 		Rarity = first.Rarity,
-		Burden = first.Burden,
+		Weight = first.Weight,
 		Size = size,
 		Grown = Economy.GrowthSeconds(first),
 		Rank = first.Rank + 1,
@@ -393,12 +469,12 @@ function Economy.Name(sheep: Sheep, showSize: boolean?): string
 	return table.concat(parts, " ")
 end
 
--- The model scale a sheep shows at: a lamb's burden size while it's young, its adult size after.
+-- The model scale a sheep shows at: its weight's lamb size while it's young, its adult size after.
 function Economy.Scale(sheep: Sheep, sheepSize: number): number
 	if Economy.IsAdult(sheep) then
 		return sheepSize * Economy.Sizes[sheep.Size].Scale
 	end
-	return sheepSize * Economy.Burdens[sheep.Burden].Scale
+	return sheepSize * Economy.LambScale(sheep.Weight)
 end
 
 return table.freeze(Economy)

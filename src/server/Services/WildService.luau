@@ -13,17 +13,18 @@ local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
--- The gods' wild lambs: four spawns a tier, each rolled once (fleece, burden, and the adult size it will grow to) and
--- kept until someone delivers it; a failed theft puts the same lamb back. A theft: hold Interact on a lamb, it goes
--- over your head, its god gives chase (GodService), and you either reach your own delivery pad or lose it (caught,
--- dead, reset, left, gave up, blocked at a gate). New players also get one private, Light, ordinary tier 1 lamb of
--- their own for the tutorial.
+-- The gods' wild lambs: four spawns a tier, each rolled once (fleece, hidden weight, and the adult size it will grow
+-- to) and kept until someone delivers it. A theft: hold Interact on a lamb, it goes over your head, its god gives chase
+-- (GodService), and you either carry it into your own plot and put it down there (Remotes.PutDown: anywhere inside
+-- your fence) or lose it. A thief who's caught or dies on the ramp drops it where they were: anyone can steal it from
+-- there (its god then chases them), and it goes back to its pasture after DropSeconds. Giving up, falling off the world
+-- or leaving puts it straight back. New players also get one private, light, ordinary tier 1 lamb for the tutorial.
 local WildService = { Name = "WildService" }
 
 type Roll = {
 	Family: string,
 	Rarity: number,
-	Burden: number,
+	Weight: number,
 	Size: number,
 	Tutorial: boolean?,
 }
@@ -37,6 +38,7 @@ type Spawn = {
 	Prompt: ProximityPrompt?,
 	Carrier: Player?,
 	RefillAt: number,
+	ReturnAt: number, -- os.clock() a dropped lamb goes back to its pasture, 0 when it's there
 	Owner: Player?, -- a tutorial lamb's only thief
 }
 
@@ -45,7 +47,9 @@ type Carry = {
 	Started: number,
 }
 
-local DELIVERY_CHECK = 0.1
+local CARRY_CHECK = 0.1
+-- How a theft ended -> whether the lamb is left lying where the thief was.
+local DROPS: { [string]: boolean } = { Caught = true, Died = true }
 local WRONG_PLOT_EVERY = 3
 local FALL_Y = -50
 
@@ -66,8 +70,8 @@ local function notify(player: Player, message: string, kind: string, sound: stri
 end
 
 local function roll(tier: number): Roll
-	local rarity, burden, size = Economy.RollWild(random)
-	return { Family = Olympus.Tiers[tier].Family, Rarity = rarity, Burden = burden, Size = size }
+	local rarity, weight, size = Economy.RollWild(random)
+	return { Family = Olympus.Tiers[tier].Family, Rarity = rarity, Weight = weight, Size = size }
 end
 
 local function asSheep(rolled: Roll): Economy.Sheep
@@ -75,7 +79,7 @@ local function asSheep(rolled: Roll): Economy.Sheep
 		Id = "",
 		Family = rolled.Family,
 		Rarity = rolled.Rarity,
-		Burden = rolled.Burden,
+		Weight = rolled.Weight,
 		Size = rolled.Size,
 		Grown = 0,
 		Rank = 0,
@@ -86,13 +90,7 @@ local function asSheep(rolled: Roll): Economy.Sheep
 	}
 end
 
-local BURDEN_COLORS = {
-	Color3.fromRGB(140, 235, 120),
-	Color3.fromRGB(255, 214, 90),
-	Color3.fromRGB(255, 120, 100),
-}
-
--- The inspection card over a wild lamb: its name, what it will earn grown up, and how heavy it is to carry.
+-- The inspection card over a wild lamb: its name and what it will earn grown up. Its weight stays hidden.
 local function card(model: Model, rolled: Roll)
 	local root = model.PrimaryPart
 	if not root then
@@ -102,7 +100,7 @@ local function card(model: Model, rolled: Roll)
 	local low, high = Economy.FutureRange(sheep)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "Card"
-	billboard.Size = UDim2.fromOffset(190, 66)
+	billboard.Size = UDim2.fromOffset(190, 46)
 	billboard.StudsOffsetWorldSpace = Vector3.new(0, 4, 0)
 	billboard.MaxDistance = 45
 	billboard.LightInfluence = 0
@@ -126,7 +124,6 @@ local function card(model: Model, rolled: Roll)
 	local rarity = Economy.Rarities[rolled.Rarity]
 	line(Economy.Name(sheep), 24, if rolled.Rarity > 1 then rarity.Color else Color3.new(1, 1, 1))
 	line(`Grows to +{Format.Rate(low)}-{Format.Rate(high)}/s`, 20, Color3.fromRGB(190, 255, 90))
-	line(Economy.Burdens[rolled.Burden].Name, 20, BURDEN_COLORS[rolled.Burden])
 end
 
 local function setCard(model: Model?, visible: boolean)
@@ -137,10 +134,11 @@ local function setCard(model: Model?, visible: boolean)
 	end
 end
 
-local function place(spawn: Spawn)
+-- Puts the lamb down, ready to steal: at its pasture spot, or at `at` (dropped by a thief).
+local function place(spawn: Spawn, at: CFrame?)
 	local model = spawn.Model
 	if model then
-		registry.SheepService:Place(model, spawn.At)
+		registry.SheepService:Place(model, at or spawn.At)
 		model.Parent = wildFolder
 		setCard(model, true)
 	end
@@ -161,13 +159,15 @@ local function fill(spawn: Spawn)
 		spawn.Prompt = nil
 	end
 	local rolled = spawn.Roll
-	local scale = GameConfig.SheepSize * Economy.Burdens[rolled.Burden].Scale
+	local scale = GameConfig.SheepSize * Economy.LambScale(rolled.Weight)
 	local model = registry.SheepService:Build(rolled.Family, rolled.Rarity, scale)
 	if not model then
 		return
 	end
 	model.Name = `Wild_{rolled.Family}`
 	model:SetAttribute("Tier", spawn.Tier)
+	-- Clients graze it like a lamb in a pen (AnimController).
+	model:SetAttribute("Lamb", true)
 	card(model, rolled)
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "StealPrompt"
@@ -194,8 +194,8 @@ end
 local function announceRoyal(spawn: Spawn)
 	local tier = Olympus.Tiers[spawn.Tier]
 	for _, player in Players:GetPlayers() do
-		local unlocked = player:GetAttribute("Unlocked")
-		if type(unlocked) == "number" and unlocked >= spawn.Tier then
+		local reached = player:GetAttribute("ClimbTier")
+		if type(reached) == "number" and reached >= spawn.Tier then
 			notify(player, `A Royal {tier.FamilyName} lamb appeared in {tier.God}'s pasture!`, "Rare", "Reveal")
 		end
 	end
@@ -209,10 +209,11 @@ end
 
 local function clearAttributes(player: Player)
 	player:SetAttribute("Carrying", false)
+	player:SetAttribute("InPen", nil)
 	player:SetAttribute("CarriedFamily", nil)
 	player:SetAttribute("CarriedScale", nil)
 	player:SetAttribute("CarryTier", nil)
-	player:SetAttribute("CarryBurden", nil)
+	player:SetAttribute("CarryWeight", nil)
 	player:SetAttribute("CarryTutorial", nil)
 end
 
@@ -228,17 +229,37 @@ local function endCarry(player: Player): Carry?
 	return carry
 end
 
--- A theft that didn't make it home: the same lamb goes back to its spawn, rolls and all.
+-- Where a thief who lost their lamb drops it: on the floor under them, if they're on the ramp.
+local function dropSpot(player: Player): CFrame?
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	if not root or not root:IsA("BasePart") then
+		return nil
+	end
+	local position = root.Position
+	if position.X < Olympus.SafeLineX or math.abs(position.Y - Mountain.RampY(position.X)) > 18 then
+		return nil
+	end
+	return floorAt(position.X, Mountain.ClampLane(position.Z))
+end
+
+-- A theft that didn't make it home: the same lamb, rolls and all, lies where the thief was caught or died, or goes
+-- back to its pasture.
 function WildService.Fail(_self: any, player: Player, reason: string)
+	local drop = if DROPS[reason] then dropSpot(player) else nil
 	local carry = endCarry(player)
 	if not carry then
 		return
 	end
 	local spawn = carry.Spawn
 	local tier = Olympus.Tiers[spawn.Tier]
-	place(spawn)
+	if spawn.Owner then
+		drop = nil
+	end
+	place(spawn, drop)
+	spawn.ReturnAt = if drop then os.clock() + GameConfig.Theft.DropSeconds else 0
 	if reason == "Caught" then
-		notify(player, `{tier.God} took their lamb back!`, "Bad", "Denied")
+		notify(player, `{tier.God} caught you! You dropped the lamb`, "Bad", "Denied")
 		registry.PlotService:SendHome(player)
 	elseif reason == "Returned" then
 		notify(player, `The lamb ran back to {tier.God}`, "Bad", "Notice")
@@ -247,17 +268,20 @@ function WildService.Fail(_self: any, player: Player, reason: string)
 	end
 end
 
-local function deliver(player: Player, carry: Carry)
+-- Put down in the thief's pen at `at`: the lamb joins their flock, hopping down from where it was held.
+local function deliver(player: Player, carry: Carry, at: CFrame)
 	if not endCarry(player) then
 		return
 	end
 	local spawn = carry.Spawn
+	local heldAt: CFrame? = nil
 	if spawn.Model then
+		heldAt = spawn.Model:GetPivot()
 		spawn.Model:Destroy()
 		spawn.Model = nil
 		spawn.Prompt = nil
 	end
-	registry.FlockService:Deliver(player, spawn.Roll)
+	registry.FlockService:Deliver(player, spawn.Roll, at, heldAt)
 	if spawn.Owner then
 		-- The tutorial lamb is a one-off.
 		tutorialSpawns[spawn.Owner] = nil
@@ -290,10 +314,6 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	if not registry.PlotService:GetPlot(player) then
 		return
 	end
-	if Economy.Unlocked(data.ClimbPower, data.Deliveries) < spawn.Tier then
-		notify(player, "Train to climb this slope", "Bad", "Denied")
-		return
-	end
 	if registry.FlockService:Count(player) >= GameConfig.Theft.InventoryLimit then
 		notify(player, "Your flock is full: merge or sell first", "Bad", "Denied")
 		return
@@ -304,6 +324,7 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	end
 	spawn.State = "Carried"
 	spawn.Carrier = player
+	spawn.ReturnAt = 0
 	if spawn.Prompt then
 		spawn.Prompt.Enabled = false
 	end
@@ -318,7 +339,7 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	player:SetAttribute("CarriedFamily", rolled.Family)
 	player:SetAttribute("CarriedScale", model:GetScale())
 	player:SetAttribute("CarryTier", spawn.Tier)
-	player:SetAttribute("CarryBurden", rolled.Burden)
+	player:SetAttribute("CarryWeight", rolled.Weight)
 	player:SetAttribute("CarryTutorial", if spawn.Owner then true else nil)
 	player:SetAttribute("Carrying", true)
 	local tier = Olympus.Tiers[spawn.Tier]
@@ -336,11 +357,12 @@ local function makeTutorialLamb(player: Player)
 		Tier = 1,
 		At = floorAt(x, Olympus.LaneMiddleZ),
 		State = "Empty",
-		Roll = { Family = tier.Family, Rarity = 1, Burden = 1, Size = 1, Tutorial = true },
+		Roll = { Family = tier.Family, Rarity = 1, Weight = 1, Size = 1, Tutorial = true },
 		Model = nil,
 		Prompt = nil,
 		Carrier = nil,
 		RefillAt = 0,
+		ReturnAt = 0,
 		Owner = player,
 	}
 	tutorialSpawns[player] = spawn
@@ -357,41 +379,64 @@ local function dropTutorialLamb(player: Player)
 	end
 end
 
+local function rootOf(player: Player): BasePart?
+	local character = player.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	return if root and root:IsA("BasePart") then root else nil
+end
+
+-- Thieves who fell off the world lose the lamb; one in their own pen may put it down (InPen, for their client's
+-- prompt and objective); one in someone else's is told so.
 local function checkCarriers()
-	for player, carry in carries do
-		local character = player.Character
-		local root = character and character:FindFirstChild("HumanoidRootPart")
-		if not root or not root:IsA("BasePart") then
+	for player in carries do
+		local root = rootOf(player)
+		if not root then
 			continue
 		end
 		if root.Position.Y < FALL_Y then
 			WildService:Fail(player, "Fell")
 			continue
 		end
-		local plot = registry.PlotService:GetPlot(player)
-		for _, other in registry.PlotService:Plots() do
-			local pad = other.Pieces.Delivery
-			local offset = root.Position - pad.Position
-			if
-				Vector2.new(offset.X, offset.Z).Magnitude <= GameConfig.Theft.DeliverStuds
-				and math.abs(offset.Y) < 10
-			then
-				if other == plot then
-					deliver(player, carry)
-				elseif os.clock() - (wrongPlotAt[player] or 0) > WRONG_PLOT_EVERY then
-					wrongPlotAt[player] = os.clock()
-					notify(player, "That's not your plot! Yours has your name over the gate.", "Bad", "Denied")
-				end
-				break
-			end
+		local here = registry.PlotService:PenAt(root.Position, 0)
+		local home = here ~= nil and here == registry.PlotService:GetPlot(player)
+		if player:GetAttribute("InPen") ~= (if home then true else nil) then
+			player:SetAttribute("InPen", if home then true else nil)
+		end
+		if here and not home and os.clock() - (wrongPlotAt[player] or 0) > WRONG_PLOT_EVERY then
+			wrongPlotAt[player] = os.clock()
+			notify(player, "That's not your plot! Yours has your name over the gate.", "Bad", "Denied")
 		end
 	end
+end
+
+-- The thief asked to put their lamb down (their client shows the prompt inside their own fence): on the floor just in
+-- front of them, kept inside the fence. The server's view of them may be a step behind, so a little outside counts.
+local function putDown(player: Player)
+	local carry = carries[player]
+	local root = rootOf(player)
+	local plot = registry.PlotService:GetPlot(player)
+	if not carry or not root or not plot then
+		return
+	end
+	if registry.PlotService:PenAt(root.Position, -GameConfig.Theft.PutDownSlack) ~= plot then
+		notify(player, "Bring it inside your own fence first", "Bad", "Denied")
+		return
+	end
+	local look = root.CFrame.LookVector * Vector3.new(1, 0, 1)
+	look = if look.Magnitude > 1e-3 then look.Unit else Vector3.xAxis
+	local ahead = root.Position + look * GameConfig.Theft.PutDownAhead
+	local spot = registry.PlotService:ClampToPen(plot, ahead, GameConfig.SheepMotion.WanderFenceGap)
+	-- Facing the way its thief faced, as if set down in front of them.
+	deliver(player, carry, CFrame.lookAt(spot, spot + look))
 end
 
 local function refill()
 	local now = os.clock()
 	for _, spawn in spawns do
-		if spawn.State == "Empty" and now >= spawn.RefillAt then
+		if spawn.State == "Ready" and spawn.ReturnAt > 0 and now >= spawn.ReturnAt then
+			spawn.ReturnAt = 0
+			place(spawn)
+		elseif spawn.State == "Empty" and now >= spawn.RefillAt then
 			spawn.Roll = roll(spawn.Tier)
 			fill(spawn)
 			if spawn.Roll.Rarity >= 3 then
@@ -440,6 +485,7 @@ function WildService.Start(_self: any)
 					Prompt = nil,
 					Carrier = nil,
 					RefillAt = 0,
+					ReturnAt = 0,
 					Owner = nil,
 				}
 				table.insert(spawns, spawn)
@@ -487,13 +533,14 @@ function WildService.Start(_self: any)
 	trove:Add(Remotes.ReturnSheep:Connect(function(player: Player)
 		WildService:Fail(player, "Returned")
 	end))
+	trove:Add(Remotes.PutDown:Connect(putDown))
 
 	local sinceCheck = 0
 	local sinceRefill = 0
 	trove:Connect(RunService.Heartbeat, function(dt: number)
 		sinceCheck += dt
 		sinceRefill += dt
-		if sinceCheck >= DELIVERY_CHECK then
+		if sinceCheck >= CARRY_CHECK then
 			sinceCheck = 0
 			checkCarriers()
 		end
@@ -531,7 +578,9 @@ function WildService.DebugSteal(_self: any, player: Player, tier: number): boole
 	end
 	for _, spawn in spawns do
 		if spawn.Tier == tier and spawn.State == "Ready" and spawn.Model then
-			character:PivotTo(spawn.At * CFrame.new(0, 4, 3))
+			local at = spawn.At * CFrame.new(0, 4, 3)
+			registry.MountainService:Teleported(player, at.Position.X)
+			character:PivotTo(at)
 			tryPickUp(player, spawn)
 			return carries[player] ~= nil
 		end

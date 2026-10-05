@@ -130,11 +130,10 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		rateLabel.Text = `+{Format.Rate(sheep.Income)}/s`
 		local scale = if sheep.Adult
 			then Economy.Sizes[math.max(sheep.Size, 1)].Scale
-			else Economy.Burdens[sheep.Burden].Scale + 0.3 * sheep.Growth
+			else Economy.LambScale(sheep.Weight) + 0.3 * sheep.Growth
 		MenuParts.ShowSheep(view, sheep.Family, scale)
-		local burden = Economy.Burdens[sheep.Burden].Name
 		if sheep.Adult then
-			lines[1].Text = `{Economy.Sizes[sheep.Size].Name} adult - {burden} to carry`
+			lines[1].Text = `{Economy.Sizes[sheep.Size].Name} adult`
 			growthBar.Visible = false
 		else
 			lines[1].Text = `Grows to +{Format.Rate(sheep.Low)}-{Format.Rate(sheep.High)}/s`
@@ -142,10 +141,10 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			Style.SetBar(growthBar, sheep.Growth)
 		end
 		lines[2].Text = if sheep.Slot > 0
-			then (if sheep.Pinned then `In pen slot {sheep.Slot} (pinned)` else `In pen slot {sheep.Slot}`)
+			then (if sheep.Pinned then "In your pen (pinned)" else "In your pen")
 			else "Stored - not earning"
 		lines[3].Text = if sellMode
-			then `Sells for {Format.Short(sheep.Sell)} coins`
+			then `Sells for {Format.Short(sheep.Sell)} cash`
 			elseif sheep.Locked then "Locked: can't be sold or merged"
 			else ""
 		Buttons.Set(

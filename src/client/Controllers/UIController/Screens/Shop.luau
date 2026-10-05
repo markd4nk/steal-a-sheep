@@ -15,7 +15,7 @@ local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
 -- The hub shop, in Shear a Sheep's upgrades look (an orange Prize Fleece menu of raised tiles): the next stair walker
--- level, the next pen slot, and the four trails in order. Each tile is its name, one short line and its buy button.
+-- level, room for one more sheep in the pen, and the four trails in order. Each tile is its name, one short line and its buy button.
 local Shop = {}
 
 local ROW_HEIGHT = 74
@@ -107,19 +107,19 @@ function Shop.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			local cost = Economy.WalkerCost(level)
 			if cost then
 				detailLabel.Text =
-					`Gain {Format.Short(Economy.WalkerRate(level + 1))} Climb Power per second (now {Format.Short(
+					`Gain {Format.Short(Economy.WalkerRate(level + 1))} Climbing per second (now {Format.Short(
 						Economy.WalkerRate(level)
 					)})`
 				price(button, cost, "Upgrade")
 			else
-				detailLabel.Text = `{Format.Short(Economy.WalkerRate(level))} Climb Power per second`
+				detailLabel.Text = `{Format.Short(Economy.WalkerRate(level))} Climbing per second`
 				Buttons.Set(button, "Owned", "MAX")
 				Buttons.SetValue(button, nil)
 			end
 		end
 		do
 			local nameLabel, detailLabel, button = tile("PenSlot")
-			nameLabel.Text = `Pen Slots {data.PenSlots}/{Economy.MaxPens}`
+			nameLabel.Text = `Pen Space {data.PenSlots}/{Economy.MaxPens}`
 			local cost = Economy.PenCost(data.PenSlots + 1)
 			if cost then
 				detailLabel.Text = "One more sheep can earn"

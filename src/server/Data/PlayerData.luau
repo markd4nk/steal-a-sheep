@@ -14,7 +14,7 @@ export type Data = {
 	WalkerLevel: number,
 	Trails: { [string]: boolean }, -- owned, by Economy.Trails id
 	Trail: string, -- the equipped one, "" for none
-	PenSlots: number, -- earning slots, 3 to 12
+	PenSlots: number, -- how many sheep the pen holds (they earn), StartPens to MaxPens
 	Sheep: { [string]: Sheep }, -- every owned sheep by id, equipped or stored
 	NextId: number,
 	Deliveries: { [string]: number }, -- successful deliveries by source tier ("1" to "12")
@@ -25,7 +25,7 @@ export type Data = {
 
 local PlayerData = {}
 
-PlayerData.SchemaVersion = 1
+PlayerData.SchemaVersion = 2
 
 PlayerData.Template = {
 	SchemaVersion = PlayerData.SchemaVersion,
@@ -47,6 +47,21 @@ PlayerData.Template = {
 -- migrations[n] upgrades data from schema n to n + 1, in place.
 local migrations: { [number]: (data: any) -> () } = {}
 
+-- Schema 2: a sheep's Burden (1 Light, 2 Stout, 3 Heavy) became a hidden Weight on a smooth range, each burden at its
+-- band's middle. The size each sheep already rolled stays.
+local BURDEN_WEIGHTS = { 1.05, 1.2, 1.35 }
+migrations[1] = function(data: any)
+	if type(data.Sheep) ~= "table" then
+		return
+	end
+	for _, sheep in data.Sheep do
+		if sheep.Weight == nil then
+			sheep.Weight = BURDEN_WEIGHTS[sheep.Burden] or 1.05
+		end
+		sheep.Burden = nil
+	end
+end
+
 local function isNatural(value: any): boolean
 	return type(value) == "number" and value == value and value >= 0 and value < 2 ^ 53 and value % 1 == 0
 end
@@ -59,19 +74,26 @@ local function isWhole(value: any, min: number, max: number): boolean
 	return isNatural(value) and value >= min and value <= max
 end
 
+-- A home spot's coordinate, in studs from the plot's middle (nil: none yet).
+local function isHome(value: any): boolean
+	return value == nil or (type(value) == "number" and value == value and math.abs(value) <= 500)
+end
+
 local function validSheep(id: any, sheep: any): boolean
 	return type(id) == "string"
 		and type(sheep) == "table"
 		and sheep.Id == id
 		and type(sheep.Family) == "string"
 		and isWhole(sheep.Rarity, 1, 3)
-		and isWhole(sheep.Burden, 1, 3)
-		and isWhole(sheep.Size, 1, 3)
+		and (isWhole(sheep.Burden, 1, 3) or (isAmount(sheep.Weight) and sheep.Weight >= 1))
+		and isWhole(sheep.Size, 1, #Economy.Sizes)
 		and isAmount(sheep.Grown)
 		and isWhole(sheep.Rank, 0, Economy.MaxRank)
 		and type(sheep.Locked) == "boolean"
 		and isWhole(sheep.Slot, 0, Economy.MaxPens)
 		and type(sheep.Pinned) == "boolean"
+		and isHome(sheep.HomeX)
+		and isHome(sheep.HomeZ)
 end
 
 local function flags(value: any): boolean

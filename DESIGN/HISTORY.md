@@ -30,6 +30,130 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     three colour fixes after them (Hephaestus's caps charcoal, not Ares's red; Aphrodite's blossoms pink; Artemis's
     floor slate). Not walked: the new stretches by foot, a theft from them.
 
+- **Put lambs down anywhere in the pen; sheep roam and graze (2026-10-05)**.
+  The user: instead of the delivery platform and fixed pads you unlock, be like Steal an Egg (bring the lamb into the
+  pen and place it where you choose); sheep walk around on their own like Shear a Sheep's; lambs mostly eat off the
+  floor, looking down and chewing with an eating face; make it fluid.
+  - *Delivery*: the carry lasts until the thief puts the lamb down inside their own plot's fence. `PlotService/Build`
+    makes an invisible `Pen` box filling each plot's fence (measured from the plot model's parts) and a `Keepout` box
+    round the stair walker; the pads, the delivery pad and their decor clearing are gone. `WildService` sets the
+    `InPen` attribute and warns in other plots; `PromptController` makes a local Put down prompt on the carried lamb
+    while the player stands in their own `Pen` (`Utils/PenArea`, the same test on server and client); its
+    `Remotes.PutDown` has the server put the lamb 4 studs ahead (clamped inside the fence) and call
+    `FlockService:Deliver(player, wild, at, from)`.
+  - *Pen sheep* (`FlockService/Pens`): models stand at a spot and stroll with Shear a Sheep's `Utils/Wander` (copied
+    with its tests): the server picks each stroll every 0.25 s (within RoamRadius of home, inside the fence, off the
+    walker, `PlotService:CanStand` (an overlap box, solid parts only, ground and game folders skipped) and
+    `PathClear` (keep-out samples and a spherecast)), and sets `WalkAt` then `Spot`; the model moves on the server only
+    when shown, grown or rebuilt. Arrivals (`DropFrom`, `DroppedAt`) land on the put-down spot or the nearest clear one.
+    Saved sheep gained optional `HomeX`/`HomeZ` (studs from the plot's middle; validated, no migration). Slots still
+    mean "in the pen" (1 to PenSlots), so Roster, Equip Best, merging and income are unchanged.
+  - *Each device* (`AnimController`, rewritten): every penned sheep follows its hop or stroll (re-pivoted when the
+    server moves the model), legs in step with the ground (`SheepClips.Walk`); the nearest 50 in 70 studs graze
+    (`SheepClips.Graze`/`GrazeStage`: body tips 14 degrees, sinks a little, head tips 80 and the neck reaches so the nose
+    touches the grass; bites tug and sweep, chews bob and roll), idle, happy-hop after landing, and swap faces (chew
+    frames, Happy, Baa, Blink). Wild lambs carry `Lamb` and graze too.
+  - *Eating face*: two variants drawn with Shear a Sheep's face helpers (`art/faces/chew_faces.py`, renders in
+    `art/faces/renders/`, ignored), shown as a sheet and then filmed on a grazing tier 8 lamb (pictures loaded from
+    Studio's content folder, nothing uploaded); the user picked A, "Munch". MunchA and MunchB were uploaded through the
+    Studio MCP's `upload_image` (served on 127.0.0.1) as rbxassetid://140615494609777 and 118466923824368 and set as
+    `ChewFaces`. AnimController preloads its face pictures one request each and swaps in only those that have
+    arrived (or whose fetch status says Success), so a picture still in Roblox's review never shows as a blank face.
+    Seen in a fresh Studio: the lamb chews with the uploaded Munch frames (filmed).
+  - *The user's calls after seeing it*: merge it; the pen holds 8 to start, up to 20, very expensive to grow (Pen
+    Space prices x6 a slot from 25K; older saves raised to 8 on load); sheep roam the whole plot at the same pace (the
+    18-stud range round home is gone). Checked with `check.ps1` and the unit tests in Studio.
+  - *A fix found filming*: a sheep made while the player is in the game (every put-down) could reach the client in
+    pieces, its `Sheep` tag before its Motor6Ds and face: AnimController rigged it at once and it walked about stiff,
+    never grazing or changing face (two takes in five). It now takes joints and the face from `DescendantAdded` too;
+    three lambs put down in a row then all grazed, chewed, blinked and baa-ed (25 s face log).
+  - *UI*: objective "Bring it into your pen" / "Put it down where you like" (and the full-pen warning); Flock card "In
+    your pen"; Shop "Pen Space n/20".
+  - *Checked*: `check.ps1` passes; 43 tests pass in Studio (Wander, PlayerData homes). Playtested solo in this session's
+    own Studio on `build/PenPlaytest.rbxl` (main's Studio was in someone's playtest): a stolen lamb carried home, no
+    prompt outside the gate or in another plot (the notice showed), "Put down" pressed with E landed it 4 studs ahead
+    after a 0.47 s hop from head height; 8 then 12 sheep: 560 samples over 40 s found none outside the fence, on the
+    walker or in solid decor, the nearest two 5.7 studs apart, all strolling; grazing seen (nose on the grass, chewing
+    with the stand-in face) and filmed; store, equip (hops back in at home), grow-up rebuilds in place, merge (hops in
+    at the first sheep's home), sell, and a full pen (stored, warning shown). Console clean. Not checked: two players,
+    touch, gamepad, a real rejoin.
+
+- **Coins renamed cash (2026-10-05)**. The user: there are no coins, just cash, all through the game. The nine messages
+  that said coins now say cash (selling, the Shop's "Need ... more", Sheepdex rewards, the tutorial reward, the
+  welcome-back card, the debug panel). Code names and saved data keep `Coins`; the map and the borrowed assets have
+  no coin text (scanned with Lune). Tyche's crown of coins and the coin-clink sounds stay: decoration, not money.
+
+- **World leaderboards (2026-10-05)**. The user: make the leaderboard actually work, on the map's billboard in the safe
+  zone rather than inside a HUD icon. The map has four boards (`workspace.Base.Leaderboard`, two pairs at x 280, z
+  28-66 and 303-341, facing the plots), so each ranks one thing. The first mock-up (Coins Earned, Top Income, Most
+  Steals, Climb Power, a trophy by each title) drew the user's calls: the money is cash, not coins, so swap Coins
+  Earned for This Server (the richest here) next to Top Income (the richest overall, best ever); the look is OK; drop
+  the icon, words only.
+  - *LeaderboardService* (folder): `Boards` (the four rankings, in the order of the boards sorted by z: This Server,
+    Top Income, Most Steals, Climbing), `Score` (store encoding and the merge), `Face` (the screen). Each board gets
+    an upright invisible part just in front of its panel with a SurfaceGui (50 px a stud), since the map's panels lie
+    on their side. Every 5 s it measures each loaded player's values (their best this session; This Server takes
+    their income now) and redraws the boards from the store's top 10 merged with this server's players. This Server
+    has no store. Every 60 s it writes what went up
+    (`UpdateAsync` with `math.max`) and reads each store's top 10 (`GetSortedAsync`), looking names up in one
+    `UserService:GetUserInfosByUserIdsAsync` call. The last write happens on `DataService.PlayerReleasing`, and from
+    `Destroy` for anyone still in at shutdown (it's destroyed before DataService releases them).
+  - *Stores*: `Leaderboard_Income`, `_Steals`, `_Climb` (`_Studio` in Studio). Values are
+    `floor(log10(1 + value) x 1e13)`: late-game income (about 5e14/s for a full pen at Zeus, stored in tenths) and
+    Climb Power head past what an OrderedDataStore and Luau hold exactly. The order holds, and whole numbers come back
+    exact below about 2e12. No saved data changed.
+  - *Checked*: `check.ps1` passes. Playtests in a second Studio on a copy of the built place: both bootstraps ready, 41
+    tests pass (5 new for `Score`: exact round trip to a trillion, order, under 2^53 at 1e300, the merge). Without
+    DataStores the boards say "This server" and the console has one line saying so. After debug Climb Power and three
+    sheep, all four boards showed the player within 5 s, matching the player list (2.38K/s, 48K); after selling the
+    best sheep, This Server read 854/s and Top Income kept 2.38K/s. Screenshots of both pairs, words-only titles, with
+    sample rows filled in on the client. Store writes and reads weren't run (unpublished place). Merging main
+    (Climbing) retitled the last board CLIMBING, as everything on screen now says.
+
+- **Climbing: one stat, no walls (2026-10-05)**. The user asked how chaser speed worked, then: climbing and speed
+  should be one thing called Climbing; the steeper the slope the less it works, so going higher needs almost
+  exponentially more; you can still climb when far too weak, just painfully slowly ("crawl", not slip back), and that
+  slowness gets you caught on the way down. Walls removed completely, no delivery lock, no god lunge. For the gods
+  they chose a fixed speed like Steal an Egg's and asked for it to be checked: guides say each zone has its own,
+  faster guardian that never scales with the player, and you escape with enough Speed over the zone's minimum. Ours
+  already did that, so `GodService` is unchanged.
+  How it works: `Economy.ClimbShare` (Climbing / (Climbing + Reach)), `Mountain.ClimbSpeedAt` (18 studs/s times that,
+  at least `Movement.CrawlSpeed` 1), `MovementController` caps the uphill part of a walk to it,
+  `MountainService` keeps a per-player ceiling rising at that speed (x1.3, with 10 studs or 1 s of lead) and puts
+  anyone above it back. `Economy.CarryMultiplier` keeps falling below Reach (to `UnderTrainedFloor` 0.45 of the
+  burden's first value). `Economy.ClimbTier` (highest Reach held) replaces `Unlocked` for HUD goals, the training
+  meter, Royal-lamb notices and the "in reach" notice. Gates became `TierSigns`. Every "Climb Power" on screen now
+  says "Climbing"; the saved field stays `ClimbPower`.
+  Then, after a napkin-maths explanation, the user made the chase "your speed vs its speed" like Steal an Egg: one set
+  speed per god for the whole chase (`Economy.GodSpeed`, 0.8 x the tier's `SlideSpeed`), no god walking speed, and
+  the escape speed from Climbing (`Economy.EscapeSpeed`, with burden weights replacing the old Carry tables), set when
+  a slide starts and kept all the way down because momentum carries you (`MovementController` slideTarget).
+  `Mountain.SlideSpeedAt` and the under-trained floor went. The carry card shows "you N, god N".
+  Then, wanting as few numbers as possible, the user settled on one rule: your ratio is Climbing / (sign x lamb weight),
+  your speed is the ratio below 1 and +1x per 4x above, no cap on the mountain, 7x for walking in the safe zone, tier 1
+  never below normal; the sign is just enough for the lightest lamb, an average one leaving about 95%. Weight became
+  hidden and a smooth range, saved with the sheep and tilting (not deciding) adult size; the Light/Stout/Heavy words
+  and the carry card's speeds went. The Merge Shrine session asked for the weight interface: `Economy.RollWeight(random,
+  luck)`, `SizeOdds(weight)`, `RollSize`, `LambScale`, a placeholder Titan size. Schema 2 migrates Burden to Weight.
+  `Mountain.SpeedAt` replaced `ClimbSpeedAt`; slides now reach their speed in about 2 s.
+  Checked: `check.ps1`; 40 of 40 tests in Studio; a playtest in StealASheep.rbxl with this branch's scripts swapped in
+  (main's put back after, not saved): the server put a client teleport to x 900 back to x 235; tier 3 uphill at 0,
+  200, 800 and 12,800 Climbing measured 1.0, 4.4, 17.6 and ~54 studs/s; chases on tier 3 (god 25.6) with a 1.03
+  lamb: caught at 200, escaped at 800 (24.9, god 39 studs behind), easy at 3,200 (50.7); at 1e9 Climbing walking on
+  the plots stopped at 126, uphill ran 245 with no airborne samples, slides of 200-260 stayed on the floor; the carry
+  card shows only the lamb's name. Console clean.
+  Then the user kept gods walking home slowly and asked for dropped lambs: a caught (or dead) thief's lamb lies where
+  they were for 30 s, anyone may steal it and its god chases them. Also a server ground-speed check (a budget refilled
+  at the fastest legal speed; server teleports reset it). Checked in Studio: 45 of 45 tests; a thief caught on tier 3
+  dropped the lamb 5 studs from the catch spot, the player walked back and stole it 16.5 s later and the god ran at
+  them at once; left alone it went back to its pasture; a 200-stud sideways teleport was put back; no pull-backs on
+  legal chases or a 254 studs/s slide.
+  The user asked for a final scaling pass before playtesting. A simulated efficient player (steals once Climbing is
+  1.15x the next sign, buys every walker level, pen and trail it can) reaches tier 10 in 30 min, tier 20 in 1.8 h and
+  Zeus in 4.3 h; climbs never take over a minute (lower tiers zoom); every tier's numbers are in the same proportion
+  (a walker level costs 60 s of one adult from the tier below), so nothing breaks, but Climbing outruns the signs
+  10-70x between new tiers, so chases are easy most of the time.
+
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9
   (4-5 are 126, 10-12 are 325), and 129-178 across the ground. The user picked 275.
