@@ -35,9 +35,9 @@ local function near(a: number, b: number): boolean
 	return math.abs(a - b) < 1e-9
 end
 
--- Every number here is from the design document's tables ("Steal a Sheep Game Design Document Draft.md").
+-- These pin the current tuning: when the numbers are changed on purpose, change the expectations with them.
 return function(t: Run.Suite)
-	t.Test("base income follows round(2 x 2.5^(tier - 1)) and the design's table", function()
+	t.Test("base income follows round(2 x 2.5^(tier - 1))", function()
 		local expected = { 2, 5, 13, 31, 78, 195, 488, 1221, 3052, 7629, 19073, 47684 }
 		for tier, income in expected do
 			t.Expect(Economy.BaseIncome(tier)).ToBe(income)
@@ -97,7 +97,7 @@ return function(t: Run.Suite)
 		t.Expect(Economy.TrainingRate(2, "Laurel")).ToBe(60)
 	end)
 
-	t.Test("the burden size odds add up to the design's overall 74.8 / 22.75 / 2.45", function()
+	t.Test("the burden size odds add up to 74.8 / 22.75 / 2.45 overall", function()
 		local totals = { 0, 0, 0 }
 		for _, burden in Economy.Burdens do
 			for size, chance in burden.Sizes do

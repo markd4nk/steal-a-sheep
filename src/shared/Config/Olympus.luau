@@ -3,7 +3,7 @@
 -- The mountain: twelve tiers up one ramp, each a god's pasture with its own sheep family. The commissioned map
 -- (vvs_map) is one corridor climbing east (+X) from the plots, in seven themed stages that get steeper: 2, 7, 12, 17,
 -- 22, 29 and 31 degrees. Long stages hold two or three tiers. Gods are ordered to fit each stage's theme (meadow,
--- bamboo, snow, lava, rose garden, marble temple, golden cloud path); every tier keeps the design's numbers in order
+-- bamboo, snow, lava, rose garden, marble temple, golden cloud path); every tier keeps its numbers in order
 -- (reach threshold, income), so swapping two gods is a matter of swapping their rows' names and looks.
 
 export type Tier = {

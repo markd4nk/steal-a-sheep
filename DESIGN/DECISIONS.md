@@ -7,11 +7,11 @@ confirmed or reversed it.
 
 ## Confirmed rules
 
-- From the design doc (user confirmed directions): climb uphill, slide downhill carrying a sheep; aimed slides knock back
-  uphill walkers with no damage or sheep transfer; the stair walker replaces the treadmill and Climb Power both opens
-  steeper slopes and reduces carrying slowdown; reach -> Light -> Heavy stages per tier; reuse Shear a Sheep's UI and
-  assets wherever possible; the Sheepdex is a standard MVP collection book.
-- Keep new things MVP primitive; reuse Shear a Sheep's UI and assets (the user, 2026-10-05).
+- **The user directs the game from here (2026-10-05).** They deleted the draft design doc the first build followed and
+  are taking the game their own way: a request that changes what was built is the new rule. Don't object that it goes
+  against earlier plans, the old doc, or the calls below; just make it and update the docs.
+- The first build reused Shear a Sheep's UI and assets and kept new things primitive (the user, 2026-10-05). That was
+  how the MVP was made, not a limit on later changes.
 
 ## To review
 
@@ -19,8 +19,8 @@ Calls made while building the MVP on 2026-10-05:
 
 - **God order fits the map's stage themes**: Demeter (meadow), Dionysus (bamboo), Artemis (snow), Hephaestus and Ares
   (lava), Aphrodite and Apollo (rose garden), Athena and Poseidon (marble temple and aqueduct), Hermes, Hera and Zeus
-  (cloud path to the summit). The doc ordered Hermes 3rd and Artemis 7th, Aphrodite 4th and Hephaestus 5th; each tier
-  keeps the doc's numbers (reach, income). Swapping back is a reorder of rows in `Config/Olympus`.
+  (cloud path to the summit). Each tier
+  keeps its numbers (reach, income) in order. Reordering is a reorder of rows in `Config/Olympus`.
 - **Twelve tiers on seven stages**: the long stages hold two or three tiers (stage 4: 2, stage 5: 2, stage 6: 2,
   stage 7: 3). Tier boundaries are x positions on the ramp (`Olympus.Tiers[].XStart`).
 - **Families are Shear a Sheep breeds**: Scarecrow, Moon (silver), Lava, Cotton Candy, Solar System, Ocean, Cloud,
@@ -63,4 +63,4 @@ Calls made while building the MVP on 2026-10-05:
 ## Calls left to the user
 
 - Thin the corridor's decor (trees, rocks, arches) on a few slide lanes, or keep it as an obstacle course?
-- Keep the theme-fitted god order, or the design doc's order?
+- Keep the theme-fitted god order, or change it?

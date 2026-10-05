@@ -5,7 +5,7 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 | File | Holds | When to read it |
 | --- | --- | --- |
-| `DESIGN/GAME_DESIGN.md` | The user's design (short form; the full doc is at the repo root) | When the task touches gameplay |
+| `DESIGN/GAME_DESIGN.md` | The game as it is now (the user directs it: their requests win) | When the task touches gameplay |
 | `DESIGN/HISTORY.md` | Every finished build, newest first: how it works, the user's calls, how it was checked | Search it for the feature you touch |
 | `DESIGN/DECISIONS.md` | The user's confirmed rules, and agents' calls waiting for review | Before changing anything players notice |
 | `DESIGN/STUDIO_CONTENT.md` | What the code expects in the place file, and what the place holds now | Before Studio-side work or a publish |
@@ -19,7 +19,7 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## The game, and where each part lives
 
-The design doc's MVP, built in one pass on 2026-10-05 (HISTORY.md): twelve tiers up the commissioned map, a god each,
+The MVP built in one pass on 2026-10-05 (HISTORY.md); the user now takes it in their own direction (GAME_DESIGN.md): twelve tiers up the commissioned map, a god each,
 four wild lambs each, stair walker training, overhead carrying, the automatic downhill slide with steering, braking and
 slide hits, pursuit, delivery, pens, income, growth, size reveal, Equip Best, locks, selling, merging, trails, pen slots,
 the Sheepdex, offline earnings and the tutorial lamb.

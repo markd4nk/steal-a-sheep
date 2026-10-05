@@ -4,8 +4,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 
--- Every formula of the design's economy, as pure functions so the server, the UI and the tests agree. All values are
--- the design's proposed prototype settings ("Steal a Sheep Game Design Document Draft.md").
+-- Every formula of the economy, as pure functions so the server, the UI and the tests agree. The values are the
+-- first build's prototype settings: tune them freely.
 
 export type Sheep = {
 	Id: string,
@@ -76,7 +76,7 @@ for _, trail in Economy.Trails do
 	trailsById[trail.Id] = trail
 end
 
--- Half up, as the design's tables round (4687.5 -> 4688).
+-- Half up (4687.5 -> 4688).
 function Economy.Round(value: number): number
 	return math.floor(value + 0.5)
 end
@@ -320,7 +320,7 @@ function Economy.Earn(sheep: Sheep, seconds: number): (number, number)
 	return coins, seconds
 end
 
--- The offline settlement: the design's 25% of up to two hours of income, juvenile rate until each lamb matures in
+-- The offline settlement: 25% of up to two hours of income, juvenile rate until each lamb matures in
 -- that window; growth itself runs for the whole time away. Mutates each sheep's Grown. Returns the coins and the
 -- sheep that grew up meanwhile.
 function Economy.Offline(equipped: { Sheep }, elapsed: number, maxSeconds: number, share: number): (number, { Sheep })

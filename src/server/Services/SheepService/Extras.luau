@@ -1,6 +1,6 @@
 --!strict
 
--- The primitive accessories three families wear on top of a Shear a Sheep breed (the design's "primitive visual"):
+-- The primitive accessories three families wear on top of a Shear a Sheep breed (primitive pieces):
 -- the Grape Sheep's leaf, the War Sheep's helmet and plume, the Laurel Sheep's wreath, and the Wingfoot Sheep's ankle
 -- wings. Built on a sheep dressed at its rig's own size (Looks.Dress at scale 1), welded to the piece they sit on, and
 -- scaled with the sheep afterwards.

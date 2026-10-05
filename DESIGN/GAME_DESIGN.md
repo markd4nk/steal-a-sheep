@@ -1,17 +1,17 @@
 # Game design
 
-Owned by the user. Agents read it and ask before changing it. The full design is
-[`Steal-a-Sheep-Game-Design-Document-Draft.md`](../Steal-a-Sheep-Game-Design-Document-Draft.md) at the repo root
-(draft v0.3, 2026-10-05); this page is its short form and how it maps onto the commissioned map.
+**The user directs this game.** Since 2026-10-05 they are taking it in their own direction, so this page describes the
+game *as it is now*, not a plan to defend. When the user asks for a change, make it: don't push back because it
+differs from what was built before or from earlier plans (the first build followed a draft design doc that the user
+has since deleted; it is not a requirement). After the change, update this page so it stays a true description.
 
 ## Pitch
-Train on a stair walker, climb Olympus, steal a god's lamb, hold it over your head and slide downhill to escape
-(knocking back climbers on the way), then grow your flock into the biggest earners in your pen.
+Climb the mountain, steal a god's lamb, hold it over your head and slide downhill to escape (knocking back climbers
+on the way), then grow your flock into the biggest earners in your pen.
 
-## Core loop
-Train on the stair walker -> climb a steeper route -> steal a lamb -> slide home with the god behind you -> deliver ->
-earn and grow -> upgrade. Each tier has three stages: reach its pasture, escape with Light lambs, then reliably bring
-Heavy ones home.
+## Core loop (as built)
+Train on the stair walker -> climb to a god's pasture -> steal a lamb -> slide home with the god behind you ->
+deliver -> earn and grow -> upgrade.
 
 ## Systems
 - Climb Power, stair walker, trails: `TrainingService`, `ShopService`.
@@ -24,8 +24,7 @@ Heavy ones home.
 
 ## The map
 The commissioned map is one corridor climbing east (+X) from the plots in seven themed stages of rising grade (2, 7,
-12, 17, 22, 29, 31 degrees). The twelve tiers are spread over them, two or three on the long stages, and the gods are
-ordered to fit each stage's theme; every tier keeps the design doc's numbers in order (DECISIONS.md, To review).
+12, 17, 22, 29, 31 degrees), with twelve tiers spread over them.
 
 | Tier | God | Stage | Family (Shear a Sheep breed) |
 | --- | --- | --- | --- |
@@ -42,10 +41,10 @@ ordered to fit each stage's theme; every tier keeps the design doc's numbers in 
 | 11 | Hera | cloud path | Crown Sheep (Royal Sheep) |
 | 12 | Zeus | summit | Thunder Sheep (Storm Sheep) |
 
-## Economy
+## Economy (as built)
 Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels, pen slots and trails. Climb Power
-(stair walker) opens tiers and reduces carrying slowdown. No Robux products in the MVP.
+(stair walker) opens tiers and reduces carrying slowdown. No Robux products.
 
-## Out of scope
-Per the design doc: player plot raiding, trading, breeding, rebirth, bespoke god attacks, mutations beyond the
-fleece rarity, premium products.
+## Not built
+Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.
+These are just not built yet, not ruled out: build them if the user asks.

@@ -1,8 +1,8 @@
 # Steal a Sheep
 
-Climb Olympus, steal a god's lamb, hold it over your head and slide home with the god behind you. The design is
-[`Steal-a-Sheep-Game-Design-Document-Draft.md`](Steal-a-Sheep-Game-Design-Document-Draft.md); what's built and what
-isn't is in [`DESIGN/CURRENT_STATE.md`](DESIGN/CURRENT_STATE.md). Built on RobloxPack (below) with Shear a Sheep's UI
+Climb Olympus, steal a god's lamb, hold it over your head and slide home with the god behind you. What's built and
+what isn't is in [`DESIGN/CURRENT_STATE.md`](DESIGN/CURRENT_STATE.md); the game as it is now in
+[`DESIGN/GAME_DESIGN.md`](DESIGN/GAME_DESIGN.md). Built on RobloxPack (below) with Shear a Sheep's UI
 kit, sheep and sounds.
 
 ## Play it
