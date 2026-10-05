@@ -4,6 +4,16 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, free placement**: no place changes. The plots no longer get
+  pads or a delivery pad, so the map's hay and trees inside the plots stay where the map has them (only the stair
+  walker's spot is cleared); sheep walk round them. The code still expects `workspace.Base.Terrain` to be the ground
+  (it's skipped by the sheep's obstacle checks) and each `PlayerPlot`'s parts to outline its fence (the pen box is
+  measured from them).
+- **2026-10-05, world leaderboards**. Nothing new in the place: `LeaderboardService` uses the map's
+  `workspace.Base.Leaderboard` (a Folder of four `Leaderboard` Models, each with one big panel part whose front face,
+  its LookVector, faces the plots; the rest are posts). It sorts the boards by the panel's z and adds a `<Id>Board`
+  part with a `Screen` SurfaceGui to each Model at runtime. Without the folder the boards are off, with a warning.
+
 - **2026-10-05, High Olympus at 275 studs a stretch**. Same instances as below, rebuilt longer by `build-place.ps1`:
   Zeus's top at x 6721.3, height 4439.1, the plaza from there to x 6811.3. `StealASheep.rbxl` in the main checkout
   was rebuilt with it; a Studio that had it open still shows the 210 version until reopened without saving.
@@ -20,7 +30,8 @@ here. Newest first.
   - **The map**, `vvs_map(commission) (1).rbxl` (the user's commission), as it is. The code expects:
     `workspace.Base.PlayerPlots` (five `PlayerPlot` models; PlotService sorts them by z), `workspace.Base.Shop` (two
     stall models: the one at z 205 is the Shop, the one at z 175 the Sell Stall), `workspace.Stages.Stage1..7` (the ramp),
-    `workspace.Decors` and `workspace.Base.Foliages`/`HayStacks` (decor PlotService may move out of a pad's way), and
+    `workspace.Decors` and `workspace.Base.Foliages`/`HayStacks` (decor PlotService may move out of the stair
+    walker's way), and
     the ramp's shape in `Config/Olympus.Ramp` (measured; re-measure if the map changes). Workspace.StreamingEnabled is
     off in the map.
   - **Shear a Sheep's pieces**, `assets/ShearASheepAssets.rbxm` (from `tools/extract-assets.luau`), placed in
@@ -29,6 +40,7 @@ here. Newest first.
     `<Build>Wool` and `<Build>Extras`), `WorldKit.MutationMachine` (the Merge Shrine; a primitive altar if missing).
   - **The code**, from `rojo build default.project.json`.
 - Made at runtime (not in the place): `workspace.Plots`, `Gods`, `WildSheep`, `CarriedSheep`, `PenSheep`,
-  `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`, `ReplicatedStorage.SheepLooks`, every ScreenGui.
+  `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`, `ReplicatedStorage.SheepLooks`, the leaderboards' screens,
+  every ScreenGui.
 - Before publishing: set Maximum Visitor Count to 5 (one player a plot) in Creator Hub, turn on Studio access to API
   services for saving, and publish under the account that owns Shear a Sheep's assets.

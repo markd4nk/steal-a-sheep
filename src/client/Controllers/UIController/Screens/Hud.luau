@@ -9,6 +9,7 @@ local Format = require(ReplicatedStorage.Utils.Format)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Mountain = require(ReplicatedStorage.Utils.Mountain)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
+local PenArea = require(ReplicatedStorage.Utils.PenArea)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Theme = require(ReplicatedStorage.Config.Theme)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -362,11 +363,23 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			local character = player.Character
 			local here = character and character:GetPivot().Position
 			local onRamp = here ~= nil and Mountain.IsOnRamp(here)
-			local pad = plotPiece("Delivery")
+			local pen = plotPiece("Pen")
+			if pen and here and PenArea.Contains(pen, here, 0) then
+				local equipped = 0
+				for _, sheep in data.Sheep do
+					if sheep.Slot > 0 then
+						equipped += 1
+					end
+				end
+				return {
+					Title = "Put it down where you like",
+					Sub = if equipped >= (data.PenSlots or 0) then "Your pen is full: it'll be stored" else nil,
+				}
+			end
 			return {
-				Title = if onRamp then "Slide home!" else "Bring it to your pen",
+				Title = if onRamp then "Slide home!" else "Bring it into your pen",
 				Sub = if onRamp then "Run downhill to slide" else nil,
-				Target = if pad then pad.Position else nil,
+				Target = if pen then pen.Position else nil,
 			}
 		end
 		if data.Tutorial == 0 then

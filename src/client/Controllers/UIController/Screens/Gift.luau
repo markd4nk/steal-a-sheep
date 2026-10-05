@@ -148,7 +148,7 @@ function Gift.Build(playerGui: Instance): ScreenGui
 		local climb = prize(prizes, "ClimbPrize", UDim2.new(0.5, -6, 1, 0), 1, "Legendary", nil)
 		reward(climb, "ClimbReward", Theme.Icons.HudShoe, "ClimbLabel", Color.Gold300, "CLIMBING")
 		local coins = prize(prizes, "CoinPrize", UDim2.new(0.5, -6, 1, 0), 2, "Uncommon", nil)
-		reward(coins, "CoinReward", Theme.Icons.HudCash, "CoinLabel", Color.Lime, "COINS")
+		reward(coins, "CoinReward", Theme.Icons.HudCash, "CoinLabel", Color.Lime, "CASH")
 	else
 		local line = prize(prizes, "Prize", UDim2.fromScale(1, 1), 1, nil, ACCENT)
 		reward(line, "ClimbReward", Theme.Icons.HudShoe, "ClimbLabel", Color.Gold300, "CLIMBING").LayoutOrder = 1
@@ -156,7 +156,7 @@ function Gift.Build(playerGui: Instance): ScreenGui
 			Stroke = Color.Line,
 			Order = 2,
 		})
-		reward(line, "CoinReward", Theme.Icons.HudCash, "CoinLabel", Color.Lime, "COINS").LayoutOrder = 3
+		reward(line, "CoinReward", Theme.Icons.HudCash, "CoinLabel", Color.Lime, "CASH").LayoutOrder = 3
 	end
 
 	local steps = UIKit.Frame(page, "Steps", UDim2.fromScale(1, 0))
@@ -264,7 +264,7 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		context.Close("Gift")
 		context.Controllers.UIController:Celebrate(
 			"FREE GIFT!",
-			`+{Format.Short(climb or 0)} Climbing  +{Format.Short(coins or 0)} Coins`
+			`+{Format.Short(climb or 0)} Climbing  +{Format.Short(coins or 0)} Cash`
 		)
 	end
 

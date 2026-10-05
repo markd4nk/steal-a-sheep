@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Format = require(ReplicatedStorage.Utils.Format)
+local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Mountain = require(ReplicatedStorage.Utils.Mountain)
@@ -15,7 +16,9 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- The climb's rules on the ramp. Climbing: nothing walls a tier off; each player climbs at the speed their Climbing
 -- allows on that tier's slope (Mountain.SpeedAt, MovementController moves them), down to a crawl. The server
 -- keeps a ceiling per player that rises at that speed (with some slack for lag) and puts anyone found above it back on
--- it. A sign at the foot of each tier from the second up names it and its Reach. Slide hits: a player sliding downhill
+-- it. It also gives each player a budget of ground they may cover, refilled at the fastest they could legally go (their
+-- walking or escape speed there, or a knockback), and puts anyone who outruns it back where they were. A sign at the
+-- foot of each tier from the second up names it and its Reach. Slide hits: a player sliding downhill
 -- fast enough who reaches a player walking uphill knocks them back down the slope (their client moves them), protects
 -- them for a moment, and loses some speed. No hits below the safety line or on a protected tutorial run.
 local MountainService = { Name = "MountainService" }
@@ -35,6 +38,9 @@ local protectedUntil: { [Player]: number } = {}
 local touching: { [Player]: { [Player]: boolean } } = {}
 -- The furthest up the ramp (x) each player may be right now.
 local ceilings: { [Player]: number } = {}
+-- Each player's last checked spot, its character's root, and the studs they may still cover before the next refill.
+type Track = { Root: BasePart, At: Vector3, Budget: number }
+local tracks: { [Player]: Track } = {}
 local sightParams = RaycastParams.new()
 sightParams.FilterType = Enum.RaycastFilterType.Exclude
 
@@ -103,6 +109,39 @@ local function speedBoost(player: Player): number
 	return if type(boost) == "number" and boost > 0 then boost else 1
 end
 
+-- The fastest a player at `x` could legally move across the ground: walking, sliding (carrying or not) or knocked back.
+local function fastest(player: Player, x: number, climb: number): number
+	local tier = player:GetAttribute("CarryTier")
+	local weight = player:GetAttribute("CarryWeight")
+	local escape = if type(tier) == "number" and type(weight) == "number"
+		then Economy.EscapeSpeed(climb, tier, weight)
+		else Economy.EscapeSpeed(climb, math.max(Mountain.TierAt(x), 1), 1)
+	local knock = GameConfig.SlideHit.KnockStuds / GameConfig.SlideHit.KnockSeconds
+	return math.max(GameConfig.Movement.WalkSpeed, Mountain.SpeedAt(x, climb, 1), escape, knock)
+end
+
+-- Ground covered (x and z) against the budget, which refills at the fastest legal speed and holds up to a second of it.
+local function checkSpeed(player: Player, root: BasePart, climb: number, dt: number)
+	local track = tracks[player]
+	local position = root.Position
+	if not track or track.Root ~= root then
+		tracks[player] = { Root = root, At = position, Budget = 0 }
+		return
+	end
+	local speed = fastest(player, track.At.X, climb) * speedBoost(player)
+	local cap = math.max(LEAD_STUDS, speed * LEAD_SECONDS)
+	track.Budget = math.min(track.Budget + speed * CLIMB_SLACK * dt, cap)
+	local moved = Vector2.new(position.X - track.At.X, position.Z - track.At.Z).Magnitude
+	if moved > track.Budget + 0.5 then
+		local character = player.Character :: Model
+		character:PivotTo(CFrame.new(track.At) * root.CFrame.Rotation)
+		track.Budget = 0
+		return
+	end
+	track.Budget -= moved
+	track.At = position
+end
+
 -- A new character starts on its plot, below the safety line, so a ceiling never starts higher than that.
 local function enforce(dt: number)
 	for _, player in Players:GetPlayers() do
@@ -110,8 +149,10 @@ local function enforce(dt: number)
 		local data = registry.DataService:GetData(player)
 		if not root or not data then
 			ceilings[player] = nil
+			tracks[player] = nil
 			continue
 		end
+		checkSpeed(player, root, data.ClimbPower, dt)
 		local position = root.Position
 		local ceiling = ceilings[player] or math.min(position.X, Olympus.SafeLineX)
 		local speed = Mountain.SpeedAt(ceiling, data.ClimbPower, 1) * speedBoost(player)
@@ -123,6 +164,7 @@ local function enforce(dt: number)
 			local z = Mountain.ClampLane(position.Z)
 			local turn = root.CFrame.Rotation
 			character:PivotTo(CFrame.new(ceiling, Mountain.Floor(ceiling, z) + 4, z) * turn)
+			tracks[player] = nil
 		end
 	end
 end
@@ -221,6 +263,7 @@ function MountainService.Start(_self: any)
 		protectedUntil[player] = nil
 		touching[player] = nil
 		ceilings[player] = nil
+		tracks[player] = nil
 		for _, list in touching do
 			list[player] = nil
 		end
@@ -239,9 +282,11 @@ function MountainService.Start(_self: any)
 	end)
 end
 
--- The server moved `player` up the ramp to `x` itself (a debug steal): their ceiling starts there.
+-- The server moved `player` to `x` itself (home after a catch, onto their plot, a debug steal): both checks start
+-- again from there.
 function MountainService.Teleported(_self: any, player: Player, x: number)
 	ceilings[player] = x
+	tracks[player] = nil
 end
 
 function MountainService.Destroy(_self: any)

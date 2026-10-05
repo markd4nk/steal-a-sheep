@@ -24,19 +24,29 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 The MVP built in one pass on 2026-10-05 (HISTORY.md); the user now refines it as they go (GAME_DESIGN.md). Thirty
 tiers: twelve up the commissioned map (Aeolus on its old summit) and eighteen on High Olympus above it, Zeus at the top.
 A god each, four wild lambs each, stair walker training, overhead carrying, the automatic downhill slide with steering,
-braking and slide hits, pursuit, delivery, pens, income, growth, size reveal, Equip Best, locks, selling, merging,
-trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
+braking and slide hits, pursuit, putting lambs down anywhere in your pen, roaming and grazing sheep, income, growth,
+size reveal, Equip Best, locks, selling, merging, trails, pen space, the Sheepdex, offline earnings and the tutorial
+lamb.
+
+- **The pen** (2026-10-05): the whole fenced plot; carry a lamb in and press E to put it down where you like (no
+  delivery pad, no pads). It holds 8 sheep, buyable up to 20. Sheep roam the plot (`FlockService/Pens`,
+  `Utils/Wander`), avoiding trees, hay and the walker; lambs graze nearly all the time with the Munch face, adults now
+  and then (`AnimController`, `Utils/SheepClips`). Where each was put down is saved (`HomeX`/`HomeZ`).
 
 - **High Olympus** (tiers 13-30): one stretch a god, 275 studs along the floor, 32 rising to 52 degrees, from stage 3's
   floor slab and terraces and the stages' decor, recoloured, plus block props; Zeus's throne plaza on top. Built into
   the place by `tools/UpperMountain.luau` (Lune, in `build-place.ps1`); `tools/preview-upper-mountain.luau` previews it
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
-- **Free gift** (like + favorite): Climbing and coins once (`Economy.GiftReward`), `GiftService`, `Screens/Gift`, the
-  HUD's GIFT button; Claim needs Roblox's favorite prompt to say yes. Look waiting on the user's pick (cyan or gold).
+- **Free gift** (like + favorite): Climbing and cash once (`Economy.GiftReward`), `GiftService`, `Screens/Gift`, the
+  HUD's GIFT button; Claim needs Roblox's favorite prompt to say yes. Redesign waiting on the user's pick (A or B).
+- **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
+  Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
+  `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
+
 - **Server**: `DataService`, `PurchaseService` (pack, no products), `SheepService`, `PlotService`, `FlockService`,
-  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `GiftService`, `DebugService`
-  (Studio only).
+  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
+  `GiftService`, `DebugService` (Studio only).
 - **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Popup,
   Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
@@ -51,20 +61,26 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 - **Free gift**: built and playtested on branch `t3code/favorite-gift-reward`, not merged; waiting for the user's look pick and
   their call on rewarding the like (Roblox's rules). DECISIONS.md's *To review* lists its calls.
+- Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
+  (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
+- Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
 
 - **Two players**: slide hits and knockback (server checks, client knockback) were never tried with a second player.
+- **All-servers leaderboards**: the place isn't published, so the boards ran on this server's players only; the
+  store writes and reads, name lookups and the last write on leaving are untested.
 - **Saving**: the place isn't published, so playtests used ProfileStore's mock store; rejoin, offline credit on a real
   rejoin and session locking are untested (the offline maths is unit-tested).
-- **Touch and gamepad**: only keyboard and mouse in Studio. Prompts, HUD buttons and the slide use Roblox's own input.
+- **Touch and gamepad**: only keyboard and mouse in Studio. Prompts (Steal, Put down), HUD buttons and the slide use
+  Roblox's own input.
+- **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
+  teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
 - **The free gift's favorite prompt**: skipped in Studio (PlaceId 0); `PromptSetFavorite` on the published place, its
   answer and the claim after it are untested.
 - **Climbing in play**: playtested 2026-10-05 on tiers 1-3 and 6 with one player (TESTING.md); not on tiers 13-30,
   not with two players, not on touch or gamepad.
-- **Escape speed isn't checked by the server**: a client could slide faster than its escape speed. The uphill check
-  only stops climbing too fast.
 - **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's
   plaza). By the numbers it's about 7.6 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope) at normal speed;
   far under a tier's sign it's about 4 minutes a stretch.
@@ -80,6 +96,10 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 - **Long runs at the top**: about 7.6 minutes' climb to Zeus and about 2.5 minutes' slide home; the user keeps it all on
   foot (DECISIONS.md).
 - **High Olympus is sparse**: the user will add obstacles to the higher levels later.
+- **The economy is generous (2026-10-05 simulation)**: a walker level costs about a minute of one sheep's income
+  from the tier below, at every tier, so Climbing races past the signs (10-70x them) and chases get easy fast. An
+  efficient player reaches Zeus in about 4.3 hours (a real one maybe 2-3x that). Trails stop mattering after about
+  tier 8 (fixed prices). Waiting for the user's call on slowing it (DESIGN/HISTORY.md, Climbing).
 - **Very fast slides meet the trees hard**: at 150+ studs/s a slide that clips a tree stops dead and its god catches
   up (seen at x 944 on tier 3). Same decor issue, felt more at high speed.
 - **Plots: 5.** A sixth player is kicked with "server full"; set Maximum Visitor Count to 5 in Creator Hub.
@@ -87,4 +107,6 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   They load if this game is published under the same owner.
 - **ViewportFrames (the menus' 3D sheep) don't show in Studio MCP screenshots while the window is minimized**; they do
   in play.
-- The map's four leaderboard boards are decoration; the player list shows Income and Climbing.
+- **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
+  little sunk in the straw.
+- Studio MCP screenshots don't show ProximityPrompt buttons (Steal, Put down); they work in play.
