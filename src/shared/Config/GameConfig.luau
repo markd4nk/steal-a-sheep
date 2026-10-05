@@ -40,8 +40,8 @@ export type Breed = {
 	FaceOverlay: string?,
 	BaaPitch: number,
 	SpecialFX: SpecialFX?,
-	Mutation: string?, -- a fleece paint laid over the wool (Silver, Gold)
-	Extra: string?, -- a primitive accessory SheepService adds (Leaf, Helmet, Wreath, Wings)
+	Mutation: string?, -- a fleece paint laid over the wool (Silver, Rainbow, Gold)
+	Extra: string?, -- a primitive accessory SheepService adds (Leaf, Helmet, Wreath, Wings, BackWings, Blindfold, Flame)
 }
 
 export type Mutation = {
@@ -91,8 +91,9 @@ local function look(id: string, name: string, overrides: { [string]: any }): Bre
 	return breed
 end
 
--- The twelve families' looks, keyed by family id (Config/Olympus). Nine are Shear a Sheep breeds as they are; the
--- Grape, War and Laurel sheep are its plain breeds recoloured, with a primitive extra.
+-- The thirty families' looks, keyed by family id (Config/Olympus). Most are Shear a Sheep breeds as they are, in its
+-- colours; the Grape, War, Laurel, Cupid, Justice, Victory and Hearth sheep are its plain breeds recoloured, with a
+-- primitive extra, and the Prism Sheep a plain one in rainbow puffs.
 local breeds: { [string]: Breed } = {
 	Meadow = look("Meadow", "Meadow Sheep", {
 		Build = "ScarecrowSheep",
@@ -175,6 +176,109 @@ local breeds: { [string]: Breed } = {
 		Extra = "Wings",
 	}),
 	Crown = look("Crown", "Crown Sheep", { Build = "RoyalSheep" }),
+	Gale = look("Gale", "Gale Sheep", {
+		Build = "FrostSheep",
+		WoolColor = rgb(170, 222, 255),
+		SkinColor = rgb(196, 226, 250),
+		FaceColor = rgb(214, 238, 255),
+		LegColor = rgb(196, 228, 252),
+		EarInnerColor = rgb(160, 205, 250),
+	}),
+	Prism = look("Prism", "Prism Sheep", { WoolSize = 1.15, Face = "Happy", Mutation = "Rainbow" }),
+	Wild = look("Wild", "Wild Sheep", {
+		Build = "MossSheep",
+		WoolColor = rgb(84, 138, 58),
+		WoolSpotColor = rgb(108, 160, 68),
+		FaceColor = rgb(122, 96, 70),
+		LegColor = rgb(98, 76, 56),
+		EarInnerColor = rgb(206, 172, 140),
+		HornStyle = "SmallCurl",
+		HornColor = rgb(122, 84, 58),
+		SpecialFX = "Spores",
+	}),
+	Ambrosia = look("Ambrosia", "Ambrosia Sheep", { Build = "CupcakeSheep", WoolColor = rgb(255, 214, 140) }),
+	Cupid = look("Cupid", "Cupid Sheep", {
+		WoolColor = rgb(255, 196, 214),
+		WoolStyle = "Cloud",
+		FaceColor = rgb(255, 228, 234),
+		LegColor = rgb(255, 228, 234),
+		Face = "Love",
+		Extra = "BackWings",
+	}),
+	Fortune = look("Fortune", "Fortune Sheep", { Build = "PirateSheep", FaceOverlay = "Eyepatch" }),
+	Potion = look("Potion", "Potion Sheep", {
+		Build = "SlimeSheep",
+		WoolColor = rgb(120, 225, 90),
+		FaceColor = rgb(120, 225, 90),
+		LegColor = rgb(120, 225, 90),
+		EarInnerColor = rgb(170, 240, 140),
+	}),
+	Chaos = look("Chaos", "Chaos Sheep", { Build = "GlitchSheep" }),
+	Spirit = look("Spirit", "Spirit Sheep", { Build = "GhostSheep", WoolColor = rgb(246, 246, 252), Face = "Ghost" }),
+	Slumber = look("Slumber", "Slumber Sheep", {
+		Build = "DreamSheep",
+		WoolColor = rgb(255, 198, 222),
+		WoolSpotColor = rgb(214, 190, 255),
+		FaceColor = rgb(190, 170, 240),
+		Face = "Blink",
+		LegColor = rgb(190, 170, 240),
+		EarInnerColor = rgb(255, 196, 224),
+		SpecialFX = "Sparkles",
+	}),
+	Starlit = look("Starlit", "Starlit Sheep", {
+		Build = "GalaxySheep",
+		WoolColor = rgb(58, 40, 120),
+		FaceColor = rgb(84, 60, 160),
+		Face = "CosmicNebula",
+		LegColor = rgb(31, 29, 71),
+		EarInnerColor = rgb(200, 150, 255),
+		SpecialFX = "Stars",
+	}),
+	Fright = look("Fright", "Fright Sheep", { Build = "WolfInSheepsClothing", Face = "Sly", BaaPitch = 0.95 }),
+	Dread = look("Dread", "Dread Sheep", {
+		Build = "BlackHoleSheep",
+		FaceColor = rgb(236, 230, 246),
+		Face = "Dizzy",
+		LegColor = rgb(210, 200, 230),
+	}),
+	Bone = look("Bone", "Bone Sheep", {
+		Build = "SkeletonSheep",
+		FaceColor = rgb(244, 236, 216),
+		LegColor = rgb(244, 236, 216),
+	}),
+	Avenger = look("Avenger", "Avenger Sheep", {
+		Build = "MechaSheep",
+		WoolColor = rgb(238, 241, 246),
+		FaceColor = rgb(238, 241, 246),
+		Face = "Visor",
+		LegColor = rgb(238, 241, 246),
+	}),
+	Justice = look("Justice", "Justice Sheep", {
+		WoolColor = rgb(246, 244, 236),
+		WoolStyle = "Ringlets",
+		WoolSize = 1.2,
+		FaceColor = rgb(238, 226, 200),
+		LegColor = rgb(238, 226, 200),
+		Extra = "Blindfold",
+	}),
+	Victory = look("Victory", "Victory Sheep", {
+		WoolColor = rgb(255, 226, 140),
+		WoolSize = 1.2,
+		FaceColor = rgb(250, 236, 200),
+		LegColor = rgb(250, 236, 200),
+		Face = "Happy",
+		Extra = "BackWings",
+	}),
+	Hearth = look("Hearth", "Hearth Sheep", {
+		WoolColor = rgb(232, 128, 72),
+		WoolSpotColor = rgb(250, 176, 90),
+		WoolStyle = "Ringlets",
+		FaceColor = rgb(120, 70, 50),
+		LegColor = rgb(120, 70, 50),
+		EarInnerColor = rgb(255, 170, 110),
+		SpecialFX = "LavaLight",
+		Extra = "Flame",
+	}),
 	Thunder = look("Thunder", "Thunder Sheep", {
 		Build = "StormSheep",
 		WoolColor = rgb(66, 62, 104),
@@ -192,6 +296,14 @@ local mutations: { [string]: Mutation } = {
 		DisplayName = "Silver",
 		Color = rgb(206, 214, 226),
 		Material = Enum.Material.Metal,
+	},
+	-- Iris's Prism Sheep: every puff its own colour of the rainbow (Utils/Mutations.PuffColor).
+	Rainbow = {
+		Id = "Rainbow",
+		DisplayName = "Rainbow",
+		Color = rgb(190, 160, 255),
+		Material = Enum.Material.SmoothPlastic,
+		Rainbow = true,
 	},
 	Gold = {
 		Id = "Gold",
@@ -278,6 +390,11 @@ local GameConfig = {
 			Baa = "rbxassetid://130392269182249",
 			Sly = "rbxassetid://75523291480618",
 			Seams = "rbxassetid://94306971506667",
+			Alien = "rbxassetid://73494463527401",
+			CosmicNebula = "rbxassetid://119697508448923",
+			Visor = "rbxassetid://82292653566945",
+			Ghost = "rbxassetid://75213874763495",
+			Eyepatch = "rbxassetid://119654690639983",
 		} :: { [string]: string },
 		-- The faces a grazing sheep chews with, in turn (names in Faces). Blink, eyes shut and savouring, stands in
 		-- until the eating faces are drawn and uploaded.

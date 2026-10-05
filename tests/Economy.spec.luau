@@ -3,6 +3,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
+local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Run = require(script.Parent.Run)
 
@@ -57,6 +58,43 @@ return function(t: Run.Suite)
 		t.Expect(heavy4).ToBe(7200)
 		local _, _, heavy12 = Economy.Targets(12)
 		t.Expect(heavy12).ToBe(182250000)
+		local reach30, _, heavy30 = Economy.Targets(30)
+		t.Expect(reach30).ToBe(1.2e15)
+		t.Expect(heavy30).ToBe(2.7e15)
+	end)
+
+	t.Test("thirty tiers, each further up the ramp, harder to reach, with its own family", function()
+		t.Expect(Olympus.Count).ToBe(30)
+		t.Expect(Olympus.Tiers[30].God).ToBe("Zeus")
+		local families: { [string]: boolean } = {}
+		for index, tier in Olympus.Tiers do
+			t.Expect(tier.Tier).ToBe(index)
+			t.Expect(tier.XEnd > tier.XStart).ToBe(true)
+			t.Expect(GameConfig.Breeds[tier.Family] ~= nil).ToBe(true)
+			t.Expect(families[tier.Family]).ToBe(nil)
+			families[tier.Family] = true
+			if index > 1 then
+				local below = Olympus.Tiers[index - 1]
+				t.Expect(tier.Reach > below.Reach).ToBe(true)
+				t.Expect(tier.XStart).ToBe(below.XEnd)
+			end
+		end
+		local ramp = Olympus.Ramp
+		for index = 2, #ramp do
+			t.Expect(ramp[index][1] > ramp[index - 1][1]).ToBe(true)
+			t.Expect(ramp[index][2] >= ramp[index - 1][2]).ToBe(true)
+		end
+		t.Expect(ramp[#ramp][1] >= Olympus.Tiers[30].XEnd).ToBe(true)
+	end)
+
+	t.Test("a minute on the walker the tier below needs covers each tier's reach gap", function()
+		t.Expect(#Economy.WalkerRates).ToBe(Olympus.Count)
+		for tier = 2, Olympus.Count do
+			local gap = Olympus.Tiers[tier].Reach - Olympus.Tiers[tier - 1].Reach
+			t.Expect(Economy.WalkerRate(tier - 2) * 60 >= gap * 0.9).ToBe(true)
+		end
+		local reach, _, heavy = Economy.Targets(30)
+		t.Expect(Economy.WalkerRate(Economy.MaxWalker) * 60 >= heavy - reach).ToBe(true)
 	end)
 
 	t.Test("carry multipliers interpolate between the three targets", function()
@@ -80,7 +118,8 @@ return function(t: Run.Suite)
 
 	t.Test("growth takes 45 + 15 x (tier - 1) seconds, the tutorial lamb 30", function()
 		t.Expect(Economy.GrowthSeconds(sheep({}))).ToBe(45)
-		t.Expect(Economy.GrowthSeconds(sheep({ Family = "Thunder" }))).ToBe(210)
+		t.Expect(Economy.GrowthSeconds(sheep({ Family = "Gale" }))).ToBe(210)
+		t.Expect(Economy.GrowthSeconds(sheep({ Family = "Thunder" }))).ToBe(480)
 		t.Expect(Economy.GrowthSeconds(sheep({ Tutorial = true }))).ToBe(30)
 	end)
 
@@ -89,7 +128,8 @@ return function(t: Run.Suite)
 		t.Expect(Economy.WalkerCost(1)).ToBe(300)
 		t.Expect(Economy.WalkerCost(2)).ToBe(750)
 		t.Expect(Economy.WalkerCost(3)).ToBe(1875)
-		t.Expect(Economy.WalkerCost(11)).ToBe(nil)
+		t.Expect(Economy.WalkerCost(11)).ToBe(2861023)
+		t.Expect(Economy.WalkerCost(29)).ToBe(nil)
 		t.Expect(Economy.WalkerRate(1)).ToBe(12)
 		t.Expect(Economy.PenCost(4)).ToBe(300)
 		t.Expect(Economy.PenCost(7)).ToBe(4688)

@@ -27,6 +27,17 @@ function Mountain.RampY(x: number): number
 	return ramp[#ramp][2]
 end
 
+-- How steep the ramp is at `x`: height gained per stud of x.
+function Mountain.RampSlope(x: number): number
+	for index = 1, #ramp - 1 do
+		local a, b = ramp[index], ramp[index + 1]
+		if x <= b[1] then
+			return if x < a[1] then 0 else (b[2] - a[2]) / (b[1] - a[1])
+		end
+	end
+	return 0
+end
+
 -- The tier whose stretch of ramp `x` is on; 0 below the safety line.
 function Mountain.TierAt(x: number): number
 	if x < Olympus.SafeLineX then

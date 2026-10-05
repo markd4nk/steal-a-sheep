@@ -6,6 +6,35 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **High Olympus: thirty gods (2026-10-05)**. The user, liking the map: build out the next tiers from its parts and
+  pieces, the top Olympus gods; then a list of thirty ("map parts for all of these gods"), Zeus on the new top, the
+  look and studs indistinguishable from the original, each section grouped, the climb no steeper than about 60 degrees,
+  gradual but noticeable. They asked for a preview mid-build and were shown screenshots of every stretch. Afterwards:
+  keep 52 degrees at the top, no shortcut up the climb, obstacles on the higher levels later (they'll add them; it's
+  barren now), and merge it to main.
+  - *Map audit*: each old stage is a 190-wide floor slab (Studs material variant, a 0.9-transparent checker texture,
+    tilted to the grade) between terraces of stacked blocks, repeated in 268-stud units (stage 3: a 198-block body
+    model and a 67-part caps model holding the slab), plus decor models tilted with the stage. All colours are the
+    parts' (the map's colour correction pushes saturation +0.7). Stage 7 ended in an 80-block wall across the path.
+  - *Builder*: `tools/UpperMountain.luau` lays out eighteen stretches (210 studs along each floor, 32 to 52 degrees)
+    from the old summit's top (3060, 1148.8), clones stage 3's slab and terrace units into each, trimmed and recoloured
+    by source colour, un-tilts decor templates found by stage, name and part count, places them upright off the lane
+    (ground heights from the terrace blocks' tops, no raycasts), and adds each god's block props and pixel sprites.
+    Zeus's plaza and throne cap it. Seeded per tier, so one god's changes don't reshuffle another's. It runs in Lune
+    (`tools/assemble.luau`) and in Studio (`tools/preview-upper-mountain.luau`); both builds came out at 10,547 parts.
+  - *Code*: `Config/Olympus` holds thirty tiers (old summit to Aeolus, Zeus to 30) and the extended ramp profile;
+    `GameConfig` eighteen families (Shear a Sheep's own colours for its builds, read from its GameConfig), five more
+    faces and a Rainbow fleece paint; `SheepService/Extras` back wings, blindfold and flame; `GodService/Rig` hair and a
+    signature for each new god; `Economy` stair walker levels 12-29. Two fixes the steep stretches needed:
+    `GodService` steps gods' speed along the slope (a Humanoid's WalkSpeed is along it, so gods were outrunning
+    sliders), and `MovementController` holds a slide down to the ramp (`Mountain.RampSlope`).
+  - *Checked*: `check.ps1` passes; 36 tests pass in Studio (new: thirty tiers chain up the ramp, each with a family, and
+    a minute of the right walker covers each reach gap). Playtest in the user's Studio with the branch synced in: both
+    bootstraps ready, 30 gods on the floor, 29 gates, 121 lambs, none off the floor; lane check: no colliding decor in any
+    stretch's lane; a slide from Zeus's pasture at 60 (37 across the ground at 52 degrees) went from 29% in the air to
+    none; a Light Zeus theft at full training kept ahead of Zeus (gap 48 to 323 studs over High Olympus), then a
+    straight-line slide stuck on stage 6's mid-lane pavilion and was caught; Sheepdex shows x/30 and scrolls; 27k parts,
+    58 fps. Screenshots of every stretch, the families and the gods in the session.
 - **The base design doc kept as background (2026-10-05)**. The user used the draft design doc as the base and will now
   refine the game as they go; later sessions mustn't hold changes against it. It lives in `DESIGN/BASE_DESIGN_DOC.md`
   with a note saying so; GAME_DESIGN.md describes the game as it is; DECISIONS.md says the user's requests win.

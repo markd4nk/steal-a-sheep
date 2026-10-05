@@ -14,7 +14,7 @@ local SheepIcon = require(script.Parent.Parent.SheepIcon)
 local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
--- The standard collection book (Shear a Sheep's Sheepdex look): the twelve families as cards, dark with a "?" until
+-- The standard collection book (Shear a Sheep's Sheepdex look): the thirty families as cards, dark with a "?" until
 -- the first delivery of one, and the picked one beside them: its god, its area, what it earns and its reward.
 local Sheepdex = {}
 
@@ -30,7 +30,7 @@ function Sheepdex.Build(playerGui: Instance): ScreenGui
 	if cash then
 		cash:Destroy()
 	end
-	UIKit.HeaderChip(header, "FoundChip", Theme.Icons.Book, "FoundLabel", "0/12").LayoutOrder = 3
+	UIKit.HeaderChip(header, "FoundChip", Theme.Icons.Book, "FoundLabel", `0/{Olympus.Count}`).LayoutOrder = 3
 	local page = MenuParts.Pages(window)
 	MenuParts.CardGrid(page)
 	MenuParts.Detail(page, MenuParts.GridWidth)

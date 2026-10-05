@@ -1,0 +1,21 @@
+{
+  "name": "Sync",
+  "tree": {
+    "$className": "Folder",
+    "ReplicatedStorage": {
+      "$className": "Folder",
+      "$path": "../src/shared",
+      "Packages": { "$path": "../Packages" }
+    },
+    "ServerScriptService": {
+      "$className": "Folder",
+      "$path": "../src/server",
+      "ServerPackages": { "$path": "../ServerPackages" }
+    },
+    "StarterPlayerScripts": {
+      "$className": "Folder",
+      "$path": "../src/client"
+    },
+    "Tests": { "$path": "../tests" }
+  }
+}

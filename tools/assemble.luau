@@ -1,7 +1,8 @@
 --!strict
--- Builds the game's place file from what's on disk: the commissioned map, the borrowed Shear a Sheep assets
--- (assets/ShearASheepAssets.rbxm, from tools/extract-assets.luau) in ServerStorage.Assets, and the code from a
--- `rojo build` of default.project.json. Open the result in Studio and press Play, or `rojo serve` into it.
+-- Builds the game's place file from what's on disk: the commissioned map with High Olympus built on top
+-- (tools/UpperMountain.luau), the borrowed Shear a Sheep assets (assets/ShearASheepAssets.rbxm, from
+-- tools/extract-assets.luau) in ServerStorage.Assets, and the code from a `rojo build` of default.project.json. Open the
+-- result in Studio and press Play, or `rojo serve` into it.
 --
 -- From the repo root:
 --   rojo build default.project.json --output build/game.rbxl
@@ -12,11 +13,25 @@ local fs = require("@lune/fs")
 local process = require("@lune/process")
 local roblox = require("@lune/roblox")
 
+local UpperMountain = require("./UpperMountain")
+
 local mapPath, assetsPath, codePath, output = process.args[1], process.args[2], process.args[3], process.args[4]
-assert(mapPath and assetsPath and codePath and output, "usage: lune run tools/assemble.luau <map.rbxl> <assets.rbxm> <code.rbxl> <out.rbxl>")
+assert(
+	mapPath and assetsPath and codePath and output,
+	"usage: lune run tools/assemble.luau <map.rbxl> <assets.rbxm> <code.rbxl> <out.rbxl>"
+)
 
 local place = roblox.deserializePlace(fs.readFile(mapPath))
 local code = roblox.deserializePlace(fs.readFile(codePath))
+
+-- The map: High Olympus, the stretches above the commissioned map's old summit (tiers 13 to 30), from its own pieces.
+UpperMountain.Build({
+	Instance = roblox.Instance,
+	CFrame = roblox.CFrame,
+	Vector3 = roblox.Vector3,
+	Color3 = roblox.Color3,
+	Enum = roblox.Enum,
+}, place:GetService("Workspace"))
 
 -- Code: every child of the containers Rojo owns, over whatever the map had there.
 local function moveChildren(from: any, to: any)
