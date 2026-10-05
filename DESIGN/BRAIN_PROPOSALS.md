@@ -101,6 +101,11 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   attachments folder) and delete the folder before committing. To film the game view without taking over the screen,
   pin the camera from a Client `execute_luau` (a RenderStepped that sets `CameraType` Scriptable and the CFrame), turn
   off the core UI, define a viewport over the 3D view, and record that with `foreground: false`." Seen 2026-10-05.
+- **S15** (`BRAIN/GOTCHAS.md`): "A statement put in front of a line that starts with `(` joins it: `a:Call(x)` then
+  `(thing :: Model):PivotTo(cf)` on the next line is read as `a:Call(x)(thing):PivotTo(cf)`, and the formatter puts it on
+  one line. Through an untyped registry (`registry.X`) the type checker can't see the bad call, so it only fails when it
+  runs. Start such a line with a local (`local character = thing :: Model`) instead." Seen 2026-10-05 in Steal a Sheep:
+  a merge added a call before the stair walker's exit `PivotTo`, so jumping off would have errored.
 
 ## Done
 
