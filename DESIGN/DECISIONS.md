@@ -43,16 +43,31 @@ confirmed or reversed it.
 - **The stair walker is a real StairMaster the player climbs (the user, 2026-10-05)**: level 1 looks like a plain gym
   machine and each upgrade looks better, ending in the Olympus look (marble and gold); the player snaps onto it like a
   treadmill and climbs the moving steps; the steps get faster with each machine level.
+- **Its first five looks are the mock-up's** (Starter, Sport, Pro, Turbo, Champion), "stick with the five for a second";
+  the level floats over the machine; the machine stands outside the pen, very close to it, like Steal an Egg's; its
+  upgrade sign beside it upgrades it directly, for coins or Robux (the user, 2026-10-05).
+- **The stair walker's spot by the gate is right** (the user, 2026-10-05). Its Robux prices are being decided in
+  another session; the ones in `GameConfig.StairWalker.Robux` are placeholders until then.
 
 ## To review
 
-Calls in the stair walker mock-ups (2026-10-05), not built yet.
+Calls building the stair walker (2026-10-05).
 
+- **Placeholder Robux prices (another session is deciding them; nothing is on sale)**: the next level costs R$ 19 (to
+  level 2), 39, 59, 99, then 149 for every level after. A developer product per price; ids 0 until they're made in Creator Hub, and the Robux
+  prompt says "Robux upgrades aren't on sale yet" meanwhile.
+- **Levels 6-30 keep the Champion look** until more looks are designed.
+- **The sign** stands by the machine's entry, turned to the gate, written on both sides ("UPGRADE", the next level, its
+  price in cash and R$).
+- **On and off**: walking into the entry snaps the owner on (only the owner, not while carrying a lamb); jumping puts
+  them down behind the entry facing away; "Jump to get off" shows the first time each session. Training only counts
+  while snapped on.
+- **The sign's prompts**: E upgrades with coins, R with Robux; only the owner sees them; they go at the top level, and
+  the board says MAX LEVEL. An empty plot's machine shows level 1 with no floating tag.
 - **Step speed by level**: a step takes `0.25 + 0.35 x 0.9^(level-1)` seconds: 0.60 at level 1, 0.48 at 5, 0.40 at
   10, 0.30 at 20, 0.27 at 30.
-- **Levels 1-5 looks**: Starter grey, Sport white and blue, Pro black and red, Turbo black and cyan neon, Champion
-  white and gold with torches and a laurel (HISTORY.md has the details).
-- **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor.
+- **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor; the
+  machine's sides, hood, console and the sign are solid, the entry step and stairs aren't.
 
 Calls made building Climbing (2026-10-05):
 

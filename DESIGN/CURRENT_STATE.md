@@ -32,6 +32,10 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   the place by `tools/UpperMountain.luau` (Lune, in `build-place.ps1`); `tools/preview-upper-mountain.luau` previews it
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
+- **Stair walker**: a StairMaster outside each pen by the gate (`PlotService/Walker`: five looks, the level floating
+  over it, an upgrade sign with coin and Robux prompts); walk in to snap on, jump to get off (`TrainingService`); every
+  client runs the steps and poses climbers' legs on them (`WalkerController`, `Utils/StairClimb`).
+
 - **Server**: `DataService`, `PurchaseService` (pack, no products), `SheepService`, `PlotService`, `FlockService`,
   `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `DebugService` (Studio only).
 - **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Popup, Studio
@@ -46,11 +50,13 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 ## In progress
 
-- **Stair walker redesign** (branch `t3code/research-stairmaster-model`): no usable free model found; climbing on the
-  steps proven with code-driven leg IK; the user picked gym at level 1 rising to Olympus, snap-on, faster steps per
-  level; mock-ups of levels 1-5 shown, waiting for the user's OK. Nothing built yet (HISTORY.md, stair walker study).
+- **Stair walker** (branch `t3code/research-stairmaster-model`, not merged): built and playtested solo; waiting for the
+  user's OK, their Robux prices and the developer products (HISTORY.md, 2026-10-05).
 
 ## Not verified
+
+- **Stair walker with two players**: another player's climb (posed on each device) and the owner-only sign prompts
+  were only checked solo; the Robux upgrade can't be bought until its developer products exist.
 
 - **Two players**: slide hits and knockback (server checks, client knockback) were never tried with a second player.
 - **Saving**: the place isn't published, so playtests used ProfileStore's mock store; rejoin, offline credit on a real

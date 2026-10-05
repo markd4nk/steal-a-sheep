@@ -67,8 +67,16 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels, pen slots and trails. No Robux
-products.
+Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels, pen slots and trails. The one
+Robux offer: the next stair walker level, at the machine's sign (prices in `Config/GameConfig` StairWalker.Robux; the
+developer products aren't made yet).
+
+## Stair walker (the user, 2026-10-05)
+A real StairMaster just outside each pen, beside the gate, like Steal an Egg's treadmill. Walk into it and you snap on
+and climb its moving steps (your legs on the steps, any avatar); jump to get off. Its level floats over it, its steps
+run faster each level, and it looks better as it upgrades: Starter, Sport, Pro, Turbo, Champion (levels 6 and up
+keep Champion's look for now, ending in an Olympus look later). The upgrade sign beside it buys the next level
+straight away, for coins or Robux.
 
 ## Climbing (the user, 2026-10-05)
 Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain

@@ -1,19 +1,23 @@
 --!strict
 
+local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
+local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Remotes = require(ReplicatedStorage.Remotes)
+local StairClimb = require(ReplicatedStorage.Utils.StairClimb)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- Coin purchases (the next stair walker level, the next pen slot, trails in order) and the hub's three stations: the
 -- map's two stalls become the Shop and the Sell Stall, and the Merge Shrine stands between them. A station's prompt
 -- carries an Opens attribute; the client opens that screen (PromptController). Trails train faster and show on the
--- player as a coloured trail.
+-- player as a coloured trail. Each stair walker's sign upgrades it straight away, for coins or Robux (a developer
+-- product per price, PurchaseService/Products).
 local ShopService = { Name = "ShopService" }
 
 local SHRINE_AT = CFrame.new(287, 59.5, 245) * CFrame.Angles(0, math.rad(90), 0)
@@ -240,6 +244,38 @@ function ShopService.Start(_self: any)
 	Remotes.Buy:Handle(function(player: Player, item: string, which: string?)
 		return buy(player, item, which)
 	end)
+	for _, plot in registry.PlotService:Plots() do
+		local walker = plot.Pieces.Walker
+		trove:Connect(walker.CoinPrompt.Triggered, function(player: Player)
+			if plot.Owner ~= player then
+				return
+			end
+			local ok, message = buy(player, "Walker")
+			Remotes.Notify:Fire(player, message or "", if ok then "Good" else "Bad", if ok then "Upgrade" else "Denied")
+		end)
+		trove:Connect(walker.RobuxPrompt.Triggered, function(player: Player)
+			local data = registry.DataService:GetData(player)
+			if plot.Owner ~= player or not data or not Economy.WalkerCost(data.WalkerLevel) then
+				return
+			end
+			local offer = StairClimb.RobuxOffer(data.WalkerLevel)
+			if offer.ProductId > 0 then
+				MarketplaceService:PromptProductPurchase(player, offer.ProductId)
+			else
+				Remotes.Notify:Fire(player, "Robux upgrades aren't on sale yet", "Bad", "Denied")
+			end
+		end)
+	end
+	trove:Add(registry.PurchaseService.Granted:Connect(function(player: Player, productId: number)
+		for _, offer in GameConfig.StairWalker.Robux do
+			if offer.ProductId == productId then
+				local data = registry.DataService:GetData(player)
+				local level = if data then data.WalkerLevel + 1 else 0
+				Remotes.Notify:Fire(player, `Stair walker level {level}!`, "Good", "Upgrade")
+				return
+			end
+		end
+	end))
 	local function watch(player: Player)
 		trove:Connect(player.CharacterAdded, function(character: Model)
 			character:WaitForChild("HumanoidRootPart", 10)

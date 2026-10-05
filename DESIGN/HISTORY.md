@@ -6,6 +6,34 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Stair walker: a StairMaster outside the pen (2026-10-05)**. After the study below, the user: the first five looks
+  are good, stick with five for now; the level floats over the machine; place it outside the pen, very close, like
+  Steal an Egg's treadmill; an upgrade sign beside it to upgrade directly with cash or Robux. Earlier calls: gym at
+  level 1 getting better each level, snap on like a treadmill, steps faster each level.
+  - *Shared*: `Utils/StairClimb` holds the machine's stair geometry (treads 3 x 0.6 x 1.0, eight steps, those between
+    -1.9 and 3.5 steps from the lower foot on show), `StepSeconds(level)`, `StepAt`/`StepParts` (where each step's
+    three parts are at a given cycle), `Rig(character)` (R15 joints from Motor6Ds or AnimationConstraints, the root's
+    spot from the avatar's leg length; R6 hips), `Pose` (two-bone leg IK, arms forward, lean and bob; R6 swings),
+    `Release`, `ExitAt`, `RobuxOffer`. `GameConfig.StairWalker`: step speed, animation range, Robux offers.
+  - *Server*: `PlotService/Walker` builds the machine (model pivot = machine frame; `Body`, `Steps`, `Zone`,
+    `TagAnchor` with the floating "LV n") and the `UpgradeSign` (two-sided board, `CoinPrompt` E and `RobuxPrompt` R
+    with the owner's id); `Paint` rebuilds the body when the look changes and updates the level, screen, sign and
+    prompts. `Build` places it at plot (61, 25) facing +z and the sign at (65.5, 18.5) facing the gate, clearing map
+    decor there; the old in-pen walker is gone. `TrainingService` snaps the owner on when their root enters the zone
+    (root anchored at the rig's spot, `OnWalker` attribute, the machine's `Climber`), steps them off on
+    `Remotes.LeaveWalker`, death, carrying or being moved, and trains only while on. `ShopService` handles the sign:
+    coins through the shop's own walker purchase, Robux by `PromptProductPurchase` (or the not-on-sale notice);
+    `PurchaseService/Products` grants a level for each configured product. Debug: "Stair walker level (id)".
+  - *Client*: `WalkerController` moves each nearby machine's steps (`BulkMoveTo`, its own cycle advancing only while
+    someone climbs), poses every nearby climber after the Animator, releases their joints when they get off, and sends
+    `LeaveWalker` on a jump. `MovementController`'s walk-on-the-spot is gone. `PromptController` hides other plots'
+    sign prompts.
+  - *Checked*: `check.ps1`; 44 of 44 tests (4 new in `StairClimb.spec`) in Studio; a solo playtest in a copy of the
+    place with this branch's scripts: both bootstraps ready, console clean; walking into the entry snapped on (+2
+    Climbing/s, meter shown), the sign's coin prompt took the machine to level 2 live (look, steps, tag, sign: LV 3,
+    300 coins, R$ 39), the Robux prompt gave the not-on-sale notice, a jump put the player down behind the entry with
+    animations back, walking in again snapped on; levels 3, 4 and 5 shown on the real machine; both sign faces
+    readable; an R6 rig stood on the steps at the right height; empty plots show no tag. Screenshots shown to the user.
 - **Stair walker study: free models, a climbing test, two mock-ups (2026-10-05)**. Not built yet. The user wants a
   proper StairMaster in place of the MVP machine (a base, five sliding planks, rails), free models first, and the
   player walking up the steps instead of walking on the spot in front of them.

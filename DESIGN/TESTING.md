@@ -15,6 +15,7 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 | `GiveSheep` | tier | An ordinary lamb of that tier straight into the flock, as if delivered |
 | `GrowAll` | - | Every lamb grows up on the next tick (with its reveal) |
 | `UnlockAll` | - | Zeus's Heavy target in Climbing and one delivery from every tier |
+| `SetWalker` | level (1-30) | The stair walker at that level (its look, step speed and sign) |
 | `WipeSave` | - | A new player's save |
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).

@@ -19,13 +19,12 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- (Economy.EscapeSpeed: Climbing against the lamb's tier and weight) and keeps it all the way down, like momentum;
 -- it steers within a cone either side of straight downhill with the ordinary movement controls,
 -- brakes when pulled back, and runs out to a stop past the safety line. A slider's hit costs it speed; a hit player is
--- moved back down the slope and stunned for a moment. Also: their stair walker steps while they train.
+-- moved back down the slope and stunned for a moment. The stair walker is WalkerController's.
 local MovementController = { Name = "MovementController" }
 
 local SLIDE_RENDER = "SlideControl"
 local SIT_R15 = "rbxassetid://2506281703"
 local SIT_R6 = "rbxassetid://178130996"
-local STEP_CYCLE = 0.55 -- seconds a stair walker step takes to come down one step
 
 local registry: Lifecycle.Registry = {}
 local trove = Trove.new()
@@ -40,7 +39,6 @@ local stunUntil = 0
 local knockDirection = Vector3.zero
 local stuckFor = 0
 local sitTrack: AnimationTrack? = nil
-local walkTrack: AnimationTrack? = nil
 
 local function character(): (Model?, Humanoid?, BasePart?)
 	local model = player.Character
@@ -262,51 +260,6 @@ local function step(dt: number)
 	end
 end
 
--- The player's own stair walker steps down while they train, and they walk on the spot.
-local function animateWalker(humanoid: Humanoid?)
-	local training = player:GetAttribute("Training") == true
-	if training and humanoid then
-		if not walkTrack then
-			local model = player.Character
-			local animate = model and model:FindFirstChild("Animate")
-			local walkValue = animate and animate:FindFirstChild("walk")
-			local walkAnimation = walkValue and walkValue:FindFirstChildOfClass("Animation")
-			if walkAnimation then
-				walkTrack = loadTrack(humanoid, walkAnimation.AnimationId)
-				if walkTrack then
-					walkTrack.Priority = Enum.AnimationPriority.Action
-					walkTrack.Looped = true
-				end
-			end
-		end
-		if walkTrack and not walkTrack.IsPlaying then
-			walkTrack:Play(0.2)
-		end
-	elseif walkTrack and walkTrack.IsPlaying then
-		walkTrack:Stop(0.2)
-	end
-	local index = player:GetAttribute("Plot")
-	local plots = workspace:FindFirstChild("Plots")
-	local plot = if plots and type(index) == "number" then plots:FindFirstChild(`Plot{index}`) else nil
-	local walker = plot and plot:FindFirstChild("StairWalker")
-	if not walker then
-		return
-	end
-	local share = if training then (os.clock() % STEP_CYCLE) / STEP_CYCLE else 0
-	for _, child in walker:GetChildren() do
-		local number = tonumber(string.match(child.Name, "^Step(%d)$"))
-		if number and child:IsA("BasePart") then
-			local rest = child:GetAttribute("Rest")
-			if typeof(rest) ~= "CFrame" then
-				child:SetAttribute("Rest", child.CFrame)
-				rest = child.CFrame
-			end
-			-- Each step moves down and back one step's height and depth, so the stair seems to roll.
-			child.CFrame = (rest :: CFrame) * CFrame.new(0, -0.6 * share, -0.9 * share)
-		end
-	end
-end
-
 function MovementController.Init(_self: any, systems: Lifecycle.Registry)
 	registry = systems
 end
@@ -315,10 +268,6 @@ function MovementController.Start(_self: any)
 	RunService:BindToRenderStep(SLIDE_RENDER, Enum.RenderPriority.Character.Value + 5, step)
 	trove:Add(function()
 		RunService:UnbindFromRenderStep(SLIDE_RENDER)
-	end)
-	trove:Connect(RunService.Heartbeat, function()
-		local _, humanoid = character()
-		animateWalker(humanoid)
 	end)
 	trove:Add(Remotes.SlideHit:Connect(function(loss: number)
 		slideSpeed *= 1 - math.clamp(loss, 0, 1)
@@ -339,7 +288,6 @@ function MovementController.Start(_self: any)
 	end))
 	trove:Connect(player.CharacterAdded, function()
 		sitTrack = nil
-		walkTrack = nil
 		sliding = false
 		Remotes.Slide:Fire(false)
 	end)
