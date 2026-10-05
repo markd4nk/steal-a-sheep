@@ -49,7 +49,7 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 ## In progress
 
-- **Free gift**: built and playtested on branch `t3code/cf18b902`, not merged; waiting for the user's look pick and
+- **Free gift**: built and playtested on branch `t3code/favorite-gift-reward`, not merged; waiting for the user's look pick and
   their call on rewarding the like (Roblox's rules). DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
