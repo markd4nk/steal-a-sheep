@@ -16,10 +16,10 @@ Train on the stair walker -> climb to a god's pasture -> steal a lamb -> slide h
 deliver -> earn and grow -> upgrade.
 
 ## Systems
-- Climb Power, stair walker, trails: `TrainingService`, `ShopService`.
+- Climbing, stair walker, trails: `TrainingService`, `ShopService`.
 - Wild lambs, theft, carrying, delivery, failure rules, tutorial lamb: `WildService` (+ `SheepService` for models).
 - Gods and pursuit: `GodService` (one state machine, primitive block rigs).
-- Climb gates, slide hits and knockback: `MountainService`; client slide, steering, braking: `MovementController`.
+- Climb speed checks, tier signs, slide hits and knockback: `MountainService`; uphill speed, client slide, steering, braking: `MovementController`.
 - Flock, pens, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging: `FlockService`.
 - Plots (the map's five), pen pads, delivery pads, stair walkers: `PlotService`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
@@ -67,8 +67,23 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels, pen slots and trails. Climb Power
-(stair walker) opens tiers and reduces carrying slowdown. No Robux products.
+Coins (equipped sheep, first-discovery rewards, selling) buy stair walker levels, pen slots and trails. No Robux
+products.
+
+## Climbing (the user, 2026-10-05)
+One stat, **Climbing** (the stair walker trains it; saved as `ClimbPower`), is both how fast you go uphill and how well
+you carry. No walls: every tier is open to everyone. Going up a tier's slope you move at
+`18 x Climbing / (Climbing + Reach)` studs a second, never under a 1 stud/s crawl. That's half speed at the tier's Reach
+and 91% at ten times it. Reach grows about 4x a tier, so one tier above your Climbing is slow (about 3.6 studs/s) and
+two or more is a crawl: possible, but nobody wants to. Carrying: a lamb from a tier whose Reach you lack slows you
+down towards 0.45 of its burden's speed, so a thief who crawled up is caught by that tier's god. Moving across the
+slope or downhill is unaffected; slides keep the stretch's slide speed.
+
+## Gods (as built)
+Each god chases at a fixed speed for the stretch it's on (88% of its slide speed, or of walking speed when the thief
+walks). It never scales with the thief, like Steal an Egg's guardians, which the user chose as the model
+(2026-10-05). Escaping takes enough Climbing over the lamb's tier: about 1.25x its Reach for a Light lamb, 2x for a
+Heavy one.
 
 ## Not built
 Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.

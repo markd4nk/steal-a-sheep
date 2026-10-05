@@ -43,7 +43,9 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
 
 ## In progress
 
-- Nothing. High Olympus is merged into main; DECISIONS.md's *To review* lists its calls.
+- **Climbing** (branch `t3code/climbing-slope-scaling`, not merged): one stat for climbing speed and carrying; no
+  tier walls; uphill speed falls with each tier's Reach down to a 1 stud/s crawl; under-trained thieves carry slowly
+  and get caught. Gods unchanged (fixed speed). GAME_DESIGN.md, *Climbing*.
 
 ## Not verified
 
@@ -52,10 +54,13 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   rejoin and session locking are untested (the offline maths is unit-tested).
 - **Touch and gamepad**: only keyboard and mouse in Studio. Prompts, HUD buttons and the slide use Roblox's own input.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
+- **Climbing in play**: not playtested (Studio was in use by another session). The crawl, the uphill cap, the
+  server's put-back and the under-trained chase are unit-tested in their formulas only.
 - **Upper tiers by foot**: tiers 7 and up were reached with the debug Unlock; climbing them on foot wasn't timed. By
-  the numbers it's about 6.5 minutes from the plots to Zeus (a Humanoid walks its 18 studs/s along the slope).
+  the numbers it's about 6.5 minutes from the plots to Zeus at full Climbing (a Humanoid walks its 18 studs/s along
+  the slope); far under a tier's Reach it's about 4 minutes a stretch.
 - **High Olympus theft to delivery**: a tier-30 slide was measured through all eighteen stretches (no hops, Zeus
-  falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; gates there weren't walked into.
+  falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; and the climb speed check wasn't tried there.
 
 ## Known issues
 
@@ -71,4 +76,4 @@ trails, pen slots, the Sheepdex, offline earnings and the tutorial lamb.
   They load if this game is published under the same owner.
 - **ViewportFrames (the menus' 3D sheep) don't show in Studio MCP screenshots while the window is minimized**; they do
   in play.
-- The map's four leaderboard boards are decoration; the player list shows Income and Climb.
+- The map's four leaderboard boards are decoration; the player list shows Income and Climbing.

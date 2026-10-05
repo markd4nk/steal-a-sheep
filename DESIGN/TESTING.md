@@ -10,11 +10,11 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 | Command | Value | Does |
 | --- | --- | --- |
 | `AddCash` | coins (1000) | Coins |
-| `AddClimb` | Climb Power (100) | Climb Power, and a fresh snapshot |
-| `Steal` | tier | Teleports to that tier's first ready lamb and steals it (needs the tier open) |
+| `AddClimb` | Climbing (100) | Climbing, and a fresh snapshot |
+| `Steal` | tier | Teleports to that tier's first ready lamb and steals it (the climb check starts from there) |
 | `GiveSheep` | tier | An ordinary lamb of that tier straight into the flock, as if delivered |
 | `GrowAll` | - | Every lamb grows up on the next tick (with its reveal) |
-| `UnlockAll` | - | Zeus's Heavy target in Climb Power and one delivery from every tier |
+| `UnlockAll` | - | Zeus's Heavy target in Climbing and one delivery from every tier |
 | `WipeSave` | - | A new player's save |
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).

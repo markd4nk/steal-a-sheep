@@ -6,6 +6,23 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Climbing: one stat, no walls (2026-10-05)**. The user asked how chaser speed worked, then: climbing and speed
+  should be one thing called Climbing; the steeper the slope the less it works, so going higher needs almost
+  exponentially more; you can still climb when far too weak, just painfully slowly ("crawl", not slip back), and that
+  slowness gets you caught on the way down. Walls removed completely, no delivery lock, no god lunge. For the gods
+  they chose a fixed speed like Steal an Egg's and asked for it to be checked: guides say each zone has its own,
+  faster guardian that never scales with the player, and you escape with enough Speed over the zone's minimum. Ours
+  already did that, so `GodService` is unchanged.
+  How it works: `Economy.ClimbShare` (Climbing / (Climbing + Reach)), `Mountain.ClimbSpeedAt` (18 studs/s times that,
+  at least `Movement.CrawlSpeed` 1), `MovementController` caps the uphill part of a walk to it,
+  `MountainService` keeps a per-player ceiling rising at that speed (x1.3, with 10 studs or 1 s of lead) and puts
+  anyone above it back. `Economy.CarryMultiplier` keeps falling below Reach (to `UnderTrainedFloor` 0.45 of the
+  burden's first value). `Economy.ClimbTier` (highest Reach held) replaces `Unlocked` for HUD goals, the training
+  meter, Royal-lamb notices and the "in reach" notice. Gates became `TierSigns`. Every "Climb Power" on screen now
+  says "Climbing"; the saved field stays `ClimbPower`.
+  Checked: `check.ps1`; formula tests (climb share, climb tier, under-trained carry). Not playtested: the shared
+  Studio was in another session's playtest.
+
 - **High Olympus: thirty gods (2026-10-05)**. The user, liking the map: build out the next tiers from its parts and
   pieces, the top Olympus gods; then a list of thirty ("map parts for all of these gods"), Zeus on the new top, the
   look and studs indistinguishable from the original, each section grouped, the climb no steeper than about 60 degrees,

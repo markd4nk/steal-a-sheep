@@ -18,12 +18,33 @@ confirmed or reversed it.
   pieces, studs and textures).
 - **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
   noticeable; then "keep it that").
+- **Climbing is one stat, no walls (2026-10-05)**: speed and Climb Power are one thing, "Climbing". Every tier is
+  open; steeper tiers need more and more Climbing to climb at a useful pace. Too little gives a very slow crawl, never
+  a slip back down, so it's technically possible but nobody wants to, and a thief that weak is caught carrying the lamb
+  down. No delivery lock between tiers. No god lunge.
+- **Gods keep a fixed speed, like Steal an Egg's guardians (2026-10-05)**: verified there: each zone has its own
+  guardian, faster in higher zones, never scaled to the player; players escape with enough Speed over the zone's
+  minimum (guides: about 15-20% over, about double for the heaviest eggs). Ours already worked that way; unchanged.
 - **No shortcut up**: the climb stays on foot, however long (the user turned down a lift to the highest open gate,
   2026-10-05).
 - **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
   then don't thin or fill the slide lanes, old stages included.
 
 ## To review
+
+Calls made building Climbing (2026-10-05):
+
+- **Climb speed**: `18 x Climbing / (Climbing + Reach)` uphill, each tier's old gate number as its Reach (half speed
+  there). Crawl floor 1 stud/s: about 4 minutes a stretch when far under. Tier 1 (Reach 0) is always full speed.
+- **Only the uphill part is slowed**: walking across a slope is full speed; the cap applies to the move's uphill share.
+- **Carrying while under-trained**: below the lamb's tier's Reach, its carry share falls to 0.45 of its burden's
+  first value (a Light lamb with no Climbing keeps 38% speed; at a quarter of Reach 56%).
+- **Signs stay without walls**: the foot of each tier from 2 shows "<God>'s <Area> / Climbing N" (its Reach).
+- **Goals**: the HUD's next goal and the training meter aim at the highest tier whose Reach you have; "<God>'s <Area>
+  is in reach!" pops when Climbing passes the next Reach. Player list column renamed Climbing; the HUD pill reads
+  CLIMBING.
+- **Server check**: a player found further up than their Climbing allows (30% slack, 10 studs or 1 second's lead for
+  lag) is put back at their allowed spot.
 
 Calls made building High Olympus, thirty gods (2026-10-05); the user's own calls are under Confirmed rules.
 
@@ -74,9 +95,6 @@ Calls made while building the MVP on 2026-10-05:
 - **Fleece rarity looks**: Rare sheep sparkle blue; Royal sheep have gold wool (Shear a Sheep's Gold paint) and sparkle.
 - **Sizes on screen**: every sheep's base size is 1.6x the rig; lambs are 0.6 / 0.7 / 0.8 of it by burden (a clue to
   the burden) and grow towards 0.85 before the reveal; adults are 1 / 1.35 / 1.7 by size.
-- **Gates**: a tinted force-field wall at the foot of each tier from 2 up, with "<God>'s <Area> / Climb Power N";
-  solid for a player until that tier is open to them. Anyone found past a closed one is put back 10 studs below it
-  ("Train to climb this slope" or "Deliver a lamb from <God> first"), which also ends a theft.
 - **Slides**: start by themselves when moving downhill on the ramp past the safety line (the map's StartingLine,
   x 330); speed per stretch 24, 28, 32, 36, 36, 40, 40, 44, 44, 48, 48, 48 studs/s (tiers 1-12), times the carried
   lamb's burden share; steering within about 35 degrees either side of straight downhill; pulling back brakes; past the
