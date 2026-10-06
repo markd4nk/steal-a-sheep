@@ -33,6 +33,28 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     families, plus Royal and Shiny fleeces, rendered in Edit: nothing broken (the Scarecrow's denim and checker
     pictures still show). Not run on the cloud place or on a phone.
 
+- **The thirty gods as Roblox avatars (2026-10-05)**. The user wanted real god models. Roblox's mesh generator kept
+  missing (third arms, bare chests; moderation removed two limb meshes), and a Blender pipeline (`art/gods/`, Zeus and
+  Hera built from shapes, rigged) looked good. Then they asked for "a little cuter version that fits the Roblox niche"
+  and whether a player model would do. An R15 avatar dressed from the catalog did: they picked the classic angry face
+  ("the left one"), said do the rest, and dropped the fully clothed rule.
+  - *How it works*: `GodService/Avatar` makes each god with `Players:CreateHumanoidModelFromDescription` from
+    `Looks` (head, accessories, layered and classic clothing, the tier's skin), scaled 1.65 with the head 1.3 times
+    bigger, no Humanoid state machine (the root's AlignPosition still moves it), the nameplate and the held symbol
+    (`Props`: blocks welded to the right hand). Building yields while Roblox fetches the items, so `GodService.Start`
+    builds the thirty side by side in the background; a god whose avatar fails falls back to its block figure
+    (`Rig`). Its hip height (feet to root) comes from the avatar. `GodController` (client) plays Roblox's idle, walk,
+    run, point and laugh by the god's Mood and Speed within 220 studs of the camera, and keeps a `Raise` god's
+    (Zeus's) right arm up after the Animator; AnimController keeps the block figures.
+  - *Looks*: three helpers searched the catalog ten gods each, checked every id and judged each by its picture;
+    DECISIONS.md lists the calls, `Looks.luau` every item.
+  - *Checked*: a playtest of the branch in a Studio copy: all 30 avatars load with every item and symbol, 76 tests
+    pass, the console is clean; Zeus's alert (points), chase, catch (laughs) and walk home ran on a real theft; Hera's
+    run checked; review lineups five at a time on the summit (`studio/GodLineup.luau`). Nike's hair hid her face in the
+    first lineup and was swapped. The Sheepdex's god pictures lost layered clothing (dresses, Pan's goat legs) because
+    the copy dropped every constraint, an avatar's joints among them; it now drops only the movement drivers and keeps
+    the joints (checked in the menu). Not checked: a live server.
+
 - **Gods in mythological rank (2026-10-05)**. The user asked whether the thirty gods were in Mount Olympus's order.
   They weren't: the Olympians had been placed to fit the commissioned map's stage themes and the minor gods sat above
   them, ordered by mood. The user chose rank: "the Zeus family should end up at the top", and kept the proposed order of

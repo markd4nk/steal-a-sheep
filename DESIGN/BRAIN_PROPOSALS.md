@@ -189,8 +189,10 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   `desc.Head` = a catalog dynamic head (angry ones exist), not a decal. In Edit, a joint's `Transform` doesn't move
   anything, and moving an anchored limb makes Studio rebuild the body around it: pose in a playtest. There a
   `Transform` set on the server doesn't replicate, so set it on each client too (`RunService.PreSimulation`, after the
-  Animator), or play an animation, whose tracks do replicate. Roblox's default R15 walk (507777826) plays on them."
-  Seen 2026-10-05 in Steal a Sheep, dressing Zeus from the catalog.
+  Animator), or play an animation, whose tracks do replicate. Roblox's default R15 walk (507777826) plays on them.
+  A copy shown in a ViewportFrame (in a WorldModel) loses its layered clothing if its AnimationConstraints are
+  removed: anchor the parts and keep the joints." Seen 2026-10-05 in Steal a Sheep, dressing the gods from the
+  catalog (the Sheepdex's god pictures lost their dresses).
 - **S33** (`BRAIN/GOTCHAS.md`): "A MaterialVariant on a MeshPart follows the mesh's UVs but keeps its `StudsPerTile`
   size in studs: a part twice as big shows twice as many tiles, and the pattern bends and breaks where UV islands meet.
   A tile made for flat blocks (studs, bricks) reads better at half its size or less on small round meshes. A `Texture`
