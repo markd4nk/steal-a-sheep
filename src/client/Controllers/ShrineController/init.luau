@@ -4,8 +4,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
-local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
+local LambLook = require(ReplicatedStorage.Utils.LambLook)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -61,6 +61,26 @@ local function sheepModel(family: string, scale: number, at: CFrame): Model?
 		return nil
 	end
 	local model = source:Clone()
+	for _, descendant in model:GetDescendants() do
+		if descendant:IsA("BasePart") then
+			descendant.CanCollide = false
+			descendant.CanQuery = false
+			descendant.CanTouch = false
+		end
+	end
+	model:ScaleTo(math.max(scale, 0.05))
+	model:PivotTo(at)
+	return model
+end
+
+-- The merged lamb as every lamb looks (Utils/LambLook): its marks (`look`), as plump as `weight`, at `scale` times its
+-- rig, standing at `at`.
+local function lambModel(look: LambLook.Look, weight: number, scale: number, at: CFrame): Model?
+	local model = sheepModel(LambLook.TemplateName(look.Horns), 1, at) or sheepModel(LambLook.TemplateName(nil), 1, at)
+	if not model then
+		return nil
+	end
+	LambLook.Dress(model, look, weight)
 	for _, descendant in model:GetDescendants() do
 		if descendant:IsA("BasePart") then
 			descendant.CanCollide = false
@@ -158,7 +178,7 @@ local function waitOnAltar(model: Model)
 	prompt.Name = "ShrinePrompt"
 	prompt.Style = Enum.ProximityPromptStyle.Custom -- drawn in the game's look (PromptController)
 	prompt.ActionText = "Pick up"
-	prompt.ObjectText = (string.gsub(model.Name, "Sheep$", "Lamb"))
+	prompt.ObjectText = "Lamb"
 	prompt.HoldDuration = 0
 	prompt.MaxActivationDistance = GameConfig.Shrine.CollectDistance
 	prompt.RequiresLineOfSight = false
@@ -206,7 +226,11 @@ local function play(show: { [string]: any })
 		end
 	end
 	local start = Show.AltarSpot(home) or CFrame.new()
-	local model = sheepModel(family, scale, start)
+	local look = show.Look
+	local weight = show.Weight
+	local model = if type(look) == "table" and type(weight) == "number"
+		then lambModel(look :: LambLook.Look, weight, scale, start)
+		else sheepModel(family, scale, start)
 	if not model then
 		for _, other in sheep do
 			other:Destroy()
@@ -214,7 +238,7 @@ local function play(show: { [string]: any })
 		showing = false
 		return
 	end
-	model.Name = Economy.FamilyName(family)
+	model.Name = "Lamb"
 	lamb = model
 	frame("Show")
 	Show.Play({

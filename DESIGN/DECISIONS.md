@@ -220,6 +220,15 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
   glow or the see-through look, as the gold paint already did.
 - Any other wool material keeps its look without studs (none uses one today).
 
+- **Mystery lambs (the user, 2026-10-06; mock-ups, not built yet)**: a lamb doesn't show what it will grow into.
+  Wild lambs have nothing over them: no card, no name ("it should just be unnamed"). Lambs are bare white lambs (no
+  wool, horn buds) marked lightly in the colours of the sheep they grow into; any hint at rarity must be subtle (mock-up
+  A's bolder-by-rarity ladder was "that clear": out). Weight shows as size, heavier lambs bigger and rounder ("that's
+  fine"). The family, rarity and size show only when it grows up: it grows bigger in the pen until 100%, then its wool
+  appears and it takes its real size, Titan included. Growing lambs earn nothing; a small timer shows the time left.
+  Rare-lamb announcements stay as they are for now; a later session makes them simpler ("a rare lamb", "a mythic
+  lamb").
+
 ## To review
 
 Calls in the trailer's first cut (2026-10-05, overnight; `trailer/stealasheep.md`, nothing uploaded):

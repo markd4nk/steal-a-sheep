@@ -2,6 +2,8 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Economy = require(ReplicatedStorage.Utils.Economy)
+local LambLook = require(ReplicatedStorage.Utils.LambLook)
 local Theme = require(ReplicatedStorage.Config.Theme)
 local UIKit = require(ReplicatedStorage.Utils.UIKit)
 local Motion = require(script.Parent.Motion)
@@ -124,18 +126,17 @@ function MenuParts.Detail(page: Frame, leftWidth: number): Frame
 	return detail
 end
 
--- A ViewportFrame showing a family's sheep (ReplicatedStorage.SheepLooks, SheepService) at `scale`, turned a little.
-function MenuParts.ShowSheep(view: ViewportFrame, family: string?, scale: number?)
-	view:ClearAllChildren()
+-- One of SheepService's preview models (ReplicatedStorage.SheepLooks), copied.
+local function lookCopy(name: string): Model?
 	local looks = ReplicatedStorage:FindFirstChild("SheepLooks")
-	local look = if family and looks then looks:FindFirstChild(family) else nil
-	if not look or not look:IsA("Model") then
-		return
-	end
-	local model = look:Clone()
-	local size = scale or 1
-	if math.abs(size - 1) > 1e-3 then
-		model:ScaleTo(size)
+	local look = if looks then looks:FindFirstChild(name) else nil
+	return if look and look:IsA("Model") then look:Clone() else nil
+end
+
+-- Stands `model` in the ViewportFrame at `scale`, turned a little, and frames it.
+local function frameModel(view: ViewportFrame, model: Model, scale: number)
+	if math.abs(scale - 1) > 1e-3 then
+		model:ScaleTo(scale)
 	end
 	model:PivotTo(CFrame.Angles(0, math.rad(-35), 0))
 	local world = Instance.new("WorldModel")
@@ -148,6 +149,27 @@ function MenuParts.ShowSheep(view: ViewportFrame, family: string?, scale: number
 	camera.CFrame = CFrame.lookAt(cframe.Position + Vector3.new(0, extents.Y * 0.2, -distance), cframe.Position)
 	camera.Parent = view
 	view.CurrentCamera = camera
+end
+
+-- A ViewportFrame showing a family's sheep (ReplicatedStorage.SheepLooks, SheepService) at `scale`, turned a little.
+function MenuParts.ShowSheep(view: ViewportFrame, family: string?, scale: number?)
+	view:ClearAllChildren()
+	local model = if family then lookCopy(family) else nil
+	if model then
+		frameModel(view, model, scale or 1)
+	end
+end
+
+-- A ViewportFrame showing a lamb as it looks in the pen: its marks (`look`), as plump as `weight`, `growth` of the way
+-- to grown (Utils/LambLook, Economy.LambSize).
+function MenuParts.ShowLamb(view: ViewportFrame, look: LambLook.Look, weight: number, growth: number)
+	view:ClearAllChildren()
+	local model = lookCopy(LambLook.TemplateName(look.Horns)) or lookCopy(LambLook.TemplateName(nil))
+	if not model then
+		return
+	end
+	LambLook.Dress(model, look, weight)
+	frameModel(view, model, Economy.LambSize(weight, growth))
 end
 
 -- The menu's confirm card (UIKit.Confirm, built by MenuGui): shows it with its words and calls `onConfirm` on OK.

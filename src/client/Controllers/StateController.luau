@@ -3,6 +3,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
+local LambLook = require(ReplicatedStorage.Utils.LambLook)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Signal = require(ReplicatedStorage.Packages.Signal)
@@ -19,7 +20,7 @@ local StateController = {
 
 export type SheepView = {
 	Id: string,
-	Family: string,
+	Family: string?, -- nil while it's a lamb: what it'll grow into is a secret until then
 	Rarity: number,
 	Weight: number,
 	Size: number, -- 0 while it's a lamb
@@ -29,11 +30,11 @@ export type SheepView = {
 	Pinned: boolean,
 	Adult: boolean,
 	Growth: number,
+	GrowLeft: number, -- seconds until a lamb grows up, at the player's pace, while it's in the pen
 	Income: number,
-	Low: number,
-	High: number,
-	Sell: number,
+	Sell: number?, -- nil for a lamb: its price shows once it's sold
 	Name: string,
+	Look: LambLook.Look?, -- a lamb's marks
 	Robux: boolean?, -- bought in the store: can't be sold or merged
 	AtShrine: boolean, -- a merged lamb still on the Merge Shrine's altar
 }
@@ -109,8 +110,10 @@ local ORDERS: { [string]: (a: SheepView, b: SheepView) -> boolean? } = {
 	Income = function(a, b)
 		return if a.Income ~= b.Income then a.Income > b.Income else nil
 	end,
+	-- Lambs after every family, their own still unknown.
 	Family = function(a, b)
-		local orderA, orderB = Economy.FamilyOrder(a.Family), Economy.FamilyOrder(b.Family)
+		local orderA = if a.Family then Economy.FamilyOrder(a.Family) else math.huge
+		local orderB = if b.Family then Economy.FamilyOrder(b.Family) else math.huge
 		return if orderA ~= orderB then orderA < orderB else nil
 	end,
 	Size = function(a, b)

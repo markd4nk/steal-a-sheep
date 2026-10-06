@@ -125,8 +125,9 @@ return function(t: Run.Suite)
 		t.Expect(Economy.EscapeSpeed(0, 1, 1.5)).ToBe(Economy.GodSpeed(1))
 	end)
 
-	t.Test("income: lamb share, fleece, size and merge rank", function()
-		t.Expect(Economy.LambIncome(sheep({}))).ToBe(1)
+	t.Test("income: nothing while a lamb, then fleece, size and merge rank", function()
+		t.Expect(Economy.Income(sheep({ Rarity = 3, Size = 4 }))).ToBe(0)
+		t.Expect(Economy.Income(adult({}))).ToBe(2)
 		t.Expect(Economy.AdultIncome(adult({ Size = 2 }))).ToBe(3)
 		t.Expect(Economy.AdultIncome(adult({ Rarity = 3, Size = 3 }))).ToBe(12.5)
 		t.Expect(Economy.AdultIncome(adult({ Rank = 1 }))).ToBe(6)
@@ -192,8 +193,13 @@ return function(t: Run.Suite)
 			end
 			t.Expect(lucky / 4000 > mean + 0.1).ToBe(true)
 			t.Expect(most > 1.5).ToBe(true)
-			t.Expect(Economy.LambScale(1)).ToBe(0.6)
-			t.Expect(near(Economy.LambScale(1.5), 0.8)).ToBe(true)
+			t.Expect(Economy.LambScale(1)).ToBe(0.55)
+			t.Expect(near(Economy.LambScale(1.5), 0.88)).ToBe(true)
+			t.Expect(near(Economy.LambScale(3), 0.88)).ToBe(true)
+			-- The light end, where most wild lambs are, spread out: 1.1 is well over a tenth of the way.
+			t.Expect(Economy.LambScale(1.1) - Economy.LambScale(1) > 0.1).ToBe(true)
+			t.Expect(near(Economy.LambSize(1, 0), 0.55)).ToBe(true)
+			t.Expect(near(Economy.LambSize(1, 1), 0.55 * (1 + Economy.LambGrowth))).ToBe(true)
 		end
 	)
 
@@ -258,16 +264,29 @@ return function(t: Run.Suite)
 		end
 	)
 
-	t.Test("selling pays two minutes of current income", function()
+	t.Test("selling pays two minutes of its grown income, a lamb's too", function()
 		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(360)
-		t.Expect(Economy.SellValue(sheep({}))).ToBe(120)
+		t.Expect(Economy.SellValue(sheep({}))).ToBe(240)
+		t.Expect(Economy.SellValue(sheep({ Size = 2 }))).ToBe(360)
 	end)
 
-	t.Test("offline: a quarter of at most two hours, lamb rate until grown", function()
+	t.Test("a lamb's name and worth give nothing of its family away", function()
+		local herd = Olympus.Tiers[1]
+		local common = sheep({ Family = herd.Family })
+		local other = sheep({ Family = "GroveSpirit" })
+		t.Expect(Economy.Name(common)).ToBe("Lamb")
+		t.Expect(Economy.Name(sheep({ Rarity = 2 }))).ToBe("Shiny Lamb")
+		t.Expect(Economy.Worth(common)).ToBe(Economy.Worth(other))
+		t.Expect(Economy.Worth(sheep({ Weight = 1.5 })) > Economy.Worth(common)).ToBe(true)
+		t.Expect(Economy.Worth(adult({ Size = 2 }))).ToBe(3)
+		t.Expect(Economy.Name(adult({}))).ToBe(Economy.FamilyName(herd.Family))
+	end)
+
+	t.Test("offline: a quarter of at most two hours, nothing until a lamb's grown", function()
 		local lamb = sheep({})
 		local coins, matured = Economy.Offline({ lamb }, 100, 7200, 0.25)
-		-- 45 s at 1/s as a lamb, then 55 s at 2/s, a quarter of it.
-		t.Expect(coins).ToBe((45 + 110) * 0.25)
+		-- 45 s growing for nothing, then 55 s at 2/s, a quarter of it.
+		t.Expect(coins).ToBe(110 * 0.25)
 		t.Expect(#matured).ToBe(1)
 		local capped = Economy.Offline({ adult({}) }, 100000, 7200, 0.25)
 		t.Expect(capped).ToBe(7200 * 2 * 0.25)

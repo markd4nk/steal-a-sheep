@@ -104,8 +104,9 @@ function Roster.Normalize(flock: Flock, penSlots: number)
 	end
 end
 
--- Equip Best: pinned sheep keep their slots; the rest of the slots go to the highest current earners, ties to the
--- older sheep (lower id). Sheep that stay equipped keep the slot they had. A lamb waiting at the Merge Shrine stays out.
+-- Equip Best: pinned sheep keep their slots; the rest of the slots go to the most valuable (Economy.Worth: a grown
+-- sheep's income, a lamb's likely adult income, since a lamb only grows in the pen), ties to the older sheep (lower
+-- id). Sheep that stay equipped keep the slot they had. A lamb waiting at the Merge Shrine stays out.
 function Roster.EquipBest(flock: Flock, penSlots: number)
 	local taken: { [number]: boolean } = {}
 	local candidates: { Sheep } = {}
@@ -119,9 +120,9 @@ function Roster.EquipBest(flock: Flock, penSlots: number)
 	end
 	local best = Economy.BestIncome(flock)
 	table.sort(candidates, function(a: Sheep, b: Sheep)
-		local incomeA, incomeB = Economy.Income(a, best), Economy.Income(b, best)
-		if incomeA ~= incomeB then
-			return incomeA > incomeB
+		local worthA, worthB = Economy.Worth(a, best), Economy.Worth(b, best)
+		if worthA ~= worthB then
+			return worthA > worthB
 		end
 		return (tonumber(a.Id) or 0) < (tonumber(b.Id) or 0)
 	end)

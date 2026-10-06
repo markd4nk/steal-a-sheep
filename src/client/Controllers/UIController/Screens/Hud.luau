@@ -545,24 +545,25 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		task.defer(placeMiddle)
 	end
 
-	-- The carry card.
+	-- The carry card: a lamb, unnamed like every lamb, with its marks (WildService sets their colour and count).
 	local function refreshCarry()
 		local carrying = player:GetAttribute("Carrying") == true
 		carryCard.Visible = carrying
 		if not carrying then
 			return
 		end
-		local family = player:GetAttribute("CarriedFamily")
-		local tier = player:GetAttribute("CarryTier")
-		if type(family) == "string" and type(tier) == "number" then
-			SheepIcon.Paint(carryToken, family, 1)
-			carryName.Text = string.gsub(Economy.FamilyName(family), "Sheep$", "Lamb")
-		end
+		local color = player:GetAttribute("CarriedColor")
+		local spots = player:GetAttribute("CarriedSpots")
+		local look = if typeof(color) == "Color3" and type(spots) == "number"
+			then { Color = color, Spots = spots, Horns = nil }
+			else nil
+		SheepIcon.PaintLamb(carryToken, look, 1)
+		carryName.Text = "Lamb"
 	end
 	trove:Connect(returnButton.Activated, function()
 		Remotes.ReturnSheep:Fire()
 	end)
-	for _, name in { "Carrying", "CarriedFamily" } do
+	for _, name in { "Carrying", "CarriedColor" } do
 		trove:Connect(player:GetAttributeChangedSignal(name), refreshCarry)
 	end
 	refreshCarry()

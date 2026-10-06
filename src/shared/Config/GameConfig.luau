@@ -339,6 +339,20 @@ for id, overrides in Herds.Looks do
 	breeds[id] = look(id, overrides.Name, fields)
 end
 
+-- Every lamb's look before it grows up (the user, 2026-10-06: no wool, a plain white coat, "you can tell that it's
+-- just a lamb"), whatever it will grow into: SheepService dresses the rig in it, and carrying poses read it. Its
+-- WoolSize is how far the bare body reaches next to a fleece. Not a family: it's no god's and never in Breeds.
+local LAMB_COAT = rgb(250, 248, 242)
+local LAMB_FACE = rgb(248, 238, 226)
+local lambBreed = look("Lamb", "Lamb", {
+	WoolColor = LAMB_COAT,
+	WoolSize = 0.75,
+	SkinColor = LAMB_COAT,
+	FaceColor = LAMB_FACE,
+	LegColor = LAMB_FACE,
+	EarInnerColor = rgb(250, 186, 186),
+})
+
 local mutations: { [string]: Mutation } = {
 	Silver = {
 		Id = "Silver",
@@ -368,6 +382,7 @@ local GameConfig = {
 
 	SheepSize = SHEEP_SIZE,
 	Breeds = breeds,
+	LambBreed = lambBreed,
 	Mutations = mutations,
 
 	-- Studs per second.
@@ -446,6 +461,15 @@ local GameConfig = {
 	},
 
 	Sheep = {
+		-- A lamb's marks (the user, 2026-10-06, mock-up D): one spot for each step of its family's rarity, Common one to
+		-- Mythic six, in the main colour of the sheep it grows into (Utils/LambLook). Its horns, if it'll have any, are
+		-- buds HornBud of their size, and its body is Plump[1] as wide at the lightest, Plump[2] wider at the heaviest
+		-- wild weight.
+		Lamb = {
+			Spot = 0.24, -- a spot's width, a share of the body's
+			HornBud = 0.45,
+			Plump = { 0.92, 0.38 } :: { number },
+		},
 		DetailColors = {
 			EarInner = rgb(250, 176, 180),
 		} :: { [string]: Color3 },

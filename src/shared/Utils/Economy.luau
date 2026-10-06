@@ -86,7 +86,9 @@ Economy.Sizes = table.freeze({
 
 Economy.RankNames = table.freeze({ [0] = "", [1] = "Merged", [2] = "Ascended" }) :: { [number]: string }
 Economy.MaxRank = 2
-Economy.LambShare = 0.5 -- a lamb earns this share of its family's base, times its fleece
+-- A lamb in the pen grows this share bigger than its starting size by the time it's grown (Economy.LambSize), then
+-- takes its adult size.
+Economy.LambGrowth = 0.6
 Economy.TutorialGrowth = 30
 Economy.SellSeconds = 120 -- the user, 2026-10-05: two minutes of income, near Steal an Egg's 100 s, to start
 Economy.DexRewardSeconds = 30
@@ -329,9 +331,21 @@ function Economy.SizeOdds(weight: number): { number }
 	return table.clone(anchors[#anchors].Odds)
 end
 
--- A lamb's size before it grows, a clue to its weight: 0.6 of an adult at the lightest, 0.8 at 1.5, at most 1.
+-- A lamb's size before it grows, the clue to its hidden weight: 0.55 of an adult's rig at the lightest, 0.88 at the
+-- heaviest wild weight (1.5) and above. Most wild lambs weigh 1-1.1, so the curve spreads that end out.
 function Economy.LambScale(weight: number): number
-	return math.min(0.6 + 0.4 * (weight - 1), 1)
+	local t = math.clamp((weight - 1) / 0.5, 0, 1)
+	return 0.55 + 0.33 * math.sqrt(t)
+end
+
+-- How far a lamb has grown, 0 to 1.
+function Economy.Growth(sheep: Sheep): number
+	return math.clamp(sheep.Grown / Economy.GrowthSeconds(sheep), 0, 1)
+end
+
+-- A lamb's size `growth` of the way to grown (0 to 1): its weight's size, a little bigger as it grows.
+function Economy.LambSize(weight: number, growth: number): number
+	return Economy.LambScale(weight) * (1 + Economy.LambGrowth * math.clamp(growth, 0, 1))
 end
 
 -- The highest tier whose Reach a Climbing has (normal speed there or better): what the HUD's goals aim at.
@@ -396,17 +410,36 @@ function Economy.AdultIncome(sheep: Sheep, best: number?): number
 	return base * Economy.Rarities[sheep.Rarity].Multiplier * Economy.Sizes[sheep.Size].Multiplier * 3 ^ sheep.Rank
 end
 
-function Economy.LambIncome(sheep: Sheep, best: number?): number
-	if Economy.RobuxSheep[sheep.Family] then
+-- What it earns a second in a pen slot right now: nothing while it's a lamb (the user, 2026-10-06), its adult income
+-- once grown. A store sheep arrives grown.
+function Economy.Income(sheep: Sheep, best: number?): number
+	if Economy.IsAdult(sheep) or Economy.RobuxSheep[sheep.Family] then
 		return Economy.AdultIncome(sheep, best)
 	end
-	local base = Economy.FamilyBase(sheep.Family, Economy.SheepTier(sheep))
-	return base * Economy.LambShare * Economy.Rarities[sheep.Rarity].Multiplier
+	return 0
 end
 
--- What it earns a second in a pen slot right now.
-function Economy.Income(sheep: Sheep, best: number?): number
-	return if Economy.IsAdult(sheep) then Economy.AdultIncome(sheep, best) else Economy.LambIncome(sheep, best)
+-- A wild lamb's family's income multiplier on average, by the herd's odds: what its family is worth unseen.
+local unseenFamily = 0
+for _, kind in Economy.FamilyRarities do
+	unseenFamily += kind.Chance / 100 * kind.Multiplier
+end
+
+-- What Equip Best ranks a sheep by: a grown one's income, and a lamb's likely adult income from what its owner can see
+-- (its god, fleece, size and rank), the same for every family of its herd so the order gives nothing away.
+function Economy.Worth(sheep: Sheep, best: number?): number
+	if Economy.IsAdult(sheep) or Economy.RobuxSheep[sheep.Family] then
+		return Economy.AdultIncome(sheep, best)
+	end
+	local size = 0
+	for index, chance in Economy.SizeOdds(sheep.Weight) do
+		size += chance / 100 * Economy.Sizes[index].Multiplier
+	end
+	return Economy.BaseIncome(Economy.SheepTier(sheep))
+		* unseenFamily
+		* Economy.Rarities[sheep.Rarity].Multiplier
+		* size
+		* 3 ^ sheep.Rank
 end
 
 -- What a flock's best sheep earns a second now (Robux sheep left out), at least a tier 1 adult's: what its Robux sheep
@@ -426,24 +459,10 @@ function Economy.FriendBoost(friends: number): number
 	return 1 + Economy.FriendShare * math.clamp(math.floor(friends), 0, Economy.MaxFriends)
 end
 
--- A lamb's adult income from its smallest to its biggest possible size, for its weight (its size stays hidden).
-function Economy.FutureRange(sheep: Sheep, best: number?): (number, number)
-	local odds = Economy.SizeOdds(sheep.Weight)
-	local low, high = math.huge, 0
-	for size, chance in odds do
-		if chance > 0 then
-			local copy = table.clone(sheep)
-			copy.Size = size
-			local income = Economy.AdultIncome(copy, best)
-			low = math.min(low, income)
-			high = math.max(high, income)
-		end
-	end
-	return low, high
-end
-
+-- SellSeconds of what it earns grown: a lamb sells for what it would really earn (the user, 2026-10-06), though its
+-- price stays hidden until it's sold.
 function Economy.SellValue(sheep: Sheep, best: number?): number
-	return Economy.Round(Economy.SellSeconds * Economy.Income(sheep, best))
+	return Economy.Round(Economy.SellSeconds * Economy.AdultIncome(sheep, best))
 end
 
 -- A Sheepdex entry's claim, once the first of the family has been delivered: cash and Climbing.
@@ -689,21 +708,19 @@ function Economy.ShrineRoll(random: Random, sheep: { Sheep }): (number, number, 
 	return rarity, weight, Economy.RollSize(random, weight)
 end
 
--- Coins an equipped sheep earns over `seconds`, growing as it goes (lamb rate until it's grown, adult rate after),
+-- Coins an equipped sheep earns over `seconds`, growing as it goes (nothing until it's grown, its adult income after),
 -- `growth` times as fast as normal (2 with the 2x Growth pass). Returns the coins and the seconds it grew.
 function Economy.Earn(sheep: Sheep, seconds: number, best: number?, growth: number?): (number, number)
 	if seconds <= 0 then
 		return 0, 0
 	end
-	local need = Economy.GrowthSeconds(sheep)
+	local need = if Economy.RobuxSheep[sheep.Family] then 0 else Economy.GrowthSeconds(sheep)
 	local lambSeconds = math.clamp((need - sheep.Grown) / (growth or 1), 0, seconds)
-	local coins = lambSeconds * Economy.LambIncome(sheep, best)
-		+ (seconds - lambSeconds) * Economy.AdultIncome(sheep, best)
-	return coins, seconds
+	return (seconds - lambSeconds) * Economy.AdultIncome(sheep, best), seconds
 end
 
--- The offline settlement: 25% of up to two hours of income, juvenile rate until each lamb matures in
--- that window; growth itself runs for the whole time away. Mutates each sheep's Grown. Returns the coins and the
+-- The offline settlement: 25% of up to two hours of income, nothing from a lamb until it matures in that window;
+-- growth itself runs for the whole time away. Mutates each sheep's Grown. Returns the coins and the
 -- sheep that grew up meanwhile.
 function Economy.Offline(
 	equipped: { Sheep },
@@ -729,13 +746,13 @@ function Economy.Offline(
 	return coins * share, matured
 end
 
--- The name a sheep goes by: "Large Royal Meadow Sheep", "Ascended Grape Sheep", "Meadow Lamb".
+-- The name a sheep goes by: "Large Royal Meadow Sheep", "Ascended Grape Sheep", and for a lamb, which keeps what
+-- it'll grow into secret until then (the user, 2026-10-06), only what shows: "Lamb", "Shiny Lamb".
 function Economy.Name(sheep: Sheep, showSize: boolean?): string
 	local robux = Economy.RobuxSheep[sheep.Family]
 	if robux then
 		return robux.Name
 	end
-	local familyName = Economy.FamilyName(sheep.Family)
 	local parts: { string } = {}
 	if sheep.Rank > 0 then
 		table.insert(parts, Economy.RankNames[sheep.Rank])
@@ -747,11 +764,7 @@ function Economy.Name(sheep: Sheep, showSize: boolean?): string
 	if sheep.Rarity > 1 then
 		table.insert(parts, Economy.Rarities[sheep.Rarity].Name)
 	end
-	if adult then
-		table.insert(parts, familyName)
-	else
-		table.insert(parts, (string.gsub(familyName, "Sheep$", "Lamb")))
-	end
+	table.insert(parts, if adult then Economy.FamilyName(sheep.Family) else "Lamb")
 	return table.concat(parts, " ")
 end
 
@@ -760,12 +773,12 @@ function Economy.DoubleClimb(climb: number): number
 	return math.max(climb * 2, climb + Economy.TutorialClimb)
 end
 
--- The model scale a sheep shows at: its weight's lamb size while it's young, its adult size after.
+-- The model scale a sheep shows at: its weight's lamb size, growing, while it's young, its adult size after.
 function Economy.Scale(sheep: Sheep, sheepSize: number): number
 	if Economy.IsAdult(sheep) then
 		return sheepSize * Economy.Sizes[sheep.Size].Scale
 	end
-	return sheepSize * Economy.LambScale(sheep.Weight)
+	return sheepSize * Economy.LambSize(sheep.Weight, Economy.Growth(sheep))
 end
 
 return table.freeze(Economy)

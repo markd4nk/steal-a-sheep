@@ -51,15 +51,14 @@ local function smooth(x: number): number
 	return t * t * (3 - 2 * t)
 end
 
--- The carried lamb's look at the size it's held: CarryPose reads a breed's Scale over GameConfig.SheepSize.
+-- The carried lamb's look at the size it's held: CarryPose reads a breed's Scale over GameConfig.SheepSize. Whatever
+-- it'll grow into, a carried sheep is a lamb, all one shape (GameConfig.LambBreed).
 local function breedOf(player: Player): GameConfig.Breed?
-	local family = player:GetAttribute("CarriedFamily")
 	local scale = player:GetAttribute("CarriedScale")
-	local breed = if type(family) == "string" then GameConfig.Breeds[family] else nil
-	if not breed or type(scale) ~= "number" then
+	if type(scale) ~= "number" then
 		return nil
 	end
-	local copy = table.clone(breed)
+	local copy = table.clone(GameConfig.LambBreed)
 	copy.Scale = scale * GameConfig.SheepSize
 	return copy
 end
@@ -202,11 +201,6 @@ local function track(player: Player)
 		player:GetAttributeChangedSignal("Carrying"):Connect(function()
 			carrier.Holding = player:GetAttribute("Carrying") == true
 			sincePick = math.huge
-		end),
-		player:GetAttributeChangedSignal("CarriedFamily"):Connect(function()
-			if breedOf(player) then
-				remeasure(carrier)
-			end
 		end),
 		player:GetAttributeChangedSignal("CarriedScale"):Connect(function()
 			if breedOf(player) then

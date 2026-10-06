@@ -19,9 +19,9 @@ local Roster = require(script.Roster)
 type Sheep = Economy.Sheep
 
 -- A player's flock: delivering stolen lambs (put down in the pen), how many the pen holds, the sheep living in the
--- plot (Pens: where each stands and strolls), income and growth every second, offline credit on join, the Sheepdex's
--- first-delivery rewards, Equip Best, locking, selling, the Merge Shrine's trade (ShrineService runs the shrine), and
--- the snapshot each client shows (Remotes.State). Every change to the flock and its coins happens here in one go, with
+-- plot (Pens: where each stands and strolls), income and growth every second, offline credit on join, a lamb growing up
+-- (what it is shows only then, and the Sheepdex finds its family), Equip Best, locking, selling, the Merge Shrine's
+-- trade (ShrineService runs the shrine), and the snapshot each client shows (Remotes.State). Every change to the flock and its coins happens here in one go, with
 -- no yields, so a save never catches half of it.
 local FlockService = {
 	Name = "FlockService",
@@ -87,13 +87,16 @@ local function markDirty(player: Player)
 	end
 end
 
--- One sheep as its owner's client sees it: the numbers already worked out, a lamb's size kept secret.
-local function view(sheep: Sheep, penSlots: number, best: number, money: number): { [string]: any }
+-- One sheep as its owner's client sees it, the numbers already worked out. A lamb keeps what it'll grow into secret
+-- until it grows up (the user, 2026-10-06): no family, size or price, only what shows on it (Look, its marks) and how
+-- long it has left to grow at the player's pace (`growth`, 2 with the 2x Growth pass).
+local function view(sheep: Sheep, penSlots: number, best: number, money: number, growth: number): { [string]: any }
 	local adult = Economy.IsAdult(sheep)
-	local low, high = Economy.FutureRange(sheep, best)
+	local robux = Economy.IsRobuxSheep(sheep.Family)
+	local mystery = not adult and not robux
 	return {
 		Id = sheep.Id,
-		Family = sheep.Family,
+		Family = if mystery then nil else sheep.Family,
 		Rarity = sheep.Rarity,
 		Weight = sheep.Weight,
 		Size = if adult then sheep.Size else 0,
@@ -102,15 +105,35 @@ local function view(sheep: Sheep, penSlots: number, best: number, money: number)
 		Slot = if Roster.IsEquipped(sheep, penSlots) then sheep.Slot else 0,
 		Pinned = sheep.Pinned,
 		Adult = adult,
-		Growth = math.clamp(sheep.Grown / Economy.GrowthSeconds(sheep), 0, 1),
+		Growth = Economy.Growth(sheep),
+		GrowLeft = if adult then 0 else (Economy.GrowthSeconds(sheep) - sheep.Grown) / growth,
 		Income = Economy.Income(sheep, best) * money,
-		Low = low * money,
-		High = high * money,
-		Sell = Economy.SellValue(sheep, best),
+		Sell = if mystery then nil else Economy.SellValue(sheep, best),
 		Name = Economy.Name(sheep),
-		Robux = if Economy.IsRobuxSheep(sheep.Family) then true else nil,
+		Look = if mystery then registry.SheepService:LambLook(sheep.Family) else nil,
+		Robux = if robux then true else nil,
 		AtShrine = sheep.Shrine == true,
 	}
+end
+
+-- A lamb that grew up finds its family in the Sheepdex: its reward waits there for a claim (SheepdexService). Only the
+-- gods' families are in it.
+local function found(data: any, sheep: Sheep)
+	if Olympus.ByFamily[sheep.Family] and not data.Dex[sheep.Family] then
+		data.Dex[sheep.Family] = true
+	end
+end
+
+-- "Your lamb is home! Grows up in 0:45" or "Your shiny lamb is stored: your pen is full".
+local function arrived(player: Player, sheep: Sheep, slot: number?)
+	local name = string.lower(Economy.Name(sheep))
+	if not slot then
+		notify(player, `Your {name} is stored: your pen is full`, "Bad", "Notice")
+		return
+	end
+	local _, growth = boosts(player)
+	local left = (Economy.GrowthSeconds(sheep) - sheep.Grown) / growth
+	notify(player, `Your {name} is home! Grows up in {Format.Duration(left)}`, "Good", "Coin")
 end
 
 function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
@@ -119,10 +142,10 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		return {}
 	end
 	local best = Economy.BestIncome(data.Sheep)
-	local money = boosts(player)
+	local money, growth = boosts(player)
 	local flock: { [string]: any } = {}
 	for id, sheep in data.Sheep do
-		flock[id] = view(sheep, data.PenSlots, best, money)
+		flock[id] = view(sheep, data.PenSlots, best, money, growth)
 	end
 	local state = states[player]
 	local income = Roster.Income(data.Sheep, data.PenSlots)
@@ -188,8 +211,12 @@ local function push(player: Player)
 	Remotes.State:Fire(player, snapshot)
 end
 
-local function build(family: string, rarity: number, scale: number): Model?
-	return registry.SheepService:Build(family, rarity, scale)
+-- A sheep's model in the pen: a lamb's look until it grows up, then its family's.
+local function build(sheep: Sheep, scale: number): Model?
+	if Economy.IsAdult(sheep) or Economy.IsRobuxSheep(sheep.Family) then
+		return registry.SheepService:Build(sheep.Family, sheep.Rarity, scale)
+	end
+	return registry.SheepService:BuildLamb(sheep.Family, sheep.Rarity, sheep.Weight, scale)
 end
 
 -- What Pens needs to know about a plot's ground.
@@ -240,7 +267,7 @@ local function refreshPen(player: Player, arriving: boolean?)
 	end
 	local now = workspace:GetServerTimeNow()
 	local best = Economy.BestIncome(data.Sheep)
-	local money = boosts(player)
+	local money, growth = boosts(player)
 	local function income(sheep: Sheep): number
 		return Economy.Income(sheep, best) * money
 	end
@@ -255,8 +282,8 @@ local function refreshPen(player: Player, arriving: boolean?)
 		if
 			not sheep
 			or (
-				not Pens.Update(shown, sheep, now, income(sheep))
-				and not Pens.Rebuild(shown, sheep, player.UserId, folder, build, now, income(sheep))
+				not Pens.Update(shown, sheep, now, income(sheep), growth)
+				and not Pens.Rebuild(shown, sheep, player.UserId, folder, build, now, income(sheep), growth)
 			)
 		then
 			shown.Model:Destroy()
@@ -275,7 +302,7 @@ local function refreshPen(player: Player, arriving: boolean?)
 			then arrival.From
 			elseif arrival or arriving then at + Vector3.new(0, HOP_IN_HEIGHT, 0)
 			else nil
-		local shown = Pens.Show(sheep, at, player.UserId, folder, build, from, income(sheep))
+		local shown = Pens.Show(sheep, at, player.UserId, folder, build, from, income(sheep), growth)
 		if shown then
 			state.Shown[id] = shown
 			sheep.HomeX, sheep.HomeZ = registry.PlotService:ToLocal(plot, at.Position)
@@ -352,6 +379,9 @@ local function settleOffline(player: Player, data: any, elapsed: number)
 		growth
 	)
 	coins *= money
+	for _, sheep in matured do
+		found(data, sheep)
+	end
 	if coins >= GameConfig.Offline.MinCredit or #matured > 0 then
 		registry.DataService:AdjustCoins(player, coins)
 		local state = states[player]
@@ -422,9 +452,11 @@ local function tickPlayer(player: Player, state: PlayerState, dt: number)
 	end
 	data.LastSeen = os.time()
 	for _, sheep in grewUp do
-		local size = Economy.Sizes[sheep.Size].Name
-		-- Its name without the size: the notice says the size once ("Fortune Sheep grew up GIANT!").
-		Remotes.Reveal:Fire(player, Economy.Name(sheep, false), size)
+		-- What it is, at last: its name without the size (the notice says the size once), its size and its family's
+		-- rarity.
+		local kind = Economy.FamilyRarities[Economy.FamilyRarity(sheep.Family)].Name
+		Remotes.Reveal:Fire(player, Economy.Name(sheep, false), Economy.Sizes[sheep.Size].Name, kind)
+		found(data, sheep)
 		state.Dirty = true
 	end
 	refreshPen(player)
@@ -572,23 +604,13 @@ function FlockService.Deliver(_self: any, player: Player, wild: Wild, at: CFrame
 	local key = tostring(tier.Tier)
 	data.Deliveries[key] = (data.Deliveries[key] or 0) + 1
 
-	-- One notice for the moment: home, or stored. The Sheepdex's badge counts a first find, and the HUD's counters show
-	-- the first delivery's bonus.
-	local name = Economy.Name(sheep)
+	-- One notice for the moment: home, or stored. The HUD's counters show the first delivery's bonus; the Sheepdex finds
+	-- its family when it grows up.
 	local state = states[player]
-	if slot then
-		if state then
-			state.Arrivals[id] = { At = at, From = from }
-		end
-		local rate = Economy.Income(sheep, Economy.BestIncome(data.Sheep)) * (boosts(player))
-		notify(player, `{name} is home! +{Format.Rate(rate)}/s`, "Good", "Coin")
-	else
-		notify(player, `{name} is stored: your pen is full`, "Bad", "Notice")
+	if slot and state then
+		state.Arrivals[id] = { At = at, From = from }
 	end
-	if not data.Dex[wild.Family] then
-		-- Its reward waits in the Sheepdex for a claim (SheepdexService).
-		data.Dex[wild.Family] = true
-	end
+	arrived(player, sheep, slot)
 	if data.Tutorial == 0 then
 		data.Tutorial = 1
 		registry.DataService:AdjustCoins(player, Economy.TutorialCoins)
@@ -790,13 +812,10 @@ function FlockService.ShrineArrive(_self: any, player: Player, id: string, reaso
 			state.Arrivals[id] = { At = at, From = from }
 		end
 	end
-	local name = Economy.Name(sheep)
-	if not slot then
-		notify(player, `{name} is stored: your pen is full`, "Bad", "Notice")
-	elseif reason then
+	if slot and reason then
 		notify(player, reason, "Good", "Coin")
 	else
-		notify(player, `{name} is home! +{Format.Rate(Economy.Income(sheep) * (boosts(player)))}/s`, "Good", "Coin")
+		arrived(player, sheep, slot)
 	end
 	refreshPen(player)
 	push(player)

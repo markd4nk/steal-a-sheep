@@ -117,6 +117,11 @@ lamb.
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
+- **Mystery lambs (mock-ups 2026-10-06, waiting for the user's pick of marking style)**: the user's rules are in
+  DECISIONS.md (no card, reveal on growing up, no income while growing, a timer). Bare white lambs marked in their
+  adult's colours, the rarity hint subtle: styles C (one small touch more a rarity), D (one more spot) or E (bigger
+  spots); bigger and rounder when heavier; growing in the pen under a clock and time left. `studio/LambMockup.luau`
+  renders them in Edit; pictures `lamb-mystery-*.png` in `.t3/userdata/attachments`. Nothing in the game changed yet.
 
 - **Game page art and a trailer, first cuts** (overnight 2026-10-05, nothing uploaded): icon and thumbnail mock-ups
   (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and

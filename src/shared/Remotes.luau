@@ -30,8 +30,8 @@ local Remotes = {
 	Notify = Net.ToClient("Notify") :: Net.ToClient<(string, string, string?)>,
 	-- A god set off after this player (their name), or nil when the chase ended.
 	Chase = Net.ToClient("Chase") :: Net.ToClient<(string?, number?)>,
-	-- A lamb grew up: its name and size ("Giant").
-	Reveal = Net.ToClient("Reveal") :: Net.ToClient<(string, string)>,
+	-- A lamb grew up and shows what it is: its name, its size ("Giant") and its family's rarity ("Epic").
+	Reveal = Net.ToClient("Reveal") :: Net.ToClient<(string, string, string)>,
 	-- Coins earned while away and how many lambs grew up meanwhile.
 	Offline = Net.ToClient("Offline") :: Net.ToClient<(number, number)>,
 	-- A slider knocked this player back, down the slope (the direction), or this player's slide hit someone.

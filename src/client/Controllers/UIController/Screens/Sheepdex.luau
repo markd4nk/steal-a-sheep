@@ -18,7 +18,7 @@ local Types = require(script.Parent.Parent.Types)
 
 -- The collection book (Mark's mock-up, 2026-10-05, like Steal an Egg's Pet Index): one scrolling list with a section
 -- per tier (its god, its six sheep Common to Mythic, a bar to the herd's gift), dark silhouettes in their rarity's
--- colour until the first of a family is delivered, and the picked one beside it: what it earns, its rarity and its
+-- colour until the first of a family grows up, and the picked one beside it: what it earns, its rarity and its
 -- reward, claimed here (SheepdexService). Cards draw their 3D sheep only once their tier scrolls near view.
 local Sheepdex = {}
 

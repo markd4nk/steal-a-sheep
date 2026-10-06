@@ -12,12 +12,16 @@ local Types = require(script.Parent.Parent.Types)
 
 -- Moments over everything: the big celebration (a merged lamb landing on the Merge Shrine's altar) and the
 -- welcome-back card with the cash earned while away (Shear a Sheep's celebration and pop-up card). A lamb growing up
--- has no celebration (the user: not needed): the label over it shows its size, and only the rare sizes, Giant and
--- Titan, get a notice.
+-- has no celebration (the user: not needed), but it's the moment it shows what it is (the user, 2026-10-06), so each
+-- one gets a notice: "Your lamb grew up: Epic Toadstool Sheep, GIANT!", louder the rarer or bigger.
 local Popup = {}
 
--- Grow-ups worth a notice, with their sound.
-local BIG_SIZES: { [string]: string } = { Giant = "RevealFanfare", Titan = "RevealFireworks" }
+-- The sound for a grow-up by its size and by its family's rarity: the louder of the two.
+local SIZE_CUES: { [string]: number } = { Giant = 2, Titan = 3 }
+local KIND_CUES: { [string]: number } = { Epic = 2, Legendary = 2, Mythic = 3 }
+local CUES = { "Reveal", "RevealFanfare", "RevealFireworks" }
+-- Family rarities named in the notice; the commoner ones go without.
+local NAMED_KINDS: { [string]: boolean } = { Rare = true, Epic = true, Legendary = true, Mythic = true }
 
 function Popup.Build(playerGui: Instance): ScreenGui
 	local gui = Instance.new("ScreenGui")
@@ -75,11 +79,15 @@ function Popup.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		Motion.Celebrate(celebration, { popLabel, lineLabel }, burst)
 	end
 
-	trove:Add(Remotes.Reveal:Connect(function(name: string, size: string)
-		local cue = BIG_SIZES[size]
-		if cue then
-			context.Notify(`{name} grew up {string.upper(size)}!`, "Rare", cue)
-		end
+	trove:Add(Remotes.Reveal:Connect(function(name: string, size: string, kind: string)
+		local level = math.max(SIZE_CUES[size] or 1, KIND_CUES[kind] or 1)
+		local what = if NAMED_KINDS[kind] then `{kind} {name}` else name
+		local sized = if size ~= "Standard" then `{what}, {string.upper(size)}` else what
+		context.Notify(
+			`Your lamb grew up: {sized}!`,
+			if level > 1 or NAMED_KINDS[kind] then "Rare" else "Good",
+			CUES[level]
+		)
 	end))
 	-- The welcome-back card, once: the summary may have come before this screen was made.
 	local function showAway()
