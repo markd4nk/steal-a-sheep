@@ -7,6 +7,18 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 
 ## Waiting
 
+- **S48** (`BRAIN/PATTERNS/trailers.md`, Studio's window): "A Studio window in the background still counts 60
+  `RenderStepped` a second, but its picture changes only every 4th frame (15 fps): don't judge the throttle by
+  `RenderStepped`. To film without taking the user's screen, run a scripted shot on its own clock at a quarter of real
+  speed (Roblox's tracks too, with `AdjustSpeed`), record it with OBS behind the user's windows, and keep each
+  picture once with ffmpeg (`mpdecimate=hi=200:lo=64:frac=0.02,setpts=N/(60*TB)`): 60 distinct frames a second.
+  Anything on Roblox's own clock (grazing animals, sways) plays four times too fast, so take it out of the shot."
+  Seen 2026-10-06 filming Steal a Sheep's slide animation mock-ups: a real-time take had 15 distinct frames a second.
+- **S49** (`BRAIN/GOTCHAS.md`): "Decorative parts are often `CanQuery = false` (a commissioned map's tree leaves
+  were), so raycasts and `GetPartBoundsInRadius` pass through them: a camera that pulls in when a ray hits scenery
+  still ends up inside a tree's crown. Find what's in the way by testing points against every part's box, and choose
+  camera sides that avoid it." Seen 2026-10-06, same mock-ups.
+
 - **S11** (`BRAIN/GOTCHAS.md`): "Roblox's moderation removes AI-generated limb meshes as if they broke the rules:
   `generate_mesh` split two characters into head, torso, arms and legs, and within the hour two of the bare-skin limbs
   (a leg, an arm: smooth skin-coloured tubes with rounded ends) were removed, with a notice to the account. Don't

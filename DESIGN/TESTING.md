@@ -41,6 +41,25 @@ its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labe
 `Root.Size` (1/scale) and each `UITextSizeConstraint` from its `MaxPoints`/`MinPoints` attributes times the scale, as
 `UIController/Scale` does in play. Delete the `TEMP_` guis after.
 
+## Slide animation mock-ups (2026-10-06)
+
+- **Rerun them**: build a place copy (`rojo build`, then `tools/assemble.luau` into `build/AnimMock.rbxl`), open it in
+  its own Studio, play. `rojo build` a one-file project of `studio/SlideMockup.luau` into the Studio version's
+  `content/sas-anim/mock.rbxm`; in a Client `execute_luau`, `game:GetObjects("rbxasset://sas-anim/mock.rbxm")[1]`,
+  parent it to ReplicatedStorage, require it, then `Mock.Shot("Now" | "Chase" | "Penguin" | "Surf" | "Sled")`;
+  `Mock.Done` turns true at the shot's end, `Mock.Stop()` puts the HUD, camera, Pan and the character back. Set
+  `Mock.TimeScale = 0` to freeze a frame for `screen_capture`. A server `LoadCharacterWithHumanoidDescription` with the
+  classic yellow, blue and green colours gave a plain blocky avatar for it (Studio's own is a skinned cat).
+- **Tier 1's lane isn't empty**: `Stages.Stage1.Tree2` stands mid-lane at (517, 188), Tree3 at (488, 222), Tree1s at
+  (437, 156), (546, 222) and (554, 136). Their leaves are `CanQuery = false`, so raycasts pass through them; the shots
+  run x 500 to 440 near z 196 with the camera on the low-z side.
+- **Filming without the screen**: Studio behind other windows shows a new picture every 4th captured frame. The shots
+  run at `TimeScale = 0.25` (the wild lambs are hidden: they'd graze four times too fast), OBS records the Studio window
+  by its title, and `build/mock/cut.py TAKE OFFSET 0.25` keeps each picture at its true time (`mpdecimate`, then the
+  timestamps times 0.25). OBS crop for a maximised Studio with Explorer open and no emulator: 167 146 345 71, canvas
+  1408 x 792 (the game view's middle, clear of Roblox's menu buttons). The phone emulator must be off (Test menu, only
+  outside a playtest): with it on, the game view was 705 x 338.
+
 ## Daily gifts (2026-10-05)
 
 - Own place copy `build/DailyPlaytest.rbxl` (code swapped in from `content/sas/daily-sync.rbxm`). After `GiveSheep` (the

@@ -116,7 +116,10 @@ lamb.
 
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
-- **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
+- **God lunge and belly glide, new player slide poses (mock-ups 2026-10-06, waiting for the user's pick)**: a 29 s
+  video and a still sheet (`Videos/StealASheepTrailer/out/slide_anim_*`): Pan points, lunges face first, glides on its
+  belly steering after the thief, gets up and laughs; the player's slide as A Penguin, B Surf or C Sled instead of
+  Roblox's sit. Clips written as code like `SheepClips` (`studio/SlideMockup.luau`, TESTING.md); nothing in the game yet.
 
 - **Game page art and a trailer, first cuts** (overnight 2026-10-05, nothing uploaded): icon and thumbnail mock-ups
   (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and
