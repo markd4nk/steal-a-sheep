@@ -221,6 +221,6 @@ lamb.
 - **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
   little sunk in the straw.
 - Studio MCP screenshots don't show the prompts' buttons (AlwaysOnTop billboards in `PlayerGui.PromptUI`, BRAIN
-  proposal S48); they work in play.
+  proposal S49); they work in play.
 - **Phones**: the map is about 31,700 parts with StreamingEnabled off, so all of it loads at join; untried on a real
   phone (memory, join time). Turning streaming on needs the client's mountain code checked first.

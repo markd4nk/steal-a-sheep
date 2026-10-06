@@ -7,7 +7,7 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 
 ## Waiting
 
-- **S48** (`BRAIN/PATTERNS/testing-studio.md`, replacing "`screen_capture` leaves out BillboardGuis"): "`screen_capture`
+- **S49** (`BRAIN/PATTERNS/testing-studio.md`, replacing "`screen_capture` leaves out BillboardGuis"): "`screen_capture`
   leaves out BillboardGuis with `AlwaysOnTop` on; the others show, in Workspace or in PlayerGui with an `Adornee`. To
   see an AlwaysOnTop one, turn it off for the capture from a Client `execute_luau`, or use the desktop tools'
   `screenshot` of the Studio window (`desktop.md`)." Seen 2026-10-06 in a Steal a Sheep playtest: the stair walker's

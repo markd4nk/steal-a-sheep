@@ -34,7 +34,7 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     (`scripts/stage_branch.py --base 3667692`, then put back and verified): both bootstraps ready, 84 tests, a clean
     console. Snapped onto the walker: `TrainRate` 2, the steps measured on the client at 1.67 steps a second; at level
     30 (debug `SetWalker`) `TrainRate` 25T and 9.71 steps a second at 60 fps, both as the formula says; "+2/s" and
-    "+25T/s" over the head (screenshots; AlwaysOnTop billboards don't show in captures, BRAIN proposal S48, so it now
+    "+25T/s" over the head (screenshots; AlwaysOnTop billboards don't show in captures, BRAIN proposal S49, so it now
     draws normally). "Jump to get off" showed on the Tutorial 0 save. The Studio save was put back as found (walker
     level 1, Climbing 0). Not seen in play: the trimmed refusals and the menus without their tips.
 
