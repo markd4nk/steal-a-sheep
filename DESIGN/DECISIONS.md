@@ -78,6 +78,9 @@ confirmed or reversed it.
   things. The first mock-up's density less 20%; everything standing on the mountain tilted with the slope; scenery
   moving ("cogs turning, islands bopping ... much more immersive"); a winding path up each stretch that obstacles keep
   off.
+- **Pulling back stops a slide dead; no auto-jump up the mountain (the user, 2026-10-06)**: "if they're sliding down,
+  all they should be able to do is just move the other direction and just instantly stop" (momentum made it
+  impossible to break out); running up "should just be like they're running normally up", not hopping.
 - **Only ramps are solid on the descent (the user, 2026-10-06)**: "make the obstacles not have any sort of collision
   ... only the things that function as ramps should ... have collision", because dodging at a slide's speed is too
   hard; the mounds of the earlier levels that you can jump off, jump over or use for speed are the kind to keep.
@@ -279,6 +282,14 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
   removals); the chase's music and its scare sound stay.
 
 ## To review
+
+Calls in the slide stop and climbing without auto-jump (2026-10-06):
+
+- **"Pulling back" means a move whose uphill share is over 0.35**, as the old brake was: straight back, or back and to a
+  side; steering sideways doesn't stop. The slide ends that frame, its speed along the ground zeroed, and the player
+  walks from there; holding back never starts a new slide.
+- **Auto-jump is off only on the mountain** (from the safety line up): phones still auto-jump at the plots and the hub,
+  where fences and steps want it. Mobile players keep the jump button everywhere.
 
 Calls in High Olympus's lanes and the ramps-only rule (2026-10-06; the user's own calls are under Confirmed rules):
 

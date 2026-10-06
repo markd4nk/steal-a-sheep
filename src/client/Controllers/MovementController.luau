@@ -17,16 +17,20 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- moving downhill on the ramp starts a slide by itself; it speeds up to the escape speed set when it starts
 -- (Mountain.SlideBase: Climbing against the lamb's tier and weight), then gains momentum for every tier it passes
 -- (Mountain.Momentum, from the lamb's tier, or where it began empty-handed); a bump costs speed, won back almost at
--- once, and never trips the character over. It steers within a cone either side of straight downhill with the ordinary movement controls, brakes when
--- pulled back, and stops dead at the safety line: the plots are walked. A slider's hit costs it speed; a hit player is
--- moved back down the slope and stunned for a moment; a god's punch flies them down the mountain (Remotes.Punch).
--- The stair walker is WalkerController's.
+-- once, and never trips the character over. It steers within a cone either side of straight downhill with the
+-- ordinary movement controls, stops dead the moment the player pulls back up the slope (then they walk), and stops dead
+-- at the safety line: the plots are walked. On the mountain Roblox's touch auto-jump is off, so running up the slope
+-- into a bump or a dune just runs up it. A slider's hit costs it speed; a hit player is moved back down the slope and
+-- stunned for a moment; a god's punch flies them down the mountain (Remotes.Punch). The stair walker is
+-- WalkerController's.
 local MovementController = { Name = "MovementController" }
 
 local SLIDE_RENDER = "SlideControl"
 -- R15 characters surf down instead, posed on every device (SlideController).
 local SIT_R6 = "rbxassetid://178130996"
 local PUNCH_ARC = 0.12 -- a punch's arc peaks this share of its length above the straight line (20 to 120 studs)
+-- Pulling back this much up the slope (the uphill share of the move) ends a slide.
+local PULL_BACK = 0.35
 
 local registry: Lifecycle.Registry = {}
 local trove = Trove.new()
@@ -223,6 +227,11 @@ local function step(dt: number)
 	local onRamp = Mountain.IsOnRamp(position)
 	local grounded = humanoid.FloorMaterial ~= Enum.Material.Air
 	local input = moveInput(humanoid)
+	-- Touch controls jump by themselves at anything in the way; up the mountain that hopped climbers at every bump and
+	-- dune (the user, 2026-10-06: "it should just be like they're running normally up"). Off the mountain it stays.
+	if humanoid.AutoJumpEnabled == onRamp then
+		humanoid.AutoJumpEnabled = not onRamp
+	end
 
 	if not sliding then
 		humanoid.WalkSpeed = walkSpeed(position, input) * boost
@@ -262,10 +271,17 @@ local function step(dt: number)
 		humanoid.WalkSpeed = walk * boost
 		return
 	end
+	-- Pulling back up the slope stops the slide dead, whatever its momentum (the user, 2026-10-06): from there they walk.
+	if input.X > PULL_BACK then
+		setSliding(false, humanoid)
+		slideSpeed = 0
+		stuckFor = 0
+		humanoid.WalkSpeed = walkSpeed(position, input) * boost
+		root.AssemblyLinearVelocity = Vector3.new(0, math.min(root.AssemblyLinearVelocity.Y, 0), 0)
+		return
+	end
 	local target = slideTarget * Mountain.Momentum(slideTarget, slideFrom, position.X)
-	if input.X > 0.35 then
-		slideSpeed = math.max(0, slideSpeed - settings.SlideBrake * dt)
-	elseif grounded then
+	if grounded then
 		if slideSpeed < target then
 			local rise = if recovering then settings.SlideRecoverSeconds else settings.SlideRiseSeconds
 			slideSpeed = math.min(target, slideSpeed + math.max(settings.SlideAccel, target / rise) * dt)

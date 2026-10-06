@@ -76,7 +76,8 @@ Zeus's siblings, Hera and Zeus. Below the Twelve the myths set no order, so the 
 The climb is all on foot. High Olympus's stretches have each god's obstacles, dunes and the god's landmark, a
 winding path up the middle, and moving scenery (bobbing islands, turning cogs, circling birds; still with Reduce
 motion). On the whole descent only ramps are solid (the user): the dunes, mounds and pyramids you can jump off or
-ride; trees, columns, lamps and the gods' obstacles are scenery you slide through.
+ride; trees, columns, lamps and the gods' obstacles are scenery you slide through. Pulling back up the slope stops a
+slide dead, however fast; on the mountain nobody auto-jumps, so climbers run straight up over bumps and dunes.
 
 Each god has six sheep families (below); the table's is the god's own, their Common. Their lambs all look alike but
 for their marks (*Mystery lambs*).

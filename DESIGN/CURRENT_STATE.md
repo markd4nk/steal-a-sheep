@@ -166,6 +166,9 @@ lamb.
   god's obstacles, dunes, the god's landmark, a winding path, particles and birds, everything standing tilted with the
   slope; scenery moves (`SceneryController`). `tools/UpperMountain.luau`'s `Lane`; `tools/check-lanes.luau` checks it.
   Built into the cloud place for version 28. HISTORY.md.
+- **Slide stop and no auto-jump on the mountain (2026-10-06, branch `t3code/olympus-obstacle-mockups`, not merged,
+  not published)**: pulling back up the slope ends a slide at once (`MovementController`, `PULL_BACK`); touch
+  auto-jump is off on the ramp. HISTORY.md.
 - **Only ramps are solid on the descent (2026-10-06, live in version 28)**: the
   user's rule. High Olympus's obstacles are scenery, its ramps stage 7's dunes; the old stages' trees, spires, arches,
   pavilion, lamps and columns in the lane are passed through too (`UpperMountain.ClearOldLanes`).

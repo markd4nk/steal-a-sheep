@@ -6,6 +6,19 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **A slide stops dead when pulled back; no auto-jump up the mountain (2026-10-06, branch
+  `t3code/olympus-obstacle-mockups`, not merged)**. The user, after version 28: running up made climbers auto-jump on
+  the slope; and with momentum nobody could break out of a slide: moving the other way should stop it at once.
+  - *Why it hopped*: Roblox's touch auto-jump (`Humanoid.AutoJumpEnabled`, on for phones and Studio's device
+    simulator) jumped whenever a climber met a bump: stage 5's 3-stud floor rise at x 1740, stage 6's dune face at
+    x 1860, and the new dunes. `MovementController` now turns it off on the ramp (`Mountain.IsOnRamp`) and back on off
+    it.
+  - *The stop*: a move with an uphill share over 0.35 (`PULL_BACK`) ends the slide that frame, zeroes its ground speed
+    and hands over to walking; `GameConfig.Movement.SlideBrake` (the old 40 studs/s a second) is gone.
+  - *Checked*: `check.ps1`; own Studio copy: 101 tests, a clean console. A Zeus slide pulled back at 55 studs/s read 4
+    the next frame, then walked uphill; `AutoJumpEnabled` false on the ramp. A climb from the plots to tier 14 at a
+    modest Climbing: no jumps on the mountain (before: five, at x 1736 and 1858-1866), straight over both bumps, 19 of
+    2,401 frames off the ground (crests). The only jump left was at x 282 in the hub, where auto-jump stays.
 - **Only ramps are solid on the descent (2026-10-06, branch `t3code/olympus-obstacle-mockups`, after the lanes were
   merged)**. The user, seeing the lanes: dodging at a slide's speed is too hard; make the obstacles have no collision,
   keep only "the things that function as ramps", like the earlier levels' mounds you can jump off, jump over or use

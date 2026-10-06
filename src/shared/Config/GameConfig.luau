@@ -394,7 +394,6 @@ local GameConfig = {
 		SlideAccel = 26, -- the least studs a second a slide gains each second
 		SlideRiseSeconds = 2, -- a fast slide reaches its escape speed in about this long
 		SlideRecoverSeconds = 0.25, -- and gets back up to speed after a bump in about this long
-		SlideBrake = 40, -- studs a second pulling back takes off each second (the same with any burden)
 		SlideStopSpeed = 4, -- under this a slide ends
 		SlideHeading = 0.7, -- how far either side of straight downhill a slider can steer (0 none, 1 sideways)
 		SlideTurnRate = 2.5, -- how fast the heading follows the stick, per second
