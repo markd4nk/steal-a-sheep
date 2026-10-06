@@ -1,9 +1,11 @@
 --!strict
 
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SocialService = game:GetService("SocialService")
+local StarterGui = game:GetService("StarterGui")
 local UserInputService = game:GetService("UserInputService")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
@@ -33,6 +35,9 @@ local TILES_BOTTOM = 70 -- the menu pictures stop this far above the bottom, cle
 local WORK_HINT_SECONDS = 12 -- "Put your sheep to work" shows this long after room opens up in the pen
 local CRAWL_SHARE = 0.5 -- climbing slower than this share of normal speed: "Train to climb"
 local MIDDLE_HALF_WIDTH = 160 -- half the widest hint or notice, in points: what must clear the menu pictures
+-- Pixels Roblox's player list (the leaderstats: Income, Climbing) takes at the top right on a computer, where it opens
+-- by default over the counters, with a margin.
+local PLAYER_LIST_WIDTH = 330
 local Color = Theme.Color
 local TextSize = Theme.TextSize
 
@@ -273,7 +278,16 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 		banner.Position = UDim2.new(0, middle, 0, below + 110)
 	end
+	-- On a computer the counters stand left of Roblox's player list, which opens by default over the top right.
+	local counters = topBar:FindFirstChild("Right") :: Frame
+	local function clearPlayerList()
+		local computer = not UserInputService.TouchEnabled and not GuiService:IsTenFootInterface()
+		local listed = computer and StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.PlayerList)
+		local shift = if listed then PLAYER_LIST_WIDTH / Scale.Of(root) else 0
+		counters.Position = UDim2.new(1, -10 - shift, 0.5, 0)
+	end
 	Scale.TopBar(gui, root, topBar, trove, function(top: number)
+		clearPlayerList()
 		below = top
 		tiles.Position = UDim2.fromOffset(8, below + 8)
 		tiles.Size = UDim2.new(0, PICTURE_SIZE + 12, 1, -(below + 8 + TILES_BOTTOM))
