@@ -39,6 +39,10 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     (the pops rose through it) and comes back when you step off. The user, on the video (filmed in the cloud place on
     the Galaxy A06 emulator, `record` of Studio's window in the background at 15 fps): "much better now"; one decimal,
     keep the shoe, hide the level.
+  - *Checked after the user's OK* (main d8fc2b3 merged in, the branch's 19 scripts staged in the cloud place, then put
+    back and verified): both bootstraps ready, 88 tests (the new `Format.spec` with them), a clean console; level 1
+    popped "+1" at 2.0 a second, level 30 "+2.5T" at 9.7 a second; the level tag hid while climbing and came back on
+    stepping off. The Studio save was left a new player's, as found.
   - *Checked*: `check.ps1` passes. A playtest of the cloud place with the branch's 17 scripts staged in
     (`scripts/stage_branch.py --base 3667692`, then put back and verified): both bootstraps ready, 84 tests, a clean
     console. Snapped onto the walker: `TrainRate` 2, the steps measured on the client at 1.67 steps a second; at level
