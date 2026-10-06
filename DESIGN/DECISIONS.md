@@ -65,6 +65,19 @@ confirmed or reversed it.
 
 ## To review
 
+Calls building the friend boost (2026-10-05). The user chose: the tile under the menus (mock-up B), the invite state
+with no friends, +20% a friend, written "+20%"; then no notice when a friend leaves, and the tile staying hidden with
+the menus during the tutorial was left to the agent (kept).
+
+- **Live income only**: the boost isn't in offline earnings, the leaderboards, the player list's Income, the pen signs
+  or the Flock menu's per-sheep rates; only the HUD's cash rate shows it.
+- **Capped at 4 friends** (+80%), the most a 5-player server can hold.
+- **Notices**: friends already here get "<name> joined: friend boost +40%"; the joiner gets "Friends here: friend
+  boost +20%". Nothing when a friend leaves (the tile updates; the user agreed).
+- **The tile hides with the other menu pictures** until the first lamb is home; the boost works meanwhile.
+- **Tapping it opens Roblox's invite** with friends here too, not only at 0; where invites aren't allowed it says
+  "Invites aren't available here".
+
 Calls building the stair walker (2026-10-05).
 
 - **Placeholder Robux prices (another session is deciding them; nothing is on sale)**: the next level costs R$ 19 (to

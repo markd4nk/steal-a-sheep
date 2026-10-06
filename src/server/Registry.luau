@@ -10,6 +10,7 @@ local Services = script.Parent.Services
 local registry: { Lifecycle.System } = {
 	require(Services.DataService),
 	require(Services.PurchaseService),
+	require(Services.FriendService),
 	require(Services.SheepService),
 	require(Services.PlotService),
 	require(Services.FlockService),

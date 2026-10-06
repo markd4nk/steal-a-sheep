@@ -353,7 +353,7 @@ local function tick(dt: number)
 			end
 		end
 		if income > 0 then
-			registry.DataService:AdjustCoins(player, income * dt)
+			registry.DataService:AdjustCoins(player, income * registry.FriendService:Boost(player) * dt)
 		end
 		data.LastSeen = os.time()
 		for _, sheep in grewUp do

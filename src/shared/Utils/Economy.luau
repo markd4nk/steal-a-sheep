@@ -80,6 +80,10 @@ Economy.MaxPens = 20
 Economy.MergeAfterDeliveries = 3
 Economy.GodShare = 0.8 -- a god's set speed, as a share of its tier's SlideSpeed
 Economy.SafeZoneCap = 7 -- the most times normal speed anyone walks below the safety line
+-- Each Roblox friend in the server adds this share to the flock's live income (the user, 2026-10-05: +20% each). A
+-- server holds 5, so 4 friends at most; MaxFriends caps it if servers grow.
+Economy.FriendShare = 0.2
+Economy.MaxFriends = 4
 
 -- Climbing a second on the stair walker, by its level (0 is the free one). Each level covers the gap between the
 -- next two tiers' reach in about a minute, and the last carries Zeus's Heavy target.
@@ -279,6 +283,11 @@ end
 -- What it earns a second in a pen slot right now.
 function Economy.Income(sheep: Sheep): number
 	return if Economy.IsAdult(sheep) then Economy.AdultIncome(sheep) else Economy.LambIncome(sheep)
+end
+
+-- What the flock's income is multiplied by with `friends` friends in the server.
+function Economy.FriendBoost(friends: number): number
+	return 1 + Economy.FriendShare * math.clamp(math.floor(friends), 0, Economy.MaxFriends)
 end
 
 -- A lamb's adult income from its smallest to its biggest possible size, for its weight (its size stays hidden).

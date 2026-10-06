@@ -52,6 +52,14 @@ local commands: { [string]: Command } = {
 		player:SetAttribute("DebugSpeed", if boost == 1 then nil else boost)
 		return true, nil
 	end,
+	-- value: how many friends the player counts as having in the server, for the friend boost; a negative value goes
+	-- back to their real friends.
+	SetFriends = function(player, value)
+		local friends = math.floor(value or 0)
+		player:SetAttribute("DebugFriends", if friends >= 0 then friends else nil)
+		registry.FriendService:Refresh(player)
+		return true, nil
+	end,
 	-- value: a tier. An ordinary lamb of that tier's family goes straight into the flock, as if delivered.
 	GiveSheep = function(player, value)
 		local tier = Olympus.Tiers[math.clamp(math.floor(value or 1), 1, Olympus.Count)]

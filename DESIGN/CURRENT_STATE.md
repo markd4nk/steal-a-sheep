@@ -45,9 +45,11 @@ lamb.
 - **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
   Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
   `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
+- **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
+  `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
 
 - **Server**: `DataService`, `PurchaseService` (pack; the walker's Robux levels, no products made yet), `SheepService`, `PlotService`, `FlockService`,
-  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
+  `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
   `DebugService` (Studio only).
 - **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Popup, Studio
   DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
@@ -66,6 +68,9 @@ lamb.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
+
+- **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
+  `IsFriendsWithAsync` pairs and the join notices between two real friends are untested until the place is published.
 
 - **Stair walker with two players**: another player's climb (posed on each device) and the owner-only sign prompts
   were only checked solo; the Robux upgrade can't be bought until its developer products exist.

@@ -29,6 +29,7 @@ local BUTTONS: { Button } = {
 	{ Text = "Grow every lamb", Command = "GrowAll" },
 	{ Text = "Unlock every tier", Command = "UnlockAll" },
 	{ Text = "Stair walker level (id)", Command = "SetWalker", UsesId = true },
+	{ Text = "Friends in server (id)", Command = "SetFriends", UsesId = true },
 	{ Text = "Speed x5", Command = "SetSpeed", Value = 5 },
 	{ Text = "Speed normal", Command = "SetSpeed", Value = 1 },
 	{ Text = "Wipe save", Command = "WipeSave", Confirm = true },

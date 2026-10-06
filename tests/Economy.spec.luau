@@ -38,6 +38,14 @@ end
 
 -- These pin the current tuning: when the numbers are changed on purpose, change the expectations with them.
 return function(t: Run.Suite)
+	t.Test("each friend in the server adds 20% income, up to 4 friends", function()
+		t.Expect(near(Economy.FriendBoost(0), 1)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(1), 1.2)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(4), 1.8)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(9), 1.8)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(-2), 1)).ToBe(true)
+	end)
+
 	t.Test("base income follows round(2 x 2.5^(tier - 1))", function()
 		local expected = { 2, 5, 13, 31, 78, 195, 488, 1221, 3052, 7629, 19073, 47684 }
 		for tier, income in expected do

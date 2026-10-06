@@ -6,6 +6,24 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Friend boost (2026-10-05)**. The user asked for a simple friend multiplier like other games: each friend in the
+  server multiplies your income. Mock-ups A (a pill under the cash) and B (a tile under the menus, tap to invite) on
+  a real HUD screenshot; the user picked B, the INVITE state at 0 friends, and +20% a friend (over the proposed +10%).
+  - *Shared*: `Economy.FriendShare` 0.2, `MaxFriends` 4, `FriendBoost(friends)`. `Theme.Icons.HudFriend` and
+    `HudInvite`: gvesster's Free Icon Pack v3.1 `Player/Friend` and `Player/Add Player` (1st Outline, 256 px), the
+    cash icon's pack, uploaded through the Studio MCP.
+  - *Server*: `FriendService` asks `IsFriendsWithAsync` once per pair (the later joiner asks), keeps pairs while both
+    stay, sets the `Friends` attribute and sends the join notices. `FlockService`'s tick multiplies the income it pays
+    by `FriendService:Boost`. Studio: `DebugFriends` attribute, debug panel "Friends in server (id)" (`SetFriends`, -1
+    for the real count).
+  - *Client*: `Hud` adds `Tiles.FriendButton` (order 4): HudFriend and "+N%" in lime with friends here, HudInvite
+    and INVITE without; a tap runs `CanSendGameInviteAsync` then `PromptGameInvite`. The cash rate shows income x
+    boost.
+  - *Checked*: `check.ps1`; 57 of 57 tests (FriendBoost new) in a Studio copy of the place with this branch's code;
+    both bootstraps ready, console clean. INVITE tile with the uploaded icon; pretend 2 friends: tile "+40%", cash
+    paid 6.57/s -> 9.19/s (x1.40); 4 friends +80%, 9 capped at +80%, back to INVITE at -1; the join notice drawn;
+    tapping the tile opened Roblox's Invite Friends dialog (closed without inviting). Real friends untested.
+
 - **Stair walker: a StairMaster outside the pen (2026-10-05)**. After the study below, the user: the first five looks
   are good, stick with five for now; the level floats over the machine; place it outside the pen, very close, like
   Steal an Egg's treadmill; an upgrade sign beside it to upgrade directly with cash or Robux. Earlier calls: gym at

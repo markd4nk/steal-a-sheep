@@ -92,6 +92,12 @@ Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, fi
 buys stair walker levels, pen space and trails. The one Robux offer: the next stair walker level, at the machine's
 sign (prices being decided in another session; the developer products aren't made yet).
 
+## Friend boost (the user, 2026-10-05)
+Each Roblox friend in your server adds +20% to your flock's cash income while they stay (servers hold 5, so +80% at
+most); not offline earnings, not the leaderboards. A tile under the menu pictures shows it: two friends and "+40%",
+or, with no friends here, the invite picture and INVITE. Tapping it opens Roblox's invite. When a friend joins:
+"Sam joined: friend boost +20%"; the HUD's cash rate includes the boost.
+
 ## Stair walker (the user, 2026-10-05)
 A real StairMaster just outside each pen, beside the gate, like Steal an Egg's treadmill. Walk into it and you snap on
 and climb its moving steps (your legs on the steps, any avatar); jump to get off. Its level floats over it, its steps
