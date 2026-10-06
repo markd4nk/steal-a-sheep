@@ -19,6 +19,8 @@ local registry: { Lifecycle.System } = {
 	require(Controllers.ShrineController),
 	require(Controllers.PromptController),
 	require(Controllers.ComponentController),
+	-- Studio-only camera rig for filming trailers (BRAIN/PATTERNS/trailers.md); does nothing in live games.
+	require(Controllers.TrailerController),
 }
 
 return registry

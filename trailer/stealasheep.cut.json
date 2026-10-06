@@ -1,0 +1,56 @@
+{
+  "name": "trailer",
+  "ink": "0x152A55",
+  "font": "FredokaOne-Regular.ttf",
+  "variants": {
+    "page": { "size": [1920, 1080], "captions": "page" },
+    "tall": { "size": [1080, 1920], "captions": "social" }
+  },
+  "clips": [
+    {
+      "src": "steal.mkv", "in": 0, "out": 3, "game_audio_db": 2,
+      "captions": {
+        "page": [{ "text": "Steal sheep from the gods", "at": [0.2, 2.8] }],
+        "social": [{ "text": "STEAL FROM ZEUS", "at": [0.15, 2.8] }]
+      }
+    },
+    { "src": "alert.mkv", "in": 0, "out": 2, "game_audio_db": 2 },
+    {
+      "src": "chase.mkv", "in": 0, "out": 5, "game_audio_db": 3,
+      "captions": {
+        "page": [{ "text": "Slide home before they catch you", "at": [0.3, 4.6] }],
+        "social": [{ "text": "RUN!", "at": [0.3, 4.6] }]
+      }
+    },
+    { "src": "slide_wide.mkv", "in": 0, "out": 3, "game_audio_db": 0 },
+    { "src": "home.mkv", "in": 0, "out": 3, "game_audio_db": 0 },
+    {
+      "src": "pens.mkv", "in": 0, "out": 3, "game_audio_db": -2,
+      "captions": {
+        "page": [{ "text": "Fill your pens", "at": [0.2, 2.8] }],
+        "social": [{ "text": "FILL YOUR PENS", "at": [0.2, 2.8] }]
+      }
+    },
+    {
+      "src": "climb.mkv", "in": 0, "out": 5, "game_audio_db": -2,
+      "captions": {
+        "page": [{ "text": "Climb to Zeus", "at": [0.4, 4.6] }],
+        "social": [{ "text": "CLIMB TO ZEUS", "at": [0.4, 4.6] }]
+      }
+    },
+    { "src": "caught.mkv", "in": 0, "out": 3, "game_audio_db": 3, "transition": 0.15 },
+    {
+      "src": "gods.mkv", "in": 0, "out": 4, "game_audio_db": -2,
+      "captions": {
+        "page": [{ "text": "30 gods to rob", "at": [0.4, 3.8] }],
+        "social": [{ "text": "30 ANGRY GODS", "at": [0.4, 3.8] }]
+      }
+    }
+  ],
+  "title": {
+    "text": "Steal a Sheep",
+    "sub": { "page": "", "social": "" },
+    "seconds": 3,
+    "transition": 0.35
+  }
+}
