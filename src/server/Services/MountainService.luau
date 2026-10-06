@@ -51,6 +51,8 @@ type Launch = { Until: number, Landing: Vector3 }
 local launches: { [Player]: Launch } = {}
 local sightParams = RaycastParams.new()
 sightParams.FilterType = Enum.RaycastFilterType.Exclude
+local pathParams = RaycastParams.new()
+pathParams.FilterType = Enum.RaycastFilterType.Exclude
 
 local function rootOf(player: Player): BasePart?
 	local character = player.Character
@@ -143,8 +145,16 @@ local function checkSpeed(player: Player, root: BasePart, climb: number, dt: num
 	track.Budget = math.min(track.Budget + speed * CLIMB_SLACK * dt, cap)
 	local moved = Vector2.new(position.X - track.At.X, position.Z - track.At.Z).Magnitude
 	if moved > track.Budget + 0.5 then
-		local reached = track.At:Lerp(position, math.clamp(track.Budget / moved, 0, 1))
 		local character = player.Character :: Model
+		local reached = track.At:Lerp(position, math.clamp(track.Budget / moved, 0, 1))
+		-- The straight line between two samples can cut through a ledge or a trunk: back where they were if anything
+		-- solid is in the way, else on the floor under that spot.
+		pathParams.FilterDescendantsInstances = { character }
+		if workspace:Raycast(track.At, reached - track.At, pathParams) then
+			reached = track.At
+		else
+			reached = Vector3.new(reached.X, math.max(reached.Y, Mountain.Floor(reached.X, reached.Z) + 3), reached.Z)
+		end
 		character:PivotTo(CFrame.new(reached) * root.CFrame.Rotation)
 		track.At = reached
 		track.Budget = 0
@@ -162,6 +172,8 @@ local function enforce(dt: number)
 		if not root or not data then
 			ceilings[player] = nil
 			tracks[player] = nil
+			-- Dead or reset mid-punch: the flight is over, so the next character isn't put on its landing spot.
+			launches[player] = nil
 			continue
 		end
 		local launch = launches[player]

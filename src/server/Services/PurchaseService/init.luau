@@ -159,10 +159,15 @@ function PurchaseService.OwnsPass(_self: any, player: Player, passId: number): b
 	local ok, owns = false, nil :: any
 	for try = 1, PASS_TRIES do
 		ok, owns = pcall(MarketplaceService.UserOwnsGamePassAsync, MarketplaceService, player.UserId, passId)
-		if ok or player.Parent ~= Players then
+		if ok or player.Parent ~= Players or try == PASS_TRIES then
 			break
 		end
 		task.wait(try)
+	end
+	-- Bought while this was asking: that answer stands.
+	local bought = cache[passId]
+	if bought ~= nil then
+		return bought
 	end
 	if not ok then
 		warn(`[PurchaseService] Pass check failed for {player.UserId}/{passId}: {owns}`)
