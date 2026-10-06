@@ -4,6 +4,13 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, published to Roblox** (private): the place now lives on Roblox as place 114389615931493 (universe
+  10769564664, "Steal a Sheep", getajobgle's). Its first version is `scripts/build-place.ps1`'s output at main 3c5ee43:
+  scripts checked one by one against `rojo build tools/sync.project.json`, the Studio-side content fingerprinted
+  against a fresh `tools/assemble.luau` build (identical: 44,045 Workspace instances, same positions and sizes). No
+  `TEMP_` instances, no debug attributes. Team Create is on and Drafts Mode off, so the main Studio holds the cloud
+  place: edits there last without a Save. Open it with File > Open from Roblox, or Creator Hub's Edit in Studio.
+
 - **2026-10-05, the Robux store**: no place changes (the store and its HUD button are made at runtime). Its 17
   pictures are uploaded images (ids in `Theme.Icons`). Tried in the main Studio with the branch's scripts swapped in
   and swapped back; nothing saved.
@@ -53,5 +60,6 @@ here. Newest first.
   `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`,
   `MergeShrine` (the Laurel Ring, ShrineService/Model; on each client `ShrineLocal` holds its pedestal previews and lamb), `ReplicatedStorage.SheepLooks`, the leaderboards' screens,
   every ScreenGui.
-- Before publishing: set Maximum Visitor Count to 5 (one player a plot) in Creator Hub, turn on Studio access to API
-  services for saving, and publish under the account that owns Shear a Sheep's assets.
+- Set on the published place (2026-10-05): Maximum Visitor Count 5 (one player a plot, Creator Hub > Places > Access),
+  Studio access to API services on (Experience Settings > Security), owned by getajobgle, who owns Shear a Sheep's
+  assets.

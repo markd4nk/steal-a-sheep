@@ -112,6 +112,13 @@ confirmed or reversed it.
 
 ## To review
 
+Calls made publishing the private test version (2026-10-05):
+
+- **The game page**: named "Steal a Sheep", described as "Climb the mountain, steal a god's sheep and slide home
+  before they catch you."; Roblox's default icon and thumbnail, no genre.
+- **Devices**: Computer, Phone, Tablet and VR (Roblox's defaults); not Console.
+- **Five players a server**, one per plot.
+
 Calls made building the Robux store (2026-10-05):
 
 - **"Your best sheep"** is the highest income right now among the player's other sheep, stored ones included (a lamb

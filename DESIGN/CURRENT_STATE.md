@@ -16,9 +16,13 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## Live
 
-- Not published. No Roblox place yet: the place is `StealASheep.rbxl`, built by `scripts/build-place.ps1` from the
-  map (`vvs_map(commission) (1).rbxl`) with High Olympus built on top (`tools/UpperMountain.luau`), the Shear a Sheep
-  assets (`assets/ShearASheepAssets.rbxm`) and the code.
+- **Private test version (2026-10-05)**: "Steal a Sheep", universe 10769564664, place 114389615931493
+  (`https://www.roblox.com/games/114389615931493`), owned by getajobgle (who owns Shear a Sheep's assets). Audience
+  Private: only the owner and people with edit permission can play. Main @ 3c5ee43, its first version. Max 5 players,
+  Team Create on, Studio access to API services on; no products or passes yet.
+- The main Studio is now that cloud place (Team Create: edits there last without a Save and ship with the next
+  publish). `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is
+  the local copy sessions build their own Studios from; the main checkout's was rebuilt from 3c5ee43.
 
 ## The game, and where each part lives
 
@@ -78,10 +82,10 @@ lamb.
 
 ## In progress
 
-- **The Robux store can't sell yet** (merged 2026-10-05; the user: Creator Hub later): once the game is published,
-  make the 2 passes and 49 developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) at
-  Config/Store's prices and put their ids in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`). `StealASheep.rbxl` wasn't
-  rebuilt with the store: run `scripts/build-place.ps1` (or swap main's scripts into the open Studio).
+- **The Robux store can't sell yet** (merged 2026-10-05; the user: Creator Hub later): the game now exists on Roblox,
+  so the 2 passes and 49 developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) can be made in
+  universe 10769564664 at Config/Store's prices, their ids put in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`). Until
+  then a live server answers "Not on sale yet".
 
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
@@ -92,6 +96,9 @@ lamb.
 
 ## Not verified
 
+- **The live game itself**: nobody has joined the published place yet. Checked only in Studio on the cloud place
+  (both bootstraps ready, 66 tests, ProfileStore "data will be saved", no warnings). Not yet seen in a real server:
+  Shear a Sheep's meshes, faces and sounds loading, the debug panel staying hidden, the store's "Not on sale yet".
 - **Real Robux purchases**: no product or pass exists yet, so nothing went through Roblox's dialog or ProcessReceipt;
   the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and
   the one-dialog-at-a-time rule with a real dialog are untested. Store on a phone: Galaxy A06 sideways only.
@@ -99,7 +106,8 @@ lamb.
 - **Merge Shrine with two players** (another player mustn't see your picks, merge or lamb), **leaving with a lamb on
   the altar** (should go to the pen), **touch and gamepad** in its menu, and **a Titan's grow-up** (none rolled yet).
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
-  `IsFriendsWithAsync` pairs and the join notices between two real friends are untested until the place is published.
+  `IsFriendsWithAsync` pairs and the join notices between two real friends are untested. The place is Private, so
+  friends can't join until they get edit permission or the audience changes (Creator Hub > Settings > Audience).
   The left column (GIFT, FLOCK, SHOP, SHEEPDEX, the friend tile) wasn't checked on a phone's short screen.
 
 - **Sell Stall on a phone and a gamepad**: played on a PC window only (mouse); the layout matches the mock-up's phone
@@ -108,17 +116,18 @@ lamb.
   were only checked solo; the Robux upgrade can't be bought until its developer products exist.
 
 - **Two players**: slide hits and knockback (server checks, client knockback) were never tried with a second player.
-- **All-servers leaderboards**: the place isn't published, so the boards ran on this server's players only; the
-  store writes and reads, name lookups and the last write on leaving are untested.
-- **Saving**: the place isn't published, so playtests used ProfileStore's mock store; rejoin, offline credit on a real
-  rejoin and session locking are untested (the offline maths is unit-tested).
+- **All-servers leaderboards**: their stores open on the published place (no warning in a Studio playtest of it), but
+  writes and reads across servers, name lookups and the last write on leaving are untested.
+- **Saving**: a Studio playtest of the published place loaded a save from the real DataStore (`PlayerData_Studio`);
+  saves in the live game (`PlayerData`), rejoin, offline credit on a real rejoin and session locking are untested (the
+  offline maths is unit-tested).
 - **Touch and gamepad**: only keyboard and mouse in Studio. Prompts (Steal, Put down), HUD buttons and the slide use
   Roblox's own input.
 - **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
   teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
-- **The free gift's favorite prompt**: skipped in Studio (PlaceId 0); `PromptSetFavorite` on the published place, its
-  answer and the claim after it are untested.
+- **The free gift's favorite prompt**: skipped in Studio before the publish (PlaceId 0); `PromptSetFavorite` in the
+  live game, its answer and the claim after it are untested.
 - **Climbing in play**: playtested 2026-10-05 on tiers 1-3 and 6 with one player (TESTING.md); not on tiers 13-30,
   not with two players, not on touch or gamepad.
 - **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's
@@ -141,9 +150,9 @@ lamb.
   hasn't set them yet).
 - **Very fast slides meet the trees hard**: at 150+ studs/s a slide that clips a tree stops dead and its god catches
   up (seen at x 944 on tier 3). Same decor issue, felt more at high speed.
-- **Plots: 5.** A sixth player is kicked with "server full"; set Maximum Visitor Count to 5 in Creator Hub.
-- **Asset ownership**: the sheep meshes, faces, UI images and sounds are Shear a Sheep's uploads (Mark's account).
-  They load if this game is published under the same owner.
+- **Plots: 5.** The place's Maximum Visitor Count is 5 (Creator Hub); a sixth player would be kicked with "server full".
+- **Asset ownership**: the sheep meshes, faces, UI images and sounds are uploads by getajobgle, the account that owns
+  the game too. Publish it under that account only.
 - **ViewportFrames (the menus' 3D sheep) don't show in Studio MCP screenshots while the window is minimized**; they do
   in play.
 - **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a

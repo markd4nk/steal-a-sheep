@@ -6,6 +6,27 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **First publish: a private test experience (2026-10-05)**. The user: "save everything that's currently there and
+  then publish it to a real Roblox experience ... keep it private for now, just to test it out". Published main at
+  3c5ee43 (everything merged by then) as "Steal a Sheep": universe 10769564664, place 114389615931493, owned by
+  getajobgle, audience Private.
+  - *The place*: the main Studio held scripts from before the store, the Merge Shrine gamble and friend boost (31
+    changed, 10 missing). Main's scripts went in from `rojo build tools/sync.project.json` (GetObjects swap); all 115
+    then matched main and the old ones were deleted. Its Studio-side content matched a fresh `assemble.luau` build
+    exactly (fingerprint: instance counts, names, part positions and volumes per service).
+  - *Before publishing*: the debug panel, debug speed, pretend friends and the store's free grants are all Studio-only
+    (`RunService:IsStudio()`); a live server answers "Not on sale yet" for every store item. Saves and leaderboards use
+    separate `_Studio` stores in Studio.
+  - *Publishing*: File > Publish to Roblox > Create (Creator Me; Computer, Phone, Tablet and VR; Team Create and Data
+    Sharing left at Roblox's defaults, on). Turning on Team Create logged HTTP 429 failures for the scripts' version
+    history, but the reopened cloud place's 115 scripts still matched main. Then Studio access to API services on, and
+    Maximum Visitor Count 5 in Creator Hub (it read 50).
+  - *Checked*: `check.ps1` passes; before the publish a playtest of the place had both bootstraps ready, 66 tests
+    passing and only the "not published" notices; after it, `develop.roblox.com/v1/universes/10769564664` says
+    `privacyType` Private, Creator Hub shows Access and Audience Reach Private, and a Studio playtest of the cloud place
+    had both bootstraps ready, 66 tests, ProfileStore "data will be saved" and no warnings. Not joined in a real
+    server yet.
+
 - **The Robux store (2026-10-05)**. The user: a shop "just to buy stuff for Robux", reusing Shear a Sheep's store:
   pay-to-win sheep, 2x Growth and 2x Money passes, 2x Speed (3 Robux in Steal an Egg), the treadmill's upgrade for
   Robux beside its cash price, six Climbing ("speed") packs and five cash packs (24K for 45 up to 8M for 720); mock-ups
