@@ -6,7 +6,7 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
-- **Less hand-holding after onboarding, first cuts (2026-10-06, branch `t3code/b39d69ab`)**. The user: after the
+- **Less hand-holding after onboarding, and a faster stair walker (2026-10-06, branch `t3code/b39d69ab`)**. The user: after the
   onboarding the game shouldn't tell players what to do ("no is in reach"), and asked for every other part of the UI
   like that. Done alongside the onboarding session (`t3code/simplify-onboarding-guidance`), which owns `Hud.luau`.
   - *Cut*: FlockService's "<God>'s <Area> is in reach!" notice when Climbing passed a sign (its per-player `ClimbTier`
@@ -14,9 +14,12 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     showed on the first climb of every session; now only while `Tutorial < 2` (the onboarding's first climb).
   - *Cut by the onboarding session* in its `goal()` rewrite: "Put your sheep to work" (and the FLOCK glow) and "Train
     to climb".
-  - *Listed for the user, untouched*: the Merge Shrine's "Bigger sheep in, more luck" and its empty-list lines, the
-    Sell Stall's "Tap the sheep to sell", the gift's "Tap here, or the star", refusals with advice tails ("Your flock
-    is full: merge or sell first"), the HUD's glows and red badges (GIFT, DAILY, SHEEPDEX), the rare-spawn notice.
+  - *The rest of the audit, on the user's answers*: menu tips cut (Merge Shrine "Bigger sheep in, more luck", Sell
+    Stall "Tap the sheep to sell", the gift's "Tap here, or the star"); the Merge Shrine's empty list says "No sheep to
+    merge yet" or "Opens after 3 deliveries"; every refusal that said what to do now says what's wrong ("Your flock is
+    full: merge or sell first" -> "Your flock is full", "Take your sheep home first" -> "Your hands are full", "Bring it
+    inside your own fence first" -> "Not in your pen", and the rest in DECISIONS.md). Kept, on the user's word: the
+    HUD's glows and red badges (GIFT, DAILY, SHEEPDEX) and the rare-lamb notice.
   - *The stair walker* (the user, same thread: the "Next" line and its bar go, "all it needs to indicate is that you're
     gaining plus speed ... above the player"; "the player should be moving on the treadmill way faster ... at higher
     levels and higher speeds. Right now it's still the same thing every single time"): TrainingService sets the
@@ -25,8 +28,15 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     the free machine to 0.1 s on the top one with the Sunlight trail (`GameConfig.StairWalker.SlowestStep`,
     `FastestStep`), so trails speed it up too. It was 0.6 s to 0.27 s by level, most of it in the first levels. Your
     own client shows the Climbing shoe and "+N/s" over your head (`WalkerController`, `TrainGain` in PlayerGui), with
-    a small punch each second. The HUD's meter came out on the onboarding branch (it owns `Hud.luau`).
-  - *Checked*: `check.ps1` passes.
+    a small punch each second, just over the head's top (higher, it covered the machine's floating "LV" tag). The
+    HUD's meter came out on the onboarding branch (it owns `Hud.luau`).
+  - *Checked*: `check.ps1` passes. A playtest of the cloud place with the branch's 17 scripts staged in
+    (`scripts/stage_branch.py --base 3667692`, then put back and verified): both bootstraps ready, 84 tests, a clean
+    console. Snapped onto the walker: `TrainRate` 2, the steps measured on the client at 1.67 steps a second; at level
+    30 (debug `SetWalker`) `TrainRate` 25T and 9.71 steps a second at 60 fps, both as the formula says; "+2/s" and
+    "+25T/s" over the head (screenshots; AlwaysOnTop billboards don't show in captures, BRAIN proposal S48, so it now
+    draws normally). "Jump to get off" showed on the Tutorial 0 save. The Studio save was put back as found (walker
+    level 1, Climbing 0). Not seen in play: the trimmed refusals and the menus without their tips.
 
 - **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
   it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game

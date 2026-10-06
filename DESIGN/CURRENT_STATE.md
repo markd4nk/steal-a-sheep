@@ -114,8 +114,10 @@ lamb.
 
 ## In progress
 
-- **Less hand-holding** (branch `t3code/b39d69ab`, not merged): no "in reach" notice; "Jump to get off" only on the
-  onboarding's first climb. The rest of the list waits on the user (HISTORY.md, top entry).
+- **Less hand-holding** (branch `t3code/b39d69ab`, not merged): no "in reach" notice, no menu tips, refusals say only
+  the fact; "Jump to get off" only on the onboarding's first climb. The stair walker's steps run at the climber's
+  training rate (0.6 s to 0.1 s a step) and "+N/s" floats over your head. The HUD's hints and training meter go with
+  the onboarding branch (`t3code/simplify-onboarding-guidance`), which owns `Hud.luau`.
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
@@ -218,6 +220,7 @@ lamb.
   in play.
 - **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
   little sunk in the straw.
-- Studio MCP screenshots don't show the prompts' buttons (billboards in `PlayerGui.PromptUI`); they work in play.
+- Studio MCP screenshots don't show the prompts' buttons (AlwaysOnTop billboards in `PlayerGui.PromptUI`, BRAIN
+  proposal S48); they work in play.
 - **Phones**: the map is about 31,700 parts with StreamingEnabled off, so all of it loads at join; untried on a real
   phone (memory, join time). Turning streaming on needs the client's mountain code checked first.

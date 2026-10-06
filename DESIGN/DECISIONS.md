@@ -147,6 +147,12 @@ confirmed or reversed it.
   need to do besides just playing the game. After the onboarding, it should just be their own experience. They can
   figure out how to do it." So no "<God>'s <Area> is in reach!", and no hint, tip or nudge that tells a player what to
   do once the onboarding is over. Onboarding itself is the onboarding session's (`t3code/simplify-onboarding-guidance`).
+  On the audit's list the user said: cut the menu tips ("Bigger sheep in, more luck", "Tap the sheep to sell", the
+  gift's "Tap here, or the star"; the Merge Shrine's empty list reads "No sheep to merge yet", or "Opens after 3
+  deliveries"); refusals say the fact without the advice ("Your flock is full", "Your hands are full", "Not in your
+  pen", "Too far from the altar", "Not ready yet", "It's locked", "Not found yet", "Needs the Dust Trail", "Not
+  favorited yet"); **keep** the HUD's glows and red badges (GIFT, DAILY, SHEEPDEX) and the daily gift opening itself
+  once a session; **keep** the rare-lamb notice ("A Royal ... appeared in Zeus's pasture!").
 - **The stair walker (the user, 2026-10-06)**: no "Next" line or bar to the next god while training; "all it needs to
   indicate is that you're gaining plus speed, whatever you're making per second ... above the player". And "the
   player should be moving on the treadmill way faster ... at higher levels and higher speeds."

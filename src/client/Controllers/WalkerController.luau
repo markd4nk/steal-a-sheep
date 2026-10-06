@@ -35,6 +35,7 @@ type Gain = { Billboard: BillboardGui, Label: TextLabel, Punch: UIScale, Since: 
 local RESCAN = 1
 local LEAVE_GAP = 0.4
 local GAIN_HEIGHT = 40
+local GAIN_ABOVE_HEAD = 1 -- studs from the head's top to the gain's middle
 
 local trove = Trove.new()
 local player = Players.LocalPlayer
@@ -125,8 +126,6 @@ local function buildGain(): (BillboardGui, TextLabel, UIScale)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "TrainGain"
 	billboard.Size = UDim2.fromOffset(220, GAIN_HEIGHT)
-	billboard.StudsOffset = Vector3.new(0, 2.8, 0)
-	billboard.AlwaysOnTop = true
 	billboard.LightInfluence = 0
 	billboard.ResetOnSpawn = false
 	billboard.Enabled = false
@@ -171,7 +170,10 @@ local function showGain(dt: number)
 		shown.Since = 0
 		return
 	end
-	shown.Billboard.Adornee = head :: BasePart
+	local headPart = head :: BasePart
+	shown.Billboard.Adornee = headPart
+	-- Just over the head, under the machine's floating level tag (higher, the two overlap).
+	shown.Billboard.StudsOffset = Vector3.new(0, headPart.Size.Y / 2 + GAIN_ABOVE_HEAD, 0)
 	shown.Label.Text = `+{Format.Rate(rate)}/s`
 	-- A beat a second, as the Climbing comes in.
 	shown.Since += dt
