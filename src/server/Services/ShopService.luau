@@ -1,22 +1,26 @@
 --!strict
 
+local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
+local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Remotes = require(ReplicatedStorage.Remotes)
+local StairClimb = require(ReplicatedStorage.Utils.StairClimb)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- Coin purchases (the next stair walker level, the next pen slot, trails in order) and the hub's three stations: the
--- map's two stalls become the Shop and the Sell Stall, and the Merge Shrine stands between them. A station's prompt
+-- map's two stalls become the Shop and the Sell Stall, and the Merge Shrine's prompt (ShrineService builds the shrine)
+-- stands on its front steps. A station's prompt
 -- carries an Opens attribute; the client opens that screen (PromptController). Trails train faster and show on the
--- player as a coloured trail.
+-- player as a coloured trail. Each stair walker's sign upgrades it straight away, for cash or Robux (a developer
+-- product per price, PurchaseService/Products).
 local ShopService = { Name = "ShopService" }
 
-local SHRINE_AT = CFrame.new(287, 59.5, 245) * CFrame.Angles(0, math.rad(90), 0)
+local SHRINE_PROMPT = CFrame.new(0, 4, -12) -- from the shrine's centre: on the front of its dais
 local TRAIL_NAME = "PlayerTrail"
 
 local registry: Lifecycle.Registry = {}
@@ -73,28 +77,6 @@ local function station(
 	stroke.Thickness = 3
 	stroke.Parent = words
 	words.Parent = billboard
-end
-
-local function buildShrine(parent: Instance)
-	local assets = ServerStorage:FindFirstChild("Assets")
-	local kit = assets and assets:FindFirstChild("WorldKit")
-	local machine = kit and kit:FindFirstChild("MutationMachine")
-	if machine and machine:IsA("Model") then
-		local shrine = machine:Clone()
-		shrine.Name = "MergeShrine"
-		shrine:PivotTo(SHRINE_AT)
-		shrine.Parent = parent
-		return
-	end
-	-- No kit in the place: a primitive altar.
-	local altar = Instance.new("Part")
-	altar.Name = "MergeShrine"
-	altar.Anchored = true
-	altar.Size = Vector3.new(8, 4, 8)
-	altar.CFrame = SHRINE_AT * CFrame.new(0, 2, 0)
-	altar.Color = Color3.fromRGB(236, 230, 214)
-	altar.Material = Enum.Material.Marble
-	altar.Parent = parent
 end
 
 local function stallFront(model: Model): CFrame
@@ -226,11 +208,10 @@ function ShopService.Start(_self: any)
 	local sellAt = if stalls[2] then stallFront(stalls[2]) else CFrame.new(275, 63, 175)
 	station(folder, "ShopStation", shopAt, "Shop", "Shop", "SHOP", Color3.fromRGB(255, 214, 90))
 	station(folder, "SellStation", sellAt, "Sell", "Sell sheep", "SELL STALL", Color3.fromRGB(140, 235, 120))
-	buildShrine(folder)
 	station(
 		folder,
 		"MergeStation",
-		SHRINE_AT * CFrame.new(0, 4, 0),
+		GameConfig.Shrine.At * SHRINE_PROMPT,
 		"Merge",
 		"Merge",
 		"MERGE SHRINE",
@@ -240,6 +221,38 @@ function ShopService.Start(_self: any)
 	Remotes.Buy:Handle(function(player: Player, item: string, which: string?)
 		return buy(player, item, which)
 	end)
+	for _, plot in registry.PlotService:Plots() do
+		local walker = plot.Pieces.Walker
+		trove:Connect(walker.CoinPrompt.Triggered, function(player: Player)
+			if plot.Owner ~= player then
+				return
+			end
+			local ok, message = buy(player, "Walker")
+			Remotes.Notify:Fire(player, message or "", if ok then "Good" else "Bad", if ok then "Upgrade" else "Denied")
+		end)
+		trove:Connect(walker.RobuxPrompt.Triggered, function(player: Player)
+			local data = registry.DataService:GetData(player)
+			if plot.Owner ~= player or not data or not Economy.WalkerCost(data.WalkerLevel) then
+				return
+			end
+			local offer = StairClimb.RobuxOffer(data.WalkerLevel)
+			if offer.ProductId > 0 then
+				MarketplaceService:PromptProductPurchase(player, offer.ProductId)
+			else
+				Remotes.Notify:Fire(player, "Robux upgrades aren't on sale yet", "Bad", "Denied")
+			end
+		end)
+	end
+	trove:Add(registry.PurchaseService.Granted:Connect(function(player: Player, productId: number)
+		for _, offer in GameConfig.StairWalker.Robux do
+			if offer.ProductId == productId then
+				local data = registry.DataService:GetData(player)
+				local level = if data then data.WalkerLevel + 1 else 0
+				Remotes.Notify:Fire(player, `Stair walker level {level}!`, "Good", "Upgrade")
+				return
+			end
+		end
+	end))
 	local function watch(player: Player)
 		trove:Connect(player.CharacterAdded, function(character: Model)
 			character:WaitForChild("HumanoidRootPart", 10)

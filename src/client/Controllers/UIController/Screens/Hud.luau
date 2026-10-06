@@ -3,6 +3,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SocialService = game:GetService("SocialService")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
@@ -22,7 +23,7 @@ local Types = require(script.Parent.Parent.Types)
 
 -- The HUD in Shear a Sheep's Ranch Studs look: coins (with the flock's income) and Climbing at the top right, the
 -- one-line objective under the top bar, the menu pictures down the left (shown after the first delivery), notices,
--- the chase banner, a guide arrow to the next thing to do, the card of the lamb being carried (with Return), and the
+-- the friend boost's tile under them (tap to invite), the chase banner, a guide arrow to the next thing to do, the card of the lamb being carried (with Return), and the
 -- stair walker's meter while training.
 local Hud = {}
 
@@ -120,12 +121,29 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	tiles.Position = UDim2.fromOffset(8, 70)
 	tiles.AutomaticSize = Enum.AutomaticSize.Y
 	UIKit.List(tiles, false, 12, Enum.HorizontalAlignment.Center)
+	-- The free gift, until it's claimed: a red "!" on its corner.
+	local gift = UIKit.PictureButton(tiles, "GiftButton", Theme.Icons.MenuGift, PICTURE_SIZE, "GIFT")
+	gift.LayoutOrder = 0
+	local alert = UIKit.Text(gift, "Alert", "!", 20, Color.Snow, UDim2.fromOffset(26, 26), { Stroke = Color.Line })
+	alert.BackgroundTransparency = 0
+	alert.BackgroundColor3 = Color.Red500
+	alert.AnchorPoint = Vector2.new(0.5, 0.5)
+	alert.Position = UDim2.new(1, -8, 0, 6)
+	alert.ZIndex = 5
+	UIKit.Corner(alert)
+	local ring = Instance.new("UIStroke")
+	ring.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	ring.Color = Color.Line
+	ring.Thickness = Theme.Line.Normal
+	ring.Parent = alert
 	local flock = UIKit.PictureButton(tiles, "FlockButton", Theme.Icons.Wool, PICTURE_SIZE, "FLOCK")
 	flock.LayoutOrder = 1
 	local shop = UIKit.PictureButton(tiles, "ShopButton", Theme.Icons.MenuStore, PICTURE_SIZE, "SHOP")
 	shop.LayoutOrder = 2
 	local dex = UIKit.PictureButton(tiles, "SheepdexButton", Theme.Icons.MenuSheepdex, PICTURE_SIZE, "SHEEPDEX")
 	dex.LayoutOrder = 3
+	local friends = UIKit.PictureButton(tiles, "FriendButton", Theme.Icons.HudInvite, PICTURE_SIZE, "INVITE")
+	friends.LayoutOrder = 4
 
 	local banner = UIKit.Banner(root, "Banner")
 	banner.AnchorPoint = Vector2.new(0.5, 0)
@@ -285,7 +303,9 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			shownCoins = whole
 		end
 		local income = player:GetAttribute("Income")
-		incomeLabel.Text = if type(income) == "number" and income > 0 then `+{Format.Rate(income)}/s` else ""
+		local friends = player:GetAttribute("Friends")
+		local boost = Economy.FriendBoost(if type(friends) == "number" then friends else 0)
+		incomeLabel.Text = if type(income) == "number" and income > 0 then `+{Format.Rate(income * boost)}/s` else ""
 	end
 	local function refreshClimb()
 		local climb = player:GetAttribute("ClimbPower")
@@ -301,7 +321,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			trainLabel.TextColor3 = Color.Snow
 		end
 	end
-	for _, name in { "Coins", "Income" } do
+	for _, name in { "Coins", "Income", "Friends" } do
 		trove:Connect(player:GetAttributeChangedSignal(name), refreshCoins)
 	end
 	for _, name in { "ClimbPower", "Training" } do
@@ -436,10 +456,14 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 	end
 
-	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding.
+	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding. The gift's glows until claimed.
+	local giftButton = tiles:FindFirstChild("GiftButton") :: TextButton
 	local function refreshTiles()
 		local data = stateController:Get()
 		tiles.Visible = (data.Tutorial or 0) >= 1
+		local unclaimed = data.FreeGift == false
+		giftButton.Visible = unclaimed
+		Motion.SetGlow(Motion.FindGlow(giftButton), unclaimed and tiles.Visible)
 	end
 
 	-- The carry card.
@@ -511,6 +535,9 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end))
 	refreshTiles()
 
+	trove:Connect(giftButton.Activated, function()
+		context.Open("Gift")
+	end)
 	trove:Connect((tiles:FindFirstChild("FlockButton") :: TextButton).Activated, function()
 		context.Open("Flock")
 	end)
@@ -519,6 +546,32 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end)
 	trove:Connect((tiles:FindFirstChild("SheepdexButton") :: TextButton).Activated, function()
 		context.Open("Sheepdex")
+	end)
+
+	-- The friend boost's tile: the boost while friends are here, the invite (and what a friend is worth) while none
+	-- are. Either way a tap opens Roblox's invite.
+	local friendButton = tiles:FindFirstChild("FriendButton") :: TextButton
+	local friendIcon = friendButton:FindFirstChild("Icon", true) :: ImageLabel
+	local friendLabel = friendButton:FindFirstChild("NameLabel") :: TextLabel
+	local function refreshFriends()
+		local friends = player:GetAttribute("Friends")
+		local count = if type(friends) == "number" then friends else 0
+		local percent = math.round((Economy.FriendBoost(count) - 1) * 100)
+		friendIcon.Image = if count > 0 then Theme.Icons.HudFriend else Theme.Icons.HudInvite
+		friendLabel.Text = if count > 0 then `+{percent}%` else "INVITE"
+		friendLabel.TextColor3 = if count > 0 then Color.Lime else Color.Snow
+	end
+	trove:Connect(player:GetAttributeChangedSignal("Friends"), refreshFriends)
+	refreshFriends()
+	trove:Connect(friendButton.Activated, function()
+		task.spawn(function()
+			local ok, canInvite = pcall(function()
+				return SocialService:CanSendGameInviteAsync(player)
+			end)
+			if not (ok and canInvite and pcall(SocialService.PromptGameInvite, SocialService, player)) then
+				notice("Invites aren't available here", "Bad")
+			end
+		end)
 	end)
 
 	-- The chase banner and its music.

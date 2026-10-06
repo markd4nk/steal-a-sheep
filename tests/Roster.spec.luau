@@ -55,4 +55,19 @@ return function(t: Run.Suite)
 		t.Expect(flock["2"].Slot).ToBe(2)
 		t.Expect(flock["3"].Slot).ToBe(0)
 	end)
+
+	t.Test("CanSell takes stored, unlocked sheep only, each once, never the whole flock", function()
+		local flock = { ["1"] = make("1", 1, 1), ["2"] = make("2", 1, 0), ["3"] = make("3", 2, 0) }
+		t.Expect((Roster.CanSell(flock, { "2", "3" }, 3))).ToBe(true)
+		t.Expect((Roster.CanSell(flock, {}, 3))).ToBe(false)
+		t.Expect((Roster.CanSell(flock, { "1" }, 3))).ToBe(false) -- earning in the pen
+		t.Expect((Roster.CanSell(flock, { "2", "2" }, 3))).ToBe(false)
+		t.Expect((Roster.CanSell(flock, { "9" }, 3))).ToBe(false)
+		flock["3"].Locked = true
+		t.Expect((Roster.CanSell(flock, { "3" }, 3))).ToBe(false)
+		-- Past the pen's size counts as stored; selling every sheep is refused.
+		local stored = { ["1"] = make("1", 1, 5), ["2"] = make("2", 1, 0) }
+		t.Expect((Roster.CanSell(stored, { "1" }, 3))).ToBe(true)
+		t.Expect((Roster.CanSell(stored, { "1", "2" }, 3))).ToBe(false)
+	end)
 end

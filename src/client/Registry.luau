@@ -13,7 +13,9 @@ local registry: { Lifecycle.System } = {
 	require(Controllers.UIController),
 	require(Controllers.CarryController),
 	require(Controllers.MovementController),
+	require(Controllers.WalkerController),
 	require(Controllers.AnimController),
+	require(Controllers.ShrineController),
 	require(Controllers.PromptController),
 	require(Controllers.ComponentController),
 }

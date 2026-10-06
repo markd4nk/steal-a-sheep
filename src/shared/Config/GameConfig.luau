@@ -353,6 +353,8 @@ local GameConfig = {
 		HeadStart = 1.5, -- seconds before the god sets off
 		RefillSeconds = 15, -- an empty spawn after a delivery
 		DropSeconds = 30, -- a lamb a caught thief dropped lies there this long, then goes back to its pasture
+		PunchTiers = 3, -- a caught thief is punched this many tiers down the mountain (or to its foot)
+		PunchStun = 0.5, -- seconds they're held still after landing
 		PromptDistance = 10,
 		CatchStuds = 3.5,
 		CatchCheckEvery = 0.1,
@@ -365,8 +367,35 @@ local GameConfig = {
 		PutDownReach = 12, -- the Put down prompt's reach (it sits on the lamb over the thief's head)
 	},
 
+	-- The Merge Shrine in the hub (ShrineService builds it; the Merge menu and ShrineController show it).
+	Shrine = {
+		At = CFrame.new(287, 59.46, 245) * CFrame.Angles(0, math.rad(90), 0), -- the dais's centre on the ground
+		MenuDistance = 26, -- the menu closes when its player walks further than this from the shrine's centre
+		MergeSeconds = 5.6, -- from Merge to the lamb landing on the altar (the show ShrineController plays)
+		LambWaitSeconds = 30, -- a lamb left on the altar this long goes to its owner's pen by itself
+		CollectDistance = 14, -- studs from the altar to pick the lamb up
+	},
+
 	Training = {
 		TickSeconds = 0.25,
+	},
+
+	-- The stair walker machine outside each pen. A step takes StepSeconds + StepRange x StepDecay^(level - 1) seconds
+	-- (level 1 is the free machine), so each upgrade runs faster.
+	StairWalker = {
+		StepSeconds = 0.25,
+		StepRange = 0.35,
+		StepDecay = 0.9,
+		AnimateRange = 220, -- studs from the camera within which machines and climbers move
+		-- Robux for the next level, by the level bought: 2, 3, 4, 5, then every level after. A product id of 0 isn't on
+		-- sale yet: make the developer products in Creator Hub and put their ids here.
+		Robux = {
+			{ Price = 19, ProductId = 0 },
+			{ Price = 39, ProductId = 0 },
+			{ Price = 59, ProductId = 0 },
+			{ Price = 99, ProductId = 0 },
+			{ Price = 149, ProductId = 0 },
+		} :: { { Price: number, ProductId: number } },
 	},
 
 	-- Offline earnings: a quarter of at most two hours.
@@ -507,6 +536,12 @@ local GameConfig = {
 		NoticeSeconds = 2.5,
 		NoticeQueue = 4,
 		BannerSeconds = 4,
+	},
+	-- The free gift's menu opens by itself once a session, this long after the player could first claim it (after
+	-- their first delivery), as soon as they're off the mountain and no other menu is open.
+	Gift = {
+		AutoOpenSeconds = 30,
+		FavoriteTimeout = 60, -- seconds to wait for Roblox's favorite prompt to answer
 	},
 }
 

@@ -39,10 +39,11 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
 - Gods and pursuit: `GodService` (one state machine, primitive block rigs).
 - Climb speed checks, tier signs, slide hits and knockback: `MountainService`; uphill speed, client slide, steering, braking: `MovementController`.
 - Flock, pen capacity, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging:
-  `FlockService`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
+  `FlockService`; the Sell Stall's menu (stored sheep only, several at once): `UIController/Screens/SellStall`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
 - Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
 - Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climbing): `LeaderboardService`.
+- Free gift for liking and favoriting the game (Climbing and cash, once): `GiftService`, `Screens/Gift`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
 ## The map
@@ -91,8 +92,22 @@ The climb is all on foot. High Olympus is sparse for now: the user will add obst
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards and selling, and
-buys stair walker levels, pen space and trails. No Robux products.
+Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling and the free gift, and
+buys stair walker levels, pen space and trails. The one Robux offer: the next stair walker level, at the machine's
+sign (prices being decided in another session; the developer products aren't made yet).
+
+## Friend boost (the user, 2026-10-05)
+Each Roblox friend in your server adds +20% to your flock's cash income while they stay (servers hold 5, so +80% at
+most); not offline earnings, not the leaderboards. A tile under the menu pictures shows it: two friends and "+40%",
+or, with no friends here, the invite picture and INVITE. Tapping it opens Roblox's invite. When a friend joins:
+"Sam joined: friend boost +20%"; the HUD's cash rate includes the boost.
+
+## Stair walker (the user, 2026-10-05)
+A real StairMaster just outside each pen, beside the gate, like Steal an Egg's treadmill. Walk into it and you snap on
+and climb its moving steps (your legs on the steps, any avatar); jump to get off. Its level floats over it, its steps
+run faster each level, and it looks better as it upgrades: Starter, Sport, Pro, Turbo, Champion (levels 6 and up
+keep Champion's look for now, ending in an Olympus look later). The upgrade sign beside it buys the next level
+straight away, for cash or Robux.
 
 ## Climbing (the user, 2026-10-05)
 Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain
@@ -116,6 +131,15 @@ and to outrun its gods. No walls: every tier is open to everyone.
 Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (lightest) up, saved with the sheep
 (`Weight`). Wild lambs: 1-1.1 mostly, 1.1-1.5 for one in twenty. Heavier lambs are slower to carry and tend to grow
 bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look a little bigger as lambs.
+
+## Merge Shrine (the user, 2026-10-05)
+The Laurel Ring in the hub, where the Mutation Machine stood: pick three grown sheep of one family in its menu, pay
+cash, and they merge into one fresh lamb of that family. Its fleece and hidden weight are rerolled (so its adult size
+too): bigger sheep in bring more luck, which makes heavy lambs likelier and opens the huge weights, the only way to a
+Titan. It can come out worse than what went in; the menu shows the odds first. The lamb pops out of an orb that
+appears over the altar only during the merge, lands on the altar, and its player picks it up and carries it home like
+a stolen lamb (no god chases it; nobody else sees or takes it); left there 30 s it goes home by itself. Its size shows
+when it grows up in the pen. `ShrineService` (server), `ShrineController` (the scene on each device), the Merge menu.
 
 ## Not built
 Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.

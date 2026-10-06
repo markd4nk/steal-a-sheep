@@ -1,24 +1,21 @@
 --!strict
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
-local Economy = require(ReplicatedStorage.Utils.Economy)
+local Walker = require(script.Parent.Walker)
 
 -- The primitive pieces each plot gets at runtime, in the plot's own frame (its middle, +X towards its gate): the pen
 -- (an invisible box filling the fence, where the owner's sheep live and where a stolen lamb is put down), the stair
--- walker by the back fence with a keep-out box round it for the sheep, and the owner's sign over the gate. Map decor
--- (hay, trees) standing where the walker goes is moved out of the way; the rest stays, and the sheep walk round it.
+-- walker just outside the pen beside the gate with its upgrade sign, and the owner's sign over the gate. Map decor
+-- (hay, trees) standing where the walker and its sign go is moved out of the way; the rest stays, and the sheep walk
+-- round it.
 local Build = {}
 
 export type Pieces = {
 	Folder: Folder,
 	Pen: BasePart,
 	Keepouts: { BasePart },
-	Walker: Model,
-	WalkerZone: BasePart,
-	WalkerScreen: TextLabel,
-	Steps: { BasePart },
+	Walker: Walker.Pieces,
 	Sign: TextLabel,
 	SignIncome: TextLabel,
 	Spawn: CFrame,
@@ -29,7 +26,11 @@ local PEN_HEIGHT = 14
 local FENCE_INSET = 1 -- studs from the fence posts' outer faces to the pen's edge
 
 -- Offsets from the plot's middle (x along its length, towards the gate; z across).
-local WALKER_AT = Vector2.new(20, 25)
+-- The walker stands outside the front fence (x 53.6), beside the gate (z -15 to 14), climbing towards the pen's
+-- corner; its sign stands by its entry, turned to the gate.
+local WALKER_AT = Vector2.new(61, 25)
+local SIGN_AT = Vector2.new(65.5, 18.5)
+local GATE_AT = Vector2.new(54, 0)
 local SPAWN_AT = Vector2.new(34, 0)
 
 local function block(parent: Instance, name: string, size: Vector3, cframe: CFrame, color: Color3): Part
@@ -44,29 +45,6 @@ local function block(parent: Instance, name: string, size: Vector3, cframe: CFra
 	part.BottomSurface = Enum.SurfaceType.Smooth
 	part.Parent = parent
 	return part
-end
-
-local function label(face: BasePart, side: Enum.NormalId, text: string, color: Color3): TextLabel
-	local gui = Instance.new("SurfaceGui")
-	gui.Face = side
-	gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
-	gui.PixelsPerStud = 40
-	gui.LightInfluence = 0
-	gui.Parent = face
-	local words = Instance.new("TextLabel")
-	words.Name = "Label"
-	words.BackgroundTransparency = 1
-	words.Size = UDim2.fromScale(1, 1)
-	words.FontFace = Font.fromEnum(Enum.Font.FredokaOne)
-	words.TextScaled = true
-	words.TextColor3 = color
-	words.Text = text
-	local stroke = Instance.new("UIStroke")
-	stroke.Thickness = 3
-	stroke.Color = Color3.fromRGB(20, 22, 30)
-	stroke.Parent = words
-	words.Parent = gui
-	return words
 end
 
 -- Hides map decor (a model or part under Decors or Base.Foliages) whose footprint overlaps a box, by moving it to
@@ -137,57 +115,6 @@ local function invisible(part: BasePart)
 	part.CanTouch = false
 end
 
-local function makeWalker(parent: Instance, origin: CFrame): (Model, BasePart, TextLabel, { BasePart })
-	local walker = Instance.new("Model")
-	walker.Name = "StairWalker"
-	local base =
-		block(walker, "Base", Vector3.new(10, 1, 9), origin * CFrame.new(0, 0.5, 0), Color3.fromRGB(70, 76, 92))
-	base.Material = Enum.Material.Metal
-	walker.PrimaryPart = base
-	-- The steps run up towards the back fence (+Z of its frame); they only show, the player stands on the base.
-	local steps: { BasePart } = {}
-	for index = 1, 5 do
-		local step = block(
-			walker,
-			`Step{index}`,
-			Vector3.new(6, 0.6, 1.4),
-			origin * CFrame.new(0, 1 + index * 0.6, 0.8 + index * 0.9),
-			Color3.fromRGB(230, 214, 170)
-		)
-		step.CanCollide = false
-		step.Material = Enum.Material.WoodPlanks
-		table.insert(steps, step)
-	end
-	for _, side in { -1, 1 } do
-		local rail = block(
-			walker,
-			"Rail",
-			Vector3.new(0.4, 0.4, 7.5),
-			origin * CFrame.new(side * 3.6, 4.6, 1.2) * CFrame.Angles(math.rad(-15), 0, 0),
-			Color3.fromRGB(255, 196, 64)
-		)
-		rail.Material = Enum.Material.Metal
-		local post = block(
-			walker,
-			"Post",
-			Vector3.new(0.5, 4, 0.5),
-			origin * CFrame.new(side * 3.6, 2.8, -2.4),
-			Color3.fromRGB(255, 196, 64)
-		)
-		post.Material = Enum.Material.Metal
-	end
-	local screen =
-		block(walker, "Screen", Vector3.new(5, 2.4, 0.4), origin * CFrame.new(0, 6.6, 5.4), Color3.fromRGB(30, 34, 46))
-	local words = label(screen, Enum.NormalId.Front, "STAIR WALKER", Color3.fromRGB(255, 226, 120))
-	local zone = block(walker, "Zone", Vector3.new(6, 7, 5), origin * CFrame.new(0, 4.5, -1.5), Color3.new(1, 1, 1))
-	zone.Transparency = 1
-	zone.CanCollide = false
-	zone.CanQuery = false
-	zone.CanTouch = false
-	walker.Parent = parent
-	return walker, zone, words, steps
-end
-
 function Build.Plot(index: number, model: Model, parent: Instance): (Pieces, CFrame)
 	local center, size = model:GetBoundingBox()
 	local origin = CFrame.new(center.Position.X, FLOOR_Y, center.Position.Z)
@@ -205,13 +132,13 @@ function Build.Plot(index: number, model: Model, parent: Instance): (Pieces, CFr
 	)
 	invisible(pen)
 
-	local walkerOrigin = origin * CFrame.new(WALKER_AT.X, 0, WALKER_AT.Y)
-	clearDecor(walkerOrigin.Position + Vector3.new(0, 6, 2), Vector3.new(6, 6, 7))
-	local walker, zone, screen, steps = makeWalker(folder, walkerOrigin)
-	-- Sheep keep off the machine, its steps and its screen.
-	local keepout =
-		block(folder, "Keepout", Vector3.new(12, 8, 13), walkerOrigin * CFrame.new(0, 4, 1.5), Color3.new(1, 1, 1))
-	invisible(keepout)
+	-- The machine's frame faces up its stairs (-Z), here towards +Z of the plot.
+	local walkerFrame = origin * CFrame.new(WALKER_AT.X, 0, WALKER_AT.Y) * CFrame.Angles(0, math.pi, 0)
+	clearDecor(walkerFrame:PointToWorldSpace(Vector3.new(0, 6, 0.6)), Vector3.new(4, 6, 6.5))
+	local signSpot = origin:PointToWorldSpace(Vector3.new(SIGN_AT.X, 0, SIGN_AT.Y))
+	local gate = origin:PointToWorldSpace(Vector3.new(GATE_AT.X, 0, GATE_AT.Y))
+	clearDecor(signSpot + Vector3.new(0, 4, 0), Vector3.new(2.5, 4, 2.5))
+	local walker = Walker.Build(folder, walkerFrame, CFrame.lookAt(signSpot, Vector3.new(gate.X, signSpot.Y, gate.Z)))
 
 	-- The owner's name over the gate.
 	local gateTop = origin * CFrame.new(size.X / 2 - 1, 38, 0)
@@ -249,28 +176,14 @@ function Build.Plot(index: number, model: Model, parent: Instance): (Pieces, CFr
 	return {
 		Folder = folder,
 		Pen = pen,
-		Keepouts = { keepout },
+		-- The walker stands outside the fence: nothing in the pen is off limits but the map's own props.
+		Keepouts = {},
 		Walker = walker,
-		WalkerZone = zone,
-		WalkerScreen = screen,
-		Steps = steps,
 		Sign = signName,
 		SignIncome = signIncome,
 		Spawn = spawn,
 	},
 		origin
-end
-
--- The machine's accent shows its level: a colour along a ramp from wood to gold.
-function Build.PaintWalker(walker: Model, level: number)
-	local share = level / Economy.MaxWalker
-	local accent = Color3.fromRGB(230, 214, 170):Lerp(Color3.fromRGB(255, 180, 30), share)
-	for _, child in walker:GetChildren() do
-		if child:IsA("BasePart") and string.match(child.Name, "^Step") then
-			child.Color = accent
-			child.Material = if level >= 6 then Enum.Material.Neon else Enum.Material.WoodPlanks
-		end
-	end
 end
 
 return table.freeze(Build)

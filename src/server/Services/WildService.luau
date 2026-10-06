@@ -42,8 +42,16 @@ type Spawn = {
 	Owner: Player?, -- a tutorial lamb's only thief
 }
 
+-- A merged lamb from the Merge Shrine, already its carrier's (ShrineService): its id in their flock and its model.
+type Lamb = {
+	Id: string,
+	Model: Model,
+}
+
+-- One of the two: a stolen lamb (Spawn) or a merged lamb carried home from the shrine (Lamb).
 type Carry = {
-	Spawn: Spawn,
+	Spawn: Spawn?,
+	Lamb: Lamb?,
 	Started: number,
 }
 
@@ -244,14 +252,20 @@ local function dropSpot(player: Player): CFrame?
 end
 
 -- A theft that didn't make it home: the same lamb, rolls and all, lies where the thief was caught or died, or goes
--- back to its pasture.
+-- back to its pasture. A merged lamb from the Merge Shrine is its carrier's already, so it goes to their pen instead.
 function WildService.Fail(_self: any, player: Player, reason: string)
 	local drop = if DROPS[reason] then dropSpot(player) else nil
 	local carry = endCarry(player)
 	if not carry then
 		return
 	end
-	local spawn = carry.Spawn
+	local lamb = carry.Lamb
+	if lamb then
+		lamb.Model:Destroy()
+		registry.FlockService:ShrineArrive(player, lamb.Id, "Your lamb went to your pen")
+		return
+	end
+	local spawn = carry.Spawn :: Spawn
 	local tier = Olympus.Tiers[spawn.Tier]
 	if spawn.Owner then
 		drop = nil
@@ -259,8 +273,8 @@ function WildService.Fail(_self: any, player: Player, reason: string)
 	place(spawn, drop)
 	spawn.ReturnAt = if drop then os.clock() + GameConfig.Theft.DropSeconds else 0
 	if reason == "Caught" then
-		notify(player, `{tier.God} caught you! You dropped the lamb`, "Bad", "Denied")
-		registry.PlotService:SendHome(player)
+		notify(player, `{tier.God} punched you! You dropped the lamb`, "Bad", "Denied")
+		registry.MountainService:Punch(player)
 	elseif reason == "Returned" then
 		notify(player, `The lamb ran back to {tier.God}`, "Bad", "Notice")
 	elseif reason == "Blocked" then
@@ -273,7 +287,14 @@ local function deliver(player: Player, carry: Carry, at: CFrame)
 	if not endCarry(player) then
 		return
 	end
-	local spawn = carry.Spawn
+	local lamb = carry.Lamb
+	if lamb then
+		local heldAt = lamb.Model:GetPivot()
+		lamb.Model:Destroy()
+		registry.FlockService:ShrineArrive(player, lamb.Id, nil, at, heldAt)
+		return
+	end
+	local spawn = carry.Spawn :: Spawn
 	local heldAt: CFrame? = nil
 	if spawn.Model then
 		heldAt = spawn.Model:GetPivot()
@@ -563,11 +584,37 @@ end
 function WildService.CarriersFrom(_self: any, tier: number): { Player }
 	local list: { Player } = {}
 	for player, carry in carries do
-		if carry.Spawn.Tier == tier then
+		if carry.Spawn and carry.Spawn.Tier == tier then
 			table.insert(list, player)
 		end
 	end
 	return list
+end
+
+-- A merged lamb from the Merge Shrine (ShrineService) goes over its owner's head to be carried home like a stolen one,
+-- with no god after it. False if they can't take it now.
+function WildService.CarryLamb(_self: any, player: Player, model: Model, id: string, weight: number): boolean
+	if carries[player] then
+		return false
+	end
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	local family = model:GetAttribute("Family")
+	local tier = if type(family) == "string" then Olympus.ByFamily[family] else nil
+	if not character or not humanoid or humanoid.Health <= 0 or not tier then
+		return false
+	end
+	if not registry.SheepService:Carry(model, character) then
+		return false
+	end
+	model.Parent = carriedFolder
+	carries[player] = { Lamb = { Id = id, Model = model }, Started = os.clock() }
+	player:SetAttribute("CarriedFamily", family)
+	player:SetAttribute("CarriedScale", model:GetScale())
+	player:SetAttribute("CarryTier", tier.Tier)
+	player:SetAttribute("CarryWeight", weight)
+	player:SetAttribute("Carrying", true)
+	return true
 end
 
 -- Studio tests: the first ready spawn of a tier, so a test can steal without walking there.

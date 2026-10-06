@@ -17,8 +17,10 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- allows on that tier's slope (Mountain.SpeedAt, MovementController moves them), down to a crawl. The server
 -- keeps a ceiling per player that rises at that speed (with some slack for lag) and puts anyone found above it back on
 -- it. It also gives each player a budget of ground they may cover, refilled at the fastest they could legally go (their
--- walking or escape speed there, or a knockback), and puts anyone who outruns it back where they were. A sign at the
--- foot of each tier from the second up names it and its Reach. Slide hits: a player sliding downhill
+-- walking or escape speed there, or a knockback), and puts anyone who outruns it back where they were. Punches: a god
+-- that catches a thief punches them PunchTiers tiers down the mountain; their device flies them there, both checks wait
+-- for the flight, and the server puts them on the landing spot if they aren't there by then. A sign at the foot of each
+-- tier from the second up names it and its Reach. Slide hits: a player sliding downhill
 -- fast enough who reaches a player walking uphill knocks them back down the slope (their client moves them), protects
 -- them for a moment, and loses some speed. No hits below the safety line or on a protected tutorial run.
 local MountainService = { Name = "MountainService" }
@@ -29,6 +31,8 @@ local LEAD_STUDS = 10 -- how far ahead of a player the ceiling may run, so a lag
 local LEAD_SECONDS = 1 -- or this many seconds of their climb, whichever is more
 local SAFE_MARGIN = 6
 local UPHILL_SPEED = 1.5 -- a target must be moving up the slope at least this fast
+local LANDING_GRACE = 0.4 -- seconds after a punch's flight before the server checks the landing
+local LANDING_SLACK = 25 -- studs from the landing spot that still count as landed
 
 local registry: Lifecycle.Registry = {}
 local trove = Trove.new()
@@ -41,6 +45,9 @@ local ceilings: { [Player]: number } = {}
 -- Each player's last checked spot, its character's root, and the studs they may still cover before the next refill.
 type Track = { Root: BasePart, At: Vector3, Budget: number }
 local tracks: { [Player]: Track } = {}
+-- Punched players in flight: when they should have landed, and where.
+type Launch = { Until: number, Landing: Vector3 }
+local launches: { [Player]: Launch } = {}
 local sightParams = RaycastParams.new()
 sightParams.FilterType = Enum.RaycastFilterType.Exclude
 
@@ -152,6 +159,18 @@ local function enforce(dt: number)
 			tracks[player] = nil
 			continue
 		end
+		local launch = launches[player]
+		if launch then
+			if os.clock() < launch.Until + LANDING_GRACE then
+				continue
+			end
+			launches[player] = nil
+			if (root.Position - launch.Landing).Magnitude > LANDING_SLACK then
+				(player.Character :: Model):PivotTo(CFrame.new(launch.Landing) * root.CFrame.Rotation)
+			end
+			MountainService:Teleported(player, launch.Landing.X)
+			continue
+		end
 		checkSpeed(player, root, data.ClimbPower, dt)
 		local position = root.Position
 		local ceiling = ceilings[player] or math.min(position.X, Olympus.SafeLineX)
@@ -213,6 +232,7 @@ local function checkHits()
 				and canHitFrom(sliderRoot)
 				and canHitFrom(targetRoot)
 				and not sliders[target]
+				and not launches[target]
 				and targetVelocity.X > UPHILL_SPEED
 				and now >= (protectedUntil[target] or 0)
 				and target:GetAttribute("CarryTutorial") ~= true
@@ -264,6 +284,7 @@ function MountainService.Start(_self: any)
 		touching[player] = nil
 		ceilings[player] = nil
 		tracks[player] = nil
+		launches[player] = nil
 		for _, list in touching do
 			list[player] = nil
 		end
@@ -280,6 +301,30 @@ function MountainService.Start(_self: any)
 			checkHits()
 		end
 	end)
+end
+
+-- A god caught `player`: they're punched PunchTiers tiers down the mountain, to the same share along that tier, or to
+-- the mountain's foot from the lowest tiers. The flight takes 1 to 2.5 seconds, longer the further it goes.
+function MountainService.Punch(_self: any, player: Player)
+	local root = rootOf(player)
+	if not root then
+		return
+	end
+	local from = root.Position
+	local tier = Mountain.TierAt(from.X)
+	local below = tier - GameConfig.Theft.PunchTiers
+	local x = Olympus.SafeLineX + 12
+	if tier >= 1 and below >= 1 then
+		local here, there = Olympus.Tiers[tier], Olympus.Tiers[below]
+		local share = math.clamp((from.X - here.XStart) / (here.XEnd - here.XStart), 0, 1)
+		x = there.XStart + (there.XEnd - there.XStart) * share
+	end
+	local z = Mountain.ClampLane(from.Z)
+	local landing = Vector3.new(x, Mountain.Floor(x, z) + 3, z)
+	local seconds = math.clamp(0.8 + (from - landing).Magnitude / 500, 1, 2.5)
+	launches[player] = { Until = os.clock() + seconds, Landing = landing }
+	sliders[player] = nil
+	Remotes.Punch:Fire(player, landing, seconds)
 end
 
 -- The server moved `player` to `x` itself (home after a catch, onto their plot, a debug steal): both checks start

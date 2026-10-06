@@ -38,6 +38,14 @@ end
 
 -- These pin the current tuning: when the numbers are changed on purpose, change the expectations with them.
 return function(t: Run.Suite)
+	t.Test("each friend in the server adds 20% income, up to 4 friends", function()
+		t.Expect(near(Economy.FriendBoost(0), 1)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(1), 1.2)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(4), 1.8)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(9), 1.8)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(-2), 1)).ToBe(true)
+	end)
+
 	t.Test("base income follows round(2 x 2.5^(tier - 1))", function()
 		local expected = { 2, 5, 13, 31, 78, 195, 488, 1221, 3052, 7629, 19073, 47684 }
 		for tier, income in expected do
@@ -133,11 +141,11 @@ return function(t: Run.Suite)
 	end)
 
 	t.Test("stair walker, pen slot and trail prices", function()
-		t.Expect(Economy.WalkerCost(0)).ToBe(120)
-		t.Expect(Economy.WalkerCost(1)).ToBe(300)
-		t.Expect(Economy.WalkerCost(2)).ToBe(750)
-		t.Expect(Economy.WalkerCost(3)).ToBe(1875)
-		t.Expect(Economy.WalkerCost(11)).ToBe(2861023)
+		t.Expect(Economy.WalkerCost(0)).ToBe(1200)
+		t.Expect(Economy.WalkerCost(1)).ToBe(3000)
+		t.Expect(Economy.WalkerCost(2)).ToBe(7500)
+		t.Expect(Economy.WalkerCost(3)).ToBe(18750)
+		t.Expect(Economy.WalkerCost(11)).ToBe(28610229)
 		t.Expect(Economy.WalkerCost(29)).ToBe(nil)
 		t.Expect(Economy.WalkerRate(1)).ToBe(12)
 		t.Expect(Economy.PenCost(8)).ToBe(nil)
@@ -189,28 +197,70 @@ return function(t: Run.Suite)
 		end
 	)
 
-	t.Test("merging: three of a kind, the biggest size, one rank up, never less income", function()
-		local a = adult({ Id = "1", Size = 1 })
-		local b = adult({ Id = "2", Size = 3 })
-		local c = adult({ Id = "3", Size = 2 })
-		t.Expect((Economy.CanMerge({ a, b, c }))).ToBe(true)
-		local result = Economy.MergeResult({ a, b, c })
-		t.Expect(result.Size).ToBe(3)
-		t.Expect(result.Rank).ToBe(1)
-		t.Expect(Economy.IsAdult(result)).ToBe(true)
-		local inputs = Economy.AdultIncome(a) + Economy.AdultIncome(b) + Economy.AdultIncome(c)
-		t.Expect(Economy.AdultIncome(result) >= inputs).ToBe(true)
-		t.Expect((Economy.CanMerge({ a, b, adult({ Id = "4", Rarity = 2 }) }))).ToBe(false)
-		t.Expect((Economy.CanMerge({ a, b, adult({ Id = "5", Locked = true }) }))).ToBe(false)
-		t.Expect((Economy.CanMerge({ a, b, sheep({ Id = "6" }) }))).ToBe(false)
-		t.Expect((Economy.CanMerge({ a, a, b }))).ToBe(false)
-		local top = { adult({ Id = "7", Rank = 2 }), adult({ Id = "8", Rank = 2 }), adult({ Id = "9", Rank = 2 }) }
-		t.Expect((Economy.CanMerge(top))).ToBe(false)
-	end)
+	t.Test(
+		"the Merge Shrine: three grown sheep of one family in, one fresh lamb out, rolled with their luck",
+		function()
+			local a = adult({ Id = "1", Size = 1 })
+			local b = adult({ Id = "2", Size = 3, Rarity = 2 })
+			local c = adult({ Id = "3", Size = 2 })
+			t.Expect((Economy.CanShrine({ a, b, c }))).ToBe(true)
+			t.Expect((Economy.CanShrine({ a, b }))).ToBe(false)
+			t.Expect((Economy.CanShrine({ a, a, b }))).ToBe(false)
+			t.Expect((Economy.CanShrine({ a, b, adult({ Id = "4", Locked = true }) }))).ToBe(false)
+			t.Expect((Economy.CanShrine({ a, b, sheep({ Id = "5" }) }))).ToBe(false)
+			t.Expect((Economy.CanShrine({ a, b, adult({ Id = "6", Family = "Grape" }) }))).ToBe(false)
+			-- Different sizes and fleeces may go in together.
+			t.Expect((Economy.CanShrine({ a, b, adult({ Id = "7", Rarity = 3 }) }))).ToBe(true)
 
-	t.Test("selling pays 15 seconds of current income", function()
-		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(45)
-		t.Expect(Economy.SellValue(sheep({}))).ToBe(15)
+			local standard = { a, adult({ Id = "8" }), adult({ Id = "9" }) }
+			local titans =
+				{ adult({ Id = "10", Size = 4 }), adult({ Id = "11", Size = 4 }), adult({ Id = "12", Size = 4 }) }
+			t.Expect(near(Economy.ShrineLuck(standard), Economy.ShrineBaseLuck)).ToBe(true)
+			t.Expect(near(Economy.ShrineLuck(titans), 1)).ToBe(true)
+			t.Expect(Economy.ShrineLuck({ a, b, c }) > Economy.ShrineLuck(standard)).ToBe(true)
+			t.Expect(Economy.ShrinePrice(Olympus.Tiers[1].Family))
+				.ToBe(Economy.ShrinePriceSeconds * Economy.BaseIncome(1))
+
+			-- The odds the menu shows add up, Titan only through the shrine's luck, likelier with bigger sheep in.
+			for _, luck in { 0, Economy.ShrineBaseLuck, 1 } do
+				local total = 0
+				for _, chance in Economy.LuckySizeOdds(luck) do
+					total += chance
+				end
+				t.Expect(math.abs(total - 100) < 1e-6).ToBe(true)
+			end
+			t.Expect(Economy.LuckySizeOdds(0)[4]).ToBe(0)
+			local base, best = Economy.LuckySizeOdds(Economy.ShrineBaseLuck), Economy.LuckySizeOdds(1)
+			t.Expect(base[4] > 0 and base[4] < 1).ToBe(true)
+			t.Expect(best[4] > base[4]).ToBe(true)
+			t.Expect(best[1] < base[1]).ToBe(true)
+			local plain, royal =
+				Economy.ShrineFleeceOdds(standard), Economy.ShrineFleeceOdds({
+					adult({ Id = "13", Rarity = 3 }),
+					adult({ Id = "14", Rarity = 3 }),
+					adult({ Id = "15", Rarity = 3 }),
+				})
+			t.Expect(plain[3]).ToBe(Economy.ShrineFleece.Plain[3])
+			t.Expect(royal[3]).ToBe(Economy.ShrineFleece.Royal[3])
+
+			-- The roll: a fleece, a weight of at least 1 and a size in range; heavier on average than a wild lamb's.
+			local random = Random.new(7)
+			local shrine, wild = 0, 0
+			for _ = 1, 4000 do
+				local rarity, weight, size = Economy.ShrineRoll(random, standard)
+				t.Expect(rarity >= 1 and rarity <= 3).ToBe(true)
+				t.Expect(weight >= 1).ToBe(true)
+				t.Expect(size >= 1 and size <= #Economy.Sizes).ToBe(true)
+				shrine += weight
+				wild += Economy.RollWeight(random)
+			end
+			t.Expect(shrine > wild).ToBe(true)
+		end
+	)
+
+	t.Test("selling pays two minutes of current income", function()
+		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(360)
+		t.Expect(Economy.SellValue(sheep({}))).ToBe(120)
 	end)
 
 	t.Test("offline: a quarter of at most two hours, lamb rate until grown", function()
@@ -239,5 +289,14 @@ return function(t: Run.Suite)
 			t.Expect(weight >= 1 and weight <= 1.5).ToBe(true)
 			t.Expect(size >= 1 and size <= 3).ToBe(true)
 		end
+	end)
+
+	t.Test("the free gift: three minutes of walker and income, at least 500 of each", function()
+		local coins, climb = Economy.GiftReward(0, 0)
+		t.Expect(coins).ToBe(500)
+		t.Expect(climb).ToBe(500)
+		local laterCoins, laterClimb = Economy.GiftReward(2, 13.5)
+		t.Expect(laterCoins).ToBe(2430)
+		t.Expect(laterClimb).ToBe(7200)
 	end)
 end

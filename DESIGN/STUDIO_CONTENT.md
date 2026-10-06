@@ -4,6 +4,11 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, friend boost**: no place changes (the HUD tile is made in code).
+
+- **2026-10-05, the free gift**: no place changes (its menu and HUD button are made at runtime; its two step
+  pictures are uploaded images). `StealASheep.rbxl` in the main checkout was rebuilt from main with it, and the open
+  main Studio got main's scripts swapped in (not saved).
 - **2026-10-05, free placement**: no place changes. The plots no longer get
   pads or a delivery pad, so the map's hay and trees inside the plots stay where the map has them (only the stair
   walker's spot is cleared); sheep walk round them. The code still expects `workspace.Base.Terrain` to be the ground
@@ -37,10 +42,12 @@ here. Newest first.
   - **Shear a Sheep's pieces**, `assets/ShearASheepAssets.rbxm` (from `tools/extract-assets.luau`), placed in
     `ServerStorage.Assets`: `SheepRig` (Model, PrimaryPart `Root`, pieces on Motor6Ds named after the piece, a `Face`
     Decal on `Head`), `SheepAddons` (73 Models of MeshParts with `Piece` and `Tint` attributes: wool styles, horns,
-    `<Build>Wool` and `<Build>Extras`), `WorldKit.MutationMachine` (the Merge Shrine; a primitive altar if missing).
+    `<Build>Wool` and `<Build>Extras`), and `WorldKit.MutationMachine`, which nothing uses since the Merge Shrine became
+    the Laurel Ring (2026-10-05).
   - **The code**, from `rojo build default.project.json`.
 - Made at runtime (not in the place): `workspace.Plots`, `Gods`, `WildSheep`, `CarriedSheep`, `PenSheep`,
-  `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`, `ReplicatedStorage.SheepLooks`, the leaderboards' screens,
+  `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`,
+  `MergeShrine` (the Laurel Ring, ShrineService/Model; on each client `ShrineLocal` holds its pedestal previews and lamb), `ReplicatedStorage.SheepLooks`, the leaderboards' screens,
   every ScreenGui.
 - Before publishing: set Maximum Visitor Count to 5 (one player a plot) in Creator Hub, turn on Studio access to API
   services for saving, and publish under the account that owns Shear a Sheep's assets.
