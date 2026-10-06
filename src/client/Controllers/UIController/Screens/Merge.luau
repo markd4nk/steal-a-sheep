@@ -13,6 +13,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local UIKit = require(ReplicatedStorage.Utils.UIKit)
 local Buttons = require(script.Parent.Parent.Buttons)
 local Panel = require(script.Parent.Parent.Panel)
+local Scale = require(script.Parent.Parent.Scale)
 local SheepIcon = require(script.Parent.Parent.SheepIcon)
 local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
@@ -271,20 +272,34 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local luckLabel = odds:FindFirstChild("LuckLabel", true) :: TextLabel
 	local mergeButton = root:FindFirstChild("MergeButton") :: TextButton
 
-	-- On a short screen (a phone held sideways) the odds shrink just enough to stand clear of the Merge button: every
-	-- chance has to show (Roblox's rule for paid random items).
+	-- Every chance has to show (Roblox's rule for paid random items). Where the odds and the Merge button don't fit one
+	-- above the other (a phone held sideways), the button goes to the foot of the window, under the list, and the odds
+	-- keep the left side to themselves; only if that's still too short do they shrink.
 	local ODDS_GAP = 8
+	local page = window:FindFirstChild("Pages") :: Frame
 	local oddsFit = Instance.new("UIScale")
 	oddsFit.Name = "Fit"
 	oddsFit.Parent = odds
 	local function fitOdds()
-		local natural = odds.AbsoluteSize.Y / math.max(oddsFit.Scale, 1e-3)
-		local room = mergeButton.AbsolutePosition.Y - odds.AbsolutePosition.Y - ODDS_GAP
-		if natural > 0 and room > 0 then
-			oddsFit.Scale = math.clamp(room / natural, 0.5, 1)
+		local scale = Scale.Of(root)
+		local tall = root.AbsoluteSize.Y / scale
+		local natural = odds.AbsoluteSize.Y / scale / math.max(oddsFit.Scale, 1e-3)
+		local buttonHeight = mergeButton.AbsoluteSize.Y / scale
+		local short = ODDS_TOP + natural + ODDS_GAP + buttonHeight + EDGE > tall
+		if short then
+			mergeButton.Parent = page
+			mergeButton.Position = UDim2.fromScale(0.5, 1)
+			list.Size = UDim2.new(1, 0, 1, -(30 + buttonHeight + ODDS_GAP))
+		else
+			mergeButton.Parent = root
+			mergeButton.Position = UDim2.new(0.5, -(PANEL_WIDTH + EDGE) / 2, 1, -EDGE)
+			list.Size = UDim2.new(1, 0, 1, -30)
 		end
+		local room = tall - ODDS_TOP - EDGE - (if short then 0 else buttonHeight + ODDS_GAP)
+		oddsFit.Scale = if natural > 0 then math.clamp(room / natural, 0.5, 1) else 1
 	end
 	trove:Connect(root:GetPropertyChangedSignal("AbsoluteSize"), fitOdds)
+	-- Its own size settles once laid out; refitting gives the same answer, so this can't run away.
 	trove:Connect(odds:GetPropertyChangedSignal("AbsoluteSize"), fitOdds)
 	local stateController = context.Controllers.StateController
 	local shrineController = context.Controllers.ShrineController
