@@ -124,6 +124,107 @@ local Looks: { [string]: Look } = {
 		},
 		Prop = "Rainbow",
 	},
+	Nike = {
+		Head = FURIOUS,
+		Accessories = {
+			{ Id = 18611742138, Type = "Hair" }, -- Blonde Royal Goddess of Love Up Do Hair: the windswept one hid her face
+			{ Id = 103000933323306, Type = "Hat" }, -- Gold Laurel Wreath (random people -_-)
+			{ Id = 103988365424476, Type = "Back" }, -- Big White Angel Wings (RVO UGC)
+			{ Id = 97145004642533, Type = "DressSkirt" }, -- White and gold celestial goddess dress (Blue infinity)
+		},
+		Prop = "Wreath",
+	},
+	Aeolus = {
+		Head = ANGRY,
+		Accessories = {
+			{ Id = 109414322745943, Type = "Hair" }, -- Silver White Wind Swept Side Part Hair (PearlLilac Studios)
+			{ Id = 83727794341050, Type = "Face" }, -- Greek Mythology God Beard White (U8DEV)
+			{ Id = 88467090024031, Type = "Hat" }, -- Winter Blue Laurel Wreath (Enchanted Radiance)
+			{ Id = 94629266088883, Type = "Back" }, -- Blue Winter Wind Aura (The Aura Emporium)
+		},
+		Shirt = 74479924710279, -- Aeolus of Aeolia [+] (The Pantheon Apparel)
+		Pants = 113796590455958, -- Aeolus of Aeolia [-]
+		Prop = "Wind",
+	},
+	Hypnos = {
+		Head = ANGRY,
+		Accessories = {
+			{ Id = 126804724994191, Type = "Hair" }, -- Windswept messy boy hair, White/Grey (SpookyCo)
+			{ Id = 85133058560778, Type = "Hat" }, -- Purple Striped Night Hat Sleepy Cap (exactly ablimity)
+			{ Id = 87185412742719, Type = "Hat" }, -- Head Wings (Marty_nas)
+			{ Id = 132118652351032, Type = "Front" }, -- Poppy Pin (Monture)
+		},
+		Pants = 6963988882, -- Exomis [-] (Scorpilleus): a lavender one-shoulder tunic
+		Prop = "Poppy",
+	},
+	Morpheus = {
+		Head = ANGRY,
+		Accessories = {
+			{ Id = 86774212483805, Type = "Hair" }, -- Dark Blue Messy Wavy Middle Part Mullet Hair (cosmicfall)
+			{ Id = 15187856998, Type = "Hat" }, -- Crown Of Starry Moons Pink (Mockeri)
+			{ Id = 78737392875952, Type = "DressSkirt" }, -- Night Greek Tunic (Tilted Tree Studios): stars and swirls
+		},
+		Prop = "StarWand",
+	},
+	Deimos = {
+		Head = ANGRY,
+		Accessories = {
+			{ Id = 18564351713, Type = "Hat" }, -- Black Roman Tribune Helmet with Red Plume (The Roman Empire)
+			{ Id = 98377862985485, Type = "Front" }, -- Greek Hoplite Cuirass, Gold & Red (Olympus Reforged)
+			{ Id = 117241324250549, Type = "Back" }, -- Spartan Red Cape (Sparta)
+		},
+		Pants = 13012399211, -- Exomis (The Galante): dark red with gold trim
+		Prop = "DarkSpear",
+	},
+	Thanatos = {
+		Head = ANGRY,
+		Accessories = {
+			{ Id = 110139449974722, Type = "Hat" }, -- Black Robe Hood Up (Lively Armoury)
+			{ Id = 115801444959828, Type = "Back" }, -- Black Angel Wings (Mesh UGC's Wings)
+			{ Id = 86401989612624, Type = "DressSkirt" }, -- Hades Villain Greek Tunic (Tilted Tree Studios)
+		},
+		Prop = "Scythe",
+	},
+	Nemesis = {
+		Head = FURIOUS,
+		Accessories = {
+			{ Id = 18701457788, Type = "Hair" }, -- Black Roman Goddess Hair with Silver Diadem (The Roman Empire)
+			{ Id = 124573912462654, Type = "Back" }, -- Dark Angel Feathered Wings Cape, Teal (Varn & Veil)
+			{ Id = 140177046199076, Type = "DressSkirt" }, -- Snow Greek Tunic (Tilted Tree Studios)
+		},
+		Prop = "Sword",
+	},
+	Dionysus = {
+		Head = ANGRY,
+		Accessories = {
+			{ Id = 107089302420737, Type = "Hair" }, -- Brown Messy Classical Greek Curly Hair (Crooner)
+			{ Id = 104234937398903, Type = "Hat" }, -- Ivy Crown Tiara (Chaotiq)
+		},
+		Shirt = 117430250480495, -- Lord Dionysus' Flashy Party Bracelets [+] (The Pantheon Apparel)
+		Pants = 101406094276965, -- Lord Dionysus' Himation of Revelry [-]
+		Prop = "Thyrsus",
+	},
+	Hermes = {
+		Head = ANGRY,
+		Accessories = {
+			{ Id = 71369467772630, Type = "Hair" }, -- Blonde Messy Classical Greek Curly Hair (Crooner)
+			{ Id = 156485800, Type = "Hat" }, -- Knights of the Splintered Skies: Winged Messenger (Roblox)
+			{ Id = 84666262262448, Type = "Pants" }, -- Cute Angel Wing Bow Shoes in White (starbby)
+		},
+		Pants = 15875028264, -- Exomis [-] (Athens): light blue with a brown belt
+		Prop = "Caduceus",
+	},
+	Hephaestus = {
+		Head = ANGRY,
+		Accessories = {
+			{ Id = 70452913619869, Type = "Hair" }, -- Black Long Hair & Beard (U8DEV)
+			{ Id = 125233156306732, Type = "Hat" }, -- Fire Crown (Scarvalan)
+			{ Id = 133627666175204, Type = "Waist" }, -- Blacksmith tong for forging (OlympusϞ)
+		},
+		Shirt = 123582753978954, -- Lord Hephaestus' Scarred Forge Attire [+] (The Pantheon Apparel)
+		Pants = 128181645354310, -- Lord Hephaestus' Apron of Cinders [-]
+		Prop = "Hammer",
+	},
 	Ares = {
 		Head = ANGRY,
 		Accessories = {
