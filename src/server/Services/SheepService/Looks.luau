@@ -1,5 +1,6 @@
 --!strict
 
+local MaterialService = game:GetService("MaterialService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BreedBuilds = require(ReplicatedStorage.Config.BreedBuilds)
@@ -8,7 +9,8 @@ local Mutations = require(ReplicatedStorage.Utils.Mutations)
 local SheepRigLayout = require(ReplicatedStorage.Config.SheepRigLayout)
 
 -- Dresses a sheep cloned from the rig for its breed: body colours, wool style and size, horns, accessory, special
--- effects, then its scale. Wool colours and materials come last and again whenever a mutation lands (Paint).
+-- effects, then its scale. Wool colours and materials come last and again whenever a mutation lands (Paint), and the
+-- map's studs over the fleece after them (Studs).
 -- Add-ons are the placeholder models in ServerStorage.Assets.SheepAddons (studio/BuildSheep.luau), placed on a Farm
 -- Sheep at the origin and welded on relative to the joint of the piece they sit on, so they stay put when the mesh
 -- build swaps a piece's block for a mesh.
@@ -438,6 +440,65 @@ function Looks.Paint(model: Model, breed: GameConfig.Breed, mutationId: string?)
 			part.Material = material
 			if mutation and part:IsA("MeshPart") then
 				part.TextureID = ""
+			end
+		end
+	end
+end
+
+-- The fleece's parts: the Wool folder (every puff and whatever hangs off it), the woolly tail, and add-on blocks
+-- tinted as wool.
+local function fleeceOf(model: Model): { BasePart }
+	local parts: { BasePart } = {}
+	local woolFolder = model:FindFirstChild("Wool")
+	if woolFolder then
+		for _, descendant in woolFolder:GetDescendants() do
+			if descendant:IsA("BasePart") then
+				table.insert(parts, descendant)
+			end
+		end
+	end
+	for _, name in WOOL_PIECES do
+		local piece = model:FindFirstChild(name)
+		if piece and piece:IsA("BasePart") then
+			table.insert(parts, piece)
+		end
+	end
+	local addons = model:FindFirstChild("Addons")
+	if addons then
+		for _, descendant in addons:GetDescendants() do
+			local tag = descendant:GetAttribute("Tint")
+			if descendant:IsA("BasePart") and (tag == "Wool" or tag == "Spot") then
+				table.insert(parts, descendant)
+			end
+		end
+	end
+	return parts
+end
+
+local warnedMissing: { [string]: boolean } = {}
+
+local function hasVariant(name: string): boolean
+	local variant = MaterialService:FindFirstChild(name)
+	if variant and variant:IsA("MaterialVariant") then
+		return true
+	end
+	if not warnedMissing[name] then
+		warnedMissing[name] = true
+		warn(`[SheepService] MaterialService.{name} is missing: run studio/SheepStuds.luau in Edit`)
+	end
+	return false
+end
+
+-- Lays the map's studs over the fleece, each part by its material (Settings.Studs). Call it after Paint. A part whose
+-- variant isn't in the place keeps its look, glow and all.
+function Looks.Studs(model: Model)
+	for _, part in fleeceOf(model) do
+		local look = Settings.Studs[part.Material]
+		if look and hasVariant(look.Variant) then
+			part.Material = look.Material
+			part.MaterialVariant = look.Variant
+			if look.Transparency then
+				part.Transparency = math.max(part.Transparency, look.Transparency)
 			end
 		end
 	end

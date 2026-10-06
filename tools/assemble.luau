@@ -1,8 +1,8 @@
 --!strict
 -- Builds the game's place file from what's on disk: the commissioned map with High Olympus built on top
 -- (tools/UpperMountain.luau), the borrowed Shear a Sheep assets (assets/ShearASheepAssets.rbxm, from
--- tools/extract-assets.luau) in ServerStorage.Assets, and the code from a `rojo build` of default.project.json. Open the
--- result in Studio and press Play, or `rojo serve` into it.
+-- tools/extract-assets.luau) in ServerStorage.Assets, the sheep's stud materials (studio/SheepStuds.luau) and the code
+-- from a `rojo build` of default.project.json. Open the result in Studio and press Play, or `rojo serve` into it.
 --
 -- From the repo root:
 --   rojo build default.project.json --output build/game.rbxl
@@ -10,6 +10,7 @@
 -- (scripts/build-place.ps1 does both.)
 
 local fs = require("@lune/fs")
+local luau = require("@lune/luau")
 local process = require("@lune/process")
 local roblox = require("@lune/roblox")
 
@@ -70,6 +71,13 @@ for _, instance in roblox.deserializeModel(fs.readFile(assetsPath)) do
 	instance.Parent = folder
 end
 folder.Parent = serverStorage
+
+-- The sheep's stud materials: the Studio script the cloud place gets, run here on this place.
+local studs = luau.load(fs.readFile("studio/SheepStuds.luau"), {
+	debugName = "studio/SheepStuds.luau",
+	environment = { game = place, Enum = roblox.Enum, Color3 = roblox.Color3 },
+})
+print(studs())
 
 fs.writeFile(output, roblox.serializePlace(place))
 print(`Wrote {output}`)

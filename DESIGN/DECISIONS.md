@@ -13,6 +13,8 @@ confirmed or reversed it.
   the docs.
 - The first build reused Shear a Sheep's UI and assets and kept new things primitive (the user, 2026-10-05). That was
   how the MVP was made, not a limit on later changes.
+- **The map's studs on every sheep (2026-10-05)**: the user picked mock-up B, the map's stud material at half its
+  size over the wool (face, ears and legs smooth), "build it on every sheep", and glowing studs for glowing wool.
 - **Thirty gods, Zeus on top (2026-10-05)**: the user's list of thirty, a map part for each above the old summit
   (High Olympus), each god's section grouped, the new parts indistinguishable from the commissioned map (its own
   pieces, studs and textures).
@@ -173,6 +175,25 @@ Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-g
   rate; a walker level they're past pays that level's cash price.
 - **Signs in studs**: the plots' name signs 24 x 6.8, the stalls' names 15 x 3.5, the walkers' level tags 6.3 x 2.35,
   the same size as before at their usual distance and smaller further away.
+Calls in the store's product and pass icons (2026-10-05, files waiting for Mark's OK):
+
+- **The seven 2x Speed icons are the same** (the card doesn't number the buys); the 29 walker icons show the card's
+  level row for their step ("Lv 1 > 2" to "Lv 29 > 30").
+- **No chips** ("ROBUX ONLY", "CHEAP!", "BEST VALUE"): only the words over or beside each card's picture.
+- **The two Robux sheep have the store art's ink outline** (the Golden Fleece vanished into its gold card without it),
+  and no studs on their wool, which the game's sheep get on the studs branch.
+
+Calls in the studs on every sheep (2026-10-05, branch t3code/sheep-stud-style-mockups, not merged):
+
+- **What counts as wool**: the puffs (and anything hanging off them), the tail, and add-on pieces tinted as wool.
+  Horns, hats, halos, wings and other extras stay smooth, as do the face, ears, legs and body.
+- **Stud size**: half a stud a tile on every sheep, so bigger sheep (Giant, Titan) carry more studs, like bigger
+  blocks on the map; lambs carry fewer.
+- **Glass wool** (4 families) becomes see-through studded plastic at 25% transparency: Roblox draws no studs on glass,
+  and the glassy shine goes. **Glowing wool** (10 families) glows at strength 1.6: a little less bright than Neon.
+- **Royal (gold) fleeces and silver paints** take metal studs; on glowing or glass families the Royal gold replaces the
+  glow or the see-through look, as the gold paint already did.
+- Any other wool material keeps its look without studs (none uses one today).
 
 Calls in Zeus's Blender model (2026-10-05, a mock-up waiting for the user's OK):
 

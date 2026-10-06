@@ -45,6 +45,45 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     notice per delivery, training, Put your sheep to work after buying pen space, Train to climb on tier 5, no menu
     opening itself in a first session, a Giant's notice, a god's catch and punch with a steal refused mid-flight, the
     walker sign's two buttons. Pictures in T3 Code's attachments (`night_before_*`, `night_after_*`).
+- **Icons for the store's 49 developer products and 2 passes (2026-10-05)**. Files for Mark to approve, not uploaded:
+  asked for by the overnight coordinator (t3code-60160304) for Creator Hub, where the products had Roblox's default
+  picture. `art/store/make_product_icons.py` reads the products and passes from `Config/Store.luau` (`--store` for a
+  branch with the Creator Hub ids), the walker's levels from `Economy`, and the card colours from `Screens/Store`'s
+  TINTS. Each 512 x 512 icon is its store card's picture (`make_store_art.py`'s export, pixel for pixel the store's) on
+  the card's colour shading darker downwards, with the cards' studs (`DESIGN/ui/assets/studs.png`), white rays and the
+  card's own words in Fredoka One ("+150K CLIMB", "2x SPEED", "Lv 1 > 2"); passes keep everything inside the circle the
+  game page crops them to. The two Robux sheep are Blender renders of Shear a Sheep's fluffy sheep in this game's
+  looks (`art/store/render_robux_sheep.py`, as `DESIGN/ui/art/pegasus.py` does), in the store art's ink outline.
+  Output: `.t3/userdata/attachments/product_icons/<Key>.png` and `contact_sheet.png` (gitignored pictures: the icon
+  pack may be used in the game, not shared). Checked by eye on the contact sheet and at full size.
+
+- **The map's studs on every sheep (2026-10-05)**. On branch `t3code/sheep-stud-style-mockups`, not merged. The user
+  asked for mock-ups of the map's stud style layered over the sheep, picked B, then: "build it on every sheep, and then
+  you can use the glowing studs".
+  - *The map's studs*: `MaterialService.Studs`, a Plastic MaterialVariant (colour and normal maps, one stud a tile) on
+    about 26,000 of the map's parts: a grid of square insets with a bevel. The other Texture on 14,700 faces
+    (`6905003203`, 9 studs a tile, 90% transparent) is a soft shading gradient, not studs.
+  - *Mock-ups* (`studio/StudSheepMockup.luau`, rendered in HerdsPlaytest.rbxl by the first plot): A the map's variant
+    (1 stud) on the wool, B a half-size copy on the wool, C B all over (face, ears, legs, extras). On the sheep's meshes
+    the tiles follow each mesh's UVs but keep their size in studs; at the map's size they came out uneven where UV
+    islands meet, and C's faces looked quilted. Dropped: the studs' colour map as a projected `Texture` (an even grid,
+    but flat L-shaped marks without the bump map).
+  - *How it works*: `GameConfig.Sheep.Studs` gives each wool material the material it becomes and its variant
+    (Plastic and SmoothPlastic `SheepStuds`, Metal, Fabric and Foil their own copies, Glass `SheepStuds` at
+    Transparency 0.25 or more, Neon `SheepStudsGlow`). `Looks.Studs`, called by `SheepService.Build` after the paint,
+    extras and sparkle, puts them on the fleece: the Wool folder, the tail and add-ons tinted Wool or Spot. A variant
+    missing from the place leaves the part as it was (warned once). Every sheep model comes from `Build` (wild, pens,
+    carried, the shrine's lamb, `SheepLooks` for the menus), so nothing else changed. The five variants are copies of
+    the map's Studs at 0.5 studs a tile, made by `studio/SheepStuds.luau`: their BaseMaterial, maps and glow mask (the
+    studs' own colour map) can only be set in Studio or Lune. `tools/assemble.luau` runs that same file on every place it
+    builds, through `@lune/luau` with `game` set to the place.
+  - *Checked*: `check.ps1`; a Lune build holds the five variants as made; in HerdsPlaytest.rbxl with the branch's code
+    synced (`content/sas/studs-sync.rbxm`) and the studio script run: both bootstraps ready, 78 tests (2 new in
+    `SheepStuds.spec`), console clean. The client had the five variants; 121 wild lambs and a pen of eight special
+    wools (glowing, glass, fabric, metal, foil, silver) came out right; the Flock menu's 3D sheep shows the studs. All 183
+    families, plus Royal and Shiny fleeces, rendered in Edit: nothing broken (the Scarecrow's denim and checker
+    pictures still show). Rechecked after merging main's avatar gods (78 tests, 121 of 121 wild lambs studded, console
+    clean). Not run on the cloud place or on a phone.
 
 - **The thirty gods as Roblox avatars (2026-10-05)**. The user wanted real god models. Roblox's mesh generator kept
   missing (third arms, bare chests; moderation removed two limb meshes), and a Blender pipeline (`art/gods/`, Zeus and

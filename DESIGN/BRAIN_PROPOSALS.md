@@ -209,6 +209,25 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   Sensitive Issues, Cross-Experience Content, AI Interaction, Paid Random Items (and whether the game respects
   `ArePaidRandomItemsRestricted`), Paid Item Trading, Media Sharing, Continuous Media Feed; then Preview rating, then
   Submit and publish." Seen 2026-10-05 in Steal a Sheep.
+- **S33** (`BRAIN/GOTCHAS.md`): "A MaterialVariant on a MeshPart follows the mesh's UVs but keeps its `StudsPerTile`
+  size in studs: a part twice as big shows twice as many tiles, and the pattern bends and breaks where UV islands meet.
+  A tile made for flat blocks (studs, bricks) reads better at half its size or less on small round meshes. A `Texture`
+  on a MeshPart is projected flat from each face instead: an even grid, but only its picture, with no normal map, so
+  bevels go flat. Glass and Neon parts draw no variant at all; for a glowing look, give a Plastic variant an
+  `EmissiveMaskContent` (its own colour map works). A variant's BaseMaterial and maps are PluginSecurity: make variants
+  in Studio, not from game scripts. Variants show in ViewportFrames too, and a MeshPart's own TextureID picture still
+  shows with a variant on it." Seen 2026-10-05 putting the map's Studs material on Steal a Sheep's wool.
+  (S31 and S32 are taken on t3code/publish-readiness-checklist.)
+- **S34** (`BRAIN/PATTERNS/testing-studio.md`): "`_G` lasts between `execute_luau` calls in one Studio: define a
+  long mock-up or test helper once (`_G.TEMP_Mockup = function(look) ... end`), rerun it with one-line calls, and set
+  it to nil when done. The command's thread lacks the RobloxScript capability: reading `Lighting.Technology` or
+  `MaterialService.Use2022Materials` errors." Seen 2026-10-05 in Edit, rendering four looks of the same scene.
+- **S35** (`BRAIN/PATTERNS/testing-studio.md`, running `studio/` build scripts): "A `studio/` script that only uses
+  `game:GetService`, `Enum` and datatypes can also build a place file in Lune, so the cloud place (execute_luau) and
+  local builds share one source: `luau.load(fs.readFile(path), { environment = { game = place, Enum = roblox.Enum,
+  Color3 = roblox.Color3 } })()`, where `place` is from `roblox.deserializePlace`. Lune 0.10.5 sets PluginSecurity
+  properties (a MaterialVariant's BaseMaterial, `EmissiveMaskContent` from another `...Content`) but can't read the
+  older `ContentId` ones (`ColorMap`): read the `...Content` twin." Seen 2026-10-05, Steal a Sheep's stud materials.
 
 ## Done
 

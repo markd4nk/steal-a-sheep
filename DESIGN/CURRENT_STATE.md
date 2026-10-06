@@ -108,6 +108,13 @@ lamb.
   needs `studio/SheepStuds.luau` run on the cloud place), store product icons (same branch, `art/store/`), a Settings
   menu (same branch, in progress), game page icon and thumbnail mock-ups, an asset audit (all 1,286 assets load) and a
   trailer (`t3code/order-olympian-gods`).
+- **Icons for the 49 products and 2 passes** (2026-10-05, files waiting for Mark's OK, not uploaded):
+  `art/store/make_product_icons.py` writes them to `.t3/userdata/attachments/product_icons/` (HISTORY.md).
+- **The map's studs on every sheep** (built 2026-10-05, branch `t3code/sheep-stud-style-mockups`, not merged): half-size
+  copies of the map's `Studs` material over every sheep's wool (`Looks.Studs`, `GameConfig.Sheep.Studs`), glowing
+  studs on Neon wool, see-through studs on glass. The cloud place needs `studio/SheepStuds.luau` run in Edit before
+  the publish that ships it; without the materials the wool stays plain and the server warns once.
+
 - **Gods in rank order and Zeus as a Roblox avatar** (merged into main 2026-10-05 on the user's word):
   `Config/Olympus` reordered (Pan tier 1 to Zeus 30), new High Olympus stretches for the eleven Olympians who moved
   up; Zeus a catalog-dressed avatar. Not in a published version yet.
@@ -134,6 +141,8 @@ lamb.
 
 ## Not verified
 
+- **Studs on every sheep on a phone and in a live server**: seen in a Studio playtest and in Edit on all 183 families,
+  not on a real device; their cost on a low-end phone wasn't measured (no extra parts, only materials).
 - **The live game itself**: the user has been in a live server (one player, moved onto version 5 by the restart), but
   no agent has watched one: checked only in Studio on the cloud place (both bootstraps ready, 76 tests, ProfileStore
   "data will be saved", no warnings). Unconfirmed in a real server: Shear a Sheep's meshes, faces and sounds loading,
