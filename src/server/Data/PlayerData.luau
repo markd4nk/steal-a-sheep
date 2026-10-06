@@ -3,6 +3,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
+local PlayerSettings = require(ReplicatedStorage.Utils.PlayerSettings)
 
 export type Sheep = Economy.Sheep
 
@@ -27,6 +28,7 @@ export type Data = {
 	FreeGift: boolean, -- the like-and-favorite gift was claimed
 	DailyDay: number, -- the daily gift's day to claim next, 1 to 7 (Economy.DailyWeek)
 	DailyAt: number, -- os.time() of the last daily gift claimed, 0 for never
+	Settings: PlayerSettings.Values, -- the Settings menu's choices (SettingsService)
 }
 
 local PlayerData = {}
@@ -54,6 +56,7 @@ PlayerData.Template = {
 	FreeGift = false,
 	DailyDay = 1,
 	DailyAt = 0,
+	Settings = PlayerSettings.Defaults(),
 } :: Data
 
 -- migrations[n] upgrades data from schema n to n + 1, in place.
@@ -185,6 +188,9 @@ function PlayerData.Validate(data: any): (boolean, string?)
 	end
 	if data.DailyDay ~= nil and not isWhole(data.DailyDay, 1, #Economy.DailyWeek) then
 		return false, "DailyDay is not a day of the week"
+	end
+	if data.Settings ~= nil and not PlayerSettings.IsValid(data.Settings) then
+		return false, "Settings has an invalid entry"
 	end
 	if data.Deliveries ~= nil then
 		if type(data.Deliveries) ~= "table" then

@@ -9,6 +9,7 @@ local Services = script.Parent.Services
 -- Order matters: Init and Start run top to bottom, Destroy bottom to top. List dependencies first.
 local registry: { Lifecycle.System } = {
 	require(Services.DataService),
+	require(Services.SettingsService),
 	require(Services.PurchaseService),
 	require(Services.FriendService),
 	require(Services.SheepService),

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Steal a Sheep: Settings</title>
+<link rel="stylesheet" href="/DESIGN/ui/fleece.css">
+<style>
+/* The player's settings (2026-10-05, overnight, for Mark): music and effects volume and Reduce motion, from a gear on
+   the HUD. Shear a Sheep's Settings menu (Screens/Settings, studio/BuildSettings) trimmed to what this game needs. The
+   HUD's own pictures are from local/settings (gitignored: Shear a Sheep's menu renders, the store's sandal and Robux
+   coin); the gift, calendar, cloud and heart are the icon pack's, standing in for the game's GIFT, DAILY, FLOCK and
+   INVITE pictures. */
+
+body.board { width: 1896px; }
+
+/* The HUD as the game draws it on a phone held sideways (844 x 390): Roblox's buttons top left, Climbing and cash top
+   right, the menu pictures down the left in two columns, the store on the right edge. */
+.sh { position: absolute; inset: 0; }
+.sh .pills { position: absolute; right: 16px; top: 8px; display: flex; gap: 18px; align-items: center; }
+.sh .pill { display: flex; align-items: center; gap: 3px; }
+.sh .pill img { width: 44px; height: 44px; }
+.sh .pill .num { display: flex; flex-direction: column; font: 27px/0.95 var(--display); color: #ffd23f; }
+.sh .pill .num small { font: 12px/1 var(--display); color: #fff; }
+.sh .pill .num.cash { color: var(--lime); }
+.sh .tiles { position: absolute; left: 12px; top: 64px; display: grid; grid-template-rows: repeat(3, 84px); grid-auto-flow: column; gap: 4px 10px; }
+.sh .tilebtn { display: flex; flex-direction: column; align-items: center; width: 64px; font: 13px/1 var(--display); color: #fff; }
+.sh .tilebtn img { width: 50px; height: 50px; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.25)); }
+.sh .store { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); }
+.sh .stick { position: absolute; left: 70px; bottom: 26px; width: 92px; height: 92px; border-radius: 50%; background: rgba(15, 18, 25, 0.28); box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.35); }
+.sh .jump { position: absolute; right: 60px; bottom: 34px; width: 74px; height: 74px; border-radius: 50%; background: rgba(15, 18, 25, 0.28); box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.35); }
+
+/* The gear. A: a button in Roblox's own top bar, round and dark like its neighbours. B: the gear picture alone at the
+   end of the top row. */
+.gear-a { position: absolute; left: 162px; top: 12px; width: 44px; height: 44px; border-radius: 22px; background: rgba(15, 18, 25, 0.62); display: grid; place-items: center; }
+.gear-a img { width: 34px; height: 34px; }
+.gear-b img { width: 46px; height: 46px; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.25)); }
+.ring { position: absolute; border-radius: 50%; box-shadow: 0 0 0 3px #ffd23f, 0 0 18px 4px rgba(255, 210, 63, 0.65); pointer-events: none; }
+
+/* The menu: a row a setting, its name on the left and its control on the right. */
+.srows { display: flex; flex-direction: column; gap: 12px; }
+.srow { display: flex; align-items: center; gap: 10px; height: 58px; padding: 0 10px 0 18px; }
+.srow .sname { flex: 1; font: 24px/1 var(--display); color: #fff; --sw: 6px; white-space: nowrap; }
+.vol { display: flex; align-items: center; gap: 8px; }
+.vol .btn { width: 44px; padding: 0 0 4px; }
+.vol .btn .lbl { font-size: 26px; }
+.vol .pips { width: 112px; height: 22px; }
+.toggle { width: 120px; }
+
+/* The PC's HUD in the menu shots: the game's winged sandal, not the kit's red shoe. */
+.sas-hud .stat:first-child .ico { content: url("/DESIGN/ui/local/settings/Talaria.png"); }
+.frame .gear-a.pc { left: 162px; top: 12px; }
+.note { font: 800 16px/1.4 var(--text); color: #c9d2e3; max-width: 1700px; }
+.note b { color: #fff; }
+.left-out { columns: 2; column-gap: 40px; font: 800 17px/1.5 var(--text); color: #c9d2e3; }
+.left-out b { color: #fff; }
+</style>
+</head>
+<body class="board" data-pending>
+<script type="module">
+import * as K from "/DESIGN/ui/kit.js";
+
+const LOCAL = "/DESIGN/ui/local/settings/";
+const pack = (folder, stem) => `/pack/${folder}/256px/${stem} 256px.png`;
+const GEAR = `${LOCAL}MenuSettings.png`;
+K.ACCENT.settings = ["#b7c2d1", "#7f8ca0", "#4f596b"]; // Theme.Accent.Settings
+
+const tile = (src, word) => `<div class="tilebtn"><img src="${src}" alt="">${K.ol(word, 4)}</div>`;
+
+// The HUD on a phone, with the gear in place A or B (or none), and a ring round it when `ring` is set.
+function hud(spot, ring) {
+	const gearB = spot === "B" ? `<div class="pill gear-b"><img src="${GEAR}" alt=""></div>` : "";
+	return `<div class="sh">
+		<div class="tiles">
+			${tile(pack("Item/Gift", "Green Gift 1st Outline"), "GIFT")}
+			${tile(pack("Item/Calendar", "Calendar 1st Outline"), "DAILY")}
+			${tile(pack("Nature/Cloud", "Cloud 1st Outline"), "FLOCK")}
+			${tile(`${LOCAL}MenuStore.png`, "SHOP")}
+			${tile(`${LOCAL}MenuSheepdex.png`, "SHEEPDEX")}
+			${tile(pack("Main/Heart", "Golden Heart 1st Outline"), "+20%")}
+		</div>
+		<div class="pills">
+			<div class="pill"><img src="${LOCAL}Talaria.png" alt=""><div class="num">${K.ol("1.2K", 6)}<small>${K.ol("CLIMBING", 3.5)}</small></div></div>
+			<div class="pill"><img src="${K.ICON.cash}" alt=""><div class="num cash">${K.ol("45.6K", 6)}</div></div>
+			${gearB}
+		</div>
+		<div class="store tilebtn"><img src="${LOCAL}HudRobux.png" alt="">${K.ol("STORE", 4)}</div>
+		<div class="stick"></div><div class="jump"></div>
+		${spot === "A" ? `<div class="gear-a"><img src="${GEAR}" alt=""></div>` : ""}
+		${ring ? `<div class="ring" style="${ring}"></div>` : ""}
+	</div>`;
+}
+
+function topbar() {
+	const logo = `<svg viewBox="0 0 24 24"><path d="M7.2 3.4l13.4 3.8-3.8 13.4L3.4 16.8z" stroke-width="2.4"/></svg>`;
+	const menu = `<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`;
+	const chat = `<svg viewBox="0 0 24 24"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-7l-4.5 3.5v-3.5H5A1.5 1.5 0 0 1 3.5 15V7A1.5 1.5 0 0 1 5 5.5z"/></svg>`;
+	return `<div class="rbx"><span>${logo}</span><span>${menu}${chat}</span></div>`;
+}
+
+function hudFrame(id, spot, ring) {
+	return `<div class="frame phone" data-id="${id}" data-w="844" data-h="390" data-scale="2" style="width:844px;height:390px">
+		<img class="world" src="/DESIGN/ui/assets/world-plots.jpg" alt="">
+		${hud(spot, ring)}
+		${topbar()}
+	</div>`;
+}
+
+// One volume: minus, four steps lit up to its level, plus (greyed at either end).
+function volume(level) {
+	const pips = [1, 2, 3, 4].map((step) => `<i class="${step <= level ? "on" : ""}"></i>`).join("");
+	return `<div class="vol">
+		${K.btn(level > 0 ? "soft" : "off", K.lbl("−"), { size: "sm" })}
+		<div class="pips">${pips}</div>
+		${K.btn(level < 4 ? "soft" : "off", K.lbl("+"), { size: "sm" })}
+	</div>`;
+}
+
+const toggle = (on) => `<div class="toggle ${on ? "on" : "offt"}">${K.lbl(on ? "On" : "Off")}</div>`;
+const row = (name, control) => `<div class="tile srow"><div class="sname ol">${name}</div>${control}</div>`;
+
+// The menu: `music` and `sounds` are levels 0-4, or true/false for the on/off variant.
+function settings({ music = 4, sounds = 4, motion = false, w = 480 } = {}) {
+	const control = (value) => (typeof value === "boolean" ? toggle(value) : volume(value));
+	const body = `<div class="srows">
+		${row("Music", control(music))}
+		${row("Sound effects", control(sounds))}
+		${row("Reduce motion", toggle(motion))}
+	</div>`;
+	return K.panel({ w, h: "auto", accent: "settings", badge: GEAR, title: "Settings", body });
+}
+
+// The menu over the HUD, with gear A in Roblox's top bar.
+function menuFrame(id, content, pc) {
+	const frame = pc
+		? K.pcFrame(id, content, { coins: 45600, climb: 1200 })
+		: K.phoneFrame(id, content, { coins: 45600, climb: 1200 });
+	return frame.replace(`<div class="rbx">`, `<div class="gear-a${pc ? " pc" : ""}"><img src="${GEAR}" alt=""></div><div class="rbx">`);
+}
+
+const boardHead = `<div class="board-head">
+	<div class="kicker">Steal a Sheep · mock-up · 2026-10-05, overnight</div>
+	<h1>Settings</h1>
+	<p>Players can't turn the music down yet. A gear on the HUD opens <b>Settings</b>: music and sound effects in four
+	steps each, and <b>Reduce motion</b>. Each change saves at once and follows the player to every server. Shear a
+	Sheep's Settings menu, trimmed: no descriptions under the rows, no percentages.</p>
+</div>`;
+
+K.boot(() => {
+	document.body.innerHTML += `${boardHead}
+	<div class="section">
+		<h2>Where the gear goes</h2>
+		<p class="note">The left column is full on phones (two columns already), so the gear goes in the top bar.
+		<b>A</b> sits in Roblox's own bar beside its buttons, round and dark like them, where Roblox games put their
+		settings; nothing of ours moves. <b>B</b> is Shear a Sheep's place, after the cash; Climbing and cash move left
+		to make room.</p>
+		<div class="row">
+			${K.shot(hudFrame("gear-a", "A", "left:156px;top:6px;width:56px;height:56px"), "<b>A</b> In Roblox's top bar, beside its buttons (my pick).")}
+			${K.shot(hudFrame("gear-b", "B", "right:12px;top:6px;width:56px;height:56px"), "<b>B</b> At the end of the top row, after the cash.")}
+		</div>
+	</div>
+	<div class="section">
+		<h2>The menu</h2>
+		<p class="note">Three rows. <b>−</b> and <b>+</b> move a volume a step (four steps, all lit is full, none is off);
+		the button greys out at either end. <b>Reduce motion</b> stops the menus' bounces and the screen shakes.</p>
+		<div class="row">
+			${K.shot(menuFrame("menu-phone", settings({ music: 4, sounds: 2 })), "Opened on a phone: music full, effects at half.")}
+			${K.shot(menuFrame("menu-off", settings({ music: 0, sounds: 4, motion: true })), "Music off, Reduce motion on.")}
+		</div>
+		<div class="row">
+			${K.shot(menuFrame("menu-pc", settings({ music: 3, sounds: 4 }), true), "On a computer.")}
+		</div>
+		<h2>Or simpler: on and off only</h2>
+		<p class="note">The same menu with switches instead of steps: one tap each, but no way to make the music quieter
+		without turning it off.</p>
+		<div class="row">
+			${K.shot(menuFrame("menu-switches", settings({ music: true, sounds: false })), "Music on, sound effects off.")}
+		</div>
+	</div>
+	<div class="section">
+		<h2>Left out</h2>
+		<div class="left-out">
+			<p><b>Low graphics</b>: Shear a Sheep had it, but nothing in this game would change yet, so the switch would do
+			nothing.</p>
+			<p><b>Invite friends</b>: the HUD's friend tile (+20%) already opens Roblox's invite.</p>
+			<p><b>A line under each row</b> and <b>percentages</b>: the steps show the level.</p>
+			<p><b>Separate ambience</b>: the meadow's birds follow Music.</p>
+		</div>
+	</div>`;
+});
+</script>
+</body>
+</html>

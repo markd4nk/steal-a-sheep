@@ -4,6 +4,10 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, the Settings menu** (branch `t3code/sheep-stud-style-mockups`): no place changes. The menu and its
+  gear (`PlayerGui.SettingsGear`, ScreenInsets TopbarSafeInsets) are made at runtime; the gear is the uploaded
+  `Theme.Icons.MenuSettings`.
+
 - **2026-10-05, the map's studs on every sheep** (branch `t3code/sheep-stud-style-mockups`): the code expects five
   MaterialVariants in `MaterialService`, copies of the map's `Studs` at 0.5 studs a tile: `SheepStuds` (Plastic),
   `SheepStudsMetal`, `SheepStudsFabric`, `SheepStudsFoil` and `SheepStudsGlow` (Plastic, its colour map as its

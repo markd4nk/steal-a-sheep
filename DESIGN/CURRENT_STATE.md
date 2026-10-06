@@ -92,6 +92,10 @@ lamb.
 
 ## In progress
 
+- **Settings menu** (built 2026-10-05 on branch `t3code/sheep-stud-style-mockups`, not merged; its look waits for
+  Mark's OK, `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound effects in four
+  steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in the save,
+  `SoundController` volumes).
 - **Icons for the 49 products and 2 passes** (2026-10-05, files waiting for Mark's OK, not uploaded):
   `art/store/make_product_icons.py` writes them to `.t3/userdata/attachments/product_icons/` (HISTORY.md).
 - **The map's studs on every sheep** (built 2026-10-05, branch `t3code/sheep-stud-style-mockups`, not merged): half-size

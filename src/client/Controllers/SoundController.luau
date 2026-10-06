@@ -6,12 +6,14 @@ local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
+local PlayerSettings = require(ReplicatedStorage.Utils.PlayerSettings)
 local Sounds = require(ReplicatedStorage.Config.Sounds)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- Shear a Sheep's sounds (Config/Sounds, Roblox-licensed audio) played the same way, trimmed to what this game
 -- needs: pooled 2D effects for what the player does, 3D ones at a spot for what happens around them, the calm music in
--- turn, its danger track while a god chases the player, and the meadow ambience.
+-- turn, its danger track while a god chases the player, and the meadow ambience. Each group plays at its mix volume
+-- times the player's own setting (the Settings menu): music and the ambience follow Music, every effect Sound effects.
 local SoundController = { Name = "SoundController" }
 
 type Pool = { Sounds: { Sound }, Next: number }
@@ -52,6 +54,17 @@ end
 local function speedOf(settings: Sounds.Effect, speed: number?): number
 	local jitter = settings.Jitter or 0
 	return (speed or settings.Speed or 1) * (1 + random:NextNumber(-jitter, jitter))
+end
+
+local function groupVolume(name: string): number
+	local setting: PlayerSettings.Name = if name == "Effects" then "SfxVolume" else "MusicVolume"
+	return (Sounds.Groups[name] or 1) * PlayerSettings.Volume(Players.LocalPlayer, setting)
+end
+
+local function applyVolumes()
+	for name, group in groups do
+		group.Volume = groupVolume(name)
+	end
 end
 
 local function fadeTo(sound: Sound, volume: number)
@@ -105,12 +118,16 @@ function SoundController.Start(_self: any)
 	created.Name = FOLDER_NAME
 	created.Parent = SoundService
 	trove:Add(created)
-	for name, volume in Sounds.Groups do
+	for name in Sounds.Groups do
 		local group = Instance.new("SoundGroup")
 		group.Name = name
-		group.Volume = volume
+		group.Volume = groupVolume(name)
 		group.Parent = created
 		groups[name] = group
+	end
+	local player = Players.LocalPlayer
+	for _, setting in { "MusicVolume", "SfxVolume" } do
+		trove:Connect(player:GetAttributeChangedSignal(PlayerSettings.Attribute(setting)), applyVolumes)
 	end
 	for name, settings in Sounds.Effects do
 		local copies: { Sound } = {}
@@ -140,7 +157,6 @@ function SoundController.Start(_self: any)
 	ambience.Looped = true
 	ambience:Play()
 	playCalm()
-	local player = Players.LocalPlayer
 	trove:Connect(player:GetAttributeChangedSignal("Carrying"), function()
 		local carrying = player:GetAttribute("Carrying") == true
 		if carrying then
