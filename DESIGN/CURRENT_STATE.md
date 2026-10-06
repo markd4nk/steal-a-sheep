@@ -92,6 +92,8 @@ lamb.
 
 ## In progress
 
+- **Icons for the 49 products and 2 passes** (2026-10-05, files waiting for Mark's OK, not uploaded):
+  `art/store/make_product_icons.py` writes them to `.t3/userdata/attachments/product_icons/` (HISTORY.md).
 - **The map's studs on every sheep** (built 2026-10-05, branch `t3code/sheep-stud-style-mockups`, not merged): half-size
   copies of the map's `Studs` material over every sheep's wool (`Looks.Studs`, `GameConfig.Sheep.Studs`), glowing
   studs on Neon wool, see-through studs on glass. The cloud place needs `studio/SheepStuds.luau` run in Edit before

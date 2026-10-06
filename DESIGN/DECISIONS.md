@@ -138,6 +138,14 @@ confirmed or reversed it.
 
 ## To review
 
+Calls in the store's product and pass icons (2026-10-05, files waiting for Mark's OK):
+
+- **The seven 2x Speed icons are the same** (the card doesn't number the buys); the 29 walker icons show the card's
+  level row for their step ("Lv 1 > 2" to "Lv 29 > 30").
+- **No chips** ("ROBUX ONLY", "CHEAP!", "BEST VALUE"): only the words over or beside each card's picture.
+- **The two Robux sheep have the store art's ink outline** (the Golden Fleece vanished into its gold card without it),
+  and no studs on their wool, which the game's sheep get on the studs branch.
+
 Calls in the studs on every sheep (2026-10-05, branch t3code/sheep-stud-style-mockups, not merged):
 
 - **What counts as wool**: the puffs (and anything hanging off them), the tail, and add-on pieces tinted as wool.

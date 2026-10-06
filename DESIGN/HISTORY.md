@@ -6,6 +6,18 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Icons for the store's 49 developer products and 2 passes (2026-10-05)**. Files for Mark to approve, not uploaded:
+  asked for by the overnight coordinator (t3code-60160304) for Creator Hub, where the products had Roblox's default
+  picture. `art/store/make_product_icons.py` reads the products and passes from `Config/Store.luau` (`--store` for a
+  branch with the Creator Hub ids), the walker's levels from `Economy`, and the card colours from `Screens/Store`'s
+  TINTS. Each 512 x 512 icon is its store card's picture (`make_store_art.py`'s export, pixel for pixel the store's) on
+  the card's colour shading darker downwards, with the cards' studs (`DESIGN/ui/assets/studs.png`), white rays and the
+  card's own words in Fredoka One ("+150K CLIMB", "2x SPEED", "Lv 1 > 2"); passes keep everything inside the circle the
+  game page crops them to. The two Robux sheep are Blender renders of Shear a Sheep's fluffy sheep in this game's
+  looks (`art/store/render_robux_sheep.py`, as `DESIGN/ui/art/pegasus.py` does), in the store art's ink outline.
+  Output: `.t3/userdata/attachments/product_icons/<Key>.png` and `contact_sheet.png` (gitignored pictures: the icon
+  pack may be used in the game, not shared). Checked by eye on the contact sheet and at full size.
+
 - **The map's studs on every sheep (2026-10-05)**. On branch `t3code/sheep-stud-style-mockups`, not merged. The user
   asked for mock-ups of the map's stud style layered over the sheep, picked B, then: "build it on every sheep, and then
   you can use the glowing studs".
