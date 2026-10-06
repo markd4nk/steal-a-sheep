@@ -10,7 +10,8 @@ local UIKit = require(ReplicatedStorage.Utils.UIKit)
 local Motion = require(script.Parent.Parent.Motion)
 local Types = require(script.Parent.Parent.Types)
 
--- Moments over everything: the big celebration (a lamb's adult size, a merge) and the welcome-back card with the coins
+-- Moments over everything: the big celebration (a lamb's adult size, Titan the biggest; a merged lamb landing on the
+-- Merge Shrine's altar) and the welcome-back card with the coins
 -- earned while away (Shear a Sheep's celebration and pop-up card).
 local Popup = {}
 
@@ -71,7 +72,13 @@ function Popup.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end
 
 	trove:Add(Remotes.Reveal:Connect(function(name: string, size: string)
-		sound:Play(if size == "Giant" then "RevealFanfare" elseif size == "Large" then "Reveal" else "StepDone")
+		sound:Play(
+			if size == "Titan"
+				then "RevealFireworks"
+				elseif size == "Giant" then "RevealFanfare"
+				elseif size == "Large" then "Reveal"
+				else "StepDone"
+		)
 		celebrate(if size == "Standard" then "Grown up!" else `{string.upper(size)}!`, name)
 	end))
 	trove:Add(stateController.Offline:Connect(function(coins: number, matured: number)

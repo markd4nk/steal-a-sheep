@@ -367,6 +367,15 @@ local GameConfig = {
 		PutDownReach = 12, -- the Put down prompt's reach (it sits on the lamb over the thief's head)
 	},
 
+	-- The Merge Shrine in the hub (ShrineService builds it; the Merge menu and ShrineController show it).
+	Shrine = {
+		At = CFrame.new(287, 59.46, 245) * CFrame.Angles(0, math.rad(90), 0), -- the dais's centre on the ground
+		MenuDistance = 26, -- the menu closes when its player walks further than this from the shrine's centre
+		MergeSeconds = 5.6, -- from Merge to the lamb landing on the altar (the show ShrineController plays)
+		LambWaitSeconds = 30, -- a lamb left on the altar this long goes to its owner's pen by itself
+		CollectDistance = 14, -- studs from the altar to pick the lamb up
+	},
+
 	Training = {
 		TickSeconds = 0.25,
 	},
@@ -527,6 +536,12 @@ local GameConfig = {
 		NoticeSeconds = 2.5,
 		NoticeQueue = 4,
 		BannerSeconds = 4,
+	},
+	-- The free gift's menu opens by itself once a session, this long after the player could first claim it (after
+	-- their first delivery), as soon as they're off the mountain and no other menu is open.
+	Gift = {
+		AutoOpenSeconds = 30,
+		FavoriteTimeout = 60, -- seconds to wait for Roblox's favorite prompt to answer
 	},
 }
 

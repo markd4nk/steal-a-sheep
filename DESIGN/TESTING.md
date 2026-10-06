@@ -16,9 +16,18 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 | `GrowAll` | - | Every lamb grows up on the next tick (with its reveal) |
 | `UnlockAll` | - | Zeus's Heavy target in Climbing and one delivery from every tier |
 | `SetWalker` | level (1-30) | The stair walker at that level (its look, step speed and sign) |
+| `ResetGift` | - | The free gift can be claimed again (its HUD button comes back) |
 | `WipeSave` | - | A new player's save |
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
+
+The free gift in a playtest: `GiveSheep` 1 counts as the first delivery, and the menu opens by itself 30 s later at the
+plot. Claim skips Roblox's favorite prompt while the place is unpublished (PlaceId 0).
+
+UI mock-ups without playing: in Edit, `require` a screen module from `StarterPlayerScripts.UIController.Screens`, call
+its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labels, and set `Root.Scale.Scale` (1.25),
+`Root.Size` (1/scale) and each `UITextSizeConstraint` from its `MaxPoints`/`MinPoints` attributes times the scale, as
+`UIController/Scale` does in play. Delete the `TEMP_` guis after.
 
 ## Sell Stall (2026-10-05)
 
@@ -144,3 +153,17 @@ Useful measurements:
 - **Economy simulation**: an efficient player model (walker, pens, trails, trips timed from `Mountain.SpeedAt` and
   `Economy.EscapeSpeed`) lived in a throwaway script; its results are in HISTORY.md (Climbing). Rebuild it from
   Economy and Olympus if the economy changes.
+
+## Merge Shrine playtest (2026-10-05)
+
+- **Getting the character to the shrine**: `Humanoid:MoveTo` does nothing now (MovementController moves the humanoid
+  every frame), and a jump uphill is pulled back by MountainService's climb ceiling (the shrine at x 287 is uphill of
+  the plots). Step it there from a Client call: `PivotTo` 3 studs at a time every 0.35 s. A new character can spawn
+  snapped onto the StairMaster: fire `Remotes.LeaveWalker` first.
+- **A merge without the menu**: `Remotes.Merge:Invoke({ id1, id2, id3 })` from the client within 34 studs of the shrine
+  (4 a second at most); the lamb lands after `GameConfig.Shrine.MergeSeconds`, then `Remotes.ShrineCollect:Fire()`
+  within 18 studs of the altar picks it up, and `Remotes.PutDown:Fire()` inside the plot delivers it.
+- **The flock from a Client call**: `Remotes.GetState:Invoke()` (a fresh `require` of StateController is empty).
+- **Three grown sheep**: `Debug GiveSheep` three times, then `GrowAll` (only sheep in the pen grow).
+- **Recording**: start `ffmpeg -f gdigrab` a second before the click (it takes about 1.5 s to start); the game view of
+  a maximized Studio is at 6,166, 1732 x 792 on this PC.

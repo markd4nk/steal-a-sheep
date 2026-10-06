@@ -6,6 +6,97 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **The Merge Shrine: the Laurel Ring, a gamble like Steal an Egg's Fuse Machine (2026-10-05)**. Merged into main at
+  the user's request.
+  - *How it works*: `ShrineService` builds the Laurel Ring (`ShrineService/Model`) where the Mutation Machine stood
+    (`GameConfig.Shrine.At`) and runs the merge: `FlockService.ShrineMerge` checks three grown, unlocked sheep of one
+    family and the price (`Economy.ShrinePrice`), takes them and the cash, and makes one lamb from `Economy.ShrineRoll`
+    (fleece from `ShrineFleeceOdds`, weight from the Climbing session's `RollWeight` with `ShrineLuck`, size from
+    `RollSize`), saved at once with `Shrine = true` (out of the pen, can't be equipped or sold). Its owner's client
+    plays the merge (`ShrineController/Show`, the approved mock-up's beats) and leaves the lamb on the altar with a
+    Pick up prompt; `Remotes.ShrineCollect` puts it over their head (`WildService.CarryLamb`, no god), and main's put
+    down delivers it (`FlockService.ShrineArrive`, at the spot). Return, dying, leaving, or 30 s on the altar send it to
+    the pen. The Merge menu (rewritten) is the camera on the shrine with no backdrop, the odds panel
+    (`Economy.LuckySizeOdds`, the real roll's spread), the shop's rows and a big Merge button; picks stand on the
+    pedestals (`ShrineController:Preview`). Titan grow-ups get the biggest sound.
+  - *The user's calls*: DECISIONS.md, *The Merge Shrine is a gamble*. Steal an Egg research: three of the same species,
+    a cash fee, an egg of that species with its weight rerolled (it can come out smaller), mutations lost, rarity never
+    changes; plus a separate secret shrine for two-pet recipes.
+  - *Checked*: check.ps1; 56 tests (a new shrine test: rules, luck, odds summing to 100, the roll). Playtested in my
+    own Studio copy, before and after rebasing onto main's free-roaming pens: the menu, picks on the pedestals, the
+    merge end to end (cash and the three taken, the lamb in the flock), the merge show recorded, pick up and carry
+    (weight on the carry attribute), put down in the pen (the lamb hops in and grazes), the Return button, the 30 s
+    auto send home, and the refusals (too far, mixed families, a lamb in, two, the same twice, a second merge while
+    a lamb waits, rate limit). Not checked: two players, leaving with a lamb waiting, touch and gamepad, a Titan.
+    The user then: commit and merge it; the price is fine for now; Titan x5; 30 s on the altar is good. After merging
+    main (the Sell Stall, friend boost, free gift): the Sell Stall leaves a waiting lamb out and the server refuses it;
+    60 of 60 tests, console clean, a merge paid, picked up and sent to the pen in a fresh build.
+
+- **Friend boost (2026-10-05)**. The user asked for a simple friend multiplier like other games: each friend in the
+  server multiplies your income. Mock-ups A (a pill under the cash) and B (a tile under the menus, tap to invite) on
+  a real HUD screenshot; the user picked B, the INVITE state at 0 friends, and +20% a friend (over the proposed +10%).
+  - *Shared*: `Economy.FriendShare` 0.2, `MaxFriends` 4, `FriendBoost(friends)`. `Theme.Icons.HudFriend` and
+    `HudInvite`: gvesster's Free Icon Pack v3.1 `Player/Friend` and `Player/Add Player` (1st Outline, 256 px), the
+    cash icon's pack, uploaded through the Studio MCP.
+  - *Server*: `FriendService` asks `IsFriendsWithAsync` once per pair (the later joiner asks), keeps pairs while both
+    stay, sets the `Friends` attribute and sends the join notices. `FlockService`'s tick multiplies the income it pays
+    by `FriendService:Boost`. Studio: `DebugFriends` attribute, debug panel "Friends in server (id)" (`SetFriends`, -1
+    for the real count).
+  - *Client*: `Hud` adds `Tiles.FriendButton` (order 4): HudFriend and "+N%" in lime with friends here, HudInvite
+    and INVITE without; a tap runs `CanSendGameInviteAsync` then `PromptGameInvite`. The cash rate shows income x
+    boost.
+  - *Checked*: `check.ps1`; 57 of 57 tests (FriendBoost new) in a Studio copy of the place with this branch's code;
+    both bootstraps ready, console clean. INVITE tile with the uploaded icon; pretend 2 friends: tile "+40%", cash
+    paid 6.57/s -> 9.19/s (x1.40); 4 friends +80%, 9 capped at +80%, back to INVITE at -1; the join notice drawn;
+    tapping the tile opened Roblox's Invite Friends dialog (closed without inviting). Real friends untested.
+    After merging main (the free gift's GIFT button now tops the same column): 60 of 60 tests, console clean, the
+    five buttons fit a 793-pixel-tall window (INVITE ends at y 690), 1 friend showed +20% and +7.8/s on 6.5/s. The
+    user then: commit and merge it; no notice when a friend leaves; the tile's tutorial hiding left to the agent.
+
+- **Free gift for liking and favoriting (2026-10-05)**. The user, with a reference from another game (a "Free Gift!"
+  panel: the reward big, numbered steps with a picture of the game page's button, Claim): give players something
+  like climbing speed and cash for liking and favoriting the game (no community to join yet), in the Shop's UI.
+  - *Reward*: `Economy.GiftReward(walkerLevel, income)`: 180 s of the stair walker's rate (no trail) in Climbing and
+    180 s of the flock's income in coins, at least 500 of each, so it's worth the same few minutes whenever it's
+    claimed. The snapshot carries `FreeGift`, `GiftCoins`, `GiftClimb`; the menu shows those.
+  - *Claim*: `GiftService` (`Remotes.ClaimGift`, no arguments) gives it once per player (saved `FreeGift`) and returns
+    what it gave. Claim first opens Roblox's favorite prompt (`AvatarEditorService:PromptSetFavorite(PlaceId, Asset,
+    true)`) and claims only on `PromptSetFavoriteCompleted` = Success; in an unpublished place (PlaceId 0) the prompt is
+    skipped. No game can see a like, so step 1 is asked, not checked; the server can't check the favorite either and
+    takes the claim on trust, capped at one.
+  - *UI*: `Screens/Gift` (a Medium Prize Fleece menu, cyan `Lab` header, the gift on a stage, the two rewards, two
+    step tiles with a thumb-up row and a Favorite star under red pointers, a green Claim). HUD: `GiftButton` (GIFT,
+    top of the left column) with a red "!" and the hint glow, gone once claimed. It opens by itself once a session, 30 s
+    after it can be claimed (after the first delivery), once the player is off the mountain, not carrying, and no menu
+    is open. Claiming closes it and plays the "FREE GIFT!" celebration with what was given.
+  - *Checked*: `check.ps1` passes. Own Studio on `build/GiftPlaytest.rbxl` (branch code via `rojo build` +
+    `GetObjects`): both bootstraps ready, 38 tests pass, no warnings. After a debug delivery the menu opened by itself
+    at 31 s; Claim gave +500 Climb Power and +500 coins (25 → 525, opening tier 2, before main's Climbing rework), celebrated, hid the HUD button; a
+    second claim was refused; `ResetGift` brought the button back and it opened the menu; the coin line then read +900
+    (income 5/s). Two looks rendered as mock-ups (cyan, gold). Not checked: the real favorite prompt (needs a published
+    place), phones. Then main's Climbing rework merged in: the gift now reads +500 Climbing; replayed on the
+    merged build (42 tests pass, opened at 31 s, Claim gave +500 Climbing and +500 coins, console clean).
+  - *Redesign, the user's notes*: no gift picture inside (the header's badge is enough), show off what they get, and
+    the like and favorite steps looked too basic (emoji, plain arrows): make them professional and say exactly what to
+    do. Now a Large panel 470 tall: the rewards ("+500 CLIMBING + +500 CASH") big on one stage of rays (variant B: each
+    on its own gold or green stage, `SPLIT_PRIZE`); each step a numbered card with a picture of Roblox's real game page
+    (roblox.com in its dark theme via Playwright at 4x, vote counts hidden, the other buttons faded, the one to tap
+    glowing green or gold with a 👆 tapping it; `build/gift-art`) and one line ("Tap 👍 on the game's page", "Tap
+    here, or ⭐ on its page"). Tapping the favorite card opens the prompt and ticks it. The pictures are Studio-local
+    (`rbxasset://sas/gift-*-2.png`) until uploaded. Checked after merging main (pens, leaderboards, cash): 54 tests
+    pass, opened at 31 s, the favorite card ticked with "Favorited! Now claim your gift", Claim gave +500 Climbing
+    and +500 cash, console clean.
+  - *The user's calls*: variant A (one stage); upload the pictures; it has to really register the like and the
+    favorite and give the gift. No game can see a like (no API: AvatarEditorService covers favorites only; nothing
+    in the docs for votes), so the gift registers the favorite: Claim or the favorite card checks
+    `GetFavoriteAsync` first (someone who favorited before has nothing to say yes to), then prompts, then checks
+    again. Pictures uploaded through the Studio MCP's `upload_image` (served on 127.0.0.1): like
+    rbxassetid://79093897520396, favorite rbxassetid://94266843104437; `art/gift/step-pictures.js` remakes them.
+    Checked in a playtest: both pictures load from Roblox, Claim gave +500 Climbing and the cash, a second claim was
+    refused, 54 tests pass, console clean. Not checked: the real favorite prompt (needs a published place).
+  - *Merged into main* on the user's word, after main's StairMaster walker, Sell Stall and punch were merged in and
+    played again (59 tests pass, opened at 31 s, +500 Climbing and +900 cash at 5/s income, second claim refused).
+
 - **The Sell Stall's menu, and a two-minute sell price (2026-10-05)**. The user sent Steal an Egg's Sell Pets (and
   its Free Gift) and asked for mock-ups of the menu the Sell Stall by the plots opens: like the reference, made easier.
   - *Mock-ups* (`DESIGN/ui/mockups/sell-stall.html`, two rounds): A, the grid four across with a sell tile on the

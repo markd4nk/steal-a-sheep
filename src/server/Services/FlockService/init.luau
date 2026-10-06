@@ -19,9 +19,9 @@ type Sheep = Economy.Sheep
 
 -- A player's flock: delivering stolen lambs (put down in the pen), how many the pen holds, the sheep living in the
 -- plot (Pens: where each stands and strolls), income and growth every second, offline credit on join, the Sheepdex's
--- first-delivery rewards, Equip Best, locking, selling, the Merge Shrine, and the snapshot each client shows
--- (Remotes.State). Every change to the flock and its coins happens here in one go, with no yields, so a save never
--- catches half of it.
+-- first-delivery rewards, Equip Best, locking, selling, the Merge Shrine's trade (ShrineService runs the shrine), and
+-- the snapshot each client shows (Remotes.State). Every change to the flock and its coins happens here in one go, with
+-- no yields, so a save never catches half of it.
 local FlockService = {
 	Name = "FlockService",
 	-- A sheep reached its owner's plot: (player, the new sheep).
@@ -98,6 +98,7 @@ local function view(sheep: Sheep, penSlots: number): { [string]: any }
 		High = high,
 		Sell = Economy.SellValue(sheep),
 		Name = Economy.Name(sheep),
+		AtShrine = sheep.Shrine == true,
 	}
 end
 
@@ -111,6 +112,8 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		flock[id] = view(sheep, data.PenSlots)
 	end
 	local state = states[player]
+	local income = Roster.Income(data.Sheep, data.PenSlots)
+	local giftCoins, giftClimb = Economy.GiftReward(data.WalkerLevel, income)
 	return {
 		Sheep = flock,
 		Count = Roster.Count(data.Sheep),
@@ -125,8 +128,11 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		Tutorial = data.Tutorial,
 		ClimbTier = Economy.ClimbTier(data.ClimbPower),
 		MergeReady = Economy.TotalDeliveries(data.Deliveries) >= Economy.MergeAfterDeliveries,
-		Income = Roster.Income(data.Sheep, data.PenSlots),
+		Income = income,
 		Offline = if state then state.Offline else nil,
+		FreeGift = data.FreeGift,
+		GiftCoins = giftCoins,
+		GiftClimb = giftClimb,
 	}
 end
 
@@ -353,7 +359,7 @@ local function tick(dt: number)
 			end
 		end
 		if income > 0 then
-			registry.DataService:AdjustCoins(player, income * dt)
+			registry.DataService:AdjustCoins(player, income * registry.FriendService:Boost(player) * dt)
 		end
 		data.LastSeen = os.time()
 		for _, sheep in grewUp do
@@ -426,9 +432,6 @@ function FlockService.Start(_self: any)
 	end)
 	Remotes.FlockAction:Handle(function(player: Player, action: string, id: string?)
 		return FlockService:Act(player, action, id)
-	end)
-	Remotes.Merge:Handle(function(player: Player, ids: { string })
-		return FlockService:Merge(player, ids)
 	end)
 	Remotes.Sell:Handle(function(player: Player, ids: { string })
 		return FlockService:Sell(player, ids)
@@ -526,6 +529,9 @@ local function act(player: Player, data: any, action: string, id: string?): (boo
 	if not sheep then
 		return false, "That sheep is gone"
 	end
+	if sheep.Shrine and (action == "Equip" or action == "Sell") then
+		return false, "It's waiting at the Merge Shrine"
+	end
 	if action == "Equip" then
 		if Roster.IsEquipped(sheep, data.PenSlots) then
 			return true, nil
@@ -584,18 +590,30 @@ function FlockService.Sell(_self: any, player: Player, ids: { string }): (boolea
 	return true, `Sold {#ids} for {Format.Short(total)} cash`
 end
 
--- The Merge Shrine: three unlocked adults of one family, fleece and rank into one of the next rank, saved as one
--- change. If any of them was in the pen, the result takes its place there and hops in where it lived.
-function FlockService.Merge(_self: any, player: Player, ids: { string }): (boolean, string?, string?)
+-- The Merge Shrine's trade (ShrineService): the three sheep and the fee go and one fresh lamb of their family comes,
+-- its fleece, weight and adult size rolled with the three's luck (Economy.ShrineRoll), saved as one change. The lamb
+-- waits on the shrine's altar (Shrine) until its owner carries it home or it goes there by itself
+-- (FlockService.ShrineArrive), and stays out of the pen meanwhile.
+function FlockService.ShrineMerge(
+	_self: any,
+	player: Player,
+	ids: { string },
+	random: Random
+): (boolean, string?, Sheep?)
 	local data = dataOf(player)
 	if not data then
 		return false, "Still loading", nil
 	end
 	if player:GetAttribute("Carrying") == true then
-		return false, "Deliver your sheep first", nil
+		return false, "Take your sheep home first", nil
 	end
 	if Economy.TotalDeliveries(data.Deliveries) < Economy.MergeAfterDeliveries then
 		return false, `Opens after {Economy.MergeAfterDeliveries} deliveries`, nil
+	end
+	for _, sheep in data.Sheep do
+		if sheep.Shrine then
+			return false, "Pick up your lamb first", nil
+		end
 	end
 	local inputs: { Sheep } = {}
 	for _, id in ids do
@@ -605,29 +623,69 @@ function FlockService.Merge(_self: any, player: Player, ids: { string }): (boole
 		end
 		table.insert(inputs, sheep)
 	end
-	local ok, why = Economy.CanMerge(inputs)
+	local ok, why = Economy.CanShrine(inputs)
 	if not ok then
 		return false, why, nil
 	end
-	local result = Economy.MergeResult(inputs)
-	local slot = 0
-	for _, sheep in inputs do
-		if Roster.IsEquipped(sheep, data.PenSlots) and (slot == 0 or sheep.Slot < slot) then
-			slot = sheep.Slot
-			result.HomeX, result.HomeZ = sheep.HomeX, sheep.HomeZ
-		end
+	local price = Economy.ShrinePrice(inputs[1].Family)
+	if data.Coins < price then
+		return false, `Need {Format.Short(price - data.Coins)} more cash`, nil
+	end
+	local rarity, weight, size = Economy.ShrineRoll(random, inputs)
+	if not registry.DataService:AdjustCoins(player, -price) then
+		return false, "Not enough cash", nil
 	end
 	for _, sheep in inputs do
 		data.Sheep[sheep.Id] = nil
 	end
 	local id = tostring(data.NextId)
 	data.NextId += 1
-	result.Id = id
-	result.Slot = slot
-	data.Sheep[id] = result
-	refreshPen(player, true)
+	local lamb: Sheep = {
+		Id = id,
+		Family = inputs[1].Family,
+		Rarity = rarity,
+		Weight = weight,
+		Size = size,
+		Grown = 0,
+		Rank = 0,
+		Locked = false,
+		Slot = 0,
+		Pinned = false,
+		Shrine = true,
+	}
+	data.Sheep[id] = lamb
+	refreshPen(player)
 	push(player)
-	return true, `{Economy.Name(result)}! +{Format.Rate(Economy.Income(result))}/s`, id
+	return true, nil, lamb
+end
+
+-- A merged lamb leaves the shrine's altar for its owner's pen: put down there at `at` (hopping down from `from`, where
+-- it was held), or by itself to a free spot. Into the pen if it has room. `reason` is what its owner is told.
+function FlockService.ShrineArrive(_self: any, player: Player, id: string, reason: string?, at: CFrame?, from: CFrame?)
+	local data = dataOf(player)
+	local sheep = data and data.Sheep[id]
+	if not data or not sheep or not sheep.Shrine then
+		return
+	end
+	sheep.Shrine = nil
+	local slot = Roster.FreeSlot(data.Sheep, data.PenSlots)
+	if slot then
+		sheep.Slot = slot
+		local state = states[player]
+		if state and at then
+			state.Arrivals[id] = { At = at, From = from }
+		end
+	end
+	local name = Economy.Name(sheep)
+	if not slot then
+		notify(player, `{name} is stored: your pen is full`, "Bad", "Notice")
+	elseif reason then
+		notify(player, reason, "Good", "Coin")
+	else
+		notify(player, `{name} is home! +{Format.Rate(Economy.Income(sheep))}/s`, "Good", "Coin")
+	end
+	refreshPen(player)
+	push(player)
 end
 
 return FlockService

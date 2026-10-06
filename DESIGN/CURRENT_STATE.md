@@ -39,6 +39,8 @@ lamb.
   the place by `tools/UpperMountain.luau` (Lune, in `build-place.ps1`); `tools/preview-upper-mountain.luau` previews it
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
+- **Free gift** (like + favorite): Climbing and cash once (`Economy.GiftReward`), `GiftService`, `Screens/Gift`, the
+  HUD's GIFT button; Claim needs the game favorited (Roblox's prompt, or favorited before). A like can't be seen.
 - **Stair walker**: a StairMaster outside each pen by the gate (`PlotService/Walker`: five looks, the level floating
   over it, an upgrade sign with cash and Robux prompts); walk in to snap on, jump to get off (`TrainingService`); every
   client runs the steps and poses climbers' legs on them (`WalkerController`, `Utils/StairClimb`).
@@ -46,12 +48,14 @@ lamb.
 - **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
   Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
   `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
+- **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
+  `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
 
 - **Server**: `DataService`, `PurchaseService` (pack; the walker's Robux levels, no products made yet), `SheepService`, `PlotService`, `FlockService`,
-  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
-  `DebugService` (Studio only).
-- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Popup, Studio
-  DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
+  `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
+  `GiftService`, `ShrineService`, `DebugService` (Studio only).
+- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Popup,
+  Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
   `Utils/Economy` (every formula), `Utils/Mountain` (ramp height, tiers by position, floor checks).
 - **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
@@ -61,10 +65,14 @@ lamb.
   the stored sheep as cards; tap them or Select all, one Sell after a confirm, two minutes of income each. Sheep in the
   pen never show and the server refuses them; the Flock menu no longer sells.
 - **From Shear a Sheep**: UIKit, Theme, Style (trimmed), Panel, Buttons, Motion, Scale, the sheep rig, add-ons and
-  breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds, the Mutation Machine (as the Merge Shrine).
+  breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds.
+- **Merge Shrine** (merged 2026-10-05): the Laurel Ring replaces the
+  Mutation Machine; three grown sheep of one family and cash make one rerolled lamb, carried home from the altar
+  (GAME_DESIGN.md, *Merge Shrine*).
 
 ## In progress
 
+- Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
@@ -75,6 +83,12 @@ lamb.
   the user's picks (layout A or B, the sheep's look, missed-day rule, the sheep every week or once).
 
 ## Not verified
+
+- **Merge Shrine with two players** (another player mustn't see your picks, merge or lamb), **leaving with a lamb on
+  the altar** (should go to the pen), **touch and gamepad** in its menu, and **a Titan's grow-up** (none rolled yet).
+- **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
+  `IsFriendsWithAsync` pairs and the join notices between two real friends are untested until the place is published.
+  The left column (GIFT, FLOCK, SHOP, SHEEPDEX, the friend tile) wasn't checked on a phone's short screen.
 
 - **Sell Stall on a phone and a gamepad**: played on a PC window only (mouse); the layout matches the mock-up's phone
   frame, not checked in the Device Simulator.
@@ -91,6 +105,8 @@ lamb.
 - **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
   teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
+- **The free gift's favorite prompt**: skipped in Studio (PlaceId 0); `PromptSetFavorite` on the published place, its
+  answer and the claim after it are untested.
 - **Climbing in play**: playtested 2026-10-05 on tiers 1-3 and 6 with one player (TESTING.md); not on tiers 13-30,
   not with two players, not on touch or gamepad.
 - **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's

@@ -43,6 +43,7 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
 - Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
 - Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climbing): `LeaderboardService`.
+- Free gift for liking and favoriting the game (Climbing and cash, once): `GiftService`, `Screens/Gift`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
 ## The map
@@ -88,9 +89,15 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards and selling, and
+Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling and the free gift, and
 buys stair walker levels, pen space and trails. The one Robux offer: the next stair walker level, at the machine's
 sign (prices being decided in another session; the developer products aren't made yet).
+
+## Friend boost (the user, 2026-10-05)
+Each Roblox friend in your server adds +20% to your flock's cash income while they stay (servers hold 5, so +80% at
+most); not offline earnings, not the leaderboards. A tile under the menu pictures shows it: two friends and "+40%",
+or, with no friends here, the invite picture and INVITE. Tapping it opens Roblox's invite. When a friend joins:
+"Sam joined: friend boost +20%"; the HUD's cash rate includes the boost.
 
 ## Stair walker (the user, 2026-10-05)
 A real StairMaster just outside each pen, beside the gate, like Steal an Egg's treadmill. Walk into it and you snap on
@@ -121,6 +128,15 @@ and to outrun its gods. No walls: every tier is open to everyone.
 Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (lightest) up, saved with the sheep
 (`Weight`). Wild lambs: 1-1.1 mostly, 1.1-1.5 for one in twenty. Heavier lambs are slower to carry and tend to grow
 bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look a little bigger as lambs.
+
+## Merge Shrine (the user, 2026-10-05)
+The Laurel Ring in the hub, where the Mutation Machine stood: pick three grown sheep of one family in its menu, pay
+cash, and they merge into one fresh lamb of that family. Its fleece and hidden weight are rerolled (so its adult size
+too): bigger sheep in bring more luck, which makes heavy lambs likelier and opens the huge weights, the only way to a
+Titan. It can come out worse than what went in; the menu shows the odds first. The lamb pops out of an orb that
+appears over the altar only during the merge, lands on the altar, and its player picks it up and carries it home like
+a stolen lamb (no god chases it; nobody else sees or takes it); left there 30 s it goes home by itself. Its size shows
+when it grows up in the pen. `ShrineService` (server), `ShrineController` (the scene on each device), the Merge menu.
 
 ## Not built
 Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.

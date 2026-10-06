@@ -564,6 +564,10 @@ local Theme = {
 		HudCloud = "rbxassetid://110760075293464",
 		HudRebirth = "rbxassetid://139634266473406",
 		HudTrophy = "rbxassetid://80868090980266",
+		-- The friend boost's HUD tile (2026-10-05), from the same pack: two friends while any are in the server, one with a
+		-- green plus (Add Player) as the invite while none are.
+		HudFriend = "rbxassetid://106767967764586",
+		HudInvite = "rbxassetid://136775580096135",
 		-- The pack's red "!": over things the player can afford (UIController/Bangs) and on the HUD's Rebirth.
 		HudAlert = "rbxassetid://93541923107912",
 		-- The pack's golden calendar: the daily gift's card and its HUD button.
