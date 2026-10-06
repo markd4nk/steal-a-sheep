@@ -38,7 +38,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     walker for Robux then cash (level 1 to 3, prices 19 to 27 and 1.2K to 7.5K); 2x Money doubled income exactly and
     showed Owned, a second buy refused; a Robux sheep refused at the Sell Stall and the Merge Shrine. Galaxy A06
     sideways: the window fits after the Motion fix, all five tabs fit, the Cash tab scrolls there. Screenshots in the
-    session (`steal-a-sheep-store-built-*.jpg` in T3 Code's attachments).
+    session (`steal-a-sheep-store-built-*.jpg` in T3 Code's attachments). After merging main's Merge Shrine gamble: 66
+    of 66 tests, Kronos bought (3x), the shrine's menu lists only the mountain's sheep with Kronos in the flock, console
+    clean.
 - **The Merge Shrine: the Laurel Ring, a gamble like Steal an Egg's Fuse Machine (2026-10-05)**. Merged into main at
   the user's request.
   - *How it works*: `ShrineService` builds the Laurel Ring (`ShrineService/Model`) where the Mutation Machine stood
