@@ -61,10 +61,13 @@ lamb.
 - **Gods in rank order** (branch `t3code/order-olympian-gods`, not merged): `Config/Olympus` reordered, new High
   Olympus stretches for the eleven Olympians who moved up. Main merged in (Climbing, pens, leaderboards, dropped
   lambs). Waiting for the user's OK on the new stretches before merging.
-- **Real god models**: whole, fully clothed gods (the user's rule after Roblox removed two bare limb meshes; no bare
-  chests). Zeus candidate (the user: bulky take 2's size, fully clothed): asset 135867199676206, short-sleeved tunic
-  over chest and shoulders, red hem, angry, two arms, 5,954 triangles, one 1024 texture, a neon-block bolt welded in
-  his raised right fist; shown in a playtest in place of the block Zeus. Waiting for the user's OK.
+- **Real god models, moving to Blender** (the user, 2026-10-05): Roblox's text-only generator kept missing (a third
+  arm, bare chests, slim arms, mild faces; 2 limb meshes removed by moderation). Next: Zeus modelled in Blender (5.2
+  installed; its MCP add-on needs Blender open) from the user's picture as a look reference only (it's a watermarked
+  stock image: describe it, don't feed it to a generator), clothed, bulky, angry, two arms, ~6k triangles; rigged as one
+  skinned mesh so he walks; the neon-block bolt in his raised fist; imported through Studio. Last generator candidate:
+  asset 135867199676206. Rules in DECISIONS.md (Confirmed).
+- **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.

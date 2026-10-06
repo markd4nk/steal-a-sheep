@@ -21,6 +21,12 @@ confirmed or reversed it.
   the thirteen Olympians youngest first: Dionysus, Hermes, Hephaestus, Ares, Aphrodite, Artemis, Apollo, Athena,
   Demeter, Hestia, Poseidon, Hera, Zeus. The user kept that order of 18-30 ("if in Greek mythology they don't have a
   hierarchy, then it doesn't really matter").
+- **Real god models (2026-10-05)**: each god is one whole mesh (never split into separate limb meshes: Roblox's
+  moderation removed two bare limbs), fully clothed (no bare chests), as bulky as the user's pick, angry, exactly two
+  arms, about 6,000 triangles and one texture; symbols as glowing block props (Zeus's neon bolt). Made in Blender from
+  now on (Roblox's generator couldn't be steered) and rigged so they walk.
+- **Later: gods lunge and belly-slide (2026-10-05)**: when you steal a god's sheep, the god lunges at you face first,
+  then glides on its stomach like a penguin, steering towards you. Rig the gods so they can dive and lie prone.
 - **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
   noticeable; then "keep it that").
 - **Climbing is one stat, no walls (2026-10-05)**: speed and Climb Power are one thing, "Climbing". Every tier is
