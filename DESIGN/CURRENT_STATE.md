@@ -55,11 +55,15 @@ lamb.
   `art/store/make_store_art.py`. No products or passes exist on Roblox yet: Studio grants them with no dialog.
 - **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
   `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
+- **Daily gifts** (2026-10-05, branch `t3code/daily-sheep-gifts`): a week of gifts, the Pegasus Sheep on Day 7
+  (`DailyService`, `Economy.DailyWeek`/`Specials`, `Screens/Daily`, the HUD's DAILY; the Pegasus's wings, halo and
+  hooves are `SheepService/Extras` "Pegasus"). GAME_DESIGN.md, *Daily gifts*. The HUD's left column wraps into a
+  second column on short screens.
 
 - **Server**: `DataService`, `PurchaseService` (grants by Config/Store key), `StoreService`, `SheepService`, `PlotService`, `FlockService`,
   `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
-  `GiftService`, `ShrineService`, `DebugService` (Studio only).
-- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Store,
+  `GiftService`, `DailyService`, `ShrineService`, `DebugService` (Studio only).
+- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Daily, Store,
   Popup, Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`,
   `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
@@ -89,11 +93,15 @@ lamb.
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
   lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
-- **Daily Gifts** (mock-ups 2026-10-05, `DESIGN/ui/mockups/daily-gifts.html`, nothing built): a seven-day check-in,
-  cash and Climbing scaled to the player, a Rare lamb on day 4, the Pegasus Sheep (new, winged) on day 7; waiting for
-  the user's picks (layout A or B, the sheep's look, missed-day rule, the sheep every week or once).
+- **Daily gifts: built and playtested on `t3code/daily-sheep-gifts`, not merged** (waiting for the user's word). Main
+  merged in after the Robux store. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
+
+- **Daily gifts over real days**: the 20-hour wait and the claims were tried with the debug day commands, not by
+  waiting; keeping the day across a real rejoin is untested (the mock store). The HUD's wrapped column was seen on
+  Studio's small phone (three columns of two), not on a tablet or a 390-point phone; the menu wasn't tried on PC
+  after the compact layout, nor with a gamepad.
 
 - **Real Robux purchases**: no product or pass exists yet, so nothing went through Roblox's dialog or ProcessReceipt;
   the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and

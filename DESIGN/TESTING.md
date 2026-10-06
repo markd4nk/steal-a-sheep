@@ -17,6 +17,8 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 | `UnlockAll` | - | Zeus's Heavy target in Climbing and one delivery from every tier |
 | `SetWalker` | level (1-30) | The stair walker at that level (its look, step speed and sign) |
 | `ResetGift` | - | The free gift can be claimed again (its HUD button comes back) |
+| `DailyReady` | - | Today's daily gift waits now, as if its 20 hours had passed |
+| `DailyDay` | day (1-7) | The daily gifts' day to claim next, waiting now (7: the Pegasus Sheep) |
 | `WipeSave` | - | A new player's save |
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
@@ -36,6 +38,21 @@ UI mock-ups without playing: in Edit, `require` a screen module from `StarterPla
 its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labels, and set `Root.Scale.Scale` (1.25),
 `Root.Size` (1/scale) and each `UITextSizeConstraint` from its `MaxPoints`/`MinPoints` attributes times the scale, as
 `UIController/Scale` does in play. Delete the `TEMP_` guis after.
+
+## Daily gifts (2026-10-05)
+
+- Own place copy `build/DailyPlaytest.rbxl` (code swapped in from `content/sas/daily-sync.rbxm`). After `GiveSheep` (the
+  first delivery) the free gift's menu opens at 30 s and the daily gifts' at 45 s once nothing else is open: claim the
+  free gift first (`Remotes.ClaimGift:Invoke()`) to see the daily one open by itself.
+- `Remotes.ClaimDaily` allows 2 calls in 2 seconds: space scripted claims out or the third is dropped ("[Net] Dropped
+  ClaimDaily ... rate limit").
+- That Studio had its Device Emulator on a phone (Samsung Galaxy A06, 800 x 360), so clicks arrive as touches
+  (`UserInputService.MouseEnabled` false). The Studio MCP's `user_mouse_input` worked once (a click at a gui's
+  `AbsolutePosition` + (0, 58) opened the menu) and later sent nothing at all, likely while another session's Studio
+  was the front window; `VirtualInputManager` needs a higher capability than `execute_luau` has. The reliable route
+  was the desktop tools on this Studio's window (announced, and handed back to the other sessions after).
+- The Pegasus in daylight: clone `ReplicatedStorage.SheepLooks.Pegasus` to (0, 400, 0) in the sky, scale it, and
+  `screen_capture` from about 12 studs off its front-left; delete it after.
 
 ## Sell Stall (2026-10-05)
 

@@ -7,7 +7,7 @@ Studio is the closer check once one is picked.
 
 | Path | What it is |
 | --- | --- |
-| `mockups/*.html` | The pages: `sell-stall` (the Sell Stall's menu, 2026-10-05; built as A, and in the game the pen's sheep don't show); `daily-gifts` (the seven-day check-in, 2026-10-05: layouts A and B, the week in B, the Pegasus Sheep's looks, the HUD button; not built) |
+| `mockups/*.html` | The pages: `sell-stall` (the Sell Stall's menu, 2026-10-05; built as A, and in the game the pen's sheep don't show); `daily-gifts` (the seven-day check-in, 2026-10-05: layouts A and B, the week in B, the Pegasus Sheep's looks, the HUD button; built as B with the halo look) |
 | `kit.js` | The pieces: the sheep token as `SheepIcon` paints it, cards, buttons, panels, phone and PC frames with the HUD |
 | `fleece.css` | Every token and component, copied from Shear a Sheep's `DESIGN/ui/fleece/fleece.css` (its `SPEC.md` has the rules) |
 | `data.json` | Each family's token colours and a sample flock, written by `export-data.luau` from the game's own `GameConfig`, `Olympus` and `Economy` |
