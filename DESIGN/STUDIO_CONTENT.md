@@ -4,6 +4,8 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-06, version 29 published** (saved 19:06:52, published 19:07:04 UTC): main 2bbcf5a's two changed scripts
+  (`MovementController`, `Config/GameConfig`) set in the cloud place; nothing Studio-side changed.
 - **2026-10-06, version 28 published** (saved 18:55:41, published 18:56:04 UTC): main 8cfd60d's two changed
   scripts set in the cloud place (`Registry`, new `Controllers/SceneryController`; 139 of 139 then matching), and
   main's `tools/UpperMountain.luau` run there in Edit: `Stages.HighOlympus` rebuilt (14,010 -> 18,888 parts) and the

@@ -16,6 +16,10 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## Live
 
+- **Private test version 29 (2026-10-06, 19:07 UTC)**: main @ 2bbcf5a, version 28 plus the slide stop (pulling back
+  ends a slide at once) and no touch auto-jump on the mountain. Two scripts changed in the cloud place
+  (`MovementController`, `Config/GameConfig`; 139 of 139 then matching); no Studio-side change. Checked there first:
+  both bootstraps ready, 101 tests, a clean console.
 - **Private test version 28 (2026-10-06, 18:56 UTC)**: main @ 8cfd60d, version 27 plus High Olympus's lanes (each
   god's obstacles, dunes, the winding path, moving scenery) and only ramps solid on the whole descent. Scripts: the new
   `SceneryController` and `Registry`; Studio-side: High Olympus rebuilt by the builder and the old stages' lane decor
@@ -166,8 +170,7 @@ lamb.
   god's obstacles, dunes, the god's landmark, a winding path, particles and birds, everything standing tilted with the
   slope; scenery moves (`SceneryController`). `tools/UpperMountain.luau`'s `Lane`; `tools/check-lanes.luau` checks it.
   Built into the cloud place for version 28. HISTORY.md.
-- **Slide stop and no auto-jump on the mountain (2026-10-06, branch `t3code/olympus-obstacle-mockups`, not merged,
-  not published)**: pulling back up the slope ends a slide at once (`MovementController`, `PULL_BACK`); touch
+- **Slide stop and no auto-jump on the mountain (2026-10-06, live in version 29)**: pulling back up the slope ends a slide at once (`MovementController`, `PULL_BACK`); touch
   auto-jump is off on the ramp. HISTORY.md.
 - **Only ramps are solid on the descent (2026-10-06, live in version 28)**: the
   user's rule. High Olympus's obstacles are scenery, its ramps stage 7's dunes; the old stages' trees, spires, arches,

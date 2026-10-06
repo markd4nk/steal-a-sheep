@@ -6,8 +6,8 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
-- **A slide stops dead when pulled back; no auto-jump up the mountain (2026-10-06, branch
-  `t3code/olympus-obstacle-mockups`, not merged)**. The user, after version 28: running up made climbers auto-jump on
+- **A slide stops dead when pulled back; no auto-jump up the mountain (2026-10-06, merged into main on the user's
+  word, live in version 29)**. The user, after version 28: running up made climbers auto-jump on
   the slope; and with momentum nobody could break out of a slide: moving the other way should stop it at once.
   - *Why it hopped*: Roblox's touch auto-jump (`Humanoid.AutoJumpEnabled`, on for phones and Studio's device
     simulator) jumped whenever a climber met a bump: stage 5's 3-stud floor rise at x 1740, stage 6's dune face at
