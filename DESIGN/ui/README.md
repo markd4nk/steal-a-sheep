@@ -7,11 +7,13 @@ Studio is the closer check once one is picked.
 
 | Path | What it is |
 | --- | --- |
-| `mockups/*.html` | The pages: `sell-stall` (the Sell Stall's menu, 2026-10-05; built as A, and in the game the pen's sheep don't show) |
+| `mockups/*.html` | The pages: `sell-stall` (the Sell Stall's menu, 2026-10-05; built as A, and in the game the pen's sheep don't show); `daily-gifts` (the seven-day check-in, 2026-10-05: layouts A and B, the week in B, the Pegasus Sheep's looks, the HUD button; not built) |
 | `kit.js` | The pieces: the sheep token as `SheepIcon` paints it, cards, buttons, panels, phone and PC frames with the HUD |
 | `fleece.css` | Every token and component, copied from Shear a Sheep's `DESIGN/ui/fleece/fleece.css` (its `SPEC.md` has the rules) |
 | `data.json` | Each family's token colours and a sample flock, written by `export-data.luau` from the game's own `GameConfig`, `Olympus` and `Economy` |
 | `assets/` | The stud tile (Shear a Sheep's `art/ui/make_studs.py`) and the world behind the frames (a playtest screenshot) |
+| `assets/daily/` | The Pegasus Sheep, rendered by `art/pegasus.py` (Blender, from a Shear a Sheep checkout's fluffy sheep) |
+| `local/` | Gitignored pictures made from the icon pack: the Robux store mock-up's cash and winged-sandal art (`%TEMP%\shopmock\art2_talaria_white`, from that session's `compose2.py`) and an in-game screenshot for the HUD (`free-gift-claimed.jpg` from the attachments) |
 | `render.mjs` | Renders each page to `renders/<page>.png` and each frame to `renders/<page>/<id>.png` (gitignored) |
 
 ```

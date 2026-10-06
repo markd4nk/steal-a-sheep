@@ -166,6 +166,7 @@ export const ACCENT = {
 	shop: ["#6cc4ff", "#2f8ff0", "#1b5fb0"],
 	confirm: ["#6cc4ff", "#2f8ff0", "#1b5fb0"],
 	warning: ["#ff8a7a", "#e8463c", "#9e1d17"],
+	daily: ["#ffe066", "#ffb31a", "#b06f00"],
 };
 
 export function accentVars(name) {

@@ -70,6 +70,9 @@ lamb.
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
   lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
+- **Daily Gifts** (mock-ups 2026-10-05, `DESIGN/ui/mockups/daily-gifts.html`, nothing built): a seven-day check-in,
+  cash and Climbing scaled to the player, a Rare lamb on day 4, the Pegasus Sheep (new, winged) on day 7; waiting for
+  the user's picks (layout A or B, the sheep's look, missed-day rule, the sheep every week or once).
 
 ## Not verified
 
