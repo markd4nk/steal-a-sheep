@@ -11,3 +11,6 @@ __pycache__/
 
 # Rendered mock-ups (make them again with: node DESIGN/ui/render.mjs)
 DESIGN/ui/renders/
+
+# God model builds and mock-up renders (art/gods/README.md)
+art/gods/out/

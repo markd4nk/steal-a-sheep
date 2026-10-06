@@ -136,6 +136,19 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   endings, so a script that edits a Luau or Markdown file turns every line CRLF. Open files for writing with
   `newline='\n'`, or strip `\r` afterwards." Seen 2026-10-05 in Steal a Sheep: four edited services came back all
   CRLF.
+- **S22** (`BRAIN/PATTERNS/animations.md`, a new "Skinned meshes from Blender" part): "A Blender rig exported as FBX
+  (forward -Z, up Y, primary bone axis Y, no leaf bones) comes in through File > Import at its Blender size, one
+  Blender unit to one stud, facing -Z: a direction (x, y, z) in Blender's rig is (-x, z, y) in the model. The Bones
+  sit under the MeshPart (unanchored), with an `AnimationController` and an `InitialPoses` folder beside it. A Bone's
+  own axes aren't Blender's (its X and Z come in flipped), so pose from the model's axes, not the bone's:
+  `bone.Transform = CFrame.new(rc:VectorToObjectSpace(offset)) * (rc:Inverse() * q * rc)`, `rc` being the bone's rest
+  rotation relative to the MeshPart and `q` the rotation in the model's axes, carried by the parent bone." Seen
+  2026-10-05 in Steal a Sheep: Zeus's walk pose from Blender matched in Studio, foot for foot.
+- **S23** (`BRAIN/PATTERNS/desktop-recipes.md`, Import 3D): "Run end to end: `ctrl+m` in the Studio window opens
+  'Open 3D File (FBX, OBJ, GLB, GLTF)'; `window click_element` 'File name:' (role Edit, `window=` the dialog's hwnd),
+  `ctrl+a`, type the path, Enter; the 'Import Preview' window's defaults (Upload to Roblox, Add to Workspace, pivot at
+  the scene origin) were right for a rigged character with an embedded texture; Import. The mesh and texture upload at
+  once (`MeshId`, `TextureID`)." Seen 2026-10-05 in Steal a Sheep.
 
 ## Done
 

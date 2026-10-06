@@ -76,14 +76,12 @@ lamb.
 - **Gods in rank order** (branch `t3code/order-olympian-gods`, not merged): `Config/Olympus` reordered, new High
   Olympus stretches for the eleven Olympians who moved up. Main merged in (Climbing, pens, leaderboards, dropped
   lambs). Waiting for the user's OK on the new stretches before merging.
-- **Real god models, moving to Blender** (the user, 2026-10-05): Roblox's text-only generator kept missing (a third
-  arm, bare chests, slim arms, mild faces; 2 limb meshes removed by moderation). Next: Zeus modelled in Blender (5.2
-  installed; its MCP add-on needs Blender open) from the user's picture as a look reference only (it's a watermarked
-  stock image: describe it, don't feed it to a generator), clothed, bulky, angry, two arms, ~6k triangles; rigged as one
-  skinned mesh so he walks; the neon-block bolt in his raised fist; imported through Studio. Last generator candidate:
-  asset 135867199676206. Rules in DECISIONS.md (Confirmed).
+- **Real god models: Zeus made in Blender, mock-up shown 2026-10-05, waiting for the user's OK.** Built from shapes
+  in code (`art/gods/`, README there): one 6,000-triangle mesh, one 1024 texture, 16 bones; walk and run in
+  `art/gods/gait.py` (bolt raised while walking, held upright while running). The rules are in DECISIONS.md
+  (Confirmed). A test import worked in a Studio copy (mesh 74120242072184, an earlier texture), posed from Blender's
+  numbers. The game still has the block gods: nothing is wired in yet.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
-
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).

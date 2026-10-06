@@ -104,6 +104,16 @@ confirmed or reversed it.
 
 ## To review
 
+Calls in Zeus's Blender model (2026-10-05, a mock-up waiting for the user's OK):
+
+- **Clothes** after the user's picture, covered up: a white knee-length tunic with short sleeves, a white drape with
+  red edges over his left shoulder, gold brooches, belt, armlets and bracers, red hem bands, gold-strapped sandals.
+- **Face**: thick white brows slanting down to the nose over glaring eyes, a frown under the moustache, a beard of
+  five locks to a point on his chest, long white hair. No crown.
+- **Walk** (going home): heavy steps, his right fist up holding the bolt, the left arm swinging. **Run** (the chase):
+  leaning in, both fists pumping, the bolt kept upright in his right. The game would speed both up to his real speed.
+- **The bolt** is 5 studs tall, gripped low.
+
 Calls made ordering the gods by rank (2026-10-05):
 
 - **Which minor god takes which stage**: Pan on the meadow (the shepherds' god), Tyche on the bamboo, Hecate on the
