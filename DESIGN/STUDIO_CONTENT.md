@@ -45,7 +45,7 @@ here. Newest first.
   was rebuilt with it; a Studio that had it open still shows the 210 version until reopened without saving.
 
 - **2026-10-05, High Olympus**. `tools/assemble.luau` now runs `tools/UpperMountain.luau` on the map before saving the
-  place: `workspace.Stages.HighOlympus` (Folder) holds one Model a god, `Tier13 Iris` ... `Tier30 Zeus` (each `Floor`,
+  place: `workspace.Stages.HighOlympus` (Folder) holds one Model a god, `Tier13 Hypnos` ... `Tier30 Zeus` (each `Floor`,
   `Terraces`, `Decor`), and `Summit` (plaza, throne, colonnade). It destroys stage 7's end wall (the Model of 80 parts
   across the path at x 3077). It needs from the map: `Stages.Stage3`'s slab and its 198- and 67-part terrace models,
   the decor templates its `TEMPLATES` table names (stage, model name, part count, height), and `MaterialService.Studs`.

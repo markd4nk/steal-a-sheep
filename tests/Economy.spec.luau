@@ -10,7 +10,7 @@ local Run = require(script.Parent.Run)
 local function sheep(fields: { [string]: any }): Economy.Sheep
 	local base: any = {
 		Id = "1",
-		Family = "Meadow",
+		Family = Olympus.Tiers[1].Family,
 		Rarity = 1,
 		Weight = 1,
 		Size = 1,
@@ -218,7 +218,8 @@ return function(t: Run.Suite)
 			t.Expect(near(Economy.ShrineLuck(standard), Economy.ShrineBaseLuck)).ToBe(true)
 			t.Expect(near(Economy.ShrineLuck(titans), 1)).ToBe(true)
 			t.Expect(Economy.ShrineLuck({ a, b, c }) > Economy.ShrineLuck(standard)).ToBe(true)
-			t.Expect(Economy.ShrinePrice("Meadow")).ToBe(Economy.ShrinePriceSeconds * Economy.BaseIncome(1))
+			t.Expect(Economy.ShrinePrice(Olympus.Tiers[1].Family))
+				.ToBe(Economy.ShrinePriceSeconds * Economy.BaseIncome(1))
 
 			-- The odds the menu shows add up, Titan only through the shrine's luck, likelier with bigger sheep in.
 			for _, luck in { 0, Economy.ShrineBaseLuck, 1 } do

@@ -12,6 +12,7 @@ local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local Avatar = require(script.Avatar)
 local Rig = require(script.Rig)
 
 -- The thirty gods, one per tier, all on one state machine: Idle at home, Alert (the thief's head start), Chase along
@@ -19,7 +20,7 @@ local Rig = require(script.Rig)
 -- lock on its target, down the whole descent until they cross the foothill safety line. It moves along the floor itself
 -- (no pathfinding to get stuck) at one set speed for the whole chase (Economy.GodSpeed), like Steal an Egg's guardians:
 -- never scaled by the thief, nor by the stretch it's on. A catch needs the target within reach and nothing solid
--- between them.
+-- between them. Each god is a Roblox avatar (Avatar, Looks), or its block figure (Rig) if the catalog won't load.
 local GodService = {
 	Name = "GodService",
 	-- A god caught this thief: (player).
@@ -32,6 +33,7 @@ type God = {
 	Tier: Olympus.Tier,
 	Model: Model,
 	Root: BasePart,
+	Hip: number, -- studs from its feet to its root's centre
 	Align: AlignPosition,
 	Turn: AlignOrientation,
 	Home: Vector3, -- feet
@@ -83,7 +85,7 @@ local function place(god: God, at: Vector3, facing: Vector3)
 	if facing.Magnitude > 1e-3 then
 		god.Facing = facing.Unit
 	end
-	god.Align.Position = at + Vector3.new(0, Rig.Hip, 0)
+	god.Align.Position = at + Vector3.new(0, god.Hip, 0)
 	god.Turn.CFrame = CFrame.lookAlong(Vector3.zero, god.Facing)
 end
 
@@ -133,7 +135,7 @@ local function pickTarget(god: God, now: number): Player?
 end
 
 local function clearSight(god: God, root: BasePart): boolean
-	local eye = god.At + Vector3.new(0, Rig.Hip + 2, 0)
+	local eye = god.At + Vector3.new(0, god.Hip + 2, 0)
 	local toward = root.Position - eye
 	return workspace:Raycast(eye, toward, losParams) == nil
 end
@@ -181,7 +183,7 @@ local function update(god: God, dt: number, now: number)
 			else Economy.GodSpeed(god.Tier.Tier)
 		god.Model:SetAttribute("Speed", speed)
 		stepTowards(god, root.Position, speed * dt)
-		local offset = root.Position - (god.At + Vector3.new(0, Rig.Hip, 0))
+		local offset = root.Position - (god.At + Vector3.new(0, god.Hip, 0))
 		local flat = Vector2.new(offset.X, offset.Z).Magnitude
 		if flat <= GameConfig.Theft.CatchStuds + 1 and math.abs(offset.Y) < 8 and clearSight(god, root) then
 			god.Thieves[target] = nil
@@ -204,15 +206,18 @@ local function update(god: God, dt: number, now: number)
 	end
 end
 
+-- Yields: an avatar's catalog items load first.
 local function build(tier: Olympus.Tier, parent: Instance): God?
-	local model = Rig.Build(tier)
+	local avatar, avatarHip = Avatar.Build(tier)
+	local model: Model = avatar or Rig.Build(tier)
+	local hip = if avatar then avatarHip else Rig.Hip
 	local root = model.PrimaryPart
 	if not root then
 		return nil
 	end
 	local home2 = Mountain.GodHome(tier.Tier)
 	local home = Vector3.new(home2.X, Mountain.Floor(home2.X, home2.Y, groundParams), home2.Y)
-	model:PivotTo(CFrame.lookAlong(home + Vector3.new(0, Rig.Hip, 0), Mountain.Downhill))
+	model:PivotTo(CFrame.lookAlong(home + Vector3.new(0, hip, 0), Mountain.Downhill))
 	local attachment = Instance.new("Attachment")
 	attachment.Name = "Drive"
 	attachment.Parent = root
@@ -235,6 +240,7 @@ local function build(tier: Olympus.Tier, parent: Instance): God?
 		Tier = tier,
 		Model = model,
 		Root = root,
+		Hip = hip,
 		Align = align,
 		Turn = turn,
 		Home = home,
@@ -282,11 +288,14 @@ function GodService.Start(_self: any)
 		groundParams.FilterDescendantsInstances = list
 	end
 	refreshExclusions()
+	-- Built side by side in the background (Start can't wait for the catalog); a god chases once it's there.
 	for _, tier in Olympus.Tiers do
-		local god = build(tier, gods_)
-		if god then
-			table.insert(gods, god)
-		end
+		task.spawn(function()
+			local god = build(tier, gods_)
+			if god and gods_.Parent then
+				gods[tier.Tier] = god
+			end
+		end)
 	end
 	local sinceRefresh = 0
 	trove:Connect(RunService.Heartbeat, function(dt: number)

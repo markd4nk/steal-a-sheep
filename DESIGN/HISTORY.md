@@ -6,6 +6,30 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Gods in mythological rank (2026-10-05)**. The user asked whether the thirty gods were in Mount Olympus's order.
+  They weren't: the Olympians had been placed to fit the commissioned map's stage themes and the minor gods sat above
+  them, ordered by mood. The user chose rank: "the Zeus family should end up at the top", and kept the proposed order of
+  tiers 18-30 ("if in Greek mythology they don't have a hierarchy, then it doesn't really matter").
+  - *Order*: tiers 1-12 on the commissioned map, each minor god on a stage that suits them: Pan, Tyche, Hecate, Phobos,
+    Eris, Eros, Hebe, Themis, Asclepius, Iris, Nike, Aeolus. 13-17 on High Olympus as before: Hypnos, Morpheus,
+    Deimos, Thanatos, Nemesis. 18-30 the Olympians, youngest first: Dionysus, Hermes, Hephaestus, Ares, Aphrodite,
+    Artemis, Apollo, Athena, Demeter, Hestia, Poseidon, Hera, Zeus. Each tier keeps its numbers (reach, income, x range,
+    slide speed, grade) and each god keeps their family, colours and signature, so the `Config/Olympus` rows swapped
+    names, areas, families and looks. Ten areas were renamed to fit their new places (DECISIONS.md).
+  - *High Olympus*: new themes in `tools/UpperMountain.luau` for the eleven Olympians who moved up (their props are
+    listed in DECISIONS.md), new pixel sprites (grapes, helmet, lyre, owl, trident, crown) and `Props.Fan` (Aphrodite's
+    shell, Hera's peacocks). The themes, sprites and arc prop only the departed minor gods used are gone, and Deimos's
+    moon helper is inlined (same draws, same stretch). Main's 275-stud stretches merged in.
+  - *Code*: the tutorial objective names tier 1's god ("Steal Pan's lamb"); the Economy and Roster specs take tier 1's
+    family from `Olympus` instead of "Meadow" (five tests failed on the reorder). `tools/check-lanes.luau` checks the
+    slide lanes in the built place with Lune, no Studio needed.
+  - *Checked*: `check.ps1` passes; `check-lanes` finds 0 of 8475 decor parts in the lane (it caught leaves of
+    Hermes's and Artemis's trees and one of Aphrodite's arches, moved further out). In a separate Studio on the built
+    place: both bootstraps ready, the 30 gods spawn in the new order, 36 tests pass, the console is clean, the HUD reads
+    "Steal Pan's lamb", Pan stands in the first pasture under Tyche's gate. Screenshots of all eleven new stretches;
+    three colour fixes after them (Hephaestus's caps charcoal, not Ares's red; Aphrodite's blossoms pink; Artemis's
+    floor slate). Not walked: the new stretches by foot, a theft from them.
+
 - **Version 5: six sheep a tier, servers restarted (2026-10-05)**. The user, through the six-sheep session: "merge to
   main and then tell the other session to publish with this new version and then refresh all the servers". Main
   3989273's 24 changed files swapped into the cloud place (120 scripts, 0 differences; Workspace fingerprint

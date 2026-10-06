@@ -469,7 +469,8 @@ local function sign(kind: string, head: BasePart, rightArm: BasePart, leftArm: B
 	end
 end
 
-local function nameplate(head: BasePart, tier: Olympus.Tier)
+-- The god's name, area and mood over its head (GodService writes the mood).
+function Rig.Nameplate(head: BasePart, tier: Olympus.Tier)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "Nameplate"
 	billboard.Size = UDim2.fromOffset(220, 64)
@@ -549,7 +550,7 @@ function Rig.Build(tier: Olympus.Tier): Model
 		model:FindFirstChild("LeftArm") :: BasePart,
 		tier
 	)
-	nameplate(head, tier)
+	Rig.Nameplate(head, tier)
 	model:ScaleTo(Rig.Scale)
 	return model
 end
