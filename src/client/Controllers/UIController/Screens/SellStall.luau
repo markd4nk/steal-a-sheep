@@ -186,6 +186,9 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local shown: { View } = {}
 	local cards: { [string]: TextButton } = {}
 	local busy = false
+	-- What the cards were last made for: a growing lamb in the pen sends a new snapshot every second, and remaking the
+	-- cards for nothing would swallow taps on them.
+	local cardsKey = ""
 
 	-- The stored sheep (the pen's are never offered, nor a merged lamb still on the Merge Shrine's altar), cheapest or
 	-- dearest first, oldest first on a tie.
@@ -307,6 +310,16 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 				picked[id] = nil
 			end
 		end
+		local parts: { string } = {}
+		for _, sheep in shown do
+			table.insert(parts, `{sheep.Id}/{sheep.Locked}/{sheep.Sell or "?"}`)
+		end
+		local key = table.concat(parts, ",")
+		if key == cardsKey then
+			showTile()
+			return
+		end
+		cardsKey = key
 		cardTrove:Clean()
 		cards = {}
 		for _, child in list:GetChildren() do

@@ -260,6 +260,24 @@ Useful measurements:
 - **No straight lane through the map's middle**: from x 2300 down every z from 145 to 240 meets a part or mesh within
   about 400 studs (raycast scan along the floor at 2.5 and 5 studs up); tier 3 down is clear at z 185.
 
+## Mystery lambs (2026-10-06)
+
+- **Lamb looks without playing**: `studio/LambMockup.luau` (wrapped as a ModuleScript in an .rbxmx under Studio's
+  `content\sas_mock\`, then `require(game:GetObjects(...)[1])` in Edit) builds lambs and adults as TEMP_ models in Pan's
+  pasture: `Shots.Herd(god, x, adults?, pattern?, style?)`, `Styles`, `Weights`, `Cards`, `Growing` (in a plot's pen)
+  and `One`. Its marking styles (Bold, Spots, Details, Count, Grow) were the mock-ups; the game's is Count (D), in
+  `Utils/LambLook`. Cards over sheep are drawn on camera-facing SurfaceGuis there, since captures leave billboards out.
+- **Staging the branch in the shared cloud Studio**: `rojo build tools/sync.project.json` into `content\sas\` under a
+  name of its own, then in Edit move each same-named child of ReplicatedStorage, ServerScriptService and
+  StarterPlayerScripts (and `ServerStorage.Tests`) into `ServerStorage.TEMP_MainScripts` and parent the new ones; to
+  update, destroy the staged ones and parent the rebuilt ones (the backup stays); afterwards put the backup back.
+- **The lamb flow in one call**: `Debug Steal` 1, `Debug Home`, step 8 studs in, `Remotes.PutDown:Fire()`; then
+  `Debug GrowAll` with a `Remotes.Reveal` listener to see the grow-up. `Debug GiveSheep 30.6` gives a Zeus Mythic lamb
+  that takes 8 minutes to grow (a tier 1 lamb grows up while you rejoin).
+- **Opening menus**: a TEMP_ LocalScript in StarterPlayerScripts that calls `UIController:Open(name)` when the
+  LocalPlayer's `TempOpen` attribute changes (Sheep looks, above). Cards on a Galaxy A06 need the 47 px x offset
+  (Robux store, above): aim at `AbsolutePosition + AbsoluteSize / 2 + (47, 0)`.
+
 ## Asset audit (2026-10-05, before launch)
 
 Every asset the game uses loads: 1,286 distinct ids, none broken, moderated, deleted or slow.

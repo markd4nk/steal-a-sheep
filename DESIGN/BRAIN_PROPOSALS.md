@@ -285,6 +285,11 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   History row, and **Publish to Roblox** publishes that autosaved version, so Version History and Server management
   show the autosave's time, not the publish's. Check that every edit came before that time." Seen 2026-10-06 in Steal
   a Sheep: version 8 was autosaved at 08:42 and published at 08:51.
+- **S48** (`BRAIN/PATTERNS/ui.md`): "A menu that remakes its cards on every state push swallows taps once the state
+  pushes every second (a countdown, something growing): a tap that starts on one card and ends on its replacement never
+  fires `Activated`. Remake the cards only when the list itself changes (a key of the ids in order and the fields the
+  cards are made from) and update the numbers in place; redraw a ViewportFrame only when what it shows changes." Seen
+  2026-10-06 in Steal a Sheep: with a lamb growing, the Flock menu's cards couldn't be picked until it kept them.
 
 ## Done
 

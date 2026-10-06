@@ -94,7 +94,8 @@ here. Newest first.
   - **The code**, from `rojo build default.project.json`.
 - Made at runtime (not in the place): `workspace.Plots`, `Gods`, `WildSheep`, `CarriedSheep`, `PenSheep`,
   `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`,
-  `MergeShrine` (the Laurel Ring, ShrineService/Model; on each client `ShrineLocal` holds its pedestal previews and lamb), `ReplicatedStorage.SheepLooks`, the leaderboards' screens,
+  `MergeShrine` (the Laurel Ring, ShrineService/Model; on each client `ShrineLocal` holds its pedestal previews and lamb), `ReplicatedStorage.SheepLooks` (a plain adult of
+  every family, and the plain lambs `Lamb` and `Lamb<HornStyle>` that every lamb is marked on), the leaderboards' screens,
   every ScreenGui.
 - Set on the published place (2026-10-05): Maximum Visitor Count 5 (one player a plot, Creator Hub > Places > Access),
   Studio access to API services on (Experience Settings > Security), owned by getajobgle, who owns Shear a Sheep's

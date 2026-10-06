@@ -13,8 +13,8 @@ on the way), then grow your flock into the biggest earners in your pen.
 
 ## Core loop (as built)
 Train on the stair walker -> climb to a god's pasture -> steal a lamb -> slide home with the god behind you ->
-carry it into your pen and put it down wherever you like -> it lives there, roaming and grazing, earning and growing ->
-upgrade.
+carry it into your pen and put it down wherever you like -> it grows up there, roaming and grazing, and only then shows
+what it is and starts earning -> upgrade.
 
 ## The pen (the user, 2026-10-05: "just like Steal an Egg ... bring them into the pen and then place them down", and
 the sheep walking around on their own "just like in Shear a Sheep", lambs "mostly eating off the floor")
@@ -62,7 +62,8 @@ kept), up to Zeus's throne plaza: five more minor gods, then the thirteen Olympi
 Zeus's siblings, Hera and Zeus. Below the Twelve the myths set no order, so the minor gods follow the stages' themes.
 The climb is all on foot. High Olympus is sparse for now: the user will add obstacles to it later.
 
-Each god has six sheep families (below); the table's is the god's own, their Common.
+Each god has six sheep families (below); the table's is the god's own, their Common. Their lambs all look alike but
+for their marks (*Mystery lambs*).
 
 | Tier | God | Where | Family (Shear a Sheep breed) |
 | --- | --- | --- | --- |
@@ -98,8 +99,8 @@ Each god has six sheep families (below); the table's is the god's own, their Com
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling, the
-free gift and the daily gifts, and buys stair walker levels, pen space and trails. Robux buys from the store below.
+Cash, the only currency (code calls it `Coins`), comes from grown sheep in the pen (lambs earn nothing),
+first-discovery rewards, selling, the free gift and the daily gifts, and buys stair walker levels, pen space and trails. Robux buys from the store below.
 
 ## The Robux store (the user, 2026-10-05)
 A STORE button on the HUD opens one page that scrolls, its section tabs outside the window on the right:
@@ -164,20 +165,22 @@ and to outrun its gods. No walls: every tier is open to everyone.
 ## Lamb weight (the user, 2026-10-05)
 Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (lightest) up, saved with the sheep
 (`Weight`). Wild lambs: 1-1.1 mostly, 1.1-1.5 for one in twenty. Heavier lambs are slower to carry and tend to grow
-bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look a little bigger as lambs.
+bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look bigger and rounder as
+lambs (*Mystery lambs*).
 
 ## Six sheep a tier (the user, 2026-10-05)
 Every god's pasture holds six families (`Config/Herds`, keyed by god): **Common** (the god's own family), **Uncommon,
 Rare, Epic, Legendary, Mythic**, the rarer ones built from Shear a Sheep's builds and wool with primitive extras. Each
 wild lamb rolls its family: 50 / 25 / 13 / 7 / 4 / 1%. A family earns its tier's base income times x1, x1.5, x2.5, x4,
 x8, x15. On top of that every lamb still rolls its **fleece: Plain, Shiny (x1.5, blue sparkles) or Royal (x2.5, gold)**.
-The theft card shows the family's rarity; Legendary and Mythic lambs (and Royal fleeces) are announced. Menus colour a
-sheep's card by its family's rarity.
+A lamb doesn't show its family until it grows up (*Mystery lambs*). Legendary and Mythic lambs (and Royal fleeces)
+are announced without naming the family ("A Mythic Lamb appeared in Zeus's pasture!"). Menus colour a grown sheep's
+card by its family's rarity; a lamb's card is Common's grey.
 
 ## Sheepdex (Mark's mock-up, 2026-10-05)
 Like Steal an Egg's Pet Index: one scrolling list with a section per tier (its god, its six sheep in a 3 x 2 grid in
 their rarity's colours, dark silhouettes until found, a bar to the herd's gift) and the picked sheep beside it: its
-picture, rarity, income, where it lives and its reward. Delivering the first of a family finds it; its reward (30 s of
+picture, rarity, income, where it lives and its reward. Growing up the first of a family finds it; its reward (30 s of
 the family's income in cash, and 5% of its tier's sign number x its rarity's multiplier in Climbing, at least 5) waits
 for **Claim** in the Sheepdex. Claiming all six of a god pays the herd's gift (10 minutes of the tier's Common income,
 and a quarter of its sign number in Climbing, at least 25). A red badge on the HUD's SHEEPDEX counts rewards waiting.
@@ -188,8 +191,26 @@ cash, and they merge into one fresh lamb of that family. Its fleece and hidden w
 too): bigger sheep in bring more luck, which makes heavy lambs likelier and opens the huge weights, the only way to a
 Titan. It can come out worse than what went in; the menu shows the odds first. The lamb pops out of an orb that
 appears over the altar only during the merge, lands on the altar, and its player picks it up and carries it home like
-a stolen lamb (no god chases it; nobody else sees or takes it); left there 30 s it goes home by itself. Its size shows
-when it grows up in the pen. `ShrineService` (server), `ShrineController` (the scene on each device), the Merge menu.
+a stolen lamb (no god chases it; nobody else sees or takes it); left there 30 s it goes home by itself. It's a lamb
+like any other: its size shows when it grows up in the pen. `ShrineService` (server), `ShrineController` (the scene on
+each device), the Merge menu.
+
+## Mystery lambs (the user, 2026-10-06)
+"So that the player doesn't actually know what they're getting", like Steal an Egg's eggs: a lamb shows only a few
+clues to what it will grow into, and what it is shows when it grows up.
+- **The look** (mock-up D, the user's pick): every lamb is a bare white lamb, no wool ("you can tell that it's just a
+  lamb"), its horns, if it'll have any, as buds, with **one spot for each step of its family's rarity**, Common one to
+  Mythic six, in the main colour of the sheep it will be (taken from that sheep's own look). Heavier lambs are bigger
+  and rounder (*Lamb weight*). Shiny and Royal fleeces show only their blue or gold sparkle.
+- **Nothing names it**: nothing over a wild lamb (no card), "Lamb" on the carry card, in the Flock menu and at the Sell
+  Stall, with its token and 3D look in its marks.
+- **Growing up**: in the pen a lamb earns nothing; its label is a clock and the time left (45 s on Pan up to 8 minutes
+  on Zeus, half with 2x Growth; stored lambs don't grow). It grows bigger as it goes, and at 100% its wool pops on and
+  it takes its real size, Titan included, with a notice ("Your lamb grew up: Epic Toadstool Sheep, GIANT!", louder the
+  rarer or bigger). The Sheepdex finds its family then.
+- **Selling a lamb** (Sell Stall): two minutes of what it will really earn grown, its price shown as "?" until it's sold.
+- **Equip Best** ranks a lamb by what it's likely worth from what shows (its god, fleece, weight and rank), the same
+  for every family of its herd, so a growing lamb keeps its place in the pen without giving its family away.
 
 ## Not built
 Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece, gifting store items.

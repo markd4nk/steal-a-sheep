@@ -96,6 +96,16 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local sortIndex = 1
 	local picked: string? = nil
 	local busy = false
+	-- What the cards and the 3D view were last made for. A growing lamb sends a new snapshot every second; the cards
+	-- are only made again when the flock itself changes (else a tap lands on a card being replaced), the numbers
+	-- update in place, and the view is drawn again only as the picked one visibly grows.
+	local cardsKey = ""
+	local viewKey = ""
+
+	-- A card's number: a grown sheep's income, a lamb's time until it grows up.
+	local function priceText(sheep: any): string
+		return if sheep.Adult then `+{Format.Rate(sheep.Income)}/s` else Format.Duration(sheep.GrowLeft)
+	end
 
 	local function sheepById(id: string?): any
 		local data = stateController:Get()
@@ -124,17 +134,22 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		if rateIcon then
 			rateIcon.Image = if sheep.Adult then Theme.Icons.HudCash else Theme.Icons.Clock
 		end
+		local shownAs = `{sheep.Id}/{sheep.Adult}/{sheep.Size}/{math.floor(sheep.Growth * 40)}`
+		local redraw = shownAs ~= viewKey
+		viewKey = shownAs
 		if sheep.Adult then
 			rateLabel.Text = `+{Format.Rate(sheep.Income)}/s`
-			MenuParts.ShowSheep(view, sheep.Family, Economy.Sizes[math.max(sheep.Size, 1)].Scale)
+			if redraw then
+				MenuParts.ShowSheep(view, sheep.Family, Economy.Sizes[math.max(sheep.Size, 1)].Scale)
+			end
 			lines[1].Text = `{Economy.Sizes[sheep.Size].Name} adult`
 			growthBar.Visible = false
 			lines[2].Text = if sheep.Slot > 0 then "In your pen" else "Stored - not earning"
 		else
 			rateLabel.Text = Format.Duration(sheep.GrowLeft)
-			if sheep.Look then
+			if redraw and sheep.Look then
 				MenuParts.ShowLamb(view, sheep.Look, sheep.Weight, sheep.Growth)
-			else
+			elseif redraw then
 				MenuParts.ShowSheep(view, sheep.Family, Economy.LambSize(sheep.Weight, sheep.Growth))
 			end
 			lines[1].Text = if sheep.Slot > 0 then "Growing up" else "Grows up in your pen"
@@ -171,13 +186,30 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			title.Text = `Your Flock ({#flock}/{data.Limit})`
 		end
 		emptyLabel.Visible = #flock == 0
+		if picked and not sheepById(picked) then
+			picked = nil
+		end
+		local parts: { string } = {}
+		for _, sheep in flock do
+			table.insert(parts, `{sheep.Id}/{sheep.Slot}/{sheep.Locked}/{sheep.Adult}/{sheep.Name}`)
+		end
+		local key = table.concat(parts, ",")
+		if key == cardsKey and picked then
+			for _, sheep in flock do
+				local card = list:FindFirstChild(`Sheep{sheep.Id}`)
+				local price = card and card:FindFirstChild("PriceLabel", true)
+				if price and price:IsA("TextLabel") then
+					price.Text = priceText(sheep)
+				end
+			end
+			showDetail()
+			return
+		end
+		cardsKey = key
 		for _, child in list:GetChildren() do
 			if child:IsA("TextButton") and child.Name ~= "CardTemplate" then
 				child:Destroy()
 			end
-		end
-		if picked and not sheepById(picked) then
-			picked = nil
 		end
 		for order, sheep in flock do
 			local card = MenuParts.NewCard(list, `Sheep{sheep.Id}`, order)
@@ -192,7 +224,11 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			local cardName = face:FindFirstChild("NameLabel") :: TextLabel
 			cardName.Text = (string.gsub(sheep.Name, " Sheep$", ""))
 			local price = face:FindFirstChild("PriceLabel", true) :: TextLabel
-			price.Text = if sheep.Adult then `+{Format.Rate(sheep.Income)}/s` else Format.Duration(sheep.GrowLeft)
+			price.Text = priceText(sheep)
+			local priceIcon = (price.Parent :: Instance):FindFirstChild("Icon")
+			if priceIcon and priceIcon:IsA("ImageLabel") and not sheep.Adult then
+				priceIcon.Image = Theme.Icons.Clock
+			end
 			local tag = face:FindFirstChild("CountLabel") :: TextLabel
 			local marks: { string } = {}
 			if sheep.Slot > 0 then

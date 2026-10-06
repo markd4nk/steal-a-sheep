@@ -59,6 +59,10 @@ end
 
 local INCOME_COLOR = Color3.fromRGB(190, 255, 90)
 local LABEL_HEIGHT = 34
+-- How high the label floats over the sheep's middle: a fleece's height for a grown one, and just over a lamb's back,
+-- rising as it grows (studs, and studs per unit of model scale).
+local ADULT_LIFT = 4.5
+local LAMB_LIFT = { 0.8, 1.1 }
 
 -- The label: a clock (lambs only) and its words, side by side and centred over the sheep.
 local function makeLabel(model: Model): (TextLabel, ImageLabel)
@@ -103,6 +107,11 @@ end
 -- it out), or a lamb's time until it grows up at `growth` times the normal pace (2 with the 2x Growth pass).
 function Pens.Label(shown: Shown, sheep: Sheep, income: number, growth: number)
 	local adult = Economy.IsAdult(sheep)
+	local billboard = shown.Label.Parent
+	if billboard and billboard:IsA("BillboardGui") then
+		local lift = if adult then ADULT_LIFT else LAMB_LIFT[1] + LAMB_LIFT[2] * shown.Scale
+		billboard.StudsOffsetWorldSpace = Vector3.new(0, lift, 0)
+	end
 	shown.Clock.Visible = not adult
 	if adult then
 		shown.Label.Text = `+{Format.Rate(income)}/s`

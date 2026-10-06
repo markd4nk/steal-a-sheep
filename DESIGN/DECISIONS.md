@@ -227,16 +227,39 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
   glow or the see-through look, as the gold paint already did.
 - Any other wool material keeps its look without studs (none uses one today).
 
-- **Mystery lambs (the user, 2026-10-06; mock-ups, not built yet)**: a lamb doesn't show what it will grow into.
-  Wild lambs have nothing over them: no card, no name ("it should just be unnamed"). Lambs are bare white lambs (no
-  wool, horn buds) marked lightly in the colours of the sheep they grow into; any hint at rarity must be subtle (mock-up
-  A's bolder-by-rarity ladder was "that clear": out). Weight shows as size, heavier lambs bigger and rounder ("that's
-  fine"). The family, rarity and size show only when it grows up: it grows bigger in the pen until 100%, then its wool
-  appears and it takes its real size, Titan included. Growing lambs earn nothing; a small timer shows the time left.
-  Rare-lamb announcements stay as they are for now; a later session makes them simpler ("a rare lamb", "a mythic
-  lamb").
+- **Mystery lambs (the user, 2026-10-06; built on `t3code/mystery-lamb-mockup`)**: a lamb doesn't show what it will
+  grow into. Wild lambs have nothing over them: no card, no name ("it should just be unnamed"). Lambs are bare white
+  lambs (no wool, horn buds) marked in the colour of the sheep they grow into, the rarity hint subtle: mock-up **D**,
+  one spot per step of rarity (A's bolder ladder was "that clear": out; C and E not picked). Weight shows as size,
+  heavier lambs bigger and rounder ("that's fine"). The family, rarity and size show only when it grows up: it grows
+  bigger in the pen until 100%, then its wool appears and it takes its real size, Titan included. Growing lambs earn
+  nothing; a small timer shows the time left. A lamb sells for about two minutes of what it will really earn. How
+  rare-lamb announcements work is for a later session; the user wants them simpler ("a rare lamb or a mythic lamb").
 
 ## To review
+
+Calls in the mystery lambs (2026-10-06, branch `t3code/mystery-lamb-mockup`):
+
+- **Every grow-up gets a notice** now (before, only Giant and Titan): "Your lamb grew up: Epic Toadstool Sheep,
+  GIANT!", the family's rarity named from Rare up, the size from Large up; sound louder for Epic+ or Giant+. No
+  celebration (the user's earlier call).
+- **Announcements name no family** already: a lamb's name is "Lamb", so they read "A Mythic Lamb appeared in Zeus's
+  pasture!" (the user's simpler wording; anything more is the later session's).
+- **A lamb's price shows as "?"** at the Sell Stall, and a pick with lambs totals "900 + ?"; the cash shows in the sold
+  notice. Lambs sort after the priced sheep.
+- **Equip Best ranks a lamb by its likely worth** (its god's base x the herd's average family multiplier x fleece x
+  its weight's size odds x rank), not by its 0 income, so growing lambs aren't benched, and the same for every family
+  of a herd so the order gives nothing away.
+- **Shiny and Royal lambs keep their sparkle** (blue, gold) but not the gold paint.
+- **Every lamb is unnamed until grown**, even when its family is known: a merged lamb, Day 4's lamb, the Pegasus.
+- **Lamb cards** are Common's grey with no rarity chip; their number is the time left (clock icon), "Stored - not
+  growing" when stored.
+- **Sizes**: a lamb starts at 0.55 of an adult's rig (lightest) to 0.88 (the heaviest wild weight and up) and grows
+  60% bigger by 100%; its body is 0.92 to 1.30 as wide.
+- **The pen label** sits just over a lamb's back (it was at an adult's height) and reads like "0:42".
+- **The Sheepdex finds a family when it grows up**, so Day 4's gift lamb now counts too.
+- **The fleece pops on** piece by piece over about half a second with a burst of sparkles when a lamb grows up.
+- **Delivery notice**: "Your lamb is home! Grows up in 0:45" (was the lamb's name and income).
 
 Calls in the momentum slide (2026-10-06, `Mountain.Momentum`, `GodService` pace):
 

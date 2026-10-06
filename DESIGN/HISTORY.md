@@ -6,6 +6,40 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Mystery lambs (2026-10-06, branch `t3code/mystery-lamb-mockup`, not merged)**.
+  The user: lambs should be a mystery "so that the player doesn't actually know what they're getting", like Steal an
+  Egg's eggs, with only a little indication (which is bigger, heavier, more basic), a default lamb look ("no wool, ...
+  a very slim body where you can tell that it's just a lamb") and a bit of the colour of what it'll be. Mock-ups in Pan's
+  pasture (`studio/LambMockup.luau`, pictures `lamb-mystery-*.png` in T3's attachments): A, marks bolder with rarity,
+  was "that clear"; of the subtler C (a touch more a rarity), D (a spot more) and E (bigger spots) the user picked
+  **D**. Their calls: nothing over a wild lamb ("it should just be unnamed"), weight as size is fine, the reveal only
+  when it's grown ("the lamb gets bigger and bigger ... until it hits 100%, and then that's when the wool actually
+  spawns"), no income while growing with "a little timer", a lamb sells for about two minutes of what it'll earn, and
+  the announcements' rework is a later session's.
+  How it works: `SheepService` makes plain lambs at start (`SheepService/Lambs`: the rig in `GameConfig.LambBreed` with
+  its wool taken off, the head moved onto the bare body over a round neck, horns shrunk to buds; one per horn style,
+  also in `ReplicatedStorage.SheepLooks` for the menus) and takes each family's main colour from its plain adult
+  (`LambLook.MainColor`: by area, not white or cream, skipping the shorn body). `SheepService.BuildLamb` clones the
+  plain lamb and `LambLook.Dress`es it (body as wide as its weight, `Economy.FamilyRarity` spots on an ellipsoid fit
+  to the body); `SheepService.LambLook` is what a lamb shows (colour, spots, horns). Wild lambs, carried ones, pen
+  lambs and the shrine's merged lamb all use it, with no family on the model or its thief (the carry card reads
+  `CarriedColor`/`CarriedSpots`; `CarriedFamily` is gone). `Economy.Income` is 0 for a lamb; `Economy.LambSize` grows
+  it 60% from `LambScale` (now 0.55-0.88, spread at the light end); `SellValue` is two minutes of `AdultIncome` for
+  everything; `Worth` (Equip Best) ranks a lamb by its likely worth; `Name` of a lamb is "Lamb" (fleece first), so the
+  announcements say "A Mythic Lamb". The flock snapshot sends a lamb without its family or price, with `Look` and
+  `GrowLeft`; the Flock menu, Sell Stall ("?", "900 + ?"), HUD carry card and Daily menu show "Lamb". The pen label
+  is a clock and the time left (`Pens.Label`), just over a lamb's back. At 100% the pen rebuilds the model as its
+  family's, marks it `GrewAt`, and each device pops its fleece on (`AnimController`); `Remotes.Reveal` now carries the
+  family's rarity and every grow-up gets a notice; the Sheepdex finds a family at grow-up (offline too), not at
+  delivery. The Flock menu and Sell Stall now remake their cards only when the flock changes: a lamb's per-second
+  snapshot remade them under the cursor and swallowed clicks.
+  Checked: `check.ps1`; in the cloud place's Studio with the branch's scripts staged in (then main's put back): both
+  bootstraps ready, 88 tests pass, a clean console; 121 wild lambs with no card or family attribute; a Pan lamb stolen
+  (carry card "Lamb" with green spots), put down ("0:42" under a clock, no income, no family in the snapshot), grown
+  with `GrowAll` ("Your lamb grew up: Legendary Blossom Sheep!", +16/s, Sheepdex badge 1); a tier 1 lamb grown while
+  away; the Flock menu's lamb card and detail; the Sell Stall's "?" and "900 + ?". The test save was wiped back to new.
+  Not seen: the fleece pop itself, the shrine's lamb, a Titan, the gift lambs, a lamb sold, two players, a phone.
+
 - **Momentum slides, the god boosted too, quick bump recovery, a dead stop at the safety line (2026-10-06, branch
   `t3code/speed-up-downhill-sliding`, merged into main on the user's word)**.
   The user: sliding home from the top was "very, very slow all the way down" and boring (a slide kept the speed it

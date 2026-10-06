@@ -1,8 +1,9 @@
 --!strict
--- Mock-up of mystery lambs (2026-10-06, not the game's code): wild lambs as plain lambs with no wool, marked in the
--- colours of the sheep they'll grow into, the markings bolder the rarer the family, the size and plumpness from the
--- hidden weight. Run in Edit with execute_luau: it builds workspace.TEMP_LambMockup in Pan's pasture and returns the
--- camera spots for screen_capture. Set MODE at the bottom; "Clear" deletes it all. Nothing here is saved anywhere else.
+-- The mystery lambs' mock-ups (2026-10-06): lambs with no wool marked in the colours of the sheep they'll grow into,
+-- in the five marking styles shown to the user (Bold, Spots, Details, Count, Grow; the game uses Count, in
+-- Utils/LambLook), sized and as plump as their hidden weight, next to their adults. A module: require it in Edit
+-- (DESIGN/TESTING.md, Mystery lambs), call Reset, then a Shots function, which builds into workspace.TEMP_LambMockup in
+-- Pan's pasture (Growing: a plot's pen) and returns a camera spot for screen_capture; Clear deletes it all.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")

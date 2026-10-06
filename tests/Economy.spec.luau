@@ -354,7 +354,8 @@ return function(t: Run.Suite)
 		-- About a Royal sheep of that god (bases round, so not to the cash).
 		t.Expect(math.abs(Economy.AdultIncome(pegasus) / Economy.AdultIncome(royal) - 1) < 0.01).ToBe(true)
 		t.Expect(Economy.Name(pegasus)).ToBe("Pegasus Sheep")
-		t.Expect(Economy.Name(sheep({ Family = "Pegasus", Tier = tier }))).ToBe("Pegasus Lamb")
+		-- Unnamed like every lamb until it grows up.
+		t.Expect(Economy.Name(sheep({ Family = "Pegasus", Tier = tier }))).ToBe("Lamb")
 		t.Expect(Economy.FamilyOrder("Pegasus") > Economy.FamilyOrder("Thunder")).ToBe(true)
 		t.Expect(GameConfig.Breeds.Pegasus ~= nil).ToBe(true)
 	end)
