@@ -99,7 +99,9 @@ here. Newest first.
 - Made at runtime (not in the place): `workspace.Plots`, `Gods`, `WildSheep`, `CarriedSheep`, `PenSheep`,
   `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`,
   `MergeShrine` (the Laurel Ring, ShrineService/Model; on each client `ShrineLocal` holds its pedestal previews and lamb), `ReplicatedStorage.SheepLooks`, the leaderboards' screens,
-  every ScreenGui.
+  every ScreenGui; on each client the chase's `ChaseScreen` (DisplayOrder -1, under the HUD) and
+  `Lighting.ChaseGrade` (a ColorCorrectionEffect, off outside a chase), and the gods' chase sounds inside their Head
+  and HumanoidRootPart (made on first use).
 - Set on the published place (2026-10-05): Maximum Visitor Count 5 (one player a plot, Creator Hub > Places > Access),
   Studio access to API services on (Experience Settings > Security), owned by getajobgle, who owns Shear a Sheep's
   assets.
