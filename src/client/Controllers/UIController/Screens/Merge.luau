@@ -270,6 +270,22 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local odds = root:FindFirstChild("Odds") :: Frame
 	local luckLabel = odds:FindFirstChild("LuckLabel", true) :: TextLabel
 	local mergeButton = root:FindFirstChild("MergeButton") :: TextButton
+
+	-- On a short screen (a phone held sideways) the odds shrink just enough to stand clear of the Merge button: every
+	-- chance has to show (Roblox's rule for paid random items).
+	local ODDS_GAP = 8
+	local oddsFit = Instance.new("UIScale")
+	oddsFit.Name = "Fit"
+	oddsFit.Parent = odds
+	local function fitOdds()
+		local natural = odds.AbsoluteSize.Y / math.max(oddsFit.Scale, 1e-3)
+		local room = mergeButton.AbsolutePosition.Y - odds.AbsolutePosition.Y - ODDS_GAP
+		if natural > 0 and room > 0 then
+			oddsFit.Scale = math.clamp(room / natural, 0.5, 1)
+		end
+	end
+	trove:Connect(root:GetPropertyChangedSignal("AbsoluteSize"), fitOdds)
+	trove:Connect(odds:GetPropertyChangedSignal("AbsoluteSize"), fitOdds)
 	local stateController = context.Controllers.StateController
 	local shrineController = context.Controllers.ShrineController
 	local sound = context.Controllers.SoundController
@@ -536,6 +552,7 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			panel.Show()
 			shrineController:Frame(true)
 			preview()
+			task.defer(fitOdds)
 		end,
 		Close = function(_self: Types.Screen)
 			local wasOpen = isOpen
