@@ -4,6 +4,12 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, studs on the sheep (mock-ups)**: no place changes. Made in a local copy (`HerdsPlaytest.rbxl`) as
+  `workspace.TEMP_StudSheep` and `MaterialService.TEMP_SheepStuds`, then deleted. Built for real, mock-up A needs only
+  the map's `MaterialService.Studs`; B and C need half-size copies of it in MaterialService: Plastic, Metal, Fabric,
+  Foil and a glowing Plastic one (HISTORY.md, *Studs on the sheep*). Their BaseMaterial and maps are Studio-only
+  properties, so they'd be made Studio-side (`tools/assemble.luau`, and a `studio/` script for the cloud place).
+
 - **2026-10-05, daily gifts**: no place changes (the menu, the HUD's DAILY and the Pegasus Sheep are made at
   runtime; `SheepService` adds the Pegasus to `ReplicatedStorage.SheepLooks` with the other families). Its six
   pictures are uploaded images (`Theme.Icons.DailyCash1/3/5`, `DailyClimb1/3`, `Pegasus`). Tried in this session's own

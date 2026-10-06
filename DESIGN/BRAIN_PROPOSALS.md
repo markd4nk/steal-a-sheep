@@ -155,6 +155,18 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   Hub > Places > the place > Access (it starts at 50). Studio Access to API Services is under Experience Settings >
   Security. The Limited audience (Playtesters, Friends) needs a content maturity label first: until the
   questionnaire is done, Save Changes stays greyed out." Seen 2026-10-05 publishing Steal a Sheep.
+- **S30** (`BRAIN/GOTCHAS.md`): "A MaterialVariant on a MeshPart follows the mesh's UVs but keeps its `StudsPerTile`
+  size in studs: a part twice as big shows twice as many tiles, and the pattern bends and breaks where UV islands meet.
+  A tile made for flat blocks (studs, bricks) reads better at half its size or less on small round meshes. A `Texture`
+  on a MeshPart is projected flat from each face instead: an even grid, but only its picture, with no normal map, so
+  bevels go flat. Glass and Neon parts draw no variant at all; for a glowing look, give a Plastic variant an
+  `EmissiveMaskContent` (its own colour map works). A variant's BaseMaterial and maps are PluginSecurity: make variants
+  in Studio, not from game scripts." Seen 2026-10-05 mocking up the map's Studs material on Steal a Sheep's wool.
+  (Numbered S30 because an unmerged branch already uses S28 and S29.)
+- **S31** (`BRAIN/PATTERNS/testing-studio.md`): "`_G` lasts between `execute_luau` calls in one Studio: define a
+  long mock-up or test helper once (`_G.TEMP_Mockup = function(look) ... end`), rerun it with one-line calls, and set
+  it to nil when done. The command's thread lacks the RobloxScript capability: reading `Lighting.Technology` or
+  `MaterialService.Use2022Materials` errors." Seen 2026-10-05 in Edit, rendering four looks of the same scene.
 
 ## Done
 

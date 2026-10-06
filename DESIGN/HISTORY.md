@@ -6,6 +6,31 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Studs on the sheep: three mock-ups (2026-10-05)**. Not built yet. The user asked to see the map's stud style
+  layered over the sheep, as mock-ups.
+  - *The map's studs*: `MaterialService.Studs`, a Plastic MaterialVariant (colour and normal maps, one stud a tile) on
+    about 26,000 of the map's parts: a grid of square insets with a bevel. The other Texture on 14,700 faces
+    (`6905003203`, 9 studs a tile, 90% transparent) is a soft shading gradient, not studs.
+  - *How the mock-ups work* (`studio/StudSheepMockup.luau`): sheep from `SheepService.Build`, then the fleece (the Wool
+    folder, the tail, add-ons tinted Wool or Spot) set to Plastic with a variant. On the sheep's meshes the tiles follow
+    each mesh's UVs but keep their size in studs, so a bigger sheep carries more of them; at the map's size they come out
+    uneven where UV islands meet. A: the map's variant (1 stud). B: a copy at half size. C: B on every Plastic part,
+    face, ears, legs, horns and extras too (the face picture stays on top). Glowing, glass and metal wool keeps its
+    material in the mock-ups, since the variant is Plastic.
+  - *Tried and dropped*: the variant on the face block at the map's size (a cross through the face); the studs' colour
+    map as a projected `Texture` (an even grid, but flat L-shaped marks without the bump map, and it washes the colour
+    out when see-through).
+  - *Checked*: rendered in a local copy of the place (HerdsPlaytest.rbxl) by the first plot: Laurel, Grape, Rose and
+    War in each look, and close-ups of one Laurel and one Rose in all four looks; shown to the user. The TEMP_ model and
+    the half-size variant were deleted after.
+  - *B on every sheep* (the user asked how much work): every sheep model comes from `SheepService.Build` (wild, pens,
+    carried, the shrine's lamb, `SheepLooks` for the menus), so one change there covers them all. Wool that isn't
+    plastic, tried on a Laurel and a block each: a copy of the variant with BaseMaterial Metal, Fabric or Foil shows the
+    studs (gold Royal fleeces, silver, the metal families). Glass and Neon draw no variant at all; stand-ins that work:
+    the half-size Plastic studs at Transparency 0.25 for glass, and a Plastic copy with the studs' own colour map as
+    its `EmissiveMaskContent` (EmissiveStrength 1.6) for glowing wool. A variant's BaseMaterial and maps can only be set
+    in Studio, so the copies would be made Studio-side.
+
 - **Version 5: six sheep a tier, servers restarted (2026-10-05)**. The user, through the six-sheep session: "merge to
   main and then tell the other session to publish with this new version and then refresh all the servers". Main
   3989273's 24 changed files swapped into the cloud place (120 scripts, 0 differences; Workspace fingerprint

@@ -91,6 +91,9 @@ lamb.
 
 ## In progress
 
+- **Studs on the sheep** (mock-ups 2026-10-05, not built): the map's `Studs` material over the wool at the map's size
+  (A), at half size (B), or half size all over (C); `studio/StudSheepMockup.luau`. Waiting for the user's pick.
+
 - **The Robux store can't sell yet** (merged 2026-10-05; the user: Creator Hub later): the game now exists on Roblox,
   so the 2 passes and 49 developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) can be made in
   universe 10769564664 at Config/Store's prices, their ids put in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`). Until
