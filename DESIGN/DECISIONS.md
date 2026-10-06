@@ -28,8 +28,12 @@ confirmed or reversed it.
   from the catalog: the "Classic Style Angry Face" head, a head bigger than the body's scale (the cute look), the
   gods' 9.6-stud height, Roblox's own idle, walk and run, and their symbols as glowing block props (Zeus's neon bolt
   raised). "We don't have to do the fully clothed method anymore": bare chests are fine.
-- **Later: gods lunge and belly-slide (2026-10-05)**: when you steal a god's sheep, the god lunges at you face first,
-  then glides on its stomach like a penguin, steering towards you.
+- **Gods lunge and belly-slide (asked 2026-10-05, built 2026-10-06)**: when you steal a god's sheep, the god lunges at
+  you face first, then glides on its stomach like a penguin, steering towards you. From the mock-up video the user
+  kept the lunge "only at the start" (no second dive at the catch) and the dive carrying the god a little faster for a
+  third of a second ("that's fine").
+- **The slide is a surf (2026-10-06)**: of three mock-ups (A Penguin belly slide, B Surf, C Sled), the user: "I like
+  the surf". It replaces Roblox's sit for R15 avatars.
 - **High Olympus's grade rises gradually to 52 degrees at Zeus** (the user, 2026-10-05: no steeper than about 60,
   noticeable; then "keep it that").
 - **Climbing is one stat, no walls (2026-10-05)**: speed and Climb Power are one thing, "Climbing". Every tier is
@@ -228,6 +232,21 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
 - Any other wool material keeps its look without studs (none uses one today).
 
 ## To review
+
+Calls in the god lunge, belly glide and surf (2026-10-06, `Utils/BodyClips`, `GodController`, `SlideController`):
+
+- **The lunge takes 0.84 s and the dive is 1.6x faster from 0.22 to 0.56 s in** (about 3 studs gained at tier 1), as
+  in the mock-up the user saw. It plays on every new chase, including a god that turns from walking home straight to a
+  new thief.
+- **Getting up takes 0.62 s of the god's 1.6 s Taunt**, so its laugh shows for about a second (it was 1.6 s; the user:
+  "the laugh is fine", another session is changing the laugh). When a thief escapes, it gets up the same way before
+  walking home.
+- **The glide's look**: flippers out about 26 degrees and flapping twice a 0.9 s stroke, chest and head up, feet up
+  behind kicking, a lean into turns of a quarter of a degree per degree a second of turning (at most 22), lying along
+  the slope. Zeus's raised bolt arm comes down while he glides.
+- **The surf**: side on (78 degrees), crouched a quarter of the hips' height, carving +-8 degrees over 1.8 s, leaning a
+  third of the way into the ramp's slope; empty hands out for balance, aimed by direction so T-pose avatars look the
+  same. A carrier's arms and waist stay CarryController's. Seen by everyone near (200 studs). R6 avatars keep the sit.
 
 Calls in the momentum slide (2026-10-06, `Mountain.Momentum`, `GodService` pace):
 
@@ -613,7 +632,7 @@ Calls made while building the MVP on 2026-10-05:
   x 330); speed per stretch 24, 28, 32, 36, 36, 40, 40, 44, 44, 48, 48, 48 studs/s (tiers 1-12), times the carried
   lamb's burden share; steering within about 35 degrees either side of straight downhill; pulling back brakes; past the
   safety line the slide runs out to a stop. A scenery hit drops the slide to the speed the player really has; stuck for
-  half a second ends it. The slide pose is Roblox's sit animation.
+  half a second ends it. The slide pose was Roblox's sit animation (R15 avatars surf since 2026-10-06).
 - **Gods**: one per tier, standing near the top of its stretch to one side of the lane; 1.5 s head start; chase at 0.88
   of the stretch's walk (18) or slide speed (whichever the target is doing); catch within 3.5 studs with a clear line
   of sight; a caught thief is sent home to their plot. Tutorial thieves are chased at 0.7. A god chases only its own

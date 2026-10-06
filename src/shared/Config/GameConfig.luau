@@ -410,6 +410,10 @@ local GameConfig = {
 		PromptDistance = 10,
 		CatchStuds = 3.5,
 		CatchCheckEvery = 0.1,
+		-- A god sets off with a lunge (Utils/BodyClips): a crouch, a dive face first and a belly flop, then glides on
+		-- its belly for the rest of the chase. The dive, DiveFrom to DiveTo seconds in, carries it DiveSpeed times as
+		-- fast (the user kept it, 2026-10-06).
+		Lunge = { Seconds = 0.84, DiveFrom = 0.22, DiveTo = 0.56, DiveSpeed = 1.6 },
 		InventoryLimit = 100,
 		-- A stolen lamb is delivered when its thief puts it down inside their own plot's fence: PutDownAhead studs in
 		-- front of them, or the nearest clear spot round it. The server allows PutDownSlack studs outside the fence,

@@ -19,8 +19,9 @@ local Rig = require(script.Rig)
 -- the ramp, Catch or Disengage, then Return home. A god chases only thieves of its own tier, nearest first with a short
 -- lock on its target, down the whole descent until they cross the foothill safety line. It moves along the floor itself
 -- (no pathfinding to get stuck) at its set speed (Economy.GodSpeed), like Steal an Egg's guardians, times its thief's
--- momentum where they are: never slower than its set speed, never scaled by the stretch it's on. A catch
--- needs the target within reach and nothing solid
+-- momentum where they are: never slower than its set speed, never scaled by the stretch it's on. A chase opens with a
+-- lunge, a dive face first that carries the god faster for a moment (Economy.LungeShare); every device shows it, and
+-- the belly glide after it, from Mood (GodController). A catch needs the target within reach and nothing solid
 -- between them. Each god is a Roblox avatar (Avatar, Looks), or its block figure (Rig) if the catalog won't load.
 local GodService = {
 	Name = "GodService",
@@ -42,6 +43,7 @@ type God = {
 	Facing: Vector3,
 	Mood: Mood,
 	Until: number, -- os.clock() an Alert or a Taunt ends
+	RunSince: number, -- os.clock() its chase (Run) began: the lunge's clock
 	Target: Player?,
 	TargetSince: number,
 	Thieves: { [Player]: boolean }, -- carriers of this tier's lambs it may chase
@@ -72,6 +74,9 @@ local function setMood(god: God, mood: Mood)
 		return
 	end
 	god.Mood = mood
+	if mood == "Run" then
+		god.RunSince = os.clock()
+	end
 	god.Model:SetAttribute("Mood", mood)
 	local head = god.Model:FindFirstChild("Head")
 	local plate = head and head:FindFirstChild("Nameplate")
@@ -204,7 +209,7 @@ local function update(god: God, dt: number, now: number)
 		setMood(god, "Run")
 		local root = rootOf(target) :: BasePart
 		local set = if god.Gentle[target] then god.Tier.SlideSpeed * TUTORIAL_SHARE else Economy.GodSpeed(god.Tier.Tier)
-		local speed = set * momentumOf(god, target, root.Position.X)
+		local speed = set * momentumOf(god, target, root.Position.X) * Economy.LungeShare(now - god.RunSince)
 		god.Model:SetAttribute("Speed", speed)
 		stepTowards(god, root.Position, speed * dt)
 		local offset = root.Position - (god.At + Vector3.new(0, god.Hip, 0))
@@ -283,6 +288,7 @@ local function build(tier: Olympus.Tier, parent: Instance): God?
 		Facing = Mountain.Downhill,
 		Mood = "Idle",
 		Until = 0,
+		RunSince = 0,
 		Target = nil,
 		TargetSince = 0,
 		Thieves = {},

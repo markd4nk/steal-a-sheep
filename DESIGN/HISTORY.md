@@ -6,6 +6,28 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Gods lunge and belly-glide, players surf down (2026-10-06, branch `t3code/god-chase-animation-mockups`, merged
+  into main on the user's word, not published)**. The user: the gods used Roblox's idle, walk and run, the planned lunge and belly chase weren't built, and
+  the slide was Roblox's sit; "show me some mock-ups ... a video perhaps". A 29 s mock-up video (Now; the god's chase;
+  the lunge slowed; the player as A Penguin, B Surf, C Sled) from a scripted scene (`studio/SlideMockup.luau`). The
+  user: "I like the surf"; the lunge "only at the start"; the dive carrying the god a little faster is "fine".
+  - *How it works*: `Utils/BodyClips` holds the clips as pure functions of time (as `SheepClips` does the sheep): the
+    Lunge (crouch, dive face first, belly flop, bounce; its key times from `GameConfig.Theft.Lunge`), the Belly glide
+    loop, GetUp, and Surf. `Measure` finds the 15 R15 joints by the parts they join and the arms' rest directions;
+    `Ground` turns a pose onto the ramp's slope round the point under the hips and leans it into turns; `Apply` and
+    `Restore` pose over the Animator in PreSimulation and put it back after physics. `GodController` clocks each god's
+    Mood: Run plays the Lunge then the Belly glide (Roblox's idle underneath), leaving Run plays GetUp, then Roblox's
+    laugh or walk; Zeus's raised arm only while standing. `GodService` notes when Run began and multiplies the chase
+    speed by `Economy.LungeShare` (1.6 during the dive). `SlideController` (after CarryController in the registry)
+    surfs every sliding R15 player near the camera, the local one from `MovementController:IsSliding()`, others from
+    the Sliding attribute; carriers keep the carry's arms and waist; empty hands are aimed by direction (T-pose rests).
+    `MovementController` plays the sit only for R6.
+  - *Checked*: `check.ps1` passes; in a Studio playtest of a place copy both bootstraps ready and 91 tests pass (5 new
+    in `BodyClips.spec`: real transforms, the lunge landing in the glide and GetUp ending standing, the chest on the
+    floor, the surf loop and its arms on a T-pose rest, `LungeShare`). A real tier 1 theft, filmed: Pan points,
+    lunges and glides after the surfing thief; once he lost them at the safety line (got up, walked home), once he
+    caught them (they flew off, he got up and laughed). The surf's lower body measured 78 degrees side on and lowered
+    while sliding. Clean console.
 - **Momentum slides, the god boosted too, quick bump recovery, a dead stop at the safety line (2026-10-06, branch
   `t3code/speed-up-downhill-sliding`, merged into main on the user's word)**.
   The user: sliding home from the top was "very, very slow all the way down" and boring (a slide kept the speed it

@@ -107,7 +107,8 @@ lamb.
   Mutation Machine; three grown sheep of one family and cash make one rerolled lamb, carried home from the altar
   (GAME_DESIGN.md, *Merge Shrine*).
 - **The gods** (version 8): thirty in mythological rank, Pan tier 1 to Zeus 30, each a catalog-dressed Roblox avatar
-  (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load.
+  (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load. Live,
+  they chase with Roblox's run; the lunge and belly glide are in main for the next version (below).
 - **What the HUD says** (version 8): one message per moment, hints only when needed (`Screens/Hud`, `goal()`); every
   ProximityPrompt drawn as the menus' button for the device, press or tap (`PromptController/Look`). HISTORY.md, the
   overnight entry.
@@ -123,10 +124,10 @@ lamb.
 
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
-- **God lunge and belly glide, new player slide poses (mock-ups 2026-10-06, waiting for the user's pick)**: a 29 s
-  video and a still sheet (`Videos/StealASheepTrailer/out/slide_anim_*`): Pan points, lunges face first, glides on its
-  belly steering after the thief, gets up and laughs; the player's slide as A Penguin, B Surf or C Sled instead of
-  Roblox's sit. Clips written as code like `SheepClips` (`studio/SlideMockup.luau`, TESTING.md); nothing in the game yet.
+- **God lunge, belly glide and the surfing slide (2026-10-06, merged into main, not published)**: a god's chase opens
+  with a face-first lunge (its dive 1.6x as fast), then it glides on its belly; R15 players surf down instead of
+  Roblox's sit. Clips as code (`Utils/BodyClips`), played by `GodController` and the new `SlideController` on every
+  device; `Economy.LungeShare` for the dive. Playtested solo (HISTORY.md).
 
 - **Game page art and a trailer, first cuts** (overnight 2026-10-05, nothing uploaded): icon and thumbnail mock-ups
   (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and
@@ -147,6 +148,9 @@ lamb.
 
 ## Not verified
 
+- **The lunge, glide and surf beyond one blocky avatar on tier 1**: seen in a solo Studio playtest (a chase lost at the
+  safety line, a catch); not on High Olympus's steep stretches, not with another player watching (the pose is drawn
+  on each device from the Sliding attribute), not on skinned or T-pose avatars, R6, a phone or a gamepad.
 - **Studs on every sheep on a phone and in a live server**: seen in a Studio playtest and in Edit on all 183 families,
   not on a real device; their cost on a low-end phone wasn't measured (no extra parts, only materials).
 - **The live game itself**: version 8 was checked only in a Studio playtest of the cloud place before its publish

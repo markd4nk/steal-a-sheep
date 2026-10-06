@@ -43,6 +43,14 @@ its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labe
 
 ## Slide animation mock-ups (2026-10-06)
 
+- **Is the surf or a god's clip on?** A `PreSimulation` connection made from `execute_luau` ran before the
+  controllers' and read the Animator's transforms, not the clips'. Read the LowerTorso's frame in the
+  HumanoidRootPart's space from `RenderStepped` instead: surfing it turns about -78 degrees and drops about 0.5 studs.
+  A real theft in one call: `Debug:Invoke("Steal", 1)`, then a RenderStep at `Input + 1` calling `Humanoid:Move(-X)`;
+  `Debug Home` and `Remotes.PutDown:Fire()` deliver a lamb still carried from the last try (a new steal is refused).
+  Moving 1.2 s, then braking (`Move(+X)`) gets the thief caught at tier 1 with Climbing 25.
+- `studio/SlideMockup.luau` is the mock-up the user picked from: its clips were copied into `Utils/BodyClips`, which is
+  the one to change; the mock-up keeps the Penguin and Sled variants.
 - **Rerun them**: build a place copy (`rojo build`, then `tools/assemble.luau` into `build/AnimMock.rbxl`), open it in
   its own Studio, play. `rojo build` a one-file project of `studio/SlideMockup.luau` into the Studio version's
   `content/sas-anim/mock.rbxm`; in a Client `execute_luau`, `game:GetObjects("rbxasset://sas-anim/mock.rbxm")[1]`,

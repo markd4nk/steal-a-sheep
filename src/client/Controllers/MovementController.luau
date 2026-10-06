@@ -24,7 +24,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local MovementController = { Name = "MovementController" }
 
 local SLIDE_RENDER = "SlideControl"
-local SIT_R15 = "rbxassetid://2506281703"
+-- R15 characters surf down instead, posed on every device (SlideController).
 local SIT_R6 = "rbxassetid://178130996"
 local PUNCH_ARC = 0.12 -- a punch's arc peaks this share of its length above the straight line (20 to 120 studs)
 
@@ -147,9 +147,8 @@ local function setSliding(on: boolean, humanoid: Humanoid?)
 	sliding = on
 	Remotes.Slide:Fire(on)
 	if on then
-		if humanoid and not sitTrack then
-			local id = if humanoid.RigType == Enum.HumanoidRigType.R15 then SIT_R15 else SIT_R6
-			sitTrack = loadTrack(humanoid, id)
+		if humanoid and not sitTrack and humanoid.RigType == Enum.HumanoidRigType.R6 then
+			sitTrack = loadTrack(humanoid, SIT_R6)
 			if sitTrack then
 				sitTrack.Priority = Enum.AnimationPriority.Action
 				sitTrack.Looped = true

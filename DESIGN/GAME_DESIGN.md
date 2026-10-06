@@ -155,7 +155,14 @@ and to outrun its gods. No walls: every tier is open to everyone.
   began. A bump costs speed, won back in about a quarter of a second, and never trips you over. The slide **stops
   dead at the safety line**: from there you walk, so nobody is carried into the plots.
 - **Gods**: 0.8 x its tier's `SlideSpeed` (19 at tier 1 up to 48 at tier 30), never walking, times its thief's
-  momentum where they are: boosted as much as its thief, and it keeps that boost while they bump into things.
+  momentum where they are: boosted as much as its thief, and it keeps that boost while they bump into things. The
+  chase opens with a **lunge** (the user, 2026-10-06): after pointing for the head start the god crouches, dives face
+  first and belly-flops (0.84 s), the dive carrying it 1.6x as fast for a third of a second; then it **glides on its
+  belly like a penguin** for the rest of the chase, flippers flapping, steering after its thief and leaning into
+  turns. One lunge per chase, at the start. A catch: it gets up, then laughs; a lost chase: it gets up and walks home.
+- **The slide's look (the user, 2026-10-06)**: you **surf** down without a board, side on, left shoulder first,
+  knees bent, looking downhill, carving and leaning into turns (instead of Roblox's sit); a carried lamb stays held
+  overhead, empty hands go out for balance. Everyone sees everyone's. R6 avatars keep Roblox's sit.
 - **So**: at the sign's number the lightest lamb's thief matches the god and the head start gets them away; an
   average lamb leaves about 95% (caught near the bottom); heavy ones need more. Momentum doesn't change who wins a
   clean chase or where, only how long it takes; a bump brings the god closer (at the sign's number, with the lightest

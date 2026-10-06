@@ -276,6 +276,12 @@ function Economy.GodSpeed(tier: number): number
 	return Olympus.Tiers[math.clamp(tier, 1, Olympus.Count)].SlideSpeed * Economy.GodShare
 end
 
+-- How many times its speed a god moves `seconds` into a chase: faster for the dive of its lunge, else 1.
+function Economy.LungeShare(seconds: number): number
+	local lunge = GameConfig.Theft.Lunge
+	return if seconds >= lunge.DiveFrom and seconds < lunge.DiveTo then lunge.DiveSpeed else 1
+end
+
 -- A slide's speed, set when it starts and kept all the way down: the god's speed times the speed factor, for the
 -- carried lamb's tier and weight, or the tier slid from (weight 1) empty-handed. At the Reach the lightest lamb's thief
 -- matches the god and its head start gets them away; an average lamb leaves about 95%.
