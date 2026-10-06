@@ -28,8 +28,11 @@ history: one line per item, details in the files below. Keep it under 300 lines 
   Violence (Repeated/Mild), no non-compliant regions. It declares the Merge Shrine as a paid random item and that the
   game respects `ArePaidRandomItemsRestricted`, live since version 8. No genre yet (the user). Going public also needs
   the owner account's checks (age check, and for all ages ID, 2-step verification, Plus or the 1,000 Robux fee).
-- **Store on Roblox**: 49 developer products and 2 passes at `Config/Store`'s prices, on sale and live in version 8;
-  Roblox's default pictures until the icons are uploaded (In progress).
+- **Store on Roblox**: 49 developer products and 2 passes at `Config/Store`'s prices, on sale and live in version 8,
+  each with its store card's icon (uploaded 2026-10-06: `art/store/make_product_icons.py`, then
+  `upload_product_icons.py` through Open Cloud; Roblox's moderation was clearing them the same hour). The Open Cloud key
+  "Steal a Sheep products and passes" (developer products and game passes, read and write, this game only, no expiry;
+  Roblox drops keys unused for 60 days) is in `~/.roblox/steal-a-sheep-open-cloud.key` on Mark's main PC, never in git.
 - The main Studio is that cloud place (Team Create: edits there last without a Save and ship with the next publish).
   `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is the local
   copy sessions build their own Studios from; the main checkout's was rebuilt from 3667692.
@@ -111,9 +114,6 @@ lamb.
 
 ## In progress
 
-- **Icons for the 49 products and 2 passes** (Mark: "good to upload", 2026-10-06; not uploaded yet):
-  `art/store/make_product_icons.py` writes them to `.t3/userdata/attachments/product_icons/`; the two Robux sheep are
-  Studio captures with the studs (HISTORY.md).
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).

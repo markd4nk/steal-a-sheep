@@ -94,7 +94,13 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     They show plainly, so both are now Studio captures of the game's own sheep (`studio/RobuxSheepIcons.luau` in a
     playtest of a copy built from main: the store card's turn, lens and light, the camera closer) on black and on
     white, cut out with their transparency by `art/store/cut_out_sheep.py` (Kronos's glass cape stays see-through),
-    then given the same ink outline. Not uploaded yet.
+    then given the same ink outline.
+  - *Uploaded (2026-10-06)*: on Mark's word ("use the Windows MCP tool to just make your own upload key", no expiry),
+    an agent made the Open Cloud key in Creator Hub as getajobgle with the desktop tools (read off the page by UI
+    Automation into `~/.roblox/steal-a-sheep-open-cloud.key`, no clipboard). `art/store/upload_product_icons.py` sent
+    each PNG as its product's or pass's `imageFile` (PATCH, picture only): 51 of 51 took, each icon asset id changed,
+    and Roblox's public product APIs agreed; `uploaded.json` beside the icons has the ids. Roblox serves the passes
+    cropped to a circle with picture and words inside, as drawn.
 
 - **The map's studs on every sheep (2026-10-05)**. On branch `t3code/sheep-stud-style-mockups`, not merged. The user
   asked for mock-ups of the map's stud style layered over the sheep, picked B, then: "build it on every sheep, and then
