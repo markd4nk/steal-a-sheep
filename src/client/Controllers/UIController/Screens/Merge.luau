@@ -152,10 +152,6 @@ local function buildOdds(root: Instance)
 	for index, rarity in Economy.Rarities do
 		oddsRow(odds, `Fleece{index}`, 10 + index, rarity.Color)
 	end
-	UIKit.Text(odds, "HintLabel", "Bigger sheep in, more luck", 13, Theme.Fleece.Muted, UDim2.new(1, 0, 0, 18), {
-		Font = Theme.Font.TextHeavy,
-		Order = 20,
-	})
 	-- Roblox's odds rules: every outcome is a size and a fleece, rolled apart; rounded odds say so.
 	local rules = "Size and fleece roll separately. Odds are rounded, so they may not add up to exactly 100%."
 	UIKit.Text(odds, "RulesLabel", rules, 12, Theme.Fleece.Muted, UDim2.new(1, 0, 0, 0), {
@@ -480,8 +476,8 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		list.Visible = ready and #eligible > 0
 		emptyLabel.Visible = not list.Visible
 		emptyLabel.Text = if not ready
-			then "The shrine opens after your third delivery"
-			else "Grow three sheep of one kind to merge them"
+			then `Opens after {Economy.MergeAfterDeliveries} deliveries`
+			else "No sheep to merge yet"
 		countLabel.Text = `{#picks}/{PICKS}`
 		setOdds(picked())
 		setButton(ready)

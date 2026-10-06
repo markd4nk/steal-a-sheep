@@ -29,7 +29,7 @@ local function claim(player: Player, family: string): (boolean, string?)
 		return false, "No such sheep"
 	end
 	if data.Dex[family] ~= true then
-		return false, "Steal one first"
+		return false, "Not found yet"
 	end
 	if data.DexClaimed[family] == true then
 		return false, "Already claimed"

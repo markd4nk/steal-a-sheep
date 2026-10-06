@@ -355,7 +355,7 @@ tryPickUp = function(player: Player, spawn: Spawn)
 		return
 	end
 	if registry.FlockService:Count(player) >= GameConfig.Theft.InventoryLimit then
-		notify(player, "Your flock is full: merge or sell first", "Bad", "Denied")
+		notify(player, "Your flock is full", "Bad", "Denied")
 		return
 	end
 	local model = spawn.Model :: Model
@@ -462,7 +462,7 @@ local function putDown(player: Player)
 		return
 	end
 	if registry.PlotService:PenAt(root.Position, -GameConfig.Theft.PutDownSlack) ~= plot then
-		notify(player, "Bring it inside your own fence first", "Bad", "Denied")
+		notify(player, "Not in your pen", "Bad", "Denied")
 		return
 	end
 	local look = root.CFrame.LookVector * Vector3.new(1, 0, 1)

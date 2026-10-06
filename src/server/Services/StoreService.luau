@@ -56,7 +56,7 @@ local function request(player: Player, key: string): (boolean, string?)
 	end
 	local opened = pending[player]
 	if opened and os.clock() - opened < PENDING_SECONDS then
-		return false, "Finish your purchase first"
+		return false, "A purchase is already open"
 	end
 
 	local pass = Store.Pass(key)

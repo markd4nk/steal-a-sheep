@@ -615,7 +615,7 @@ function Economy.CanShrine(sheep: { Sheep }): (boolean, string?)
 			return false, "Robux sheep can't merge"
 		end
 		if entry.Locked then
-			return false, "Unlock it first"
+			return false, "It's locked"
 		end
 		if not Economy.IsAdult(entry) then
 			return false, "Only grown sheep can go in"

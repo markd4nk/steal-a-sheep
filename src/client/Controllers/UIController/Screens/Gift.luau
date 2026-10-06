@@ -74,9 +74,9 @@ local function prize(parent: Instance): Frame
 end
 
 -- The step, in a row that fits any height (a phone held sideways leaves it little): the game page's picture (Picture,
--- a check on its corner once done) on the left, its title and one line beside it.
+-- a check on its corner once done) on the left, its title beside it.
 local PICTURE_MAX_WIDTH = 380
-local function step(parent: Instance, name: string, title: string, picture: string, line: string)
+local function step(parent: Instance, name: string, title: string, picture: string)
 	local tile = UIKit.Tile(parent, name, UDim2.fromScale(1, 1))
 	UIKit.Padding(tile, 10, 10, 8, 8)
 	local row = UIKit.List(tile, true, 14, Enum.HorizontalAlignment.Center)
@@ -114,12 +114,6 @@ local function step(parent: Instance, name: string, title: string, picture: stri
 		AlignX = Enum.TextXAlignment.Left,
 		Order = 1,
 	})
-	UIKit.Text(words, "LineLabel", line, 16, Theme.Fleece.Muted, UDim2.fromOffset(0, 20), {
-		Font = Theme.Font.TextHeavy,
-		Auto = Enum.AutomaticSize.X,
-		AlignX = Enum.TextXAlignment.Left,
-		Order = 2,
-	})
 	return shot
 end
 
@@ -152,7 +146,7 @@ function Gift.Build(playerGui: Instance): ScreenGui
 	steps.LayoutOrder = 2
 	UIKit.Grow(steps)
 	UIKit.List(steps, true, 12)
-	local favorite = step(steps, "FavoriteStep", "Favorite the game", FAVORITE_PICTURE, "Tap here, or the star")
+	local favorite = step(steps, "FavoriteStep", "Favorite the game", FAVORITE_PICTURE)
 	local tap = Instance.new("TextButton")
 	tap.Name = "FavoriteButton"
 	tap.Text = ""
@@ -244,7 +238,7 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		if not favorited then
 			Buttons.Loading(claimButton, false)
 			busy = false
-			panel.Status("Favorite the game to claim", "Bad")
+			panel.Status("Not favorited yet", "Bad")
 			sound:Play("Denied")
 			return
 		end

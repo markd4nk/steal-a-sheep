@@ -94,10 +94,10 @@ end
 local function merge(player: Player, ids: { string }): (boolean, string?)
 	local root = rootOf(player)
 	if not root or (root.Position - GameConfig.Shrine.At.Position).Magnitude > GameConfig.Shrine.MenuDistance + 8 then
-		return false, "Come closer to the shrine"
+		return false, "Too far from the shrine"
 	end
 	if waiting[player] then
-		return false, "Pick up your lamb first"
+		return false, "Your lamb is still on the altar"
 	end
 	if not mayMerge[player] then
 		return false, "Merging isn't available in your region"
@@ -147,11 +147,11 @@ local function collect(player: Player)
 		return
 	end
 	if (root.Position - top.Position).Magnitude > GameConfig.Shrine.CollectDistance + 4 then
-		notify(player, "Get closer to the altar", "Bad", "Denied")
+		notify(player, "Too far from the altar", "Bad", "Denied")
 		return
 	end
 	if player:GetAttribute("Carrying") == true then
-		notify(player, "Take your sheep home first", "Bad", "Denied")
+		notify(player, "Your hands are full", "Bad", "Denied")
 		return
 	end
 	local model = registry.SheepService:Build(lamb.Family, lamb.Rarity, lamb.Scale)

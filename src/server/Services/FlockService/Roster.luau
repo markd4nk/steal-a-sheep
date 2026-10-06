@@ -38,7 +38,7 @@ end
 -- Stall, so a player can't sell their best by mistake), none locked, each once, and never the whole flock.
 function Roster.CanSell(flock: Flock, ids: { string }, penSlots: number): (boolean, string?)
 	if #ids == 0 then
-		return false, "Pick the sheep to sell"
+		return false, "No sheep picked"
 	end
 	local seen: { [string]: boolean } = {}
 	for _, id in ids do
@@ -54,7 +54,7 @@ function Roster.CanSell(flock: Flock, ids: { string }, penSlots: number): (boole
 			return false, "Robux sheep stay with you"
 		end
 		if sheep.Locked then
-			return false, "Unlock it first"
+			return false, "It's locked"
 		end
 		if sheep.Shrine then
 			return false, "It's waiting at the Merge Shrine"

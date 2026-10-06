@@ -648,7 +648,7 @@ function FlockService.Sell(_self: any, player: Player, ids: { string }): (boolea
 		return false, "Still loading"
 	end
 	if player:GetAttribute("Carrying") == true then
-		return false, "Deliver your sheep first"
+		return false, "Your hands are full"
 	end
 	local ok, why = Roster.CanSell(data.Sheep, ids, data.PenSlots)
 	if not ok then
@@ -712,14 +712,14 @@ function FlockService.ShrineMerge(
 		return false, "Still loading", nil
 	end
 	if player:GetAttribute("Carrying") == true then
-		return false, "Take your sheep home first", nil
+		return false, "Your hands are full", nil
 	end
 	if Economy.TotalDeliveries(data.Deliveries) < Economy.MergeAfterDeliveries then
 		return false, `Opens after {Economy.MergeAfterDeliveries} deliveries`, nil
 	end
 	for _, sheep in data.Sheep do
 		if sheep.Shrine then
-			return false, "Pick up your lamb first", nil
+			return false, "Your lamb is still on the altar", nil
 		end
 	end
 	local inputs: { Sheep } = {}
