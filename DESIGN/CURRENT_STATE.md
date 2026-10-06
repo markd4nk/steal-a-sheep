@@ -20,11 +20,15 @@ history: one line per item, details in the files below. Keep it under 300 lines 
   (save schema 3); every server restarted onto it. "Steal a Sheep", universe 10769564664, place 114389615931493
   (`https://www.roblox.com/games/114389615931493`), owned by getajobgle (who owns Shear a Sheep's assets). Audience
   Private: only the owner and people with edit permission can play. Max 5 players, Team Create on, Studio access to API
-  services on; no products or passes yet. Earlier: version 1 = 3c5ee43, version 4 = a71cab4 (2-3 were autosaves).
+  services on. Earlier: version 1 = 3c5ee43, version 4 = a71cab4 (2-3 were autosaves).
   Each publish needs the user's OK.
-- **Limited audience (the user wants it: Friends and Playtesters) is blocked**: Creator Hub greys out Save until the
-  game has a content maturity label, and the questionnaire isn't started. It needs the user's answers (the Merge Shrine
-  is likely a paid random item: cash buys a random lamb, and cash is sold for Robux; its menu shows the odds).
+- **Maturity label: Mild** (questionnaire submitted 2026-10-05; answers in DECISIONS.md): Violence (Repeated/Mild),
+  no non-compliant regions. Limited or Public audience can now be set. It declares the paid random item (the Merge
+  Shrine) and that the game respects `ArePaidRandomItemsRestricted`, which only the next publish brings: publish
+  before opening the game to anyone.
+- **Store on Roblox** (2026-10-05): 49 developer products and 2 passes in the universe at Config/Store's prices, on
+  sale, Roblox's default picture; their ids are in `Config/Store` on branch `t3code/publish-readiness-checklist`
+  (not merged into main yet, not published: live servers still answer "Not on sale yet").
 - The main Studio is now that cloud place (Team Create: edits there last without a Save and ship with the next
   publish). `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is
   the local copy sessions build their own Studios from; the main checkout's was rebuilt from 3989273.
@@ -62,7 +66,8 @@ lamb.
   scrolling page with its section tabs outside the window: two Robux-only sheep, 2x Money / 2x Growth passes, 2x Speed
   (re-buyable, tripling), the walker's next level, Climbing and Cash packs. `Config/Store` (catalog, prices, ladders),
   `StoreService` (dialogs, passes), `PurchaseService/Products` (grants by key), `Screens/Store`; art from
-  `art/store/make_store_art.py`. No products or passes exist on Roblox yet: Studio grants them with no dialog.
+  `art/store/make_store_art.py`. The products and passes exist on Roblox (Live, above); with their ids in, Studio
+  shows Roblox's test purchase dialog instead of granting at once (the debug panel still grants).
 - **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
   `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
 - **Daily gifts** (2026-10-05, merged into main): a week of gifts, the Pegasus Sheep on Day 7
@@ -105,10 +110,6 @@ lamb.
   style (`art/gods/style.py`, `hera.py`): purple gown with a peacock-eye hem, cape, diadem, sceptre with a neon
   peacock eye carried upright. Shown in Blender only, waiting for the user's word.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
-- **The Robux store can't sell yet** (merged 2026-10-05; the user: Creator Hub later): the game now exists on Roblox,
-  so the 2 passes and 49 developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) can be made in
-  universe 10769564664 at Config/Store's prices, their ids put in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`). Until
-  then a live server answers "Not on sale yet".
 
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
@@ -135,10 +136,11 @@ lamb.
   waiting; keeping the day across a real rejoin is untested (the mock store). The HUD's wrapped column was seen on
   Studio's small phone (three columns of two), not on a tablet or a 390-point phone; the menu wasn't tried on PC
   after the compact layout, nor with a gamepad.
-- **Real Robux purchases**: no product or pass exists yet, so nothing went through Roblox's dialog or ProcessReceipt;
-  the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and
+- **Real Robux purchases**: the products and passes exist now (2026-10-05), but nothing has gone through Roblox's
+  dialog or ProcessReceipt yet; the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and
   the one-dialog-at-a-time rule with a real dialog are untested. Store on a phone: Galaxy A06 sideways only.
 
+- **The Merge Shrine's region check** (`PolicyService`, 2026-10-05): not run in Studio or live yet.
 - **Merge Shrine with two players** (another player mustn't see your picks, merge or lamb), **leaving with a lamb on
   the altar** (should go to the pen), **touch and gamepad** in its menu, and **a Titan's grow-up** (none rolled yet).
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real

@@ -49,10 +49,63 @@ Store.Cash = table.freeze({
 	{ Key = "Cash.5", Amount = 8e6, Price = 720 },
 } :: { Pack })
 
--- Creator Hub ids by key, filled in once each product and pass exists (the game isn't published yet). A key
--- without one shows its price here and, in Studio, is granted at once with no dialog (StoreService).
-local PRODUCT_IDS: { [string]: number } = {}
-local PASS_IDS: { [string]: number } = {}
+-- Creator Hub ids by key (universe 10769564664, made 2026-10-05 at the prices above). A key without one shows its
+-- price here and, in Studio, is granted at once with no dialog (StoreService).
+local PRODUCT_IDS: { [string]: number } = {
+	["Sheep.GoldenFleece"] = 3716804986,
+	["Sheep.Kronos"] = 3716804989,
+	["Speed.1"] = 3716804991,
+	["Speed.2"] = 3716804992,
+	["Speed.3"] = 3716804995,
+	["Speed.4"] = 3716804998,
+	["Speed.5"] = 3716804999,
+	["Speed.6"] = 3716805001,
+	["Speed.7"] = 3716805003,
+	["Walker.0"] = 3716805005,
+	["Walker.1"] = 3716805007,
+	["Walker.2"] = 3716805008,
+	["Walker.3"] = 3716805010,
+	["Walker.4"] = 3716805014,
+	["Walker.5"] = 3716805015,
+	["Walker.6"] = 3716805016,
+	["Walker.7"] = 3716805018,
+	["Walker.8"] = 3716805019,
+	["Walker.9"] = 3716805021,
+	["Walker.10"] = 3716805023,
+	["Walker.11"] = 3716805025,
+	["Walker.12"] = 3716805027,
+	["Walker.13"] = 3716805028,
+	["Walker.14"] = 3716805030,
+	["Walker.15"] = 3716805033,
+	["Walker.16"] = 3716805034,
+	["Walker.17"] = 3716805035,
+	["Walker.18"] = 3716805037,
+	["Walker.19"] = 3716805039,
+	["Walker.20"] = 3716805042,
+	["Walker.21"] = 3716805044,
+	["Walker.22"] = 3716805047,
+	["Walker.23"] = 3716805049,
+	["Walker.24"] = 3716805055,
+	["Walker.25"] = 3716805058,
+	["Walker.26"] = 3716805062,
+	["Walker.27"] = 3716805063,
+	["Walker.28"] = 3716805066,
+	["Climb.1"] = 3716805068,
+	["Climb.2"] = 3716805069,
+	["Climb.3"] = 3716805073,
+	["Climb.4"] = 3716805075,
+	["Climb.5"] = 3716805078,
+	["Climb.6"] = 3716805080,
+	["Cash.1"] = 3716805081,
+	["Cash.2"] = 3716805083,
+	["Cash.3"] = 3716805086,
+	["Cash.4"] = 3716805089,
+	["Cash.5"] = 3716805092,
+}
+local PASS_IDS: { [string]: number } = {
+	DoubleMoney = 2008670293,
+	DoubleGrowth = 2009030273,
+}
 
 -- The stair walker's Robux price for the upgrade from `level` to the next: round(19 x 1.2^level).
 function Store.WalkerPrice(level: number): number

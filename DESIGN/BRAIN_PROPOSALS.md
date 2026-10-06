@@ -191,6 +191,22 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   `Transform` set on the server doesn't replicate, so set it on each client too (`RunService.PreSimulation`, after the
   Animator), or play an animation, whose tracks do replicate. Roblox's default R15 walk (507777826) plays on them."
   Seen 2026-10-05 in Steal a Sheep, dressing Zeus from the catalog.
+- **S31** (`BRAIN/PATTERNS/desktop-recipes.md`, Creator Hub in Chrome): "Many developer products or passes at once:
+  in the Creator Hub tab, open DevTools (`ctrl+shift+j`), click the console's prompt and `type` one line of JavaScript
+  that `fetch`es the Open Cloud endpoints with the page's sign-in (`credentials: 'include'`): `POST
+  https://apis.roblox.com/developer-products/v2/universes/<id>/developer-products` and `.../game-passes/v1/universes/
+  <id>/game-passes`, multipart `name`, `description`, `price`, `isForSale`; retry once with the `x-csrf-token` header
+  the first 403 returns. List what exists first (`GET .../developer-products/creator`, `.../game-passes/creator`) and
+  skip those names, so a rerun is safe. Write the ids into a fixed `<textarea>` on the page and screenshot it, then
+  check every id through the public details APIs (desktop-recipes step 5). 49 products and 2 passes took about 25 s."
+  Seen 2026-10-05 in Steal a Sheep.
+- **S32** (`BRAIN/PATTERNS/publishing.md`, Maturity questionnaire): "Picking the last answer of a topic moves straight
+  on to the next topic, so a Continue click sent in the same batch lands on the next page and can tick an answer
+  there (it ticked Romance 'Yes'). Click one answer per screenshot. The topics (2026-10): Violence, Blood, Fear, Crude
+  Humor, Gambling-Related Content, Strong Language, Romance, Alcohol, Social Hangout, Free-form User Creation,
+  Sensitive Issues, Cross-Experience Content, AI Interaction, Paid Random Items (and whether the game respects
+  `ArePaidRandomItemsRestricted`), Paid Item Trading, Media Sharing, Continuous Media Feed; then Preview rating, then
+  Submit and publish." Seen 2026-10-05 in Steal a Sheep.
 
 ## Done
 

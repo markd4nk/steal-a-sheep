@@ -230,6 +230,26 @@ Calls made building the daily gifts (2026-10-05):
 - **Pictures**: the store mock-up's cash (one stack, a pile, a chest) and Hermes' sandal (one, three) grow with the
   day; Day 4 shows the lamb's token; Day 7 the rendered Pegasus.
 
+Calls made filling in the maturity questionnaire and making the store's products (2026-10-05; the user: "fill them
+out based off what you know"). Restarting the questionnaire asks everything again: give these answers again and change
+only what's new.
+
+- **Answers**: Violence yes, Mild, Repeated (sliding into players knocks them back; the gods chase and catch thieves);
+  Blood no; Fear no (cartoon-angry gods and chase music, not horror); Crude humor no; Unplayable gambling no; Strong
+  language no; Romance no (the Cupid sheep's hearts aren't romance); Alcohol no (Dionysus's herd has grapes, no wine);
+  Social hangout no; Free-form user creation no; Sensitive issues no (Greek myth isn't a current polarising issue);
+  Cross-experience content no; AI interaction no; Paid random items yes (the Merge Shrine: cash, which the store sells
+  for Robux, rolls a random lamb) and it respects `ArePaidRandomItemsRestricted`; Paid item trading no (stealing isn't
+  trading); Media sharing no; Continuous media feed no. Result: **Mild**, Violence (Repeated/Mild), no non-compliant
+  regions. Answering Violence "no" would have given Minimal; Mild was the honest reading of slide knockback.
+- **The Merge Shrine is closed to players whose region restricts paid random items**: Merge answers "Merging isn't
+  available in your region". It also stays closed while Roblox's answer is unknown (three tries, 5 s apart).
+- **Product names and lines** (what Roblox's purchase dialog shows): "Golden Fleece Sheep" / "Kronos Sheep" ("A sheep
+  that earns 10x (3x) your best sheep. Arrives grown."), "2x Speed 1" to "2x Speed 7" ("Doubles your Climbing."),
+  "Stair Walker Level 2" to "Level 30" ("Upgrades your stair walker to level N."), "+150K Climbing" ... "+10B
+  Climbing", "+24K Cash" ... "+8M Cash", passes "2x Money" ("Earn 2x cash.") and "2x Growth" ("Lambs grow 2x
+  faster."). All on sale from creation, no pictures of their own yet.
+
 Calls made publishing the private test version (2026-10-05):
 
 - **The game page**: named "Steal a Sheep", described as "Climb the mountain, steal a god's sheep and slide home

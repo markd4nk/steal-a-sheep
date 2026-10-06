@@ -6,6 +6,21 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Maturity questionnaire, the store's products, the gods merged (2026-10-05)**. The user asked what was missing to
+  publish, then: fill in the maturity questions from what's known, make the store's passes and products, and merge
+  the gods branch.
+  - *Questionnaire*: answered in Creator Hub (answers in DECISIONS.md), label **Mild**. Its paid random items page
+    asks whether the game respects `ArePaidRandomItemsRestricted`; it didn't, so `ShrineService` now fetches each
+    player's `PolicyService` info on join and refuses a merge while it's restricted or unknown.
+  - *Products*: made with one script in the Creator Hub tab's DevTools console, using the page's sign-in against the
+    Open Cloud endpoints (`POST apis.roblox.com/developer-products/v2/universes/<id>/developer-products` and
+    `/game-passes/v1/universes/<id>/game-passes`, multipart name, description, price, isForSale; the CSRF token from
+    the first 403). It skips names that already exist, so a rerun is safe. All 51 checked through the public details
+    APIs (name, price, on sale), ids into `Config/Store`; a Store spec test checks every key has its own id.
+  - *Merge*: `t3code/order-olympian-gods` at 9206503 merged into main (4e3585d) after its session confirmed it ready
+    (check passes, 76 tests in its playtest, 30 gods spawn, Zeus as an avatar). Doc conflicts only.
+  - *Checked*: `check.ps1` passes on this branch and on main. Not playtested in Studio (no Studio of mine open;
+    the shrine's policy check and real purchases are untested).
 - **Gods in mythological rank (2026-10-05)**. The user asked whether the thirty gods were in Mount Olympus's order.
   They weren't: the Olympians had been placed to fit the commissioned map's stage themes and the minor gods sat above
   them, ordered by mood. The user chose rank: "the Zeus family should end up at the top", and kept the proposed order of
