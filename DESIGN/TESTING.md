@@ -247,3 +247,22 @@ Useful measurements:
   `start_stop_play` brings its window forward. Sessions took turns (a "screen free" message), running logic-only
   checks while another session's window was in front.
 
+## Asset audit (2026-10-05, before launch)
+
+Every asset the game uses loads: 1,286 distinct ids, none broken, moderated, deleted or slow.
+
+- **Collect**: `src/` (every `rbxassetid://` outside comments, plus `GodService/Looks.luau`'s catalog ids: 518) and
+  the built place (`lune run tools/asset-scan.luau <place.rbxl> <out.json>`: MeshParts, SpecialMeshes, Decals,
+  Textures; 779), plus the Sky's six faces (read in Studio: Lune can't read them). The economy API
+  (`economy.roblox.com/v2/assets/<id>/details`) gives each one's type: 768 meshes, 328 images, 70 sounds, 7
+  animations, 119 catalog items (accessories, clothing, two dynamic heads); none errored (not deleted).
+- **Public thumbnails** (`thumbnails.roblox.com/v1/assets`, 100 a batch): all 1,286 Completed. Not proof alone: the
+  same APIs said Completed for two meshes Roblox's moderation had removed.
+- **Loading, in a playtest of a Studio copy of main**: images as Decals in `ContentProvider:PreloadAsync` (all 328
+  Success, fetch status Success, 1.3 s); meshes by `AssetService:CreateMeshPartAsync` on the server, 12 at a time (all
+  768, none over 4 s); sounds as Sounds preloaded on the client, then `IsLoaded` and `TimeLength > 0` (all 70, 0.7 s);
+  animations through the character's Animator, `Length > 0` (all 7); catalog items through the gods themselves (all 30
+  avatars have every accessory, shirt, pants and head their `Looks` lists, from `GetAppliedDescription`).
+- **Don't preload ids as strings**: `PreloadAsync({"rbxassetid://..."})` reported Failure for every mesh and most
+  images that load fine as Decals or MeshParts; give it instances.
+- Not covered: a live server (Studio fetches the same CDN, so it should match), pictures uploaded after this audit.

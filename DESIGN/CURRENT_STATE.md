@@ -145,8 +145,9 @@ lamb.
   not on a real device; their cost on a low-end phone wasn't measured (no extra parts, only materials).
 - **The live game itself**: the user has been in a live server (one player, moved onto version 5 by the restart), but
   no agent has watched one: checked only in Studio on the cloud place (both bootstraps ready, 76 tests, ProfileStore
-  "data will be saved", no warnings). Unconfirmed in a real server: Shear a Sheep's meshes, faces and sounds loading,
-  the debug panel staying hidden, the store's "Not on sale yet", a save carried from version 4 to 5.
+  "data will be saved", no warnings). Unconfirmed in a real server: the debug panel staying hidden, the store's
+  "Not on sale yet", a save carried from version 4 to 5. Every asset (1,286: meshes, faces, sounds, catalog items)
+  loads in a Studio playtest (TESTING.md, Asset audit, 2026-10-05).
 
 - **Daily gifts over real days**: the 20-hour wait and the claims were tried with the debug day commands, not by
   waiting; keeping the day across a real rejoin is untested (the mock store). The HUD's wrapped column was seen on

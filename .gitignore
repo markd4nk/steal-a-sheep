@@ -17,3 +17,6 @@ DESIGN/ui/local/
 
 # God model builds and mock-up renders (art/gods/README.md)
 art/gods/out/
+
+# Game page renders in progress (art/gamepage/README.md)
+art/gamepage/work/
