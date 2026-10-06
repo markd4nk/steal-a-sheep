@@ -37,26 +37,38 @@ local function climb(amount: number): Grant
 	end
 end
 
--- The `buy`th 2x Speed: Climbing doubled. A receipt for a buy already counted (two dialogs racing) still doubles.
+-- What a Robux spent on a price step the player is already past is worth in Climbing: the second Climbing pack's rate.
+local CLIMB_PER_ROBUX = Store.Climb[2].Amount / Store.Climb[2].Price
+
+-- The `buy`th 2x Speed: Climbing doubled when it's the player's next step (a step further on, bought outside the
+-- store, counts as the next). A step they're already past, or one after it sold out (two dialogs racing, or a cheap
+-- step prompted again by a client), pays its price in Climbing instead: a cheap step never doubles twice.
 local function speed(buy: number): Grant
 	return function(player: Player, registry: { [string]: any }): boolean
 		local data = registry.DataService:GetData(player)
-		data.ClimbPower = Economy.DoubleClimb(data.ClimbPower)
-		data.SpeedBuys = math.max(data.SpeedBuys, buy)
+		local nextBuy = data.SpeedBuys + 1
+		if buy >= nextBuy and nextBuy <= #Store.SpeedPrices then
+			data.ClimbPower = Economy.DoubleClimb(data.ClimbPower)
+			data.SpeedBuys = nextBuy
+		else
+			data.ClimbPower += Store.SpeedPrices[buy] * CLIMB_PER_ROBUX
+		end
 		follow(player, registry, "2x Speed")
 		return true
 	end
 end
 
--- The stair walker's next level. A receipt that finds it maxed already (a cash level bought while the dialog was
--- open) pays the last level's cash price instead, so nothing charged is lost.
-local function walker(): Grant
+-- The stair walker from `level` to the next: a level up when the player's walker is at `level` (one further on,
+-- bought outside the store, counts as the next). A level they're already past or a maxed walker (a cash upgrade
+-- while the dialog was open, or an old price prompted again) pays that level's cash price instead, so nothing charged
+-- is lost and a cheap level can't be bought twice.
+local function walker(level: number): Grant
 	return function(player: Player, registry: { [string]: any }): boolean
 		local data = registry.DataService:GetData(player)
-		if data.WalkerLevel < Economy.MaxWalker then
+		if level >= data.WalkerLevel and data.WalkerLevel < Economy.MaxWalker then
 			data.WalkerLevel += 1
 		else
-			registry.DataService:AdjustCoins(player, Economy.WalkerCost(Economy.MaxWalker - 1) or 0)
+			registry.DataService:AdjustCoins(player, Economy.WalkerCost(math.min(level, Economy.MaxWalker - 1)) or 0)
 		end
 		follow(player, registry, "stair walker level")
 		return true
@@ -80,7 +92,7 @@ for buy in Store.SpeedPrices do
 	Products[Store.SpeedKey(buy)] = speed(buy)
 end
 for level = 0, Economy.MaxWalker - 1 do
-	Products[Store.WalkerKey(level)] = walker()
+	Products[Store.WalkerKey(level)] = walker(level)
 end
 for _, offer in Store.Sheep do
 	Products[offer.Key] = sheep(offer.Family)

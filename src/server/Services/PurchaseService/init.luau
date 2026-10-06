@@ -12,6 +12,7 @@ local Store = require(ReplicatedStorage.Config.Store)
 
 local MAX_RECEIPTS = 50
 local LOAD_WAIT = 60
+local PASS_TRIES = 3 -- a failed pass check is asked again, 1 s then 2 s later
 
 local PurchaseService = {
 	Name = "PurchaseService",
@@ -154,7 +155,15 @@ function PurchaseService.OwnsPass(_self: any, player: Player, passId: number): b
 	if isStudio and ignorePasses[player] ~= false then
 		return false
 	end
-	local ok, owns = pcall(MarketplaceService.UserOwnsGamePassAsync, MarketplaceService, player.UserId, passId)
+	-- Asked again after a failure (a Marketplace hiccup at join would otherwise leave an owner at 1x all session).
+	local ok, owns = false, nil :: any
+	for try = 1, PASS_TRIES do
+		ok, owns = pcall(MarketplaceService.UserOwnsGamePassAsync, MarketplaceService, player.UserId, passId)
+		if ok or player.Parent ~= Players then
+			break
+		end
+		task.wait(try)
+	end
 	if not ok then
 		warn(`[PurchaseService] Pass check failed for {player.UserId}/{passId}: {owns}`)
 		return false

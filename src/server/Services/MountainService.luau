@@ -29,6 +29,7 @@ local ENFORCE_EVERY = 0.25
 local CLIMB_SLACK = 1.3 -- times the allowed climb speed the ceiling rises
 local LEAD_STUDS = 10 -- how far ahead of a player the ceiling may run, so a lag burst isn't pulled back
 local LEAD_SECONDS = 1 -- or this many seconds of their climb, whichever is more
+local BUDGET_SECONDS = 2 -- the ground budget holds this many seconds of the fastest legal speed (a lag spike's catch-up)
 local SAFE_MARGIN = 6
 local UPHILL_SPEED = 1.5 -- a target must be moving up the slope at least this fast
 local LANDING_GRACE = 0.4 -- seconds after a punch's flight before the server checks the landing
@@ -127,7 +128,9 @@ local function fastest(player: Player, x: number, climb: number): number
 	return math.max(GameConfig.Movement.WalkSpeed, Mountain.SpeedAt(x, climb, 1), escape, knock)
 end
 
--- Ground covered (x and z) against the budget, which refills at the fastest legal speed and holds up to a second of it.
+-- Ground covered (x and z) against the budget, which refills at the fastest legal speed and holds up to
+-- BUDGET_SECONDS of it. Anyone past it is put at the furthest point they could have reached along the way they moved,
+-- not back where they were: a lag spike's catch-up must not drag a slider back towards their god.
 local function checkSpeed(player: Player, root: BasePart, climb: number, dt: number)
 	local track = tracks[player]
 	local position = root.Position
@@ -136,12 +139,14 @@ local function checkSpeed(player: Player, root: BasePart, climb: number, dt: num
 		return
 	end
 	local speed = fastest(player, track.At.X, climb) * speedBoost(player)
-	local cap = math.max(LEAD_STUDS, speed * LEAD_SECONDS)
+	local cap = math.max(LEAD_STUDS, speed * BUDGET_SECONDS)
 	track.Budget = math.min(track.Budget + speed * CLIMB_SLACK * dt, cap)
 	local moved = Vector2.new(position.X - track.At.X, position.Z - track.At.Z).Magnitude
 	if moved > track.Budget + 0.5 then
+		local reached = track.At:Lerp(position, math.clamp(track.Budget / moved, 0, 1))
 		local character = player.Character :: Model
-		character:PivotTo(CFrame.new(track.At) * root.CFrame.Rotation)
+		character:PivotTo(CFrame.new(reached) * root.CFrame.Rotation)
+		track.At = reached
 		track.Budget = 0
 		return
 	end
@@ -325,6 +330,12 @@ function MountainService.Punch(_self: any, player: Player)
 	launches[player] = { Until = os.clock() + seconds, Landing = landing }
 	sliders[player] = nil
 	Remotes.Punch:Fire(player, landing, seconds)
+end
+
+-- Whether `player` is flying from a god's punch: nothing they do counts until they've landed (a steal or a delivery
+-- made mid-flight, while the checks wait, would skip the climb).
+function MountainService.IsLaunched(_self: any, player: Player): boolean
+	return launches[player] ~= nil
 end
 
 -- The server moved `player` to `x` itself (home after a catch, onto their plot, a debug steal): both checks start

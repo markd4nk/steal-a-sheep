@@ -341,6 +341,9 @@ tryPickUp = function(player: Player, spawn: Spawn)
 		notify(player, "You're already carrying one", "Bad", "Denied")
 		return
 	end
+	if registry.MountainService:IsLaunched(player) then
+		return
+	end
 	local data = registry.DataService:GetData(player)
 	local character = player.Character
 	local root = character and character:FindFirstChild("HumanoidRootPart")
@@ -455,7 +458,7 @@ local function putDown(player: Player)
 	local carry = carries[player]
 	local root = rootOf(player)
 	local plot = registry.PlotService:GetPlot(player)
-	if not carry or not root or not plot then
+	if not carry or not root or not plot or registry.MountainService:IsLaunched(player) then
 		return
 	end
 	if registry.PlotService:PenAt(root.Position, -GameConfig.Theft.PutDownSlack) ~= plot then

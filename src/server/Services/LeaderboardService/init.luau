@@ -274,18 +274,28 @@ function LeaderboardService.Start(_self: any)
 		task.spawn(release, player, data)
 	end))
 
+	-- An error in one pass (one player's odd data, a store hiccup) mustn't end these loops for the server's life.
 	trove:Add(task.spawn(function()
 		while true do
 			for player in best do
-				measure(player, registry.DataService:GetData(player))
+				local ok, problem = pcall(measure :: any, player, registry.DataService:GetData(player))
+				if not ok then
+					warn(`[LeaderboardService] Couldn't measure {player.Name}: {problem}`)
+				end
 			end
-			draw()
+			local ok, problem = pcall(draw :: any)
+			if not ok then
+				warn(`[LeaderboardService] Couldn't draw the boards: {problem}`)
+			end
 			task.wait(DRAW_SECONDS)
 		end
 	end))
 	trove:Add(task.spawn(function()
 		while true do
-			syncStores()
+			local ok, problem = pcall(syncStores :: any)
+			if not ok then
+				warn(`[LeaderboardService] Couldn't sync the stores: {problem}`)
+			end
 			task.wait(STORE_SECONDS)
 		end
 	end))

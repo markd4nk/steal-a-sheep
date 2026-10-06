@@ -117,6 +117,45 @@ return function(t: Run.Suite)
 		t.Expect(Roster.Income(flock, 8)).ToBe(11 * best)
 	end)
 
+	t.Test("a price step doubles or levels only once: one the player is past pays its price instead", function()
+		local data = { ClimbPower = 100, SpeedBuys = 0, WalkerLevel = 0, Coins = 0 }
+		local registry = {
+			DataService = {
+				GetData = function()
+					return data
+				end,
+				AdjustCoins = function(_self: any, _player: any, amount: number)
+					data.Coins += amount
+					return true
+				end,
+				Replicate = function() end,
+			},
+			FlockService = { Push = function() end },
+		}
+		local player = {} :: any
+		t.Expect(Products["Speed.1"](player, registry)).ToBe(true)
+		t.Expect(data.ClimbPower).ToBe(200)
+		t.Expect(data.SpeedBuys).ToBe(1)
+		-- Speed.1 again (a client prompting the 3 R$ step twice): its price in Climbing, no doubling.
+		Products["Speed.1"](player, registry)
+		t.Expect(data.SpeedBuys).ToBe(1)
+		t.Expect(math.abs(data.ClimbPower - (200 + 3 * Store.Climb[2].Amount / Store.Climb[2].Price)) < 1e-6).ToBe(true)
+		-- A step further on counts as the next one.
+		local before = data.ClimbPower
+		Products["Speed.4"](player, registry)
+		t.Expect(data.SpeedBuys).ToBe(2)
+		t.Expect(data.ClimbPower).ToBe(Economy.DoubleClimb(before))
+
+		t.Expect(Products["Walker.0"](player, registry)).ToBe(true)
+		t.Expect(data.WalkerLevel).ToBe(1)
+		Products["Walker.0"](player, registry)
+		t.Expect(data.WalkerLevel).ToBe(1)
+		t.Expect(data.Coins).ToBe(Economy.WalkerCost(0))
+		data.WalkerLevel = Economy.MaxWalker
+		Products[Store.WalkerKey(Economy.MaxWalker - 1)](player, registry)
+		t.Expect(data.WalkerLevel).ToBe(Economy.MaxWalker)
+	end)
+
 	t.Test("2x Speed doubles Climbing, at least +25", function()
 		t.Expect(Economy.DoubleClimb(0)).ToBe(25)
 		t.Expect(Economy.DoubleClimb(10)).ToBe(35)

@@ -45,16 +45,22 @@ type God = {
 	TargetSince: number,
 	Thieves: { [Player]: boolean }, -- carriers of this tier's lambs it may chase
 	Gentle: { [Player]: boolean }, -- tutorial thieves: a slower chase
+	Over: { [Player]: number }, -- os.clock() a thief came within reach across the ground but out of it in height
 }
 
 local TUTORIAL_SHARE = 0.7
 local TARGET_LOCK = 2
+-- A thief right over or under their god this long is caught whatever the height (hovering, or under the floor).
+local OVER_CATCH_SECONDS = 1
 local TAUNT_SECONDS = 1.6
 local RETURN_SPEED = 16
 local LANE_MARGIN = 30
 
 local trove = Trove.new()
 local gods: { God } = {}
+-- Thieves who stole before their tier's god had loaded (an avatar's catalog items come first), and whether each is
+-- on the tutorial run: it chases them once it's here. Release forgets them.
+local early: { [number]: { [Player]: boolean } } = {}
 local losParams = RaycastParams.new()
 losParams.FilterType = Enum.RaycastFilterType.Exclude
 local groundParams = RaycastParams.new()
@@ -185,9 +191,20 @@ local function update(god: God, dt: number, now: number)
 		stepTowards(god, root.Position, speed * dt)
 		local offset = root.Position - (god.At + Vector3.new(0, god.Hip, 0))
 		local flat = Vector2.new(offset.X, offset.Z).Magnitude
-		if flat <= GameConfig.Theft.CatchStuds + 1 and math.abs(offset.Y) < 8 and clearSight(god, root) then
+		local close = flat <= GameConfig.Theft.CatchStuds + 1
+		local level = math.abs(offset.Y) < 8
+		local caught = close and level and clearSight(god, root)
+		if close and not level then
+			local since = god.Over[target] or now
+			god.Over[target] = since
+			caught = now - since >= OVER_CATCH_SECONDS
+		else
+			god.Over[target] = nil
+		end
+		if caught then
 			god.Thieves[target] = nil
 			god.Gentle[target] = nil
+			god.Over[target] = nil
 			god.Target = nil
 			setMood(god, "Taunt")
 			god.Until = now + TAUNT_SECONDS
@@ -252,6 +269,7 @@ local function build(tier: Olympus.Tier, parent: Instance): God?
 		TargetSince = 0,
 		Thieves = {},
 		Gentle = {},
+		Over = {},
 	}
 	place(god, home, Mountain.Downhill)
 	return god
@@ -294,6 +312,13 @@ function GodService.Start(_self: any)
 			local god = build(tier, gods_)
 			if god and gods_.Parent then
 				gods[tier.Tier] = god
+				local waiting = early[tier.Tier]
+				early[tier.Tier] = nil
+				if waiting then
+					for player, tutorial in waiting do
+						GodService:Chase(tier.Tier, player, tutorial)
+					end
+				end
 			end
 		end)
 	end
@@ -325,6 +350,9 @@ end
 function GodService.Chase(_self: any, tier: number, player: Player, tutorial: boolean)
 	local god = gods[tier]
 	if not god then
+		local waiting = early[tier] or {}
+		early[tier] = waiting
+		waiting[player] = tutorial
 		return
 	end
 	god.Thieves[player] = true
@@ -341,9 +369,13 @@ end
 
 -- The thief delivered, gave up or lost the lamb: no god chases them any more.
 function GodService.Release(_self: any, player: Player)
+	for _, waiting in early do
+		waiting[player] = nil
+	end
 	for _, god in gods do
 		god.Thieves[player] = nil
 		god.Gentle[player] = nil
+		god.Over[player] = nil
 		if god.Target == player then
 			god.Target = nil
 		end

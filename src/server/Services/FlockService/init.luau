@@ -394,43 +394,61 @@ local function onLoaded(player: Player, data: any)
 	end
 end
 
-local function tick(dt: number)
-	for player, state in states do
-		local data = dataOf(player)
-		if not data then
-			continue
-		end
-		local income = 0
-		local grewUp: { Sheep } = {}
-		local best = Economy.BestIncome(data.Sheep)
-		local money, growth = boosts(player)
-		for _, sheep in data.Sheep do
-			if Roster.IsEquipped(sheep, data.PenSlots) then
-				income += Economy.Income(sheep, best) * money
-				if not Economy.IsAdult(sheep) then
-					sheep.Grown = math.min(sheep.Grown + dt * growth, Economy.GrowthSeconds(sheep))
-					if Economy.IsAdult(sheep) then
-						table.insert(grewUp, sheep)
-					else
-						state.Dirty = true
-					end
+-- One player's second: income, growth, their pen and their snapshot.
+local function tickPlayer(player: Player, state: PlayerState, dt: number)
+	local data = dataOf(player)
+	if not data then
+		return
+	end
+	local income = 0
+	local grewUp: { Sheep } = {}
+	local best = Economy.BestIncome(data.Sheep)
+	local money, growth = boosts(player)
+	for _, sheep in data.Sheep do
+		if Roster.IsEquipped(sheep, data.PenSlots) then
+			income += Economy.Income(sheep, best) * money
+			if not Economy.IsAdult(sheep) then
+				sheep.Grown = math.min(sheep.Grown + dt * growth, Economy.GrowthSeconds(sheep))
+				if Economy.IsAdult(sheep) then
+					table.insert(grewUp, sheep)
+				else
+					state.Dirty = true
 				end
 			end
 		end
-		if income > 0 then
-			registry.DataService:AdjustCoins(player, income * registry.FriendService:Boost(player) * dt)
-		end
-		data.LastSeen = os.time()
-		for _, sheep in grewUp do
-			local size = Economy.Sizes[sheep.Size].Name
-			Remotes.Reveal:Fire(player, Economy.Name(sheep), size)
-			state.Dirty = true
-		end
-		refreshPen(player)
-		updateLeaderstats(player, Roster.Income(data.Sheep, data.PenSlots) * money, data.ClimbPower)
-		if state.Dirty then
-			push(player)
-		end
+	end
+	if income > 0 then
+		registry.DataService:AdjustCoins(player, income * registry.FriendService:Boost(player) * dt)
+	end
+	data.LastSeen = os.time()
+	for _, sheep in grewUp do
+		local size = Economy.Sizes[sheep.Size].Name
+		Remotes.Reveal:Fire(player, Economy.Name(sheep), size)
+		state.Dirty = true
+	end
+	refreshPen(player)
+	updateLeaderstats(player, Roster.Income(data.Sheep, data.PenSlots) * money, data.ClimbPower)
+	if state.Dirty then
+		push(player)
+	end
+end
+
+-- One player's failure (bad saved data, a model that won't build) mustn't stop everyone else's income: each runs
+-- alone, and a failure is reported now and then, not every second.
+local failedAt: { [Player]: number } = {}
+local function guarded(player: Player, what: string, run: () -> ())
+	local ok, problem = pcall(run :: any)
+	if not ok and os.clock() - (failedAt[player] or -math.huge) > 30 then
+		failedAt[player] = os.clock()
+		warn(`[FlockService] {player.Name}'s {what} failed: {problem}`)
+	end
+end
+
+local function tick(dt: number)
+	for player, state in states do
+		guarded(player, "tick", function()
+			tickPlayer(player, state, dt)
+		end)
 	end
 end
 
@@ -457,6 +475,7 @@ function FlockService.Start(_self: any)
 	trove:Connect(Players.PlayerRemoving, function(player: Player)
 		clearPen(player)
 		states[player] = nil
+		failedAt[player] = nil
 	end)
 
 	local elapsed = 0
@@ -475,7 +494,9 @@ function FlockService.Start(_self: any)
 		end
 		for player, state in states do
 			if state.Dirty then
-				push(player)
+				guarded(player, "snapshot", function()
+					push(player)
+				end)
 			end
 		end
 	end)
