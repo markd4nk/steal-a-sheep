@@ -124,6 +124,16 @@ Calls in Hera's Blender model (2026-10-05, a mock-up):
   as she walks; she runs like Zeus.
 - **Shared style** (`art/gods/style.py`): the eyes and brows, fists, trims and the rig are the same for every god.
 
+Calls in the avatar Zeus mock-up (2026-10-05; a Roblox R15 avatar as the god, nothing built into the game):
+
+- **Catalog items**: hair 126795757748952 and beard 76239336562150 (U8DEV's Greek god set), Roblox's Crown of Golden
+  Laurels 10770304, robe 87233169181342 or layered toga 136737172189289 (Manga Infinite), angry heads 90077016726721
+  (Classic Style Angry Face), 107620469684872 (Angry Grump pouty chibi), 120264055436211 (Angry Stare); skin
+  214, 160, 120. A game can dress its NPCs in any catalog item without owning it.
+- **Size**: Height, Width and Depth scale 1.65 (9.6 studs, the gods' height); head 1.3 times that for the cuter look.
+- **Not yet solved**: the robe and toga leave one side of the chest bare (a white torso colour would read as an
+  under-tunic); the toga lets a knee through when walking.
+
 Calls made ordering the gods by rank (2026-10-05):
 
 - **Which minor god takes which stage**: Pan on the meadow (the shepherds' god), Tyche on the bamboo, Hecate on the

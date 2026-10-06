@@ -150,6 +150,16 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   the scene origin) were right for a rigged character with an embedded texture; Import. The mesh and texture upload at
   once (`MeshId`, `TextureID`)." Seen 2026-10-05 in Steal a Sheep.
 
+- **S24** (`BRAIN/PATTERNS/npcs.md`, a new "NPCs as Roblox avatars" part): "`Players:CreateHumanoidModelFromDescription`
+  builds an NPC from any catalog items, owned or not, in Edit and on the server. Its HeightScale, WidthScale,
+  DepthScale and HeadScale go past the avatar editor's limits (1.65, head 2.1 worked). Avatars made this way have
+  AnimationConstraint joints, not Motor6Ds, and a dynamic head (FaceControls, no face Decal): give it a look with
+  `desc.Head` = a catalog dynamic head (angry ones exist), not a decal. In Edit, a joint's `Transform` doesn't move
+  anything, and moving an anchored limb makes Studio rebuild the body around it: pose in a playtest. There a
+  `Transform` set on the server doesn't replicate, so set it on each client too (`RunService.PreSimulation`, after the
+  Animator), or play an animation, whose tracks do replicate. Roblox's default R15 walk (507777826) plays on them."
+  Seen 2026-10-05 in Steal a Sheep, dressing Zeus from the catalog.
+
 ## Done
 
 - None yet.

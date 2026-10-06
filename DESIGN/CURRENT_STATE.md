@@ -84,6 +84,9 @@ lamb.
 - **Hera mock-up in Blender (2026-10-05, the user asked to see the style on his wife)**: same pipeline and shared
   style (`art/gods/style.py`, `hera.py`): purple gown with a peacock-eye hem, cape, diadem, sceptre with a neon
   peacock eye carried upright. Shown in Blender only, waiting for the user's word.
+- **Zeus as a Roblox avatar (mock-up 2026-10-05, the user asked for a cuter, Roblox-niche look and whether a player
+  model could do)**: `Players:CreateHumanoidModelFromDescription` with catalog items (ids in DECISIONS.md), scaled
+  1.65 to the gods' 9.6 studs, Roblox's own walk; shown in a playtest of a Studio copy, nothing kept.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
