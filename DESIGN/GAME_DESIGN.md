@@ -37,7 +37,7 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
 - Wild lambs, theft, carrying, putting down in the pen (delivery), failure rules, tutorial lamb: `WildService`
   (+ `SheepService` for models); the Put down prompt is the client's own (`PromptController`).
 - Gods and pursuit: `GodService` (one state machine, primitive block rigs).
-- Climb speed checks, tier signs, slide hits and knockback: `MountainService`; uphill speed, client slide, steering, braking: `MovementController`.
+- Climb speed checks, tier signs, slide hits and knockback: `MountainService`; uphill speed, client slide, steering, braking: `MovementController`; slide speed and momentum: `Mountain.SlideBase`/`Momentum`.
 - Flock, pen capacity, income, growth, offline credit, Sheepdex rewards, Equip Best, locks, selling, merging:
   `FlockService`; the Sell Stall's menu (stored sheep only, several at once): `UIController/Screens/SellStall`; the sheep living in the pen and their strolls: `FlockService/Pens` (+ `Utils/Wander`); walking,
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
@@ -150,12 +150,18 @@ and to outrun its gods. No walls: every tier is open to everyone.
   tier above you is a quarter speed (two above is a crawl) and every tier you've outgrown is +1x.
 - **Walking and climbing** = 18 studs/s x your speed. Slowed, only the uphill part is held down. Tier 1 and the safe
   zone (plots, hub) never go below normal; walking in the safe zone stops at 7x.
-- **Sliding away** = the god's speed x your speed (at least walking speed), set when the slide starts and kept all the
-  way down. It reaches it in about 2 seconds.
-- **Gods**: one set speed each for the whole chase, 0.8 x its tier's `SlideSpeed` (19 at tier 1 up to 48 at tier 30),
-  never walking, never scaled by the thief.
+- **Sliding away** = the god's speed x your speed (at least walking speed), set when the slide starts. It reaches it
+  in about 2 seconds.
+- **Momentum (the user, 2026-10-06)**: every sign you slide past adds 15% of that starting speed, up to 100 studs/s
+  (a slide already faster keeps its own). Carrying, it counts from the lamb's tier; empty-handed, from where the slide
+  began. A bump costs speed, won back in about a quarter of a second, and never trips you over. The slide **stops
+  dead at the safety line**: from there you walk, so nobody is carried into the plots.
+- **Gods**: 0.8 x its tier's `SlideSpeed` (19 at tier 1 up to 48 at tier 30), never walking, times its thief's
+  momentum where they are: boosted as much as its thief, and it keeps that boost while they bump into things.
 - **So**: at the sign's number the lightest lamb's thief matches the god and the head start gets them away; an
-  average lamb leaves about 95% (caught near the bottom); heavy ones need more.
+  average lamb leaves about 95% (caught near the bottom); heavy ones need more. Momentum doesn't change who wins a
+  clean chase or where, only how long it takes; a bump brings the god closer (at the sign's number, with the lightest
+  lamb: three quick knocks or two half-second stops leave you ahead, the next gets you caught).
 
 ## Lamb weight (the user, 2026-10-05)
 Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (lightest) up, saved with the sheep

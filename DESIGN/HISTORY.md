@@ -47,6 +47,46 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     draws normally). "Jump to get off" showed on the Tutorial 0 save. The Studio save was put back as found (walker
     level 1, Climbing 0). Not seen in play: the trimmed refusals and the menus without their tips.
 
+- **Momentum slides, the god boosted too, quick bump recovery, a dead stop at the safety line (2026-10-06, branch
+  `t3code/speed-up-downhill-sliding`, merged into main on the user's word)**.
+  The user: sliding home from the top was "very, very slow all the way down" and boring (a slide kept the speed it
+  started with, so a player weak at the top crawled home at 18 studs/s, 6.8 minutes from Zeus); wanted it to speed up
+  "like momentum", with as few numbers as possible; then "I want the guardian to also speed up on the way down" so a
+  thief below the tier's level can't just escape once they reach the lower tiers; a single bump must bring the god
+  closer, never be an instant loss, yet not reset the god to its normal speed ("it means nothing"); "almost an
+  instantaneous recovery" instead of lying on the floor for two seconds; and "as soon as they hit the safe zone, they
+  begin walking", nothing carrying them into the pens. Then: "merge it to main ... publish it too", to try it.
+  - *How it works*: a slide's base is the old escape speed (`Mountain.SlideBase`); `Mountain.Momentum` adds 15% of it
+    for every tier below where it counts from (the carried lamb's tier, or where an empty-handed slide began), never
+    lifting it past 100 studs/s (a faster slide keeps its own) and none below the safety line
+    (`GameConfig.Movement.MomentumPerTier`/`MomentumTop`). `MovementController` aims for base x momentum; a bump drops
+    the push once, and it climbs back to full in `SlideRecoverSeconds` (0.25) even while still against the obstacle,
+    so steering slides the character off it (the old rule held the push at the speed it really had, about 8, and a
+    blocked slider crept along an edge for 1.5 s); a slide restarted within 2 s of getting stuck recovers as fast; the
+    character's FallingDown and Ragdoll states are off, so a hit at speed never lays it on the floor. At the safety
+    line it zeroes the slide's ground speed and hands over to walking (no more run-out). `GodService` runs each god at
+    its set speed times its thief's momentum where they are, through bumps too. `MountainService`'s ground budget
+    allows the momentum (empty-handed: as if the slide began at the top).
+  - *Why chases still end in the same place*: with both speeds scaled by the same share, the gap changes per stud slid
+    exactly as without momentum, so every clean chase ends on the same tier (45 simulated steals, tiers 3-30, at, one
+    and two signs short, three weights: all matched). A first version had the god follow its thief's measured pace
+    (dropping to its own speed during a crash, since with a 2 s recovery a kept boost made one crash fatal); the user
+    wanted the god to keep its speed and the thief to recover almost at once instead (DECISIONS.md has the numbers).
+  - *Checked*: `check.ps1`; a Studio copy built from the branch (`build/MomentumPlaytest.rbxl`, the cloud place left
+    alone): both bootstraps ready, 86 tests (2 new in `Mountain.spec`), a clean console. Tier 20 at its sign with a
+    1.057 lamb: the god 43.2 -> 49.4 -> 56 -> 62.5 -> 69 a tier with its thief, the gap closing about 1.5 studs/s as
+    an average lamb's should, caught on tier 16. Tier 3 at 4x its sign: 49.6, 57.1, 64.5 studs/s on tiers 3, 2, 1, two
+    bumps won back in about 2 s, a dead stop at x 329.4 (64.5 to 0 in a frame, then walking at 79.9). After the bump
+    changes, the same tier-3 bump at x 738: free of it in 0.45 s (it had crept 1.5 s) and back to 57.2 a tenth of a
+    second later, the god at 29.4 throughout and 33.3 on tier 1, FallingDown and Ragdoll off, 86 tests, a clean
+    console.
+  - *Shipped as version 20* (the user: "merge it to main, and then ... publish it too", to try it): main
+    fast-forwarded to d8fc2b3; the cloud place's five changed scripts set and the new test added (it held main
+    b87e808's scripts and nothing else first; 121 of 121 matching after); a playtest of the cloud place (both
+    bootstraps ready, 86 tests, 30 gods, "data will be saved", a clean console); File > Save to Roblox, then Publish
+    to Roblox at 17:34 UTC: "Place published. Editors can now play this place in Roblox", v20. Audience still Private;
+    no schema or remote changes, so no servers to restart.
+
 - **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
   it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game
   page icon change yet; "set it to mild" (Fear) but no genre yet; "just ship it. It still needs to stay private".
