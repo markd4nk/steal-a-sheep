@@ -39,6 +39,12 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     changes, the same tier-3 bump at x 738: free of it in 0.45 s (it had crept 1.5 s) and back to 57.2 a tenth of a
     second later, the god at 29.4 throughout and 33.3 on tier 1, FallingDown and Ragdoll off, 86 tests, a clean
     console.
+  - *Shipped as version 20* (the user: "merge it to main, and then ... publish it too", to try it): main
+    fast-forwarded to d8fc2b3; the cloud place's five changed scripts set and the new test added (it held main
+    b87e808's scripts and nothing else first; 121 of 121 matching after); a playtest of the cloud place (both
+    bootstraps ready, 86 tests, 30 gods, "data will be saved", a clean console); File > Save to Roblox, then Publish
+    to Roblox at 17:34 UTC: "Place published. Editors can now play this place in Roblox", v20. Audience still Private;
+    no schema or remote changes, so no servers to restart.
 
 - **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
   it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game
