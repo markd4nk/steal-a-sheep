@@ -4,6 +4,20 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-06, version 8 published** (saved and published; Team Create): main 3667692's scripts swapped into the
+  cloud place (127, 0 differences). Two Studio-side changes since version 5, both rerunnable:
+  - **High Olympus rebuilt** for the gods' new order: `workspace.Stages.HighOlympus` now holds `Tier13 Hypnos` ...
+    `Tier30 Zeus` and `Summit` (23,317 instances), made in Edit by `tools/UpperMountain.luau` (packed into Studio's
+    content folder by `tools/preview-upper-mountain.luau`, then `require(...).Build(...)` on `workspace`; it destroys
+    and replaces its own folder).
+  - **Five stud materials** in `MaterialService`: `SheepStuds`, `SheepStudsMetal`, `SheepStudsFabric`,
+    `SheepStudsFoil`, `SheepStudsGlow` (`studio/SheepStuds.luau`), beside the map's `Studs`.
+  - Against a fresh `build-place.ps1` build: the same 44,493 Workspace instances and names, and every part's position
+    and size equal, except High Olympus's clouds, about 5% bigger in the cloud place. The builder takes the first of
+    stage 7's matching cloud models, and Studio lists the map's children in a different order than the file, so it
+    picked a near-twin (BRAIN proposal S46). They're pass-through decor off the lane. `StealASheep.rbxl` in the main
+    checkout was rebuilt from 3667692.
+
 - **2026-10-05, the Settings menu** (branch `t3code/sheep-stud-style-mockups`): no place changes. The menu and its
   gear (`PlayerGui.SettingsGear`, ScreenInsets TopbarSafeInsets) are made at runtime; the gear is the uploaded
   `Theme.Icons.MenuSettings`.
@@ -12,9 +26,9 @@ here. Newest first.
   MaterialVariants in `MaterialService`, copies of the map's `Studs` at 0.5 studs a tile: `SheepStuds` (Plastic),
   `SheepStudsMetal`, `SheepStudsFabric`, `SheepStudsFoil` and `SheepStudsGlow` (Plastic, its colour map as its
   emissive mask, strength 1.6). `studio/SheepStuds.luau` makes them (rerunnable, in Edit); `tools/assemble.luau` runs it
-  on every built place. **The cloud place doesn't have them yet**: run the script there before publishing this code
-  (without them the wool stays plain and the server warns once). `HerdsPlaytest.rbxl` (the borrowed local copy in
-  t3code-002720c0's `build/`) holds them and this branch's scripts, unsaved. The mock-ups' `TEMP_` models were deleted.
+  on every built place. The cloud place got them with version 8 (above); without them the wool stays plain and the
+  server warns once. The mock-ups' `TEMP_` models were deleted, and the borrowed `HerdsPlaytest.rbxl` Studio was closed
+  without saving.
 
 - **2026-10-05, daily gifts**: no place changes (the menu, the HUD's DAILY and the Pegasus Sheep are made at
   runtime; `SheepService` adds the Pegasus to `ReplicatedStorage.SheepLooks` with the other families). Its six

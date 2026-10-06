@@ -273,6 +273,18 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   title holds. A Team Create place closed by mistake loses nothing (its edits are on Roblox's server), but its MCP
   connection goes until it's reopened: `RobloxStudioBeta.exe -task EditPlace -placeId <id> -universeId <id>`." Seen
   2026-10-06 in Steal a Sheep, closing an overnight test copy.
+- **S46** (`BRAIN/PATTERNS/testing-studio.md`, running `studio/` build scripts): "A build script that runs both in
+  Lune and in Studio can build different things if it takes 'the first child that matches': Studio's `GetChildren`
+  order for a loaded place isn't the file's order, which Lune keeps. Pick by a stable rule (the closest match, then
+  name or position) when both must agree, and compare a Studio rebuild with a Lune build by sums of instance counts,
+  name lengths, and part positions and sizes rounded to 0.01, which don't depend on order." Seen 2026-10-06 in Steal
+  a Sheep: High Olympus rebuilt in the cloud place matched a Lune build everywhere but its clouds, about 5% bigger
+  (another of stage 7's ten-part cloud models).
+- **S47** (`BRAIN/PATTERNS/publishing.md`, What's live): "In Team Create the server autosaves edits as a new version
+  within about a minute, with no Save: **Save to Roblox** then still logs 'Saved new changes' but adds no Version
+  History row, and **Publish to Roblox** publishes that autosaved version, so Version History and Server management
+  show the autosave's time, not the publish's. Check that every edit came before that time." Seen 2026-10-06 in Steal
+  a Sheep: version 8 was autosaved at 08:42 and published at 08:51.
 
 ## Done
 
