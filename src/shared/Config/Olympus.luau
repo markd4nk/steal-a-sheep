@@ -25,6 +25,8 @@ export type Tier = {
 	Sign: string, -- their signature accessory (GodService builds it)
 }
 
+local Herds = require(script.Parent.Herds)
+
 local rgb = Color3.fromRGB
 
 local tiers: { Tier } = {
@@ -480,9 +482,16 @@ local tiers: { Tier } = {
 	},
 }
 
+-- Every family that grazes on a tier: its god's own and the rest of its herd (Config/Herds).
 local byFamily: { [string]: Tier } = {}
 for _, tier in tiers do
 	byFamily[tier.Family] = tier
+	local herd = Herds.ByGod[tier.God]
+	if herd then
+		for _, family in herd do
+			byFamily[family] = tier
+		end
+	end
 end
 
 local Olympus = {

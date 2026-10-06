@@ -4,6 +4,8 @@
 -- Config/Olympus; the economy's formulas are in Utils/Economy. The sheep, carry and UI sections are Shear a Sheep's,
 -- kept in the same shape so its Looks, CarryPose, SheepRigLayout and UI kit work unchanged.
 
+local Herds = require(script.Parent.Herds)
+
 export type WoolStyle = "Puffs" | "Ringlets" | "Cloud" | "Icicle" | "Spotted"
 export type HornStyle = "SmallCurl" | "BigCurl" | "Spiral" | "FourHorn"
 export type Accessory = "Antennae" | "WolfHead"
@@ -42,6 +44,7 @@ export type Breed = {
 	SpecialFX: SpecialFX?,
 	Mutation: string?, -- a fleece paint laid over the wool (Silver, Rainbow, Gold)
 	Extra: string?, -- a primitive accessory SheepService adds (Leaf, Helmet, Wreath, Wings, BackWings, Blindfold, Flame)
+	Extras: { Herds.Extra }?, -- more of them, each in an optional colour (SheepService/Extras)
 }
 
 export type Mutation = {
@@ -289,6 +292,12 @@ local breeds: { [string]: Breed } = {
 		SpecialFX = "StormSparks",
 	}),
 }
+-- The gods' rarer families (Config/Herds), on the same defaults.
+for id, overrides in Herds.Looks do
+	local fields = table.clone(overrides)
+	fields.Name = nil
+	breeds[id] = look(id, overrides.Name, fields)
+end
 
 local mutations: { [string]: Mutation } = {
 	Silver = {

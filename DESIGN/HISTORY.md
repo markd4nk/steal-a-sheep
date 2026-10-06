@@ -6,6 +6,31 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Six sheep a tier, and the new Sheepdex (2026-10-05)**. On t3code/sheep-deck-mockup, not merged.
+  - *How it works*: `Config/Herds` lists each god's six families, Common (the god's own) to Mythic, keyed by god, and
+    the 150 new looks (Shear a Sheep builds, wool styles, materials and paints with 36 new primitive extras in
+    `SheepService/Extras`: halo, crown, antlers, witch hat, trident, bolt...); GameConfig turns them into Breeds and
+    Olympus maps every family to its god's tier. `Economy.FamilyRarities` holds the odds and multipliers;
+    `RollFamily` picks each wild lamb's family (WildService), `FamilyBase` is its income before fleece, size and rank,
+    `FamilyName` its name. Fleeces are Plain / Shiny / Royal. The theft card adds the rarity; Legendary and Mythic
+    lambs are announced. The Flock and Sell Stall cards take the family's rarity colour. `Screens/Sheepdex` is
+    rewritten from the mock-up (`studio/SheepIndexMockup.luau`): sections per tier, 3D sheep and gods drawn when a tier
+    scrolls near, silhouettes, badges, the picked sheep with its reward and Claim (`Remotes.ClaimDex`,
+    `SheepdexService`, which also pays the herd gift). `FlockService.Deliver` only finds a family now. Save schema 3
+    adds `DexClaimed` and `HerdGifts`. The HUD's SHEEPDEX shows a count badge. Debug: `GiveSheep` 30.6 gives Zeus's
+    Mythic; `FillDex` n marks n of every herd found.
+  - *The user's calls*: six a tier, Common to Mythic; the lineup's designs ("that's good"); odds 50/25/13/7/4/1 and
+    income x1/1.5/2.5/4/8/15; fleeces renamed Plain / Shiny / Royal; the gods' new order used before it merges; the
+    Sheepdex mock-up ("looks pretty good"). The design rules (Mythic as the god's sheep made divine, no family in the
+    Gold paint) and the reward numbers are in DECISIONS.md *To review*.
+  - *Checked*: check.ps1; 64 tests (new: herds data, schema 3 migration). Playtested in my own Studio copy built from
+    the branch: server and client Ready, 180 previews (5,846 parts), 121 wild lambs rolled about 50/30/13/5/2.5%,
+    six tier-1 families' income matching the formula, the theft card ("LEGENDARY / Grape King Lamb"), carrying a
+    Legendary, the Flock menu's colours, claims (cash and Climbing paid, a second claim and an unfound one refused),
+    the herd gift (+1,200 and +25 on the sixth), the Sheepdex on the Galaxy A06 (fits after giving the picture the
+    spare height), lazy drawing (tier 2 drawn when scrolled to, tier 5 not), console clean. Not checked: clicking
+    Claim (a script opened the menu after my desktop clicks went astray), saving, two players.
+
 - **The Merge Shrine: the Laurel Ring, a gamble like Steal an Egg's Fuse Machine (2026-10-05)**. Merged into main at
   the user's request.
   - *How it works*: `ShrineService` builds the Laurel Ring (`ShrineService/Model`) where the Mutation Machine stood

@@ -125,6 +125,8 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		Trail = data.Trail,
 		Deliveries = table.clone(data.Deliveries),
 		Dex = table.clone(data.Dex),
+		DexClaimed = table.clone(data.DexClaimed),
+		HerdGifts = table.clone(data.HerdGifts),
 		Tutorial = data.Tutorial,
 		ClimbTier = Economy.ClimbTier(data.ClimbPower),
 		MergeReady = Economy.TotalDeliveries(data.Deliveries) >= Economy.MergeAfterDeliveries,
@@ -502,10 +504,14 @@ function FlockService.Deliver(_self: any, player: Player, wild: Wild, at: CFrame
 		notify(player, "Stored - not earning. Your pen is full.", "Bad", "Notice")
 	end
 	if not data.Dex[wild.Family] then
+		-- Its reward waits in the Sheepdex for a claim (SheepdexService).
 		data.Dex[wild.Family] = true
-		local reward = Economy.DexReward(tier.Tier)
-		registry.DataService:AdjustCoins(player, reward)
-		notify(player, `New in your Sheepdex! +{Format.Short(reward)} cash`, "Rare", "DexReward")
+		notify(
+			player,
+			`New in your Sheepdex: {Economy.FamilyName(wild.Family)}! Claim its reward there`,
+			"Rare",
+			"DexReward"
+		)
 	end
 	if data.Tutorial == 0 then
 		data.Tutorial = 1

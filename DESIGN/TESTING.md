@@ -12,7 +12,8 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 | `AddCash` | coins (1000) | Coins |
 | `AddClimb` | Climbing (100) | Climbing, and a fresh snapshot |
 | `Steal` | tier | Teleports to that tier's first ready lamb and steals it (the climb check starts from there) |
-| `GiveSheep` | tier | An ordinary lamb of that tier straight into the flock, as if delivered |
+| `GiveSheep` | tier, and after the point the herd slot (30.6 = Zeus's Mythic) | A Plain lamb of it straight into the flock, as if delivered |
+| `FillDex` | how many of each herd, Common first (6) | Marks them found in the Sheepdex, rewards unclaimed |
 | `GrowAll` | - | Every lamb grows up on the next tick (with its reveal) |
 | `UnlockAll` | - | Zeus's Heavy target in Climbing and one delivery from every tier |
 | `SetWalker` | level (1-30) | The stair walker at that level (its look, step speed and sign) |
@@ -167,3 +168,25 @@ Useful measurements:
 - **Three grown sheep**: `Debug GiveSheep` three times, then `GrowAll` (only sheep in the pen grow).
 - **Recording**: start `ffmpeg -f gdigrab` a second before the click (it takes about 1.5 s to start); the game view of
   a maximized Studio is at 6,166, 1732 x 792 on this PC.
+
+## Sheep looks and the Sheepdex mock-up (2026-10-05)
+
+- **Opening a menu without the mouse**: a `require` from `execute_luau` gets its own copy of UIController, so put a
+  TEMP_ LocalScript in StarterPlayerScripts in Edit that requires `Controllers.UIController` (the game's copy) and
+  calls `:Open(name)` when the LocalPlayer's `TempOpen` attribute changes; set the attribute from a Client
+  `execute_luau`. Delete the script afterwards. Used for the Sheepdex because desktop clicks are unsafe while other
+  sessions' Studios take the foreground.
+- **Claims from a script**: `Remotes.ClaimDex:Invoke(family)` returns `callOk, success, message`.
+
+- **Rendering looks without a playtest**: `studio/SheepIndexMockup.luau` builds a TEMP_ ScreenGui in Edit from the
+  game's UI kit, with sheep dressed by SheepService's Looks and Extras in ViewportFrames. ServerStorage attributes pick
+  the view: `MockView` = `Index` (the menu; `MockTier`/`MockSlot` the picked sheep), `Lineup`, `Herds` (`MockPage` 1-6,
+  five gods a page) or `Catalog` (every build, style, horn and accessory; `MockCatalog` = `Extras` for the extras).
+  To use the branch's GameConfig, Herds and Extras rather than the place's, wrap them with the script as ModuleScripts
+  in one Folder in an .rbxmx under Studio's `content\sas_mock\` (a new file name each time), then in Edit
+  `require(game:GetObjects("rbxasset://sas_mock/<file>")[1].SheepIndexMockup)`.
+- **Builds that keep their own colours**: Galaxy, Scarecrow, Slime, Ocean, Doodle, BiblicallyAccurate and the
+  Cotton Candy's second colour barely take WoolColor (their pieces are tinted "Own"); recolour plain wool styles instead.
+- **Glow**: Neon wool in a pale colour renders almost white; saturated ones (255, 90, 0) keep their colour.
+- **Where accessories show**: a sheep turned -35 degrees for a picture faces the camera with its -X side; the wool
+  reaches about 1.5 studs out from the body, so anything on a flank (the shield) sits at x -1.6 or it's hidden.

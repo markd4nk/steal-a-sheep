@@ -7,6 +7,7 @@ local ServerStorage = game:GetService("ServerStorage")
 
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Economy = require(ReplicatedStorage.Utils.Economy)
+local Herds = require(ReplicatedStorage.Config.Herds)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 
@@ -60,11 +61,28 @@ local commands: { [string]: Command } = {
 		registry.FriendService:Refresh(player)
 		return true, nil
 	end,
-	-- value: a tier. An ordinary lamb of that tier's family goes straight into the flock, as if delivered.
+	-- value: a tier, and after the point which of its herd (30.6 is Zeus's Mythic; 30 his Common). A plain lamb of it
+	-- goes straight into the flock, as if delivered.
 	GiveSheep = function(player, value)
-		local tier = Olympus.Tiers[math.clamp(math.floor(value or 1), 1, Olympus.Count)]
+		local number = value or 1
+		local tier = Olympus.Tiers[math.clamp(math.floor(number), 1, Olympus.Count)]
+		local herd = Herds.ByGod[tier.God]
+		local slot = math.floor((number % 1) * 10 + 0.5)
+		local family = if herd and herd[slot] then herd[slot] else tier.Family
 		local size = math.random(1, 3)
-		registry.FlockService:Deliver(player, { Family = tier.Family, Rarity = 1, Weight = 1.05, Size = size })
+		registry.FlockService:Deliver(player, { Family = family, Rarity = 1, Weight = 1.05, Size = size })
+		return true, nil
+	end,
+	-- value: how many of each herd to mark found in the Sheepdex, Common first (6 for all), their rewards unclaimed.
+	FillDex = function(player, value)
+		local data = registry.DataService:GetData(player)
+		local count = math.clamp(math.floor(value or 6), 0, #Herds.Rarities)
+		for _, herd in Herds.ByGod do
+			for index = 1, count do
+				data.Dex[herd[index]] = true
+			end
+		end
+		registry.FlockService:Push(player)
 		return true, nil
 	end,
 	-- Every lamb in the pen grows up now.

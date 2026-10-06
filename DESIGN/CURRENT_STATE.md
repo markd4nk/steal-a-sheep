@@ -78,6 +78,10 @@ lamb.
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
   lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
+- **Six sheep a tier and the new Sheepdex, built on t3code/sheep-deck-mockup (2026-10-05), not merged**: each god's
+  six families (`Config/Herds`), rolled for every wild lamb; fleeces Plain / Shiny / Royal; Sheepdex rewards claimed in
+  the new Sheepdex (`SheepdexService`, save schema 3) with a herd gift for all six. HISTORY.md has the details; the
+  gods' new order (t3code/order-olympian-gods) still has to merge for tiers to match the lineup the user OK'd.
 
 ## Not verified
 
@@ -85,8 +89,12 @@ lamb.
   the altar** (should go to the pen), **touch and gamepad** in its menu, and **a Titan's grow-up** (none rolled yet).
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
   `IsFriendsWithAsync` pairs and the join notices between two real friends are untested until the place is published.
-  The left column (GIFT, FLOCK, SHOP, SHEEPDEX, the friend tile) wasn't checked on a phone's short screen.
+  The left column (GIFT, FLOCK, SHOP, SHEEPDEX, the friend tile) runs off the bottom of a Galaxy A06 (800 x 360):
+  SHEEPDEX is half off and the friend tile gone (seen 2026-10-05).
 
+- **Sheepdex claim pressed with the mouse or a finger**: claims were made through `Remotes.ClaimDex` in a playtest (the
+  menu then showed Claimed!, the badges and the green herd bar); the button itself wasn't clicked. Saving the claims
+  (schema 3) is unit-tested only: the place isn't published.
 - **Sell Stall on a phone and a gamepad**: played on a PC window only (mouse); the layout matches the mock-up's phone
   frame, not checked in the Device Simulator.
 - **Stair walker with two players**: another player's climb (posed on each device) and the owner-only sign prompts
@@ -113,6 +121,9 @@ lamb.
   falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; and the climb speed check wasn't tried there.
 
 ## Known issues
+
+- **180 sheep previews**: SheepService builds a preview model of every family for the menus' 3D views at startup
+  (`ReplicatedStorage.SheepLooks`, about 5,800 parts); the Sheepdex draws a tier's sheep only when it scrolls near.
 
 - **The descent is full of the map's own trees, rocks and arches.** A slide that hits one slows, and stops if blocked;
   players steer round them; lanes stay as they are until the user adds obstacles (DECISIONS.md). Every run

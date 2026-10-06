@@ -44,6 +44,8 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
 - Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
 - Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climbing): `LeaderboardService`.
 - Free gift for liking and favoriting the game (Climbing and cash, once): `GiftService`, `Screens/Gift`.
+- Each god's six sheep: `Config/Herds` (looks, rarities); the Sheepdex's claims and herd gifts: `SheepdexService`,
+  `Screens/Sheepdex`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
 ## The map
@@ -54,6 +56,8 @@ the long stages, gods ordered to fit each stage's theme. Above its old summit, H
 carries the corridor on with one stretch a god, built from the map's own pieces, the grade rising a degree or so a god
 from 32 to 52 (the user: no steeper than about 60, gradual but noticeable; 52 at the top kept), up to Zeus's throne
 plaza. The climb is all on foot. High Olympus is sparse for now: the user will add obstacles to it later.
+
+Each god has six sheep families (below); the table's is the god's own, their Common.
 
 | Tier | God | Stage | Family (Shear a Sheep breed) |
 | --- | --- | --- | --- |
@@ -129,6 +133,22 @@ Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (l
 (`Weight`). Wild lambs: 1-1.1 mostly, 1.1-1.5 for one in twenty. Heavier lambs are slower to carry and tend to grow
 bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look a little bigger as lambs.
 
+## Six sheep a tier (the user, 2026-10-05)
+Every god's pasture holds six families (`Config/Herds`, keyed by god): **Common** (the god's own family), **Uncommon,
+Rare, Epic, Legendary, Mythic**, the rarer ones built from Shear a Sheep's builds and wool with primitive extras. Each
+wild lamb rolls its family: 50 / 25 / 13 / 7 / 4 / 1%. A family earns its tier's base income times x1, x1.5, x2.5, x4,
+x8, x15. On top of that every lamb still rolls its **fleece: Plain, Shiny (x1.5, blue sparkles) or Royal (x2.5, gold)**.
+The theft card shows the family's rarity; Legendary and Mythic lambs (and Royal fleeces) are announced. Menus colour a
+sheep's card by its family's rarity.
+
+## Sheepdex (Mark's mock-up, 2026-10-05)
+Like Steal an Egg's Pet Index: one scrolling list with a section per tier (its god, its six sheep in a 3 x 2 grid in
+their rarity's colours, dark silhouettes until found, a bar to the herd's gift) and the picked sheep beside it: its
+picture, rarity, income, where it lives and its reward. Delivering the first of a family finds it; its reward (30 s of
+the family's income in cash, and 5% of its tier's sign number x its rarity's multiplier in Climbing, at least 5) waits
+for **Claim** in the Sheepdex. Claiming all six of a god pays the herd's gift (10 minutes of the tier's Common income,
+and a quarter of its sign number in Climbing, at least 25). A red badge on the HUD's SHEEPDEX counts rewards waiting.
+
 ## Merge Shrine (the user, 2026-10-05)
 The Laurel Ring in the hub, where the Mutation Machine stood: pick three grown sheep of one family in its menu, pay
 cash, and they merge into one fresh lamb of that family. Its fleece and hidden weight are rerolled (so its adult size
@@ -139,5 +159,5 @@ a stolen lamb (no god chases it; nobody else sees or takes it); left there 30 s 
 when it grows up in the pen. `ShrineService` (server), `ShrineController` (the scene on each device), the Merge menu.
 
 ## Not built
-Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.
+Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece, premium products.
 These are just not built yet, not ruled out: build them if the user asks.

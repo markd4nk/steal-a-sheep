@@ -122,6 +122,15 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   endings, so a script that edits a Luau or Markdown file turns every line CRLF. Open files for writing with
   `newline='\n'`, or strip `\r` afterwards." Seen 2026-10-05 in Steal a Sheep: four edited services came back all
   CRLF.
+- **S22** (`BRAIN/GOTCHAS.md`): "Neon brightens a part's colour towards white: a pale Neon colour (140, 255, 170) reads
+  as white, most of all in a ViewportFrame. Give Neon a saturated colour, (255, 90, 0) or (0, 220, 190), to keep its
+  hue." Seen 2026-10-05 rendering Steal a Sheep's sheep designs: four glowing Mythics came out white.
+- **S23** (`BRAIN/PATTERNS/testing-studio.md`): "To call the running game's client code from a playtest (open a menu,
+  press what the mouse would) without the mouse, add a TEMP_ LocalScript to StarterPlayerScripts in Edit that requires
+  the controller and acts when an attribute on the LocalPlayer changes, then set the attribute from a Client
+  `execute_luau`: the LocalScript shares the game's module copies, `execute_luau` doesn't (S7). Delete it after." Seen
+  2026-10-05 in Steal a Sheep: desktop clicks meant for my Studio landed in another session's, which had taken the
+  foreground between my screenshot and my click.
 
 ## Done
 

@@ -340,7 +340,7 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local function paintRow(row: Row, sheep: View)
 		SheepIcon.Paint(row.Token, sheep.Family, sheep.Rarity)
 		local size = Economy.Sizes[sheep.Size] or Economy.Sizes[1]
-		row.Name.Text = Economy.Tier(sheep.Family).FamilyName
+		row.Name.Text = Economy.FamilyName(sheep.Family)
 		local fleece = if sheep.Rarity > 1 then ` {Economy.Rarities[sheep.Rarity].Name}` else ""
 		row.Detail.Text = `{size.Name}{fleece} · +{Format.Rate(sheep.Income)}/s`
 		local at = table.find(picks, sheep.Id)

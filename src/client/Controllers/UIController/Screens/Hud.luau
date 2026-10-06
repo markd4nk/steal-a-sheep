@@ -124,24 +124,32 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	-- The free gift, until it's claimed: a red "!" on its corner.
 	local gift = UIKit.PictureButton(tiles, "GiftButton", Theme.Icons.MenuGift, PICTURE_SIZE, "GIFT")
 	gift.LayoutOrder = 0
-	local alert = UIKit.Text(gift, "Alert", "!", 20, Color.Snow, UDim2.fromOffset(26, 26), { Stroke = Color.Line })
-	alert.BackgroundTransparency = 0
-	alert.BackgroundColor3 = Color.Red500
-	alert.AnchorPoint = Vector2.new(0.5, 0.5)
-	alert.Position = UDim2.new(1, -8, 0, 6)
-	alert.ZIndex = 5
-	UIKit.Corner(alert)
-	local ring = Instance.new("UIStroke")
-	ring.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	ring.Color = Color.Line
-	ring.Thickness = Theme.Line.Normal
-	ring.Parent = alert
+	-- A red badge on a picture's corner: "!" on the gift, the Sheepdex's rewards waiting.
+	local function alertOn(picture: GuiObject, text: string): TextLabel
+		local alert = UIKit.Text(picture, "Alert", text, 20, Color.Snow, UDim2.fromOffset(26, 26), {
+			Stroke = Color.Line,
+		})
+		alert.BackgroundTransparency = 0
+		alert.BackgroundColor3 = Color.Red500
+		alert.AnchorPoint = Vector2.new(0.5, 0.5)
+		alert.Position = UDim2.new(1, -8, 0, 6)
+		alert.ZIndex = 5
+		UIKit.Corner(alert)
+		local ring = Instance.new("UIStroke")
+		ring.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		ring.Color = Color.Line
+		ring.Thickness = Theme.Line.Normal
+		ring.Parent = alert
+		return alert
+	end
+	alertOn(gift, "!")
 	local flock = UIKit.PictureButton(tiles, "FlockButton", Theme.Icons.Wool, PICTURE_SIZE, "FLOCK")
 	flock.LayoutOrder = 1
 	local shop = UIKit.PictureButton(tiles, "ShopButton", Theme.Icons.MenuStore, PICTURE_SIZE, "SHOP")
 	shop.LayoutOrder = 2
 	local dex = UIKit.PictureButton(tiles, "SheepdexButton", Theme.Icons.MenuSheepdex, PICTURE_SIZE, "SHEEPDEX")
 	dex.LayoutOrder = 3
+	alertOn(dex, "").Visible = false
 	local friends = UIKit.PictureButton(tiles, "FriendButton", Theme.Icons.HudInvite, PICTURE_SIZE, "INVITE")
 	friends.LayoutOrder = 4
 
@@ -454,12 +462,24 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 
 	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding. The gift's glows until claimed.
 	local giftButton = tiles:FindFirstChild("GiftButton") :: TextButton
+	local dexAlert = (tiles:FindFirstChild("SheepdexButton") :: TextButton):FindFirstChild("Alert") :: TextLabel
 	local function refreshTiles()
 		local data = stateController:Get()
 		tiles.Visible = (data.Tutorial or 0) >= 1
 		local unclaimed = data.FreeGift == false
 		giftButton.Visible = unclaimed
 		Motion.SetGlow(Motion.FindGlow(giftButton), unclaimed and tiles.Visible)
+		-- Sheepdex rewards found but not claimed yet.
+		local waiting = 0
+		local found = if type(data.Dex) == "table" then data.Dex else {}
+		local claimed = if type(data.DexClaimed) == "table" then data.DexClaimed else {}
+		for family, isFound in found do
+			if isFound == true and claimed[family] ~= true then
+				waiting += 1
+			end
+		end
+		dexAlert.Visible = waiting > 0
+		dexAlert.Text = if waiting > 9 then "9+" else tostring(waiting)
 	end
 
 	-- The carry card.
