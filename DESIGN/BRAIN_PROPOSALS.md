@@ -193,9 +193,8 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   A copy shown in a ViewportFrame (in a WorldModel) loses its layered clothing if its AnimationConstraints are
   removed: anchor the parts and keep the joints." Seen 2026-10-05 in Steal a Sheep, dressing the gods from the
   catalog (the Sheepdex's god pictures lost their dresses).
-
 - **S31** (`BRAIN/PATTERNS/testing-studio.md`, a new "Checking that assets load" part): "To check a game's assets
-  load, don't preload bare ids: `ContentProvider:PreloadAsync({\"rbxassetid://...\"})` reports Failure for meshes and
+  load, don't preload bare ids: `ContentProvider:PreloadAsync({ "rbxassetid://..." })` reports Failure for meshes and
   most images that load fine. Preload instances (a Decal per image, a Sound per sound, then `IsLoaded` and
   `TimeLength > 0`), build meshes with `AssetService:CreateMeshPartAsync` on the server, and load animations through
   an Animator (`Length > 0`). The public thumbnails and economy APIs aren't enough on their own: they said Completed
