@@ -43,6 +43,8 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
 - Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
 - Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climbing): `LeaderboardService`.
+- The Robux store: what it sells and its prices in `Config/Store`; prompts and passes `StoreService`; grants
+  `PurchaseService/Products`; the screen `Screens/Store`.
 - Free gift for liking and favoriting the game (Climbing and cash, once): `GiftService`, `Screens/Gift`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
@@ -89,9 +91,18 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling and the free gift, and
-buys stair walker levels, pen space and trails. The one Robux offer: the next stair walker level, at the machine's
-sign (prices being decided in another session; the developer products aren't made yet).
+Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling and
+the free gift, and buys stair walker levels, pen space and trails. Robux buys from the store below.
+
+## The Robux store (the user, 2026-10-05)
+A STORE button on the HUD opens one page that scrolls, its section tabs outside the window on the right:
+- **Sheep**: Golden Fleece (799) and Kronos Sheep (349), sold for Robux only. Each earns 10x / 3x the player's best
+  other sheep, so it stays their top earner at every tier; they arrive grown and can't be sold or merged.
+- **Passes**: 2x Money (all sheep income, offline too) and 2x Growth (lambs grow twice as fast, away too).
+- **Speed**: 2x Speed doubles Climbing; it can be bought again, three times the price each time (3 to 2,187, seven
+  buys). The stair walker's next level, for Robux (19, then 20% more a level) or its cash price.
+- **Climbing** packs (+150K to +10B) and **Cash** packs (24K to 8M).
+Hermes' winged sandal is the climbing icon everywhere (gold wings on 2x Speed).
 
 ## Friend boost (the user, 2026-10-05)
 Each Roblox friend in your server adds +20% to your flock's cash income while they stay (servers hold 5, so +80% at
@@ -104,7 +115,7 @@ A real StairMaster just outside each pen, beside the gate, like Steal an Egg's t
 and climb its moving steps (your legs on the steps, any avatar); jump to get off. Its level floats over it, its steps
 run faster each level, and it looks better as it upgrades: Starter, Sport, Pro, Turbo, Champion (levels 6 and up
 keep Champion's look for now, ending in an Olympus look later). The upgrade sign beside it buys the next level
-straight away, for cash or Robux.
+straight away, for cash or Robux (the store's walker prices).
 
 ## Climbing (the user, 2026-10-05)
 Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain
@@ -139,5 +150,5 @@ a stolen lamb (no god chases it; nobody else sees or takes it); left there 30 s 
 when it grows up in the pen. `ShrineService` (server), `ShrineController` (the scene on each device), the Merge menu.
 
 ## Not built
-Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.
+Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, gifting store items.
 These are just not built yet, not ruled out: build them if the user asks.

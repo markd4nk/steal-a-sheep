@@ -49,8 +49,8 @@ confirmed or reversed it.
 - **Its first five looks are the mock-up's** (Starter, Sport, Pro, Turbo, Champion), "stick with the five for a second";
   the level floats over the machine; the machine stands outside the pen, very close to it, like Steal an Egg's; its
   upgrade sign beside it upgrades it directly, for cash or Robux (the user, 2026-10-05).
-- **The stair walker's spot by the gate is right** (the user, 2026-10-05). Its Robux prices are being decided in
-  another session; the ones in `GameConfig.StairWalker.Robux` are placeholders until then.
+- **The stair walker's spot by the gate is right** (the user, 2026-10-05). Its Robux prices are the store's walker
+  ladder (below).
 - **Put lambs down anywhere in the pen (2026-10-05)**: like Steal an Egg, the thief brings the lamb into their pen and
   places it where they choose; no delivery platform, no fixed pads to unlock and stand sheep on. Sheep walk around on
   their own like Shear a Sheep's; lambs mostly eat off the floor, head down and chewing, with an eating face: the
@@ -91,7 +91,51 @@ confirmed or reversed it.
   odds; no kg on screen. Confirmed after the build: the **price** is 120 seconds of one Standard adult's income of the
   family (tier 1: 240 cash, tier 6: 23.4K) "for now"; a **Titan earns x5**; the lamb waits **30 s** on the altar.
 
+- **The Robux store (the user, 2026-10-05, over five mock-ups)**: Shear a Sheep's one scrolling store in its purple,
+  with square studs and big art filling every card, the art growing with the pack (one, a pair, a pile, a sack, a
+  chest, a gold chest). Each picture is one outlined icon: overlapping stickers "looked sloppy". The section tabs
+  (Sheep, Passes, Speed, Climb, Cash) stand outside the window on its right, tight together and close to it; no
+  scrollbar inside. The approved mock-up is `steal-a-sheep-store-mockup-e-pc.png` / `-e-full.png` in T3 Code's
+  attachments folder.
+- **Hermes' winged sandal is the climbing icon everywhere**, the HUD's too, with white wings; gold wings only on 2x
+  Speed (the user, 2026-10-05, from a picture of a talaria).
+- **Store prices**: Golden Fleece 799 (earns 10x your best sheep) and Kronos Sheep 349 (3x), Robux only; passes 2x Money
+  249 and 2x Growth 149; Climbing packs +150K / 1M / 10M / 100M / 1B / 10B at 49 / 99 / 199 / 399 / 799 / 1,499; Cash
+  packs 24K / 200K / 800K / 4M / 8M at 45 / 149 / 299 / 499 / 720 (the user set 24K, 8M and their prices and the first
+  four Climbing amounts; the rest were proposed and accepted).
+- **2x Speed doubles Climbing and can be bought again, each buy three times the last**: 3, 9, 27, 81, 243, 729, 2,187,
+  then sold out.
+- **The stair walker's next level for Robux, beside its cash price**: 19 for the first level, 20% more each level
+  (3,132 for the last).
+- **The store as built is OK (the user, 2026-10-05)**, with the STORE button on the right edge of the screen; merged.
+  Creator Hub's products and passes come later.
+
 ## To review
+
+Calls made building the Robux store (2026-10-05):
+
+- **"Your best sheep"** is the highest income right now among the player's other sheep, stored ones included (a lamb
+  at its lamb rate), and at least a tier 1 adult's 2/s. 2x Money doubles the Robux sheep's income too.
+- **Robux sheep** arrive grown, Golden Fleece Giant-sized and Kronos Large (their income ignores size). They can't be
+  sold ("Robux sheep stay with you") or merged, aren't in the Sheepdex, and go into the pen if there's room, stored if
+  not; the flock limit never stops a purchase.
+- **Their looks**: Golden Fleece in Shear a Sheep's colours (gold wool, cream curled horns, happy face) with gold
+  sparkles (a new effect); Kronos Sheep is Shear a Sheep's Time Sheep.
+- **2x Speed at 0 Climbing** gives +25: each buy doubles, and gives at least +25.
+- **One Roblox dialog at a time** per player ("Finish your purchase first"), so a price step can't be bought twice at
+  its price. A receipt for a step already counted still doubles; a walker receipt that finds the walker maxed pays the
+  last level's cash price.
+- **Passes count offline too**: 2x Money on the offline cash, 2x Growth on growth while away. Every income shown (HUD,
+  flock cards, pen labels, the income boards) includes 2x Money.
+- **HUD**: the STORE button (the icon pack's golden Robux coin) is hidden like the others until the first delivery
+  (its place on the right edge is the user's OK). The store window's corner picture is the basket, as in the mock-ups.
+- **The tabs**: 2 points apart, 6 from the window (the user: tighter and closer). Where the window is short (a phone held
+  sideways) they start beside the header and shrink just enough for all five; on a phone they're about 0.8 size.
+- **Climbing's icon everywhere is the white-winged sandal** (HUD, store, the free gift); 2x Speed's has gold wings.
+- **Words**: "ROBUX ONLY" on the sheep, "CHEAP!" on 2x Speed with "Next: 9" under its price, "BEST VALUE" on +10B and
+  +8M, "Owned", "Sold out" and "MAX" when done; the walker card counts levels from 1, as the shop does.
+- **Before the products exist on Roblox**: in Studio a store button grants its product at once, with no dialog; a live
+  server says "Not on sale yet".
 
 Calls made building the Merge Shrine (2026-10-05):
 
@@ -155,9 +199,8 @@ Calls building the Sell Stall (2026-10-05).
 
 Calls building the stair walker (2026-10-05).
 
-- **Placeholder Robux prices (another session is deciding them; nothing is on sale)**: the next level costs R$ 19 (to
-  level 2), 39, 59, 99, then 149 for every level after. A developer product per price; ids 0 until they're made in Creator Hub, and the Robux
-  prompt says "Robux upgrades aren't on sale yet" meanwhile.
+- **Robux prices**: the store's walker ladder (Config/Store: 19 to level 2, then 20% more a level), the user's call in
+  the store's session; the sign's R prompt asks the store (StoreService), so it sells the same products.
 - **Levels 6-30 keep the Champion look** until more looks are designed.
 - **The sign** stands by the machine's entry, turned to the gate, written on both sides ("UPGRADE", the next level, its
   price in cash and R$).

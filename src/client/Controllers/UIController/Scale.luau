@@ -152,6 +152,10 @@ function Scale.Menu(gui: ScreenGui, window: GuiObject, trove: Trove)
 		local widest = if type(maxWidth) == "number" then maxWidth else math.huge
 		local panelWidth = window:GetAttribute("PanelWidth")
 		local panelHeight = window:GetAttribute("PanelHeight")
+		-- Points kept free to the window's right for things that stand beside it (the store's tabs); the window moves
+		-- left by half of it so the two stay centred.
+		local sideRoom = window:GetAttribute("SideRoom")
+		local beside = if type(sideRoom) == "number" then sideRoom else 0
 		if type(panelWidth) == "number" and type(panelHeight) == "number" then
 			local room = safe.Y - menu.Margin - fleece.Lip
 			local fit = 1
@@ -160,8 +164,11 @@ function Scale.Menu(gui: ScreenGui, window: GuiObject, trove: Trove)
 				height = math.min(fleece.CompactHeight, panelHeight)
 				fit = math.max(room, 1) / height
 			end
-			local width = math.min(panelWidth, widest, (safe.X - menu.SideMargin) / fit)
+			local width = math.min(panelWidth, widest, (safe.X - menu.SideMargin - beside) / fit)
 			window.Size = UDim2.fromOffset(math.floor(width), math.floor(height))
+			if beside > 0 then
+				window.Position = UDim2.new(0.5, -math.floor(beside * fit / 2), 0.5, 0)
+			end
 			-- Motion.PopIn and PopOut scale the window by its Fit; one already open takes the new one now.
 			local before = window:GetAttribute("Fit")
 			window:SetAttribute("Fit", fit)

@@ -21,6 +21,14 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
 
+The Robux store in a playtest (2026-10-05): until a product or pass has its Creator Hub id in `Config/Store`, every
+store button grants it at once in Studio (a "Studio: no product yet" notice), so buy anything by clicking it, or from a
+Client `execute_luau`: `Remotes.RequestPurchase:Invoke(key)` with "Cash.1", "Climb.6", "Sheep.Kronos", "DoubleMoney",
+"Speed" or "Walker". A pass granted that way lasts the session. The STORE button shows after the first delivery
+(`GiveSheep`); `GrowAll` then gives the Robux sheep a "best sheep" to multiply. Cards are named after their key without
+the dot (`SheepGoldenFleece`, `Climb1`), so `user_mouse_input` can reach them by `instance_path`. On a Galaxy A06 in the
+Device Simulator taps landed 47 px left of their aim (no vertical shift): tap a button at its centre + 47 in x.
+
 The free gift in a playtest: `GiveSheep` 1 counts as the first delivery, and the menu opens by itself 30 s later at the
 plot. Claim skips Roblox's favorite prompt while the place is unpublished (PlaceId 0).
 

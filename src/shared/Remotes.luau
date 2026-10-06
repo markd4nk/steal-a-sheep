@@ -57,6 +57,9 @@ local Remotes = {
 	-- The shop: the next stair walker, room for one more sheep in the pen, or a trail by id (bought, or equipped if
 	-- owned).
 	Buy = Net.Request("Buy", { Guard.OneOf(BUY_ITEMS), Guard.Optional(Guard.String(16)) }, { Count = 8, Window = 1 }) :: Net.Request<(string, string?), (boolean, string?)>,
+	-- The Robux store: an item by its Config/Store key ("Cash.1", "Sheep.Kronos", "DoubleMoney"), or "Speed" or
+	-- "Walker" for that ladder's next step. The server opens Roblox's dialog: (ok, a message to show).
+	RequestPurchase = Net.Request("RequestPurchase", { Guard.String(32) }, { Count = 4, Window = 2 }) :: Net.Request<(string), (boolean, string?)>,
 	-- The free gift, once per player: (ok, message, coins given, Climbing given).
 	ClaimGift = Net.Request("ClaimGift", {}, { Count = 2, Window = 2 }) :: Net.Request<(), (boolean, string?, number?, number?)>,
 	-- Today's daily gift (DailyService): (ok, message, what was given: Day, Kind, Amount, or a sheep's Name and Family).

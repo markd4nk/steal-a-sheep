@@ -390,8 +390,8 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		table.clear(byId)
 		local eligible: { View } = {}
 		for _, sheep in stateController:Flock() :: { any } do
-			-- A special family (the Pegasus Sheep) never goes in.
-			if sheep.Adult and not sheep.AtShrine and not Economy.Specials[sheep.Family] then
+			-- The store's sheep and the special families (the Pegasus Sheep) never go in.
+			if sheep.Adult and not sheep.AtShrine and not sheep.Robux and not Economy.Specials[sheep.Family] then
 				byId[sheep.Id] = sheep
 				table.insert(eligible, sheep)
 			end

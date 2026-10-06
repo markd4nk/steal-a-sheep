@@ -123,6 +123,24 @@ function Animate.PopIn(target: GuiObject, backdrop: GuiObject?, backdropTranspar
 		-- A screen just switched on still has the room it was laid out with while off (on a phone, 579 px tall for
 		-- 280), so a card that fits itself is fitted again once the room is known: the Daily Gift's first opening ran
 		-- off the bottom of a phone (2026-10-03).
+		-- A Prize Fleece window's Fit can change while it pops in, as the screen just switched on gets its real size
+		-- (UIController/Scale sets it a frame later on a phone): the pop then heads for the new one, or it ends up drawn
+		-- at full size, past the screen's bottom (the store and the Free Gift on a Galaxy A06, 2026-10-05).
+		if type(target:GetAttribute("Fit")) == "number" then
+			local refitted = target:GetAttributeChangedSignal("Fit"):Connect(function()
+				local refit = fitOf(target, pop)
+				if math.abs(refit - fit) > 0.01 then
+					fit = refit
+					tween:Cancel()
+					pop.Scale = Motion.PopInFrom * refit
+					tween = TweenService:Create(pop, Motion.PopIn, { Scale = refit })
+					tween:Play()
+				end
+			end)
+			task.delay(Motion.PopIn.Time, function()
+				refitted:Disconnect()
+			end)
+		end
 		if height and holder and target:GetAttribute("Fit") == nil then
 			local roomed = holder:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 				local refit = fitInto(height, holder)

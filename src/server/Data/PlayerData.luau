@@ -21,6 +21,7 @@ export type Data = {
 	Dex: { [string]: boolean }, -- families delivered at least once
 	Tutorial: number, -- 0 until the first delivery, then 1; 2 once the stair walker was used
 	LastSeen: number, -- os.time() of the last settlement, for offline earnings; 0 for a new player
+	SpeedBuys: number, -- how many times 2x Speed was bought (Config/Store.SpeedPrices: the next one's price)
 	FreeGift: boolean, -- the like-and-favorite gift was claimed
 	DailyDay: number, -- the daily gift's day to claim next, 1 to 7 (Economy.DailyWeek)
 	DailyAt: number, -- os.time() of the last daily gift claimed, 0 for never
@@ -45,6 +46,7 @@ PlayerData.Template = {
 	Dex = {},
 	Tutorial = 0,
 	LastSeen = 0,
+	SpeedBuys = 0,
 	FreeGift = false,
 	DailyDay = 1,
 	DailyAt = 0,
@@ -130,7 +132,7 @@ function PlayerData.Validate(data: any): (boolean, string?)
 			return false, `{field} is not an amount >= 0`
 		end
 	end
-	for _, field in { "WalkerLevel", "PenSlots", "NextId", "Tutorial", "LastSeen", "DailyAt" } do
+	for _, field in { "WalkerLevel", "PenSlots", "NextId", "Tutorial", "LastSeen", "SpeedBuys", "DailyAt" } do
 		if data[field] ~= nil and not isNatural(data[field]) then
 			return false, `{field} is not a whole number >= 0`
 		end

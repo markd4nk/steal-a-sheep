@@ -11,6 +11,7 @@ local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Signal = require(ReplicatedStorage.Packages.Signal)
+local Store = require(ReplicatedStorage.Config.Store)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local Pens = require(script.Pens)
 local Roster = require(script.Roster)
@@ -55,6 +56,7 @@ local TICK = 1
 local WANDER_CHECK = 0.25 -- seconds between passes over every penned sheep: strolls due, and where strollers are
 local PEN_FOLDER = "PenSheep"
 local HOP_IN_HEIGHT = 3 -- studs above its spot a sheep out of storage hops in from
+local PASS_WAIT = 15 -- seconds the offline credit waits for StoreService to learn the player's passes
 
 local registry: Lifecycle.Registry = {}
 local trove = Trove.new()
@@ -70,6 +72,14 @@ local function notify(player: Player, message: string, kind: string, sound: stri
 	Remotes.Notify:Fire(player, message, kind, sound)
 end
 
+-- The 2x Money and 2x Growth passes (StoreService sets their attributes once it knows): what income and growth are
+-- multiplied by for this player.
+local function boosts(player: Player): (number, number)
+	local money = if player:GetAttribute(Store.PassAttribute("DoubleMoney")) == true then 2 else 1
+	local growth = if player:GetAttribute(Store.PassAttribute("DoubleGrowth")) == true then 2 else 1
+	return money, growth
+end
+
 local function markDirty(player: Player)
 	local state = states[player]
 	if state then
@@ -78,9 +88,9 @@ local function markDirty(player: Player)
 end
 
 -- One sheep as its owner's client sees it: the numbers already worked out, a lamb's size kept secret.
-local function view(sheep: Sheep, penSlots: number): { [string]: any }
+local function view(sheep: Sheep, penSlots: number, best: number, money: number): { [string]: any }
 	local adult = Economy.IsAdult(sheep)
-	local low, high = Economy.FutureRange(sheep)
+	local low, high = Economy.FutureRange(sheep, best)
 	return {
 		Id = sheep.Id,
 		Family = sheep.Family,
@@ -93,11 +103,12 @@ local function view(sheep: Sheep, penSlots: number): { [string]: any }
 		Pinned = sheep.Pinned,
 		Adult = adult,
 		Growth = math.clamp(sheep.Grown / Economy.GrowthSeconds(sheep), 0, 1),
-		Income = Economy.Income(sheep),
-		Low = low,
-		High = high,
-		Sell = Economy.SellValue(sheep),
+		Income = Economy.Income(sheep, best) * money,
+		Low = low * money,
+		High = high * money,
+		Sell = Economy.SellValue(sheep, best),
 		Name = Economy.Name(sheep),
+		Robux = if Economy.IsRobuxSheep(sheep.Family) then true else nil,
 		AtShrine = sheep.Shrine == true,
 	}
 end
@@ -107,9 +118,11 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 	if not data then
 		return {}
 	end
+	local best = Economy.BestIncome(data.Sheep)
+	local money = boosts(player)
 	local flock: { [string]: any } = {}
 	for id, sheep in data.Sheep do
-		flock[id] = view(sheep, data.PenSlots)
+		flock[id] = view(sheep, data.PenSlots, best, money)
 	end
 	local state = states[player]
 	local income = Roster.Income(data.Sheep, data.PenSlots)
@@ -140,7 +153,8 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		Tutorial = data.Tutorial,
 		ClimbTier = Economy.ClimbTier(data.ClimbPower),
 		MergeReady = Economy.TotalDeliveries(data.Deliveries) >= Economy.MergeAfterDeliveries,
-		Income = income,
+		Income = income * money,
+		SpeedBuys = data.SpeedBuys,
 		Offline = if state then state.Offline else nil,
 		FreeGift = data.FreeGift,
 		GiftCoins = giftCoins,
@@ -221,6 +235,11 @@ local function refreshPen(player: Player, arriving: boolean?)
 		return
 	end
 	local now = workspace:GetServerTimeNow()
+	local best = Economy.BestIncome(data.Sheep)
+	local money = boosts(player)
+	local function income(sheep: Sheep): number
+		return Economy.Income(sheep, best) * money
+	end
 	local wanted: { [string]: Sheep } = {}
 	for id, sheep in data.Sheep do
 		if Roster.IsEquipped(sheep, data.PenSlots) then
@@ -232,8 +251,8 @@ local function refreshPen(player: Player, arriving: boolean?)
 		if
 			not sheep
 			or (
-				not Pens.Update(shown, sheep, now)
-				and not Pens.Rebuild(shown, sheep, player.UserId, folder, build, now)
+				not Pens.Update(shown, sheep, now, income(sheep))
+				and not Pens.Rebuild(shown, sheep, player.UserId, folder, build, now, income(sheep))
 			)
 		then
 			shown.Model:Destroy()
@@ -252,14 +271,14 @@ local function refreshPen(player: Player, arriving: boolean?)
 			then arrival.From
 			elseif arrival or arriving then at + Vector3.new(0, HOP_IN_HEIGHT, 0)
 			else nil
-		local shown = Pens.Show(sheep, at, player.UserId, folder, build, from)
+		local shown = Pens.Show(sheep, at, player.UserId, folder, build, from, income(sheep))
 		if shown then
 			state.Shown[id] = shown
 			sheep.HomeX, sheep.HomeZ = registry.PlotService:ToLocal(plot, at.Position)
 		end
 	end
 	table.clear(state.Arrivals)
-	registry.PlotService:Refresh(player, data.WalkerLevel, Roster.Income(data.Sheep, data.PenSlots))
+	registry.PlotService:Refresh(player, data.WalkerLevel, Roster.Income(data.Sheep, data.PenSlots) * money)
 end
 
 -- Every penned sheep's strolls (Pens.Wander).
@@ -311,18 +330,24 @@ local function updateLeaderstats(player: Player, income: number, climbPower: num
 	end
 end
 
-local function settleOffline(player: Player, data: any)
-	if data.LastSeen <= 0 then
-		return
-	end
-	local elapsed = math.max(0, os.time() - data.LastSeen)
+-- Credits `elapsed` seconds away: income at the offline share and growth for the whole time, both with the passes.
+local function settleOffline(player: Player, data: any, elapsed: number)
+	local money, growth = boosts(player)
 	local equipped: { Sheep } = {}
 	for _, sheep in data.Sheep do
 		if Roster.IsEquipped(sheep, data.PenSlots) then
 			table.insert(equipped, sheep)
 		end
 	end
-	local coins, matured = Economy.Offline(equipped, elapsed, GameConfig.Offline.MaxSeconds, GameConfig.Offline.Share)
+	local coins, matured = Economy.Offline(
+		equipped,
+		elapsed,
+		GameConfig.Offline.MaxSeconds,
+		GameConfig.Offline.Share,
+		Economy.BestIncome(data.Sheep),
+		growth
+	)
+	coins *= money
 	if coins >= GameConfig.Offline.MinCredit or #matured > 0 then
 		registry.DataService:AdjustCoins(player, coins)
 		local state = states[player]
@@ -343,11 +368,26 @@ local function onLoaded(player: Player, data: any)
 	-- A save from when the pen started smaller is brought up to today's start.
 	data.PenSlots = math.clamp(data.PenSlots, Economy.StartPens, Economy.MaxPens)
 	Roster.Normalize(data.Sheep, data.PenSlots)
-	settleOffline(player, data)
+	local away = if data.LastSeen > 0 then math.max(0, os.time() - data.LastSeen) else 0
 	data.LastSeen = os.time()
 	leaderstats(player)
 	refreshPen(player)
 	push(player)
+	if away > 0 then
+		-- The time away is credited once StoreService knows the player's passes (2x Money and Growth count offline).
+		task.spawn(function()
+			local deadline = os.clock() + PASS_WAIT
+			while player.Parent == Players and player:GetAttribute("PassesChecked") ~= true and os.clock() < deadline do
+				task.wait(0.25)
+			end
+			local loaded = dataOf(player)
+			if loaded and states[player] then
+				settleOffline(player, loaded, away)
+				refreshPen(player)
+				push(player)
+			end
+		end)
+	end
 end
 
 local function tick(dt: number)
@@ -358,11 +398,13 @@ local function tick(dt: number)
 		end
 		local income = 0
 		local grewUp: { Sheep } = {}
+		local best = Economy.BestIncome(data.Sheep)
+		local money, growth = boosts(player)
 		for _, sheep in data.Sheep do
 			if Roster.IsEquipped(sheep, data.PenSlots) then
-				income += Economy.Income(sheep)
+				income += Economy.Income(sheep, best) * money
 				if not Economy.IsAdult(sheep) then
-					sheep.Grown = math.min(sheep.Grown + dt, Economy.GrowthSeconds(sheep))
+					sheep.Grown = math.min(sheep.Grown + dt * growth, Economy.GrowthSeconds(sheep))
 					if Economy.IsAdult(sheep) then
 						table.insert(grewUp, sheep)
 					else
@@ -381,7 +423,7 @@ local function tick(dt: number)
 			state.Dirty = true
 		end
 		refreshPen(player)
-		updateLeaderstats(player, Roster.Income(data.Sheep, data.PenSlots), data.ClimbPower)
+		updateLeaderstats(player, Roster.Income(data.Sheep, data.PenSlots) * money, data.ClimbPower)
 		if state.Dirty then
 			push(player)
 		end
@@ -472,7 +514,7 @@ end
 
 function FlockService.Income(_self: any, player: Player): number
 	local data = dataOf(player)
-	return if data then Roster.Income(data.Sheep, data.PenSlots) else 0
+	return if data then Roster.Income(data.Sheep, data.PenSlots) * (boosts(player)) else 0
 end
 
 -- A stolen lamb is put down in its owner's pen: it joins the flock, standing at `at` (or the nearest clear spot) after
@@ -510,7 +552,8 @@ function FlockService.Deliver(_self: any, player: Player, wild: Wild, at: CFrame
 		if state then
 			state.Arrivals[id] = { At = at, From = from }
 		end
-		notify(player, `{name} is home! +{Format.Rate(Economy.Income(sheep))}/s`, "Good", "Coin")
+		local rate = Economy.Income(sheep, Economy.BestIncome(data.Sheep)) * (boosts(player))
+		notify(player, `{name} is home! +{Format.Rate(rate)}/s`, "Good", "Coin")
 	else
 		notify(player, "Stored - not earning. Your pen is full.", "Bad", "Notice")
 	end
@@ -728,10 +771,54 @@ function FlockService.ShrineArrive(_self: any, player: Player, id: string, reaso
 	elseif reason then
 		notify(player, reason, "Good", "Coin")
 	else
-		notify(player, `{name} is home! +{Format.Rate(Economy.Income(sheep))}/s`, "Good", "Coin")
+		notify(player, `{name} is home! +{Format.Rate(Economy.Income(sheep) * (boosts(player)))}/s`, "Good", "Coin")
 	end
 	refreshPen(player)
 	push(player)
+end
+
+-- A sheep bought in the store (PurchaseService's grant): grown, into the pen if there's room, stored if not. Its
+-- record is saved before anything is shown, so a failure showing it never loses the purchase. Never yields.
+function FlockService.AddRobuxSheep(_self: any, player: Player, family: string): Sheep?
+	local data = dataOf(player)
+	local robux = Economy.RobuxSheep[family]
+	if not data or not robux then
+		return nil
+	end
+	local id = tostring(data.NextId)
+	data.NextId += 1
+	local slot = Roster.FreeSlot(data.Sheep, data.PenSlots)
+	local sheep: Sheep = {
+		Id = id,
+		Family = family,
+		Rarity = 1,
+		Weight = 1,
+		Size = robux.Size,
+		Grown = 1,
+		Rank = 0,
+		Locked = false,
+		Slot = slot or 0,
+		Pinned = slot ~= nil,
+	}
+	data.Sheep[id] = sheep
+	local ok, problem = pcall(function()
+		local state = states[player]
+		if slot and state then
+			state.Arrivals[id] = { At = nil, From = nil }
+		end
+		notify(
+			player,
+			if slot then `{robux.Name} joined your pen!` else `{robux.Name} is stored: your pen is full`,
+			"Rare",
+			"Upgrade"
+		)
+		refreshPen(player, true)
+		push(player)
+	end)
+	if not ok then
+		warn(`[FlockService] {player.Name}'s {family} is saved but couldn't be shown: {problem}`)
+	end
+	return sheep
 end
 
 return FlockService

@@ -13,6 +13,7 @@ export type SpecialFX =
 	| "StormSparks"
 	| "Stars"
 	| "Sparkles"
+	| "GoldSparkles"
 	| "MoonGlow"
 	| "Spores"
 	| "Wisps"
@@ -92,7 +93,7 @@ local function look(id: string, name: string, overrides: { [string]: any }): Bre
 	return breed
 end
 
--- The thirty families' looks, keyed by family id (Config/Olympus). Most are Shear a Sheep breeds as they are, in its
+-- The thirty families' looks, keyed by family id (Config/Olympus), then the store's two. Most are Shear a Sheep breeds as they are, in its
 -- colours; the Grape, War, Laurel, Cupid, Justice, Victory and Hearth sheep are its plain breeds recoloured, with a
 -- primitive extra, and the Prism Sheep a plain one in rainbow puffs. Last, the families that are no god's
 -- (Economy.Specials): the daily gifts' Pegasus Sheep.
@@ -300,6 +301,24 @@ local breeds: { [string]: Breed } = {
 		SpecialFX = "Sparkles",
 		Extra = "Pegasus",
 	}),
+	-- The Robux store's two sheep (Economy.RobuxSheep), in Shear a Sheep's colours for its Golden Fleece and Time Sheep.
+	GoldenFleece = look("GoldenFleece", "Golden Fleece", {
+		WoolColor = rgb(255, 196, 64),
+		FaceColor = rgb(246, 226, 206),
+		LegColor = rgb(246, 226, 206),
+		EarInnerColor = rgb(250, 176, 180),
+		HornStyle = "BigCurl",
+		HornColor = rgb(240, 228, 198),
+		Face = "Happy",
+		SpecialFX = "GoldSparkles",
+	}),
+	Kronos = look("Kronos", "Kronos Sheep", {
+		Build = "TimeSheep",
+		WoolColor = rgb(246, 232, 196),
+		WoolSpotColor = rgb(236, 214, 166),
+		FaceColor = rgb(250, 240, 220),
+		LegColor = rgb(150, 112, 70),
+	}),
 }
 
 local mutations: { [string]: Mutation } = {
@@ -399,15 +418,6 @@ local GameConfig = {
 		StepRange = 0.35,
 		StepDecay = 0.9,
 		AnimateRange = 220, -- studs from the camera within which machines and climbers move
-		-- Robux for the next level, by the level bought: 2, 3, 4, 5, then every level after. A product id of 0 isn't on
-		-- sale yet: make the developer products in Creator Hub and put their ids here.
-		Robux = {
-			{ Price = 19, ProductId = 0 },
-			{ Price = 39, ProductId = 0 },
-			{ Price = 59, ProductId = 0 },
-			{ Price = 99, ProductId = 0 },
-			{ Price = 149, ProductId = 0 },
-		} :: { { Price: number, ProductId: number } },
 	},
 
 	-- Offline earnings: a quarter of at most two hours.

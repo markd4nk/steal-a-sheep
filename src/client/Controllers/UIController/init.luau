@@ -19,6 +19,7 @@ local screenModules: { [string]: Types.ScreenModule } = {
 	Hud = require(script.Screens.Hud),
 	Flock = require(script.Screens.Flock),
 	Shop = require(script.Screens.Shop),
+	Store = require(script.Screens.Store),
 	Gift = require(script.Screens.Gift),
 	Daily = require(script.Screens.Daily),
 	Sheepdex = require(script.Screens.Sheepdex),
@@ -153,7 +154,8 @@ end
 
 function UIController.Start(_self: any)
 	-- The HUD first, so the menus' notices have somewhere to go.
-	local order = { "Hud", "Popup", "Flock", "Shop", "Sheepdex", "Merge", "SellStall", "Gift", "Daily", "DebugPanel" }
+	local order =
+		{ "Hud", "Popup", "Flock", "Shop", "Sheepdex", "Merge", "SellStall", "Gift", "Daily", "Store", "DebugPanel" }
 	task.spawn(function()
 		for _, name in order do
 			local module = screenModules[name]

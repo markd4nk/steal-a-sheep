@@ -2,7 +2,6 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local StairClimb = require(ReplicatedStorage.Utils.StairClimb)
 local Run = require(script.Parent.Run)
 
@@ -44,16 +43,6 @@ return function(t: Run.Suite)
 				end
 			end
 			t.Expect(shown >= 5 and shown <= 6).ToBe(true)
-		end
-	end)
-
-	t.Test("Robux offers by the level bought, the last one for every level after", function()
-		local offers = GameConfig.StairWalker.Robux
-		t.Expect(StairClimb.RobuxOffer(0)).ToBe(offers[1])
-		t.Expect(StairClimb.RobuxOffer(3)).ToBe(offers[4])
-		t.Expect(StairClimb.RobuxOffer(28)).ToBe(offers[#offers])
-		for index = 2, #offers do
-			t.Expect(offers[index].Price > offers[index - 1].Price).ToBe(true)
 		end
 	end)
 end

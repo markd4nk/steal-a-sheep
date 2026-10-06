@@ -137,7 +137,10 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		lines[2].Text = if sheep.Slot > 0
 			then (if sheep.Pinned then "In your pen (pinned)" else "In your pen")
 			else "Stored - not earning"
-		lines[3].Text = if sheep.Locked then "Locked: can't be sold or merged" else ""
+		lines[3].Text = if sheep.Robux
+			then "From the store: stays with you"
+			elseif sheep.Locked then "Locked: can't be sold or merged"
+			else ""
 		Buttons.Set(
 			equipButton,
 			if sheep.Slot > 0 then "Soft" else "Action",

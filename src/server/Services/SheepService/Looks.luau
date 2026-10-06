@@ -324,6 +324,8 @@ local function addEffect(kit: Kit, model: Model, breed: GameConfig.Breed, effect
 		particles(fx, Color3.fromRGB(255, 250, 220), 4, 0.35, 1.5, 1.6)
 	elseif effect == "Sparkles" then
 		particles(fx, Color3.fromRGB(255, 190, 235), 5, 0.4, 2, 1.2)
+	elseif effect == "GoldSparkles" then
+		particles(fx, Color3.fromRGB(255, 226, 120), 7, 0.4, 2, 1.2)
 	elseif effect == "MoonGlow" then
 		light(fx, Color3.fromRGB(235, 240, 255), 0.8, 8)
 	elseif effect == "Spores" then
