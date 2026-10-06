@@ -492,7 +492,10 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local function refreshGoal()
 		current = goal()
 		local title = current and current.Title
-		objective.Visible = title ~= nil and not context.Controllers.UIController:IsModalOpen()
+		local modal = context.Controllers.UIController:IsModalOpen()
+		objective.Visible = title ~= nil and not modal
+		-- The STORE button on the right edge sits where an open menu's tabs (the store's own) stand.
+		storeButton.Visible = tiles.Visible and not modal
 		objectiveTitle.Text = title or ""
 		Motion.SetGlow(Motion.FindGlow(tiles:FindFirstChild("FlockButton") :: GuiObject), os.clock() < workUntil)
 	end

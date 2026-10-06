@@ -73,28 +73,25 @@ local function prize(parent: Instance): Frame
 	return line
 end
 
--- The step: its title, the game page's picture (Picture, a check on its corner once done), and one line.
+-- The step, in a row that fits any height (a phone held sideways leaves it little): the game page's picture (Picture,
+-- a check on its corner once done) on the left, its title and one line beside it.
+local PICTURE_MAX_WIDTH = 380
 local function step(parent: Instance, name: string, title: string, picture: string, line: string)
 	local tile = UIKit.Tile(parent, name, UDim2.fromScale(1, 1))
 	UIKit.Padding(tile, 10, 10, 8, 8)
-	UIKit.List(tile, false, 6, Enum.HorizontalAlignment.Center)
-	local head = UIKit.Frame(tile, "Head", UDim2.fromOffset(0, 30))
-	head.AutomaticSize = Enum.AutomaticSize.X
-	head.LayoutOrder = 1
-	UIKit.List(head, true, 8)
-	UIKit.Text(head, "TitleLabel", title, 22, Color.Snow, UDim2.fromOffset(0, 30), {
-		Stroke = Color.Line,
-		Auto = Enum.AutomaticSize.X,
-		Order = 1,
-	})
+	local row = UIKit.List(tile, true, 14, Enum.HorizontalAlignment.Center)
+	row.VerticalAlignment = Enum.VerticalAlignment.Center
 	local shot = UIKit.Icon(tile, "Picture", picture, 100)
-	shot.LayoutOrder = 2
+	shot.LayoutOrder = 1
 	shot.Size = UDim2.fromScale(1, 1)
 	shot.ScaleType = Enum.ScaleType.Stretch
-	UIKit.Grow(shot)
 	local aspect = Instance.new("UIAspectRatioConstraint")
 	aspect.AspectRatio = PICTURE_ASPECT
+	aspect.DominantAxis = Enum.DominantAxis.Height
 	aspect.Parent = shot
+	local cap = Instance.new("UISizeConstraint")
+	cap.MaxSize = Vector2.new(PICTURE_MAX_WIDTH, PICTURE_MAX_WIDTH / PICTURE_ASPECT)
+	cap.Parent = shot
 	UIKit.Corner(shot, 10)
 	local edge = Instance.new("UIStroke")
 	edge.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -106,10 +103,22 @@ local function step(parent: Instance, name: string, title: string, picture: stri
 	done.Position = UDim2.new(1, -6, 0, 6)
 	done.ZIndex = 5
 	done.Visible = false
-	UIKit.Text(tile, "LineLabel", line, 16, Theme.Fleece.Muted, UDim2.new(1, 0, 0, 20), {
+	local words = UIKit.Frame(tile, "Words", UDim2.fromScale(0, 1))
+	words.AutomaticSize = Enum.AutomaticSize.X
+	words.LayoutOrder = 2
+	local column = UIKit.List(words, false, 4, Enum.HorizontalAlignment.Left)
+	column.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIKit.Text(words, "TitleLabel", title, 22, Color.Snow, UDim2.fromOffset(0, 30), {
+		Stroke = Color.Line,
+		Auto = Enum.AutomaticSize.X,
+		AlignX = Enum.TextXAlignment.Left,
+		Order = 1,
+	})
+	UIKit.Text(words, "LineLabel", line, 16, Theme.Fleece.Muted, UDim2.fromOffset(0, 20), {
 		Font = Theme.Font.TextHeavy,
-		Fit = true,
-		Order = 3,
+		Auto = Enum.AutomaticSize.X,
+		AlignX = Enum.TextXAlignment.Left,
+		Order = 2,
 	})
 	return shot
 end
