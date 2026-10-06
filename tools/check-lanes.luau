@@ -1,9 +1,10 @@
 --!strict
--- High Olympus's lane check, without Studio, in each stretch's own frame (x across, y up from the floor, z uphill):
---   * decor (each stretch's Decor) stays out of the slide lane (|x| < 56) unless it's 16 or more studs up;
+-- The descent's check, without Studio. High Olympus, in each stretch's own frame (x across, y up from the floor, z uphill):
+--   * decor (each stretch's Decor, beside the lane) is passed through wherever it stands;
 --   * in the lane (its Lane model) only the dunes (the Ramp attribute) are solid: everything else is passed through;
 --   * the dunes never stand on the path (its Path tiles) and keep off the wild lambs' spots and the god's.
--- Only collidable parts lower than 16 studs count. Usage, after scripts/build-place.ps1:
+-- The commissioned stages 1-7: no solid decor (small models but stage 4's pyramids) or standing columns.
+-- Usage, after scripts/build-place.ps1:
 --   lune run tools/check-lanes.luau [StealASheep.rbxl]
 
 local fs = require("@lune/fs")
@@ -64,12 +65,8 @@ for _, section in UpperMountain.Layout() do
 		if part:IsA("BasePart") then
 			count += 1
 			if part.CanCollide then
-				local minX, maxX, minY = bounds(inverse, part)
-				if minX < LANE_HALF and maxX > -LANE_HALF and minY < CLEAR_ABOVE then
-					fail(
-						`decor in the lane: {part.Parent.Name}.{part.Name}, x {minX // 0.1 / 10} to {maxX // 0.1 / 10}`
-					)
-				end
+				local minX, maxX = bounds(inverse, part)
+				fail(`solid decor: {part.Parent.Name}.{part.Name}, x {minX // 0.1 / 10} to {maxX // 0.1 / 10}`)
 			end
 		end
 	end
@@ -172,6 +169,41 @@ for _, section in UpperMountain.Layout() do
 		end
 	end
 	print(`  {count} decor parts, {laneParts} lane parts, {dunes} dunes`)
+end
+-- The commissioned stages: what's left solid is floors, terraces (blocks wider than tall), dunes, pyramids, stage 4's
+-- unions and the backdrop mountains.
+local MOST_DECOR_PARTS = 60
+local PYRAMID_PARTS = 2
+for index = 1, 7 do
+	local stage = (game :: any).Workspace.Stages:FindFirstChild(`Stage{index}`)
+	assert(stage, `missing Stage{index}`)
+	local solid = 0
+	for _, child in stage:GetChildren() do
+		if not child:IsA("Model") then
+			continue
+		end
+		local list = child:GetDescendants()
+		local count = 0
+		for _, part in list do
+			if part:IsA("BasePart") then
+				count += 1
+			end
+		end
+		for _, part in list do
+			if not part:IsA("BasePart") or not part.CanCollide then
+				continue
+			end
+			local across = math.max(part.Size.X, part.Size.Z)
+			if count <= MOST_DECOR_PARTS and count ~= PYRAMID_PARTS then
+				fail(`Stage{index}: solid decor {child.Name}.{part.Name} at {part.CFrame.Position}`)
+				break
+			elseif count > MOST_DECOR_PARTS and across < 40 and part.Size.Y > across then
+				fail(`Stage{index}: solid column {child.Name}.{part.Name} at {part.CFrame.Position}`)
+			end
+			solid += 1
+		end
+	end
+	print(`Stage{index}: {solid} solid parts`)
 end
 print(`{total} parts checked, {failures} problems`)
 process.exit(if failures > 0 then 1 else 0)

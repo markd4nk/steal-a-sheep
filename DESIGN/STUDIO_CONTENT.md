@@ -4,6 +4,12 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-06, only ramps solid across the whole width** (branch `t3code/mound-collision-sliding`, not merged, NOT
+  in the cloud place): `tools/UpperMountain.luau` turns off CanCollide, CanQuery and CanTouch on everything under each
+  High Olympus stretch's `Decor`, and `UpperMountain.ClearOldDecor` (was `ClearOldLanes`) on every small model of
+  stages 1-7 wherever it stands (but stage 4's two-part pyramids) and on the big models' standing columns and arch
+  legs (narrower than 40, taller than wide). Solid parts in Stages 1-7 go 4,531 -> 3,243 on a fresh build; High
+  Olympus's solid decor 4,249 -> 0. The cloud place needs main's builder rerun in Edit once it's merged.
 - **2026-10-06, version 29 published** (saved 19:06:52, published 19:07:04 UTC): main 2bbcf5a's two changed scripts
   (`MovementController`, `Config/GameConfig`) set in the cloud place; nothing Studio-side changed.
 - **2026-10-06, version 28 published** (saved 18:55:41, published 18:56:04 UTC): main 8cfd60d's two changed

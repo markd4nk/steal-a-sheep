@@ -6,6 +6,26 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Only ramps are solid across the descent's whole width (2026-10-06, branch `t3code/mound-collision-sliding`, not
+  merged)**. The user: the decor should dress the way up but not affect a slide back down; "we have a lot of trees
+  that could get collided into ... only the mounds should have some sort of collision". Version 28's rule (8cfd60d)
+  only reached the middle lane (z 140-244 on the old stages, |x| < 56 on High Olympus); the open floor runs about
+  z 125-257, and the trees, columns, spires and lamps standing at its edges and on the terrace steps stayed solid.
+  - *How*: High Olympus's `Decor` is passed through whole (CanCollide, CanQuery, CanTouch off), after the props.
+    `UpperMountain.ClearOldDecor` (was `ClearOldLanes`) passes every small model on stages 1-7 wherever it stands (but
+    stage 4's pyramids), and in the big models the columns in the lane plus every standing column or arch leg
+    (under 40 across, taller than wide: only stage 6's temple and aqueduct have them). Stays solid: floors, terrace
+    steps (ground), dunes, pyramids with their lava (stage 4's two gold Neon unions are lava set in the pyramids'
+    rock, a screenshot showed) and backdrop mountains. `tools/check-lanes.luau` now fails on any solid decor anywhere
+    (its old "decor out of the lane" rule went with it: nothing there collides now).
+  - *Checked*: `check.ps1`; `check-lanes` 0 problems on a fresh build (Stages 1-7: 4,531 -> 3,243 solid parts; High
+    Olympus decor 4,249 -> 0). In a local Studio copy (`OlympusMockup.rbxl`, the cloud place untouched), slide sweeps
+    at about 120 studs/s held on z 130 and z 252 down the whole mountain, before and after rebuilding with the
+    branch's builder: High Olympus 33 hits on decor before (Zeus's and Athena's columns and bases, Hypnos's trees,
+    spires, Hera's blossom), 0 after; stages 1-7 0 decor hits after; the only hits left were terrace steps, dunes and
+    a landing. Lines on the terraces themselves (z 100, 108, 275, 285, stages 1-5): 97 bumps, every one a terrace
+    block, no tree or lamp. Both bootstraps ready, 101 tests, a clean console. Not tried: a real player, a phone, the
+    cloud place.
 - **A slide stops dead when pulled back; no auto-jump up the mountain (2026-10-06, merged into main on the user's
   word, live in version 29)**. The user, after version 28: running up made climbers auto-jump on
   the slope; and with momentum nobody could break out of a slide: moving the other way should stop it at once.

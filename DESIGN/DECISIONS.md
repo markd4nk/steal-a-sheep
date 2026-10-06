@@ -294,10 +294,14 @@ Calls in the slide stop and climbing without auto-jump (2026-10-06):
 
 Calls in High Olympus's lanes and the ramps-only rule (2026-10-06; the user's own calls are under Confirmed rules):
 
-- **The ramps-only rule covers the whole descent, tiers 1-30**: on the commissioned stages their trees, bamboo, small
-  rocks, spires, arches, blossom trees, fences, the pavilion, lamps and the aqueduct's and temple's columns in the lane
-  are passed through. Solid: the floors, terraces, stage 6 and 7's dunes, stage 4's pyramids (their faces lean into
-  the lane's edges like banks) and the backdrop mountains. Easy to limit to High Olympus if wanted.
+- **The ramps-only rule covers the whole descent, tiers 1-30, and its whole width** (the width since 2026-10-06's
+  `t3code/mound-collision-sliding`: the user, "only the mounds should have some sort of collision"): on the
+  commissioned stages their trees, bamboo, small rocks, spires, gates, arches, blossom trees, fences, the pavilion,
+  lamps and the aqueduct's and temple's columns and arch legs are passed through wherever they stand, and so is all of
+  High Olympus's side decor (trees, columns, spires, islands). Solid: the floors, the terrace steps at the floor's
+  edges (the ground itself: a slide steered onto them still bumps), stage 6 and 7's dunes, stage 4's pyramids (their
+  faces lean into the lane's edges like banks) with the lava set in them, and the backdrop mountains. The plots' trees
+  and hay below the safety line stay solid: slides end there.
 - **High Olympus's ramps are stage 7's dunes** (its own mesh), recoloured: a big one beside the path under the god's
   landmark (crest 11-13 studs over the floor) and two or three smaller ones at the lane's sides (7-11), gentle side
   uphill so a slide rides up and leaves the crest in a jump. Measured at about 160 studs/s: 0.7 s in the air, 11 studs

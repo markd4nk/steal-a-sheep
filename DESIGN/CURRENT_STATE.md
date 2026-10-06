@@ -174,7 +174,9 @@ lamb.
   auto-jump is off on the ramp. HISTORY.md.
 - **Only ramps are solid on the descent (2026-10-06, live in version 28)**: the
   user's rule. High Olympus's obstacles are scenery, its ramps stage 7's dunes; the old stages' trees, spires, arches,
-  pavilion, lamps and columns in the lane are passed through too (`UpperMountain.ClearOldLanes`).
+  pavilion, lamps and columns in the lane are passed through too. **Across the whole width** (branch
+  `t3code/mound-collision-sliding`, not merged, not in the cloud place): the decor beside the lane too, on every stage
+  (`UpperMountain.ClearOldDecor`, High Olympus's `Decor`). Needs the builder rerun in the cloud place once merged.
 
 - **Game page art and a trailer, first cuts** (overnight 2026-10-05, nothing uploaded): icon and thumbnail mock-ups
   (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and
@@ -278,9 +280,9 @@ lamb.
 - **Pacing (2026-10-05 simulation)**: with walker upgrades at 10x, an efficient player reaches Zeus in about 6.5 hours
   (a real one maybe 2-3x that), Climbing about 1.3-5x the next sign. Trail prices are fixed and unreviewed (the user
   hasn't set them yet).
-- **Very fast slides meet the trees hard**: at 150+ studs/s a slide that clips a tree stops dead and its god catches
-  up (seen at x 944 on tier 3). Same decor issue, felt more at high speed. Momentum takes many more slides to 100 on
-  the map's tree-filled stages: no straight lane runs clear from x 2300 down (raycast scan, 2026-10-06).
+- **Slides still meet decor beside the lane** (version 29): High Olympus's side columns, spires and trees and the old
+  stages' edge trees and lamps stay solid outside the middle lane (33 hits in a side-line sweep of High Olympus).
+  Fixed on `t3code/mound-collision-sliding` (0 hits); what's left are the terrace steps at the floor's edges.
 - **Plots: 5.** The place's Maximum Visitor Count is 5 (Creator Hub); a sixth player would be kicked with "server full".
 - **Asset ownership**: the sheep meshes, faces, UI images and sounds are uploads by getajobgle, the account that owns
   the game too. Publish it under that account only.

@@ -109,9 +109,9 @@ end
 -- The lane's obstacles and terrain (defined below the shared props).
 local Lane = {}
 
--- The commissioned stages' lane (z between these, with each piece's reach) and what in it stays solid.
+-- The commissioned stages' lane (z between these), where the big buildings' capitals go too.
 local OLD_LANE_Z = { 140, 244 }
--- Models of more parts than this are a stage's floor, terraces or a big building: only their pillars in the lane go.
+-- Models of more parts than this are a stage's floor, terraces or a big building: only their pillars go.
 local DECOR_MOST_PARTS = 60
 -- Stage 4's pyramids (two wedges each) lean into the lane's edges as banks: ramps, so they stay.
 local PYRAMID_PARTS = 2
@@ -399,24 +399,24 @@ local function parts(root: any): { any }
 	return list
 end
 
--- Only ramps are solid in the commissioned stages' lane too (the user, 2026-10-06: at a slide's speed, dodging
--- things is too hard): its trees, bamboo, spires, arches, blossom trees, fences, the pavilion, lamps and the aqueduct's
--- and temple's columns are passed through, and left out of ground checks and the gods' line of sight. The floors,
--- terraces, dunes, pyramids and backdrop mountains stay. Returns how many parts it changed.
-function UpperMountain.ClearOldLanes(stages: any): number
+-- Scenery a slide passes through: no collision, and left out of ground checks and the gods' line of sight.
+local function passThrough(part: any)
+	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
+end
+
+-- Only ramps are solid on the commissioned stages too, across their whole width (the user, 2026-10-06: at a slide's
+-- speed, dodging things is too hard, and a slide drifting off the lane still met the edge trees): their trees, bamboo,
+-- rocks, spires, gates, arches, blossom trees, fences, the pavilion, lamps and the aqueduct's and temple's columns are
+-- passed through. The floors, terraces, dunes, pyramids and backdrop mountains stay. Returns how many parts it changed.
+function UpperMountain.ClearOldDecor(stages: any): number
 	local changed = 0
 	local function pass(part: any)
 		if part.CanCollide or part.CanQuery then
 			changed += 1
 		end
-		part.CanCollide = false
-		part.CanQuery = false
-		part.CanTouch = false
-	end
-	local function inLane(part: any): boolean
-		local reach = part.Size.Magnitude / 2
-		local z = part.CFrame.Position.Z
-		return z + reach > OLD_LANE_Z[1] and z - reach < OLD_LANE_Z[2]
+		passThrough(part)
 	end
 	for index = 1, 7 do
 		local stage = stages:FindFirstChild(`Stage{index}`)
@@ -429,25 +429,18 @@ function UpperMountain.ClearOldLanes(stages: any): number
 			end
 			local list = parts(child)
 			if #list > DECOR_MOST_PARTS then
-				-- Columns and their capitals standing in the lane; floors and roofs are far wider, terraces outside it.
+				-- Columns and their capitals in the lane, and standing columns and arch legs anywhere; floors and
+				-- roofs are far wider, terrace blocks wider than tall.
 				for _, part in list do
+					local across = math.max(part.Size.X, part.Size.Z)
 					local z = part.CFrame.Position.Z
-					if math.max(part.Size.X, part.Size.Z) < 40 and z > OLD_LANE_Z[1] and z < OLD_LANE_Z[2] then
+					if across < 40 and (part.Size.Y > across or (z > OLD_LANE_Z[1] and z < OLD_LANE_Z[2])) then
 						pass(part)
 					end
 				end
 			elseif #list ~= PYRAMID_PARTS then
-				local reaches = false
 				for _, part in list do
-					if part.CanCollide and inLane(part) then
-						reaches = true
-						break
-					end
-				end
-				if reaches then
-					for _, part in list do
-						pass(part)
-					end
+					pass(part)
 				end
 			end
 		end
@@ -479,7 +472,7 @@ function UpperMountain.Build(env: Env, workspace: any)
 		end
 	end
 	assert(duneTemplate, "UpperMountain: stage 7's dunes are missing")
-	UpperMountain.ClearOldLanes(stages)
+	UpperMountain.ClearOldDecor(stages)
 	if stage7 then
 		for _, child in stage7:GetChildren() do
 			if child:IsA("Model") and #parts(child) == 80 then
@@ -1040,6 +1033,12 @@ function UpperMountain.Build(env: Env, workspace: any)
 		if theme.Props then
 			theme.Props(ctx, theme)
 		end
+		-- The decor beside the lane is scenery too: a slide drifting off the lane passes through it.
+		for _, part in decor:GetDescendants() do
+			if part:IsA("BasePart") then
+				passThrough(part)
+			end
+		end
 	end
 
 	-- The summit plaza above Zeus's stretch: a flat terrace with his throne.
@@ -1539,9 +1538,7 @@ function Lane.Build(c: any, theme: any)
 	-- ground checks and the gods' line of sight.
 	for _, part in lane:GetDescendants() do
 		if part:IsA("BasePart") and not part:GetAttribute("Ramp") then
-			part.CanCollide = false
-			part.CanQuery = false
-			part.CanTouch = false
+			passThrough(part)
 		end
 	end
 end

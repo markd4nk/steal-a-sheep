@@ -162,10 +162,20 @@ its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labe
   the plots draws only the sky there (seen on Hypnos's stretch, main's version too); pivot the character (anchored)
   near the shot first. With the character there and the normal camera it draws properly. `windows-computer-use`
   `record` on a background Studio window gave identical frames; foreground it (no input needed) for motion clips.
-- **Lane check**: every collidable part under a stretch's `Decor` in its frame (x across, y up from the floor) must have
-  |x| >= 56 or sit 16+ studs up; under its `Lane`, collidable parts lower than 16 must leave 28+ studs across the
-  lane everywhere, keep off the `Path` tiles and 6 studs from the lamb and god spots. `lune run tools/check-lanes.luau` checks the built `StealASheep.rbxl` without Studio
-  (exits 1 and lists the parts if any are in the lane); rerun it after changing a theme or the stretches' layout.
+- **Lane check**: nothing under a stretch's `Decor` is collidable; under its `Lane` only the dunes (`Ramp`) are, and
+  they keep off the `Path` tiles and 6 studs from the lamb and god spots; on stages 1-7 no small model but stage 4's
+  pyramids, and no standing column, is collidable. `lune run tools/check-lanes.luau` checks the built
+  `StealASheep.rbxl` without Studio (exits 1 and lists the parts); rerun it after changing a theme, the stretches'
+  layout or `ClearOldDecor`.
+- **Side-line slide sweeps (2026-10-06)**: the floor is open between z ~125 and ~257 (terrace steps beyond); z 130 and
+  252 run just inside them, outside the old middle lane (140-244). A Client bot pivots onto the floor at a chunk's top,
+  kicks `AssemblyLinearVelocity` downhill and, from a RenderStep at `Input + 1`, `Humanoid:Move`s downhill steering
+  back to its z, logging speed drops under 0.6 with the part a short ray along the old velocity meets. Client
+  teleports up the mountain are pulled back by `MountainService`'s ceiling and speed checks: in a local copy only, add
+  `if workspace:GetAttribute("TestFreeMove") then return end` at the top of its `enforce` in Edit before Play (remove
+  it after). The slide's speed comes from the client's `ClimbPower` attribute: set it locally per chunk
+  (`Mountain.SlideBase` for ~120 at the chunk's tier). Chunks of 600 studs, 5-15 s each; more than ~10 in one
+  `execute_luau` times out (the run carries on: poll a `_G` log).
 - **A mesh's cost**: in Edit, `AssetService:CreateEditableMeshAsync(part.MeshContent)` then `#mesh:GetFaces()` gives its
   triangles, and `AssetService:CreateEditableImageAsync(part.TextureContent).Size` its texture size (destroy both
   after). Measured 2026-10-05: `generate_mesh` gods come out at 8.8-9.9k triangles with a 1024x1024 texture unless
