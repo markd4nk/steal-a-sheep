@@ -217,7 +217,6 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   `EmissiveMaskContent` (its own colour map works). A variant's BaseMaterial and maps are PluginSecurity: make variants
   in Studio, not from game scripts. Variants show in ViewportFrames too, and a MeshPart's own TextureID picture still
   shows with a variant on it." Seen 2026-10-05 putting the map's Studs material on Steal a Sheep's wool.
-  (S31 and S32 are taken on t3code/publish-readiness-checklist.)
 - **S34** (`BRAIN/PATTERNS/testing-studio.md`): "`_G` lasts between `execute_luau` calls in one Studio: define a
   long mock-up or test helper once (`_G.TEMP_Mockup = function(look) ... end`), rerun it with one-line calls, and set
   it to nil when done. The command's thread lacks the RobloxScript capability: reading `Lighting.Technology` or
@@ -228,13 +227,13 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   Color3 = roblox.Color3 } })()`, where `place` is from `roblox.deserializePlace`. Lune 0.10.5 sets PluginSecurity
   properties (a MaterialVariant's BaseMaterial, `EmissiveMaskContent` from another `...Content`) but can't read the
   older `ContentId` ones (`ColorMap`): read the `...Content` twin." Seen 2026-10-05, Steal a Sheep's stud materials.
-- **S31** (`BRAIN/PATTERNS/testing-studio.md`, a new "Checking that assets load" part): "To check a game's assets
+- **S36** (`BRAIN/PATTERNS/testing-studio.md`, a new "Checking that assets load" part): "To check a game's assets
   load, don't preload bare ids: `ContentProvider:PreloadAsync({ "rbxassetid://..." })` reports Failure for meshes and
   most images that load fine. Preload instances (a Decal per image, a Sound per sound, then `IsLoaded` and
   `TimeLength > 0`), build meshes with `AssetService:CreateMeshPartAsync` on the server, and load animations through
   an Animator (`Length > 0`). The public thumbnails and economy APIs aren't enough on their own: they said Completed
   for meshes moderation had removed." Seen 2026-10-05 in Steal a Sheep's asset audit (1,286 ids, all loading).
-- **S32** (`BRAIN/PATTERNS/trailers.md`, staging and cutting; the `edit.py` part also for RobloxPack's `trailer/`):
+- **S37** (`BRAIN/PATTERNS/trailers.md`, staging and cutting; the `edit.py` part also for RobloxPack's `trailer/`):
   "To walk or steer the player's own character during a take, call `Humanoid:Move` in `BindToRenderStep` at
   `Enum.RenderPriority.Input.Value + 1`. From `RenderStepped` it comes too late: Roblox's controls have already reset
   MoveDirection when the game's own movement code reads it. Check every caption against its frame, since a game's
