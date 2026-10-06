@@ -24,7 +24,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   - *Checked*: a playtest of the branch in a Studio copy: all 30 avatars load with every item and symbol, 76 tests
     pass, the console is clean; Zeus's alert (points), chase, catch (laughs) and walk home ran on a real theft; Hera's
     run checked; review lineups five at a time on the summit (`studio/GodLineup.luau`). Nike's hair hid her face in the
-    first lineup and was swapped. Not checked: the Sheepdex's viewport copy of an avatar god; a live server.
+    first lineup and was swapped. The Sheepdex's god pictures lost layered clothing (dresses, Pan's goat legs) because
+    the copy dropped every constraint, an avatar's joints among them; it now drops only the movement drivers and keeps
+    the joints (checked in the menu). Not checked: a live server.
 
 - **Gods in mythological rank (2026-10-05)**. The user asked whether the thirty gods were in Mount Olympus's order.
   They weren't: the Olympians had been placed to fit the commissioned map's stage themes and the minor gods sat above
