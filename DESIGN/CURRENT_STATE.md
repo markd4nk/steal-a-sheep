@@ -16,6 +16,13 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## Live
 
+- **Private test version 28 (2026-10-06, 18:56 UTC)**: main @ 8cfd60d, version 27 plus High Olympus's lanes (each
+  god's obstacles, dunes, the winding path, moving scenery) and only ramps solid on the whole descent. Scripts: the new
+  `SceneryController` and `Registry`; Studio-side: High Olympus rebuilt by the builder and the old stages' lane decor
+  made pass-through (STUDIO_CONTENT.md). Checked first in the cloud place: 139 of 139 scripts matching main, both
+  bootstraps ready, 101 tests, a clean console. The user's own save (getajobgle, `Player_11005555779`) was deleted on
+  their word to start from zero, with their entries on the three all-server boards (version 08DF2348...01 of the save
+  is restorable until 2026-11-05).
 - **Private test version 27 (2026-10-06, 18:15 UTC)**: main @ 7270d54, version 20 plus the scarier steal and chase,
   mystery lambs, the onboarding trail, no hand-holding after onboarding, the stair walker's pops, and the gods' lunge
   and belly glide with the players' surf (each below; HISTORY.md, the god lunge entry, lists them). Roblox numbers
@@ -155,11 +162,11 @@ lamb.
   `Utils/ChaseFeel`, `GameConfig.Chase`), "safe" on getting away; `Remotes.Chase` says how a chase ended. The user OK'd
   the mock-up's sounds and picked alarm C; every voice one person in one take, goddesses deeper (their words, in
   DECISIONS.md); every voice-board take but M1, said at random without repeats (`Config/Sounds` Voices, `art/chase/`).
-- **High Olympus's lanes (2026-10-06, merged into main at 30182d3, not published)**: all eighteen stretches have each
+- **High Olympus's lanes (2026-10-06, live in version 28)**: all eighteen stretches have each
   god's obstacles, dunes, the god's landmark, a winding path, particles and birds, everything standing tilted with the
   slope; scenery moves (`SceneryController`). `tools/UpperMountain.luau`'s `Lane`; `tools/check-lanes.luau` checks it.
-  Not in the cloud place yet: it needs the builder run there (STUDIO_CONTENT.md) when it ships. HISTORY.md.
-- **Only ramps are solid on the descent (2026-10-06, branch `t3code/olympus-obstacle-mockups`, not merged)**: the
+  Built into the cloud place for version 28. HISTORY.md.
+- **Only ramps are solid on the descent (2026-10-06, live in version 28)**: the
   user's rule. High Olympus's obstacles are scenery, its ramps stage 7's dunes; the old stages' trees, spires, arches,
   pavilion, lamps and columns in the lane are passed through too (`UpperMountain.ClearOldLanes`).
 

@@ -4,20 +4,22 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
-- **2026-10-06, only ramps solid** (branch `t3code/olympus-obstacle-mockups`, not merged): `tools/UpperMountain.luau`
+- **2026-10-06, version 28 published** (saved 18:55:41, published 18:56:04 UTC): main 8cfd60d's two changed
+  scripts set in the cloud place (`Registry`, new `Controllers/SceneryController`; 139 of 139 then matching), and
+  main's `tools/UpperMountain.luau` run there in Edit: `Stages.HighOlympus` rebuilt (14,010 -> 18,888 parts) and the
+  old stages' lane decor made pass-through (5,953 -> 4,531 solid parts in Stages 1-7). No `TEMP_`, no debug flags.
+- **2026-10-06, only ramps solid** (main 8cfd60d, in the cloud place since version 28): `tools/UpperMountain.luau`
   now also turns off CanCollide, CanQuery and CanTouch on the commissioned stages' lane decor
   (`UpperMountain.ClearOldLanes`) and on everything in High Olympus's lanes but their `Dune` MeshParts (clones of stage
-  7's dune, `Ramp` attribute; the builder needs stage 7's 229-stud dunes). Not in the cloud place yet: the builder run
-  there does both.
-- **2026-10-06, High Olympus's lanes** (branch `t3code/olympus-obstacle-mockups`; only in local copies so far, not in
-  the cloud place). `tools/UpperMountain.luau` now adds to each `Tier.. God` model a `Lane` model (`Outcrops` with the
+  7's dune, `Ramp` attribute; the builder needs stage 7's 229-stud dunes).
+- **2026-10-06, High Olympus's lanes** (main 30182d3, in the cloud place since version 28). `tools/UpperMountain.luau` now adds to each `Tier.. God` model a `Lane` model (`Outcrops` with the
   `Knoll`, `Obstacles`, `Patches` with the flat `Path` tiles, `Life` with particle holders and bird `Flock`s) and
   tilts the old `Decor` with the slope. `SceneryController` expects the tags `OlympusBob` (`BobHeight`,
   `BobPeriod`), `OlympusSpin` (`SpinCenter`, `SpinAxis`, `SpinSpeed`) and `OlympusFlock` (`FlockCenter`,
   `FlockRadius`, `FlockSpeed`; birds' parts named `Body`, `WingL`, `WingR`); without them nothing moves. The builder
   needs `NumberRange`, `NumberSequence`, `NumberSequenceKeypoint` and `ColorSequence` in its env now
-  (`tools/assemble.luau` passes them; a Studio run passes them too, TESTING.md). For the cloud place: run the builder
-  there in Edit (it replaces `Stages.HighOlympus`), with main's code holding `SceneryController`, when this ships.
+  (`tools/assemble.luau` passes them; a Studio run passes them too, TESTING.md). Rerunning it in Edit replaces
+  `Stages.HighOlympus`.
 
 - **2026-10-06, version 20 published** (saved and published; Team Create): main d8fc2b3's five changed scripts set
   in the cloud place (MountainService, GodService, MovementController, Utils/Mountain, Config/GameConfig) and
