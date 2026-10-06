@@ -291,8 +291,6 @@ function WildService.Fail(_self: any, player: Player, reason: string)
 	if reason == "Caught" then
 		notify(player, `{tier.God} punched you! You dropped the lamb`, "Bad", "Denied")
 		registry.MountainService:Punch(player)
-	elseif reason == "Returned" then
-		notify(player, `The lamb ran back to {tier.God}`, "Bad", "Notice")
 	elseif reason == "Blocked" then
 		notify(player, "The lamb slipped away", "Bad", "Denied")
 	end
@@ -573,9 +571,6 @@ function WildService.Start(_self: any)
 		dropTutorialLamb(player)
 		wrongPlot[player] = nil
 	end)
-	trove:Add(Remotes.ReturnSheep:Connect(function(player: Player)
-		WildService:Fail(player, "Returned")
-	end))
 	trove:Add(Remotes.PutDown:Connect(putDown))
 
 	local sinceCheck = 0

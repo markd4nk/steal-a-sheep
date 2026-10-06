@@ -101,9 +101,9 @@ lamb.
   (GAME_DESIGN.md, *Merge Shrine*).
 - **The gods** (version 8): thirty in mythological rank, Pan tier 1 to Zeus 30, each a catalog-dressed Roblox avatar
   (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load.
-- **What the HUD says** (version 8): one message per moment, hints only when needed (`Screens/Hud`, `goal()`); every
-  ProximityPrompt drawn as the menus' button for the device, press or tap (`PromptController/Look`). HISTORY.md, the
-  overnight entry.
+- **What the HUD says** (version 8): one message per moment (`Screens/Hud`); every ProximityPrompt drawn as the menus'
+  button for the device, press or tap (`PromptController/Look`). HISTORY.md, the overnight entry. On the onboarding
+  branch below the HUD gives no hints in words at all.
 - **Settings menu** (version 8; `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound
   effects in four steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in
   the save, `SoundController` volumes).
@@ -113,6 +113,12 @@ lamb.
   once.
 
 ## In progress
+
+- **Onboarding trail** (branch `t3code/7bbf5a87`, not merged; the user's 2026-10-06 request): Shear a Sheep's floor
+  chevrons (`UIController/GuidePath`) guide only the first lamb, to Pan's meadow, home from the mountain's foot, then to
+  the stair walker; no words, no floating arrow. Also gone from the HUD: Train to climb, Put your sheep to work, the
+  walker's training meter (Mark via the less-hand-holding session), and the carried lamb's card with its Return button
+  (no giving up a run now). GAME_DESIGN.md, *Onboarding*.
 
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
@@ -137,6 +143,10 @@ lamb.
 
 ## Not verified
 
+- **The onboarding trail on a real phone**: seen in a Studio playtest with Studio's phone emulation, walked by script
+  (pen to meadow, the trail home, the walker); a player's own first run, a real phone's frame rate with the trail's
+  pathfinding (a route each 1.5 s) and other plots than Plot1 weren't tried. Removing the carried lamb's card and
+  Return came after that playtest (Studio was busy): `check.ps1` only.
 - **Studs on every sheep on a phone and in a live server**: seen in a Studio playtest and in Edit on all 183 families,
   not on a real device; their cost on a low-end phone wasn't measured (no extra parts, only materials).
 - **The live game itself**: version 8 was checked only in a Studio playtest of the cloud place before its publish

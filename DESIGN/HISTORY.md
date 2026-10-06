@@ -6,6 +6,36 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **The onboarding trail (2026-10-06, branch `t3code/7bbf5a87`, not merged)**. The user: too much said "steal this
+  person's sheep" and pointed at the sheep; instead chevrons on the floor "just like in Shear a Sheep" to "the place
+  where the player has to actually go", only for the first lamb, "very simple ... I don't want to hand-hold them the
+  entire time", and look at how Steal an Egg does it.
+  - *Steal an Egg* (frames of two fresh-account first plays, KreekCraft and Bloxtian PH, saved as `sae-*.jpg` in T3
+    Code's attachments): a short line per step ("Steal an Egg!", "RUN!!", "Go to your Pen!", "Hatch the Egg!") and a
+    red chevron trail to one egg just past the safe zone, flipping to point home on the grab, into the pen; on the
+    second steal nothing at all. The treadmill gets one line much later, when it's bought at $1K.
+  - *Built*: `UIController/GuidePath`, Shear a Sheep's `Guide/Path` (its solid white chevrons with a black edge, 17
+    at most, 3.4 studs apart at 13 studs/s, Reduce motion keeps them still) with two changes for this map. The way
+    always comes from PathfindingService, because the plots' fences, the hay and the leaderboards can't be seen by
+    rays (`CanQuery` off) and Shear a Sheep only asked for a way round when a ray hit something. The ground is found
+    near `Mountain.RampY`, not the goal's height, since the trail climbs the ramp. `Screens/Hud`'s `goal()` gives the
+    trail its target: the front of Pan's meadow until the player is in it, their pen from the mountain's foot while
+    carrying the first lamb (none on the slope), then the walker's `Zone` until `Tutorial` 2. The hint line, the
+    floating guide arrow with its distance, Train to climb and Put your sheep to work (with the FLOCK glow) are
+    removed, and so is the walker's training meter (Mark, via the less-hand-holding session t3code-b39d69ab, which
+    handles the hints after the onboarding).
+  - *Then the user*: "remove the thing that says wild lamb return. That is never necessary". The carried lamb's card at
+    the bottom (picture, name, Return) is gone, and so is `Remotes.ReturnSheep` with WildService's "The lamb ran back"
+    notice: nothing gives up a run now (a catch, a fall, a reset or leaving still ends one).
+  - *Checked*: `check.ps1`. A playtest of the cloud place, with the two scripts swapped in from a rojo-built model and
+    put back after: a blank save (`DebugBlankProfile`) on Plot1, with Studio's phone emulation on. Both bootstraps were
+    ready and 84 tests passed, with nothing from our code in the console. The player was walked by script along a
+    path. The trail went out through the gate and round the stalls; it ended by the tutorial lamb and showed no words
+    or arrow. A steal followed by standing still was punched by Pan, as before. A debug steal then slid to the foot,
+    where the trail turned to the pen and disappeared inside the fence. Put down gave `Tutorial` 1, the menus showed,
+    and a trail led to the walker. Stepping on gave `Tutorial` 2 and the trail was gone. Pictures are
+    `onboarding-*.jpg` in T3 Code's attachments.
+
 - **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
   it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game
   page icon change yet; "set it to mild" (Fear) but no genre yet; "just ship it. It still needs to stay private".

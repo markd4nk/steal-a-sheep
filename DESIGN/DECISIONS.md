@@ -49,7 +49,7 @@ confirmed or reversed it.
   towards Climbing sitting just over the next sign, not far past it.
 - **Hidden lamb weight (2026-10-05)**: no Light/Stout/Heavy words and no numbers on screen: players feel it. A smooth
   range, not three kinds. Saved with the sheep; heavier lambs tend to grow bigger, but a light one can still grow
-  large, just less likely. The carry card shows no speeds.
+  large, just less likely.
 - **High Olympus's stretches are 275 studs along the floor** (the user, 2026-10-05: at 210 they felt shorter than the
   first levels, about 250, so a bit longer than those). 169-233 across the ground, so the steep ones still look
   shorter than they climb.
@@ -144,6 +144,15 @@ confirmed or reversed it.
   "Climbing gets you up steeper slopes", "take it home" and the escape notice, "Put it down where you like", "Yours has
   your name over the gate", the grow-up celebration; "you get the gist".
 
+- **Onboarding is a trail on the floor to a place (the user, 2026-10-06)**: too much said "steal this god's sheep" and
+  pointed at the sheep; instead chevrons on the floor "just like in Shear a Sheep" leading "to the place where the
+  player has to actually go", only for the first lamb, "very simple ... I don't want to hand-hold them the entire
+  time", modelled on Steal an Egg's. The words, the floating arrow with its distance, Train to climb and Put your sheep
+  to work are gone (GAME_DESIGN.md, *Onboarding*).
+- **No card for the lamb being carried (the user, 2026-10-06)**: "remove the thing that says wild lamb return. That is
+  never necessary". The card at the bottom (the lamb's picture, its name, Return) is gone, and with it giving up a run:
+  a lamb only goes back when its god catches the thief, or they fall, reset or leave.
+
 - **The overnight work as summarized, merged and shipped (the user, 2026-10-06)**: "Yes, it looks good. You can merge
   it... just ship it. It still needs to stay private though." So version 8 went out with the audience left Private:
   publishing a new version is fine on their word, opening the game to players isn't yet. The overnight calls below
@@ -156,10 +165,6 @@ confirmed or reversed it.
 Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-game-for-publishing`; confirmed
 2026-10-06 with the overnight work):
 
-- **When the hint shows**: Put your sheep to work for 12 s after room opens up in the pen (pen space bought, sheep
-  merged away) while sheep are stored, not after a sheep is stored on purpose; the FLOCK button glows meanwhile.
-  Train to climb while the slope holds the player under half speed on tier 2 and up (off the walker, not carrying).
-  Slide home! only on the first lamb's run; nothing in the pen (the Put down button says it).
 - **Grow-ups**: Giant and Titan get one notice ("Fortune Sheep grew up GIANT!") with their fanfare; Standard and
   Large only update the label over the sheep.
 - **Menus that open themselves**: none in a player's first session; after that the daily gifts once a session
@@ -171,8 +176,7 @@ Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-g
   (52 pt) with no key; on a computer the key in a white cap beside it; prices and the shrine lamb's name in a small
   line above; prompts on one spot side by side; the Put down button over the carried lamb.
 - **Wording**: the shrine's landing says SHINY! for a Shiny fleece; the walker row "8 → 12 Climbing/s"; trails
-  "1.5x training"; Merge's button "Merge" (greyed until three picks); gods' nameplates show the name only; the
-  training meter "Next: <God> at <sign>" (no lamb weights named), nothing past Zeus's sign.
+  "1.5x training"; Merge's button "Merge" (greyed until three picks); gods' nameplates show the name only.
 - **Merge odds**: exact percentages, long ones to five significant digits; "Size and fleece roll separately. Odds
   are rounded, so they may not add up to exactly 100%." under the odds.
 - **Names**: Eris's area is Chaos Rift and her Mythic shows as Mayhem Sheep (was "Discord"; the saved id is
@@ -182,8 +186,7 @@ Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-g
 - **Signs in studs**: the plots' name signs 24 x 6.8, the stalls' names 15 x 3.5, the walkers' level tags 6.3 x 2.35,
   the same size as before at their usual distance and smaller further away.
 - **Layout fixes**: on a computer or a tablet the Climbing and cash counters stand left of Roblox's player list (it
-  opens over the top right by default there); the guide arrow hangs under the hint, pointing up, when its target is behind the hint's
-  words; menus that open by themselves wait for the welcome-back card and 4 s after it; the HUD's STORE button
+  opens over the top right by default there); menus that open by themselves wait for the welcome-back card and 4 s after it; the HUD's STORE button
   hides while a menu is open.
 - **Phone layouts**: the Flock menu's sheep picture shrinks so Store and Lock stay inside; the free gift's step shows
   its picture and words in a row; the Merge button stands under the shrine's list where the odds and the button
@@ -221,6 +224,18 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
 - Any other wool material keeps its look without studs (none uses one today).
 
 ## To review
+
+Calls in the onboarding trail (2026-10-06, branch `t3code/7bbf5a87`):
+
+- **Where the first trail ends**: the front of Pan's meadow, mid-lane (45% up tier 1), a few studs past the tutorial
+  lamb; it stops once the player is within 4 studs of that line or past it, so it never points back.
+- **No trail on the slope with the lamb**: the slide carries the player down; the trail home starts at the mountain's
+  foot (off the ramp) and ends inside the player's own fence.
+- **One trail to the stair walker after the first delivery**, no words, until the player steps on (Steal an Egg
+  points at its treadmill only once it's bought, about $1K in).
+- **No words at all**, unlike Steal an Egg's line per step ("Steal an Egg!", "Go to your Pen!").
+- **The trail hides while a menu is open**, and follows the walkable way (pathfinding: out through the gate, round
+  the stalls), straight when no way is found or it's over 1.3x the straight line plus 16 studs.
 
 Calls in the trailer's first cut (2026-10-05, overnight; `trailer/stealasheep.md`, nothing uploaded):
 
@@ -405,8 +420,7 @@ Calls made building the Merge Shrine (2026-10-05):
   "Not <family>". Picks stand on the pedestals in order (1 left, 2 back, 3 right) at their real sizes. Walking 26
   studs from the shrine closes it.
 - **One lamb at a time**: you can't merge again until the last lamb has left the altar ("Pick up your lamb first").
-- **Pick up**: an instant E prompt ("Pick up", the lamb's name) within 14 studs of the altar; the carry card's Return
-  button sends a shrine lamb to the pen.
+- **Pick up**: an instant E prompt ("Pick up", the lamb's name) within 14 studs of the altar.
 - **Celebration** when it lands: "NEW LAMB!" ("RARE!" or "ROYAL!" by fleece) with "Pick it up and take it home";
   sounds: LabZap at the merge, LabRiser on the rise, RevealSparkle at the pop, PenDrop on landing. A Titan grow-up
   plays RevealFireworks.
@@ -530,7 +544,7 @@ Calls made building Climbing (2026-10-05):
   lead for lag) is put back at their allowed spot.
 - **Saved sheep**: schema 2 turns Burden 1/2/3 into Weight 1.05/1.2/1.35; sizes already rolled stay.
 - **Dropped lambs** (the user: a caught thief's lamb stays where it fell, anyone can steal it, its god chases them):
-  being caught or dying on the ramp drops it; giving up, falling off the world, resetting or leaving puts it straight
+  being caught or dying on the ramp drops it; falling off the world, resetting or leaving puts it straight
   back, and the tutorial lamb always goes back. A dropped lamb lies there 30 s, then returns to its pasture. Gods still
   walk home slowly (the user's call).
 - **The punch** (the user: a caught thief is launched down about three or four tiers, not sent home): three tiers
@@ -604,11 +618,9 @@ Calls made while building the MVP on 2026-10-05:
 - **Manual Equip pins a sheep**: Equip Best keeps pinned sheep and refills the rest; Store unpins.
 - **Selling is at the Sell Stall only** (the map's stall at z 175), in its own menu (Screens/SellStall). The Shop is
   the stall at z 205; the Merge Shrine (opens after 3 deliveries) stands between the stalls.
-- **HUD**: menu buttons (Flock, Shop, Sheepdex) appear after the first delivery; the objective line always shows the
-  next useful step (steal, slide home, train, put sheep to work, train for Light/Heavy, climb to the next god), with a
-  guide arrow to it; a training meter shows the next Climb Power target while on the walker.
-- **Tutorial**: a new player's private, Light, ordinary tier 1 lamb (Pan's) sits in the meadow (others can't take it); its
-- **Tutorial**: a new player's private, Light, Plain Demeter lamb sits in the meadow (others can't take it); its
-  run is protected from slide hits; any first delivery gives +60 coins and +25 Climb Power and removes it.
+- **HUD**: menu buttons (Flock, Shop, Sheepdex) appear after the first delivery; no hints in words (the onboarding's
+  floor trail is the only guide, GAME_DESIGN.md, *Onboarding*).
+- **Tutorial**: a new player's private, Light, ordinary tier 1 lamb (Pan's) sits just short of the meadow (others can't
+  take it); its run is protected from slide hits; any first delivery gives +60 coins and +25 Climb Power and removes it.
 - **Sounds**: Shear a Sheep's cues: the danger music during a chase, WolfScare on the alert, IntroWhip on a slide,
   Yelp/Scuffle on hits, Coin/DexReward/Upgrade/Reveal on rewards.
