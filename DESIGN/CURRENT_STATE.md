@@ -104,10 +104,11 @@ lamb.
   for each device (press or tap, no hold), Roblox-rules fixes (no reward for a like, exact merge odds, no "Discord"
   names), a server audit's exploit fixes, phone layout and world-sign fixes, and the store products' ids. HISTORY.md
   has the details, DECISIONS.md the calls to review.
-- **Done overnight on other branches, waiting for the user**: studs on every sheep (`t3code/sheep-stud-style-mockups`,
-  needs `studio/SheepStuds.luau` run on the cloud place), store product icons (same branch, `art/store/`), a Settings
-  menu (same branch, in progress), game page icon and thumbnail mock-ups, an asset audit (all 1,286 assets load) and a
-  trailer (`t3code/order-olympian-gods`).
+- **Release candidate** (branch `t3code/overnight-rc`, 2026-10-05, waiting for the user): the overnight publish prep
+  with the studs, the product icons' script and the Settings menu (`t3code/sheep-stud-style-mockups`) and the asset
+  audit, game page art tools and trailer (`t3code/order-olympian-gods`) merged in, tested together (84 unit tests, two
+  players, saving, test purchases, phone menus: HISTORY.md, the overnight entry). Shipping it needs
+  `studio/SheepStuds.luau` run on the cloud place first.
 - **Settings menu** (built 2026-10-05 on branch `t3code/sheep-stud-style-mockups`, not merged; its look waits for
   Mark's OK, `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound effects in four
   steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in the save,
@@ -133,10 +134,8 @@ lamb.
   uploaded): icon and thumbnail mock-ups (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The 9:16
   cut still carries the game's APM music, which can't go to TikTok or Shorts (BRAIN trailers.md): it needs a licensed
   track first.
-- **The Robux store can't sell yet** (merged 2026-10-05; the user: Creator Hub later): the game now exists on Roblox,
-  so the 2 passes and 49 developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) can be made in
-  universe 10769564664 at Config/Store's prices, their ids put in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`). Until
-  then a live server answers "Not on sale yet".
+- **The Robux store sells once published**: the 2 passes and 49 developer products exist in universe 10769564664
+  with their ids in `Config/Store` here; live servers still run version 5 and answer "Not on sale yet".
 
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game

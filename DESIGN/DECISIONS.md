@@ -175,6 +175,14 @@ Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-g
   pack's rate (150K for 49); a walker level they're past pays that level's cash price.
 - **Signs in studs**: the plots' name signs 24 x 6.8, the stalls' names 15 x 3.5, the walkers' level tags 6.3 x 2.35,
   the same size as before at their usual distance and smaller further away.
+- **Layout fixes**: on a computer the Climbing and cash counters stand left of Roblox's player list (it opens over
+  the top right by default); the guide arrow hangs under the hint, pointing up, when its target is behind the hint's
+  words; menus that open by themselves wait for the welcome-back card and 4 s after it; the HUD's STORE button
+  hides while a menu is open.
+- **Phone layouts**: the Flock menu's sheep picture shrinks so Store and Lock stay inside; the free gift's step shows
+  its picture and words in a row; the Merge button stands under the shrine's list where the odds and the button
+  don't fit one above the other (the odds keep the left side, shrinking only if they must).
+
 Calls in the Settings menu (2026-10-05, branch t3code/sheep-stud-style-mockups; the mock-up's A, agreed overnight with
 the coordinator, waiting for Mark's OK):
 
@@ -205,6 +213,7 @@ Calls in the studs on every sheep (2026-10-05, branch t3code/sheep-stud-style-mo
 - **Royal (gold) fleeces and silver paints** take metal studs; on glowing or glass families the Royal gold replaces the
   glow or the see-through look, as the gold paint already did.
 - Any other wool material keeps its look without studs (none uses one today).
+
 Calls in the trailer's first cut (2026-10-05, overnight; `trailer/stealasheep.md`, nothing uploaded):
 
 - **Order**: steal, the god's alert, the chase, home, a full pen, the climb, a catch (Zeus punches the thief off),
@@ -213,13 +222,7 @@ Calls in the trailer's first cut (2026-10-05, overnight; `trailer/stealasheep.md
   to Zeus", "30 gods to rob". 9:16: "STEAL FROM THE GODS", "RUN!", "FILL YOUR PENS", "CLIMB TO ZEUS", "30 ANGRY GODS".
 - **The chase god is Poseidon** (tier 28): Zeus's plaza edge stopped the slide; Zeus does the catch.
 - **Sound**: the game's own music and sounds only; it fades out under the title card.
-- **Layout fixes**: on a computer the Climbing and cash counters stand left of Roblox's player list (it opens over
-  the top right by default); the guide arrow hangs under the hint, pointing up, when its target is behind the hint's
-  words; menus that open by themselves wait for the welcome-back card and 4 s after it; the HUD's STORE button
-  hides while a menu is open.
-- **Phone layouts**: the Flock menu's sheep picture shrinks so Store and Lock stay inside; the free gift's step shows
-  its picture and words in a row; the Merge button stands under the shrine's list where the odds and the button
-  don't fit one above the other (the odds keep the left side, shrinking only if they must).
+
 
 Calls in Zeus's Blender model (2026-10-05, a mock-up waiting for the user's OK):
 
