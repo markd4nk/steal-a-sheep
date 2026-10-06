@@ -290,7 +290,7 @@ function Extras.Add(model: Model, kind: string)
 			pegasusWing(model, body, -1)
 		end
 		-- A glowing gold halo over its head, tipped back a little: a ring of beads.
-		local beads = 16
+		local beads = 26
 		for index = 1, beads do
 			local angle = (index / beads) * 2 * math.pi
 			local at = CFrame.new(0, 1.2, 0.12)
@@ -301,7 +301,7 @@ function Extras.Add(model: Model, kind: string)
 				head,
 				`Halo{index}`,
 				Enum.PartType.Ball,
-				Vector3.new(0.17, 0.17, 0.17),
+				Vector3.new(0.13, 0.13, 0.13),
 				at,
 				PEGASUS_GOLD,
 				Enum.Material.Neon

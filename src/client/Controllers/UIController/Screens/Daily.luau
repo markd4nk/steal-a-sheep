@@ -32,10 +32,11 @@ local Color = Theme.Color
 local Fleece = Theme.Fleece
 local ACCENT = "Daily"
 local PANEL_WIDTH = 600
-local PANEL_HEIGHT = 340
-local CARD = Vector2.new(110, 122)
+-- The height a panel is laid out at on a short screen (Theme.Fleece.CompactHeight): the same layout everywhere, scaled.
+local PANEL_HEIGHT = Fleece.CompactHeight
+local CARD = Vector2.new(110, 111)
 local CARD_GAP = 10
-local PICTURE = 66
+local PICTURE = 58
 local TODAY_LIFT = 1.04
 -- Day 7's stage: a sky over the Epic purple.
 local SKY = Color3.fromRGB(143, 216, 255)
@@ -64,16 +65,16 @@ local function dayCard(parent: Instance, day: number): TextButton
 	name.Position = UDim2.new(0.5, 0, 0, 5)
 	name.Size = UDim2.new(1, -10, 0, 20)
 	local rays = face:FindFirstChild("Rays") :: ImageLabel
-	rays.Position = UDim2.new(0.5, 0, 0, 58)
+	rays.Position = UDim2.new(0.5, 0, 0, 53)
 	local picture = face:FindFirstChild("Picture") :: ImageLabel
 	picture.Size = UDim2.fromOffset(PICTURE, PICTURE)
-	picture.Position = UDim2.new(0.5, 0, 0, 25)
+	picture.Position = UDim2.new(0.5, 0, 0, 24)
 	local kind = Economy.DailyWeek[day].Kind
 	if kind == "Lamb" then
 		picture.Visible = false
 		local token = UIKit.Token(face, PICTURE, "Token")
 		token.AnchorPoint = Vector2.new(0.5, 0)
-		token.Position = UDim2.new(0.5, 0, 0, 25)
+		token.Position = UDim2.new(0.5, 0, 0, 24)
 		token.ZIndex = 2
 	else
 		picture.Image = PICTURES[day] or ""
@@ -86,9 +87,9 @@ local function dayCard(parent: Instance, day: number): TextButton
 	local amount = strip:FindFirstChild("PriceLabel") :: TextLabel
 	amount.TextSize = 17
 	amount.TextColor3 = if kind == "Cash" then Color.Lime elseif kind == "Climb" then Color.Gold300 else Color.Blue200
-	local done = UIKit.Icon(face, "Done", Theme.Icons.HudCheck, 52)
+	local done = UIKit.Icon(face, "Done", Theme.Icons.HudCheck, 50)
 	done.AnchorPoint = Vector2.new(0.5, 0.5)
-	done.Position = UDim2.new(0.5, 0, 0, 58)
+	done.Position = UDim2.new(0.5, 0, 0, 53)
 	done.ZIndex = 6
 	done.Visible = false
 	return card

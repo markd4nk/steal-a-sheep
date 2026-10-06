@@ -28,6 +28,7 @@ local Types = require(script.Parent.Parent.Types)
 local Hud = {}
 
 local PICTURE_SIZE = 66
+local TILES_BOTTOM = 70 -- the menu pictures stop this far above the bottom, clear of a phone's thumbstick
 local Color = Theme.Color
 local TextSize = Theme.TextSize
 
@@ -117,10 +118,13 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	bar.LayoutOrder = 3
 	bar.Visible = false
 
-	local tiles = UIKit.Frame(root, "Tiles", UDim2.fromOffset(PICTURE_SIZE + 12, 0))
+	-- The menu pictures down the left edge, as far as the bottom margin: on a short screen (a phone held sideways) the
+	-- rest wrap into a second column beside the first.
+	local tiles = UIKit.Frame(root, "Tiles", UDim2.new(0, PICTURE_SIZE + 12, 1, -(70 + TILES_BOTTOM)))
 	tiles.Position = UDim2.fromOffset(8, 70)
-	tiles.AutomaticSize = Enum.AutomaticSize.Y
-	UIKit.List(tiles, false, 12, Enum.HorizontalAlignment.Center)
+	local tilesList = UIKit.List(tiles, false, 12, Enum.HorizontalAlignment.Left)
+	tilesList.Wraps = true
+	UIKit.Padding(tiles, (PICTURE_SIZE + 12 - math.max(PICTURE_SIZE, Theme.MinTouch)) / 2, 0, 0, 0)
 	-- A red "!" on a button's corner: something waiting there.
 	local function alertOn(button: TextButton)
 		local alert =
@@ -137,7 +141,7 @@ function Hud.Build(playerGui: Instance): ScreenGui
 		ring.Thickness = Theme.Line.Normal
 		ring.Parent = alert
 	end
-	-- The free gift, until it's claimed, then the daily gifts (the golden calendar): the rewards at the top.
+	-- The rewards at the top: the free gift until it's claimed, then the daily gifts' golden calendar.
 	local gift = UIKit.PictureButton(tiles, "GiftButton", Theme.Icons.MenuGift, PICTURE_SIZE, "GIFT")
 	gift.LayoutOrder = 0
 	alertOn(gift)
@@ -249,6 +253,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		noticeLabel.Position = UDim2.new(0.5, 0, 0, below + 64)
 		banner.Position = UDim2.new(0.5, 0, 0, below + 110)
 		tiles.Position = UDim2.fromOffset(8, below + 8)
+		tiles.Size = UDim2.new(0, PICTURE_SIZE + 12, 1, -(below + 8 + TILES_BOTTOM))
 	end)
 
 	-- Notices: one at a time, the rest queued (Shear a Sheep's HUD notices).
