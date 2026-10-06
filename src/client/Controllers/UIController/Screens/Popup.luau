@@ -119,6 +119,10 @@ function Popup.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		Celebrate = function(_self: any, title: string, line: string)
 			celebrate(title, line)
 		end,
+		-- The welcome-back card is up, waiting for Collect.
+		IsShowingCard = function(_self: any): boolean
+			return card.Visible
+		end,
 	}
 	return screen :: any
 end

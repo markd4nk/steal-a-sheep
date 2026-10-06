@@ -399,7 +399,8 @@ function Daily.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end)
 
 	-- Once a session: AutoOpenSeconds after a gift is waiting, as soon as the player is off the mountain, not carrying
-	-- a lamb, and no other menu is open.
+	-- a lamb, and nothing else is up (a menu, the welcome-back card), and then not straight after it: AFTER_BUSY later.
+	local AFTER_BUSY = 4
 	task.spawn(function()
 		local readySince: number? = nil
 		while gui.Parent do
@@ -416,11 +417,15 @@ function Daily.new(context: Types.Context, gui: ScreenGui): Types.Screen
 				readySince = since
 				local character = player.Character
 				local here = character and character:GetPivot().Position
+				local busy = context.Controllers.UIController:IsBusy()
+				if busy then
+					readySince = math.max(since, os.clock() - GameConfig.Daily.AutoOpenSeconds + AFTER_BUSY)
+				end
 				local calm = here ~= nil
 					and not Mountain.IsOnRamp(here)
 					and player:GetAttribute("Carrying") ~= true
-					and not context.Controllers.UIController:IsModalOpen()
-				if calm and os.clock() - since >= GameConfig.Daily.AutoOpenSeconds then
+					and not busy
+				if calm and os.clock() - (readySince or since) >= GameConfig.Daily.AutoOpenSeconds then
 					context.Open("Daily")
 					return
 				end

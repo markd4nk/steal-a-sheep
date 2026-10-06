@@ -218,6 +218,15 @@ function UIController.IsModalOpen(_self: any): boolean
 	return false
 end
 
+-- A menu is open, or a card that wants the player's tap (the welcome-back card): no menu should open by itself now.
+function UIController.IsBusy(_self: any): boolean
+	if UIController:IsModalOpen() then
+		return true
+	end
+	local popup = screens.Popup :: any
+	return popup ~= nil and popup.IsShowingCard ~= nil and popup:IsShowingCard()
+end
+
 function UIController.Notify(_self: any, message: string, kind: string, cue: string?)
 	notify(message, kind, cue)
 end

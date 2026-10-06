@@ -171,8 +171,8 @@ Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-g
   are rounded, so they may not add up to exactly 100%." under the odds.
 - **Names**: Eris's area is Chaos Rift and her Mythic shows as Mayhem Sheep (was "Discord"; the saved id is
   unchanged).
-- **Old price steps**: a 2x Speed step the player is past pays its Robux price in Climbing at the 1M-for-99 pack's
-  rate; a walker level they're past pays that level's cash price.
+- **Old price steps**: a 2x Speed step the player is past pays its Robux price in Climbing at the smallest Climbing
+  pack's rate (150K for 49); a walker level they're past pays that level's cash price.
 - **Signs in studs**: the plots' name signs 24 x 6.8, the stalls' names 15 x 3.5, the walkers' level tags 6.3 x 2.35,
   the same size as before at their usual distance and smaller further away.
 Calls in the Settings menu (2026-10-05, branch t3code/sheep-stud-style-mockups; the mock-up's A, agreed overnight with
