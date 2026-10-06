@@ -4,6 +4,10 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-06, version 20 published** (saved and published; Team Create): main d8fc2b3's five changed scripts set
+  in the cloud place (MountainService, GodService, MovementController, Utils/Mountain, Config/GameConfig) and
+  `Tests/Mountain.spec` added; first checked that the place held exactly main b87e808's scripts (115 the same, only
+  those five differing, nothing extra), after it 121 of 121 matching d8fc2b3. No Studio-side content changed.
 - **2026-10-06, version 8 published** (saved and published; Team Create): main 3667692's scripts swapped into the
   cloud place (127, 0 differences). Two Studio-side changes since version 5, both rerunnable:
   - **High Olympus rebuilt** for the gods' new order: `workspace.Stages.HighOlympus` now holds `Tier13 Hypnos` ...

@@ -16,6 +16,9 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## Live
 
+- **Private test version 20 (2026-10-06, 17:34 UTC)**: main @ d8fc2b3, version 8 plus the momentum slides (below);
+  nothing else in code went out since 8 (main's other commits since were art and docs). Roblox numbers Team Create's
+  autosaves too, so 9-19 were never published. Same place, audience still Private.
 - **Private test version 8 (2026-10-06)**: main @ 3667692, everything through the overnight work: one message per
   moment, the game's own prompt buttons, the Settings menu, studs on every sheep, the 30 gods as avatars in rank order
   with High Olympus rebuilt for it, the store's real products, the region check. No servers were running, so none to
@@ -91,7 +94,7 @@ lamb.
 - **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
   gods at one set speed; weight saved and tilting size odds (`Economy.RollWeight`, `SizeOdds`, for the Merge Shrine).
   GAME_DESIGN.md, *Climbing* and *Lamb weight*.
-- **Momentum slides** (2026-10-06, merged into main on the user's word): +15% of a slide's starting speed per sign
+- **Momentum slides** (2026-10-06, live in version 20): +15% of a slide's starting speed per sign
   passed, up to 100 studs/s (`Mountain.SlideBase`/`Momentum`); the god gets the same boost and keeps it through
   bumps; a bump is won back in 0.25 s and never trips you; the slide stops dead at the safety line. GAME_DESIGN.md,
   *Climbing*.
