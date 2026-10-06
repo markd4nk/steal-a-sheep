@@ -114,6 +114,8 @@ lamb.
 
 ## In progress
 
+- **Less hand-holding** (branch `t3code/b39d69ab`, not merged): no "in reach" notice; "Jump to get off" only on the
+  onboarding's first climb. The rest of the list waits on the user (HISTORY.md, top entry).
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).

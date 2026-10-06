@@ -143,6 +143,10 @@ confirmed or reversed it.
   E" (and holding at all: a click or E on a computer, a tap on a phone, with a proper UI), "Claim its reward there",
   "Climbing gets you up steeper slopes", "take it home" and the escape notice, "Put it down where you like", "Yours has
   your name over the gate", the grow-up celebration; "you get the gist".
+- **No hand-holding after onboarding (the user, 2026-10-06)**: "I don't want to tell the player anything that they
+  need to do besides just playing the game. After the onboarding, it should just be their own experience. They can
+  figure out how to do it." So no "<God>'s <Area> is in reach!", and no hint, tip or nudge that tells a player what to
+  do once the onboarding is over. Onboarding itself is the onboarding session's (`t3code/simplify-onboarding-guidance`).
 
 - **The overnight work as summarized, merged and shipped (the user, 2026-10-06)**: "Yes, it looks good. You can merge
   it... just ship it. It still needs to stay private though." So version 8 went out with the audience left Private:
@@ -524,7 +528,7 @@ Calls made building Climbing (2026-10-05):
 - **Gods**: 0.8 x the tier's SlideSpeed, 19 at tier 1 to 48 at tier 30; the tutorial lamb's god 0.7.
 - **Tier 1's sign is 25** (what the tutorial gives), so a high level speeds you up there too.
 - **On screen**: tier signs "<God>'s <Area> / Climbing N"; the HUD's goals "Train to climb", "Train for heavier
-  sheep", "Ready for the heaviest sheep"; "<God>'s <Area> is in reach!" when Climbing passes the next sign; the player
+  sheep", "Ready for the heaviest sheep"; the player
   list column is Climbing; the HUD pill reads CLIMBING; the wild lamb's card and the flock menu no longer name a burden.
 - **Server check**: a player found further up the ramp than their Climbing allows (30% slack, 10 studs or 1 second's
   lead for lag) is put back at their allowed spot.

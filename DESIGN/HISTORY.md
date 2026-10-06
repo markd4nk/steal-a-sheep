@@ -6,6 +6,20 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Less hand-holding after onboarding, first cuts (2026-10-06, branch `t3code/b39d69ab`)**. The user: after the
+  onboarding the game shouldn't tell players what to do ("no is in reach"), and asked for every other part of the UI
+  like that. Done alongside the onboarding session (`t3code/simplify-onboarding-guidance`), which owns `Hud.luau`.
+  - *Cut*: FlockService's "<God>'s <Area> is in reach!" notice when Climbing passed a sign (its per-player `ClimbTier`
+    state went with it; the `ClimbTier` attribute stays for the rare-spawn notice). TrainingService's "Jump to get off"
+    showed on the first climb of every session; now only while `Tutorial < 2` (the onboarding's first climb).
+  - *Cut by the onboarding session* in its `goal()` rewrite: "Put your sheep to work" (and the FLOCK glow) and "Train
+    to climb".
+  - *Listed for the user, untouched*: the Merge Shrine's "Bigger sheep in, more luck" and its empty-list lines, the
+    Sell Stall's "Tap the sheep to sell", the gift's "Tap here, or the star", refusals with advice tails ("Your flock
+    is full: merge or sell first"), the HUD's glows and red badges (GIFT, DAILY, SHEEPDEX), the training meter's
+    "Next: <God> at <N>", the rare-spawn notice.
+  - *Checked*: `check.ps1` passes. Not playtested: the cloud place's Studio was shared with seven busy sessions.
+
 - **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
   it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game
   page icon change yet; "set it to mild" (Fear) but no genre yet; "just ship it. It still needs to stay private".

@@ -49,7 +49,6 @@ type PlayerState = {
 	Arrivals: { [string]: Arrival },
 	Dirty: boolean,
 	Offline: { Coins: number, Matured: number }?,
-	ClimbTier: number,
 }
 
 local TICK = 1
@@ -176,11 +175,6 @@ local function push(player: Player)
 	state.Offline = nil
 	local reached = snapshot.ClimbTier
 	if type(reached) == "number" then
-		if reached > state.ClimbTier then
-			local tier = Olympus.Tiers[reached]
-			notify(player, `{tier.God}'s {tier.Area} is in reach!`, "Rare", "Upgrade")
-		end
-		state.ClimbTier = math.max(state.ClimbTier, reached)
 		player:SetAttribute("ClimbTier", reached)
 	end
 	player:SetAttribute("Income", snapshot.Income)
@@ -367,7 +361,6 @@ local function onLoaded(player: Player, data: any)
 		Arrivals = {},
 		Dirty = true,
 		Offline = nil,
-		ClimbTier = Economy.ClimbTier(data.ClimbPower),
 	}
 	-- A save from when the pen started smaller is brought up to today's start.
 	data.PenSlots = math.clamp(data.PenSlots, Economy.StartPens, Economy.MaxPens)
