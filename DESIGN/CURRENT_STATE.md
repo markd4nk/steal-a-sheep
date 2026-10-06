@@ -16,23 +16,23 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## Live
 
-- **Private test version 5 (2026-10-05)**: main @ 3989273, everything up to six sheep a tier and the new Sheepdex
-  (save schema 3); every server restarted onto it. "Steal a Sheep", universe 10769564664, place 114389615931493
+- **Private test version 8 (2026-10-06)**: main @ 3667692, everything through the overnight work: one message per
+  moment, the game's own prompt buttons, the Settings menu, studs on every sheep, the 30 gods as avatars in rank order
+  with High Olympus rebuilt for it, the store's real products, the region check. No servers were running, so none to
+  restart. "Steal a Sheep", universe 10769564664, place 114389615931493
   (`https://www.roblox.com/games/114389615931493`), owned by getajobgle (who owns Shear a Sheep's assets). Audience
-  Private: only the owner and people with edit permission can play. Max 5 players, Team Create on, Studio access to API
-  services on. Earlier: version 1 = 3c5ee43, version 4 = a71cab4 (2-3 were autosaves).
-  Each publish needs the user's OK.
-- **Maturity label: Mild** (questionnaire submitted 2026-10-05; answers in DECISIONS.md): Violence (Repeated/Mild),
-  no non-compliant regions. Limited or Public audience can now be set. It declares the paid random item (the Merge
-  Shrine) and that the game respects `ArePaidRandomItemsRestricted`, which only the next publish brings: publish
-  before opening the game to anyone.
-- **Store on Roblox** (2026-10-05): 49 developer products and 2 passes in the universe at Config/Store's prices, on
-  sale, Roblox's default picture; their ids are in `Config/Store` on branch `t3code/prepare-game-for-publishing`
-  (merged there from `t3code/publish-readiness-checklist`; not in main, not published: live servers still answer "Not
-  on sale yet"). Icons for all 51 are drawn, not uploaded (T3 Code attachments, `product_icons/`).
-- The main Studio is now that cloud place (Team Create: edits there last without a Save and ship with the next
-  publish). `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is
-  the local copy sessions build their own Studios from; the main checkout's was rebuilt from 3989273.
+  Private, on the user's word ("it still needs to stay private"): only the owner and people with edit permission can
+  play. Max 5 players, Team Create on, Studio access to API services on. Earlier: 4 = a71cab4, 5 = 3989273 (Roblox's
+  numbers count Team Create autosaves: 6 and 7 were). Each publish needs the user's OK.
+- **Maturity label: Mild** (questionnaire resubmitted 2026-10-06; answers in DECISIONS.md): Fear (Repeated/Mild) and
+  Violence (Repeated/Mild), no non-compliant regions. It declares the Merge Shrine as a paid random item and that the
+  game respects `ArePaidRandomItemsRestricted`, live since version 8. No genre yet (the user). Going public also needs
+  the owner account's checks (age check, and for all ages ID, 2-step verification, Plus or the 1,000 Robux fee).
+- **Store on Roblox**: 49 developer products and 2 passes at `Config/Store`'s prices, on sale and live in version 8;
+  Roblox's default pictures until the icons are uploaded (In progress).
+- The main Studio is that cloud place (Team Create: edits there last without a Save and ship with the next publish).
+  `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is the local
+  copy sessions build their own Studios from; the main checkout's was rebuilt from 3667692.
 
 ## The game, and where each part lives
 
@@ -55,8 +55,8 @@ lamb.
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
 - **Free gift** (favorite): Climbing and cash once (`Economy.GiftReward`), `GiftService`, `Screens/Gift`, the HUD's
-  GIFT button; Claim needs the game favorited (Roblox's prompt, or favorited before). The overnight branch dropped the
-  like step (Roblox's review policy forbids rewarding a thumbs up); main still asks for one.
+  GIFT button; Claim needs the game favorited (Roblox's prompt, or favorited before; the user keeps that gate). No like
+  step (Roblox's review policy forbids rewarding a thumbs up).
 - **Stair walker**: a StairMaster outside each pen by the gate (`PlotService/Walker`: five looks, the level floating
   over it, an upgrade sign with cash and Robux prompts); walk in to snap on, jump to get off (`TrainingService`); every
   client runs the steps and poses climbers' legs on them (`WalkerController`, `Utils/StairClimb`).
@@ -96,46 +96,31 @@ lamb.
 - **Merge Shrine** (merged 2026-10-05): the Laurel Ring replaces the
   Mutation Machine; three grown sheep of one family and cash make one rerolled lamb, carried home from the altar
   (GAME_DESIGN.md, *Merge Shrine*).
+- **The gods** (version 8): thirty in mythological rank, Pan tier 1 to Zeus 30, each a catalog-dressed Roblox avatar
+  (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load.
+- **What the HUD says** (version 8): one message per moment, hints only when needed (`Screens/Hud`, `goal()`); every
+  ProximityPrompt drawn as the menus' button for the device, press or tap (`PromptController/Look`). HISTORY.md, the
+  overnight entry.
+- **Settings menu** (version 8; `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound
+  effects in four steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in
+  the save, `SoundController` volumes).
+- **Studs on every sheep** (version 8): half-size copies of the map's `Studs` material over the wool (`Looks.Studs`,
+  `GameConfig.Sheep.Studs`), glowing on Neon wool, see-through on glass. The five MaterialVariants are made by
+  `studio/SheepStuds.luau` (in the cloud place since 2026-10-06); without them the wool stays plain and the server warns
+  once.
 
 ## In progress
 
-- **Overnight publish prep** (branch `t3code/prepare-game-for-publishing`, 2026-10-05, waiting for the user's
-  review, not merged): one message per moment (no always-on objective, hints only when needed), the game's own prompts
-  for each device (press or tap, no hold), Roblox-rules fixes (no reward for a like, exact merge odds, no "Discord"
-  names), a server audit's exploit fixes, phone layout and world-sign fixes, and the store products' ids. HISTORY.md
-  has the details, DECISIONS.md the calls to review.
-- **Release candidate** (branch `t3code/overnight-rc`, 2026-10-05, waiting for the user): the overnight publish prep
-  with the studs, the product icons' script and the Settings menu (`t3code/sheep-stud-style-mockups`) and the asset
-  audit, game page art tools and trailer (`t3code/order-olympian-gods`) merged in, tested together (84 unit tests, two
-  players, saving, test purchases, phone menus: HISTORY.md, the overnight entry). Shipping it needs
-  `studio/SheepStuds.luau` run on the cloud place first.
-- **Settings menu** (built 2026-10-05 on branch `t3code/sheep-stud-style-mockups`, not merged; its look waits for
-  Mark's OK, `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound effects in four
-  steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in the save,
-  `SoundController` volumes).
 - **Icons for the 49 products and 2 passes** (2026-10-05, files waiting for Mark's OK, not uploaded):
   `art/store/make_product_icons.py` writes them to `.t3/userdata/attachments/product_icons/` (HISTORY.md).
-- **The map's studs on every sheep** (built 2026-10-05, branch `t3code/sheep-stud-style-mockups`, not merged): half-size
-  copies of the map's `Studs` material over every sheep's wool (`Looks.Studs`, `GameConfig.Sheep.Studs`), glowing
-  studs on Neon wool, see-through studs on glass. The cloud place needs `studio/SheepStuds.luau` run in Edit before
-  the publish that ships it; without the materials the wool stays plain and the server warns once.
-
-- **Gods in rank order and Zeus as a Roblox avatar** (merged into main 2026-10-05 on the user's word):
-  `Config/Olympus` reordered (Pan tier 1 to Zeus 30), new High Olympus stretches for the eleven Olympians who moved
-  up; Zeus a catalog-dressed avatar. Not in a published version yet.
-- **All 30 gods as Roblox avatars** (merged into main 2026-10-05 on the user's word, after their changes to Hebe and
-  Demeter): each god's catalog look in `GodService/Looks.luau`, its held symbol in `GodService/Props.luau`; all 30
-  load, 76 tests pass. Review shots: `studio/GodLineup.luau`. Not in a published version yet.
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
 
-- **Game page art and a trailer, first cuts** (overnight 2026-10-05, branch t3code/order-olympian-gods, nothing
-  uploaded): icon and thumbnail mock-ups (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The 9:16
-  cut still carries the game's APM music, which can't go to TikTok or Shorts (BRAIN trailers.md): it needs a licensed
-  track first.
-- **The Robux store sells once published**: the 2 passes and 49 developer products exist in universe 10769564664
-  with their ids in `Config/Store` here; live servers still run version 5 and answer "Not on sale yet".
+- **Game page art and a trailer, first cuts** (overnight 2026-10-05, nothing uploaded): icon and thumbnail mock-ups
+  (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and
+  thumbnails for now (2026-10-06). The 9:16 cut still carries the game's APM music, which can't go to TikTok or Shorts
+  (BRAIN trailers.md): it needs a licensed track first.
 
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
@@ -143,23 +128,21 @@ lamb.
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
   lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
-- Nothing from the daily gifts session (merged into main 2026-10-05 on the user's word). The published place (the
-  main Studio, Team Create) still holds main's scripts from before it until main is synced there and published.
+- Nothing from the daily gifts session (merged into main 2026-10-05 on the user's word).
 - **Six sheep a tier and the new Sheepdex** (merged 2026-10-05): each god's six families (`Config/Herds`), rolled for
   every wild lamb; fleeces Plain / Shiny / Royal; Sheepdex rewards claimed in the new Sheepdex (`SheepdexService`,
   save schema 3) with a herd gift for all six. HISTORY.md has the details. Zeus's Legendary is the Golden Ram (the
-  store's Robux sheep is the Golden Fleece). The gods' new order (t3code/order-olympian-gods) still has to merge for
-  tiers to match the lineup the user OK'd.
+  store's Robux sheep is the Golden Fleece).
 
 ## Not verified
 
 - **Studs on every sheep on a phone and in a live server**: seen in a Studio playtest and in Edit on all 183 families,
   not on a real device; their cost on a low-end phone wasn't measured (no extra parts, only materials).
-- **The live game itself**: the user has been in a live server (one player, moved onto version 5 by the restart), but
-  no agent has watched one: checked only in Studio on the cloud place (both bootstraps ready, 76 tests, ProfileStore
-  "data will be saved", no warnings). Unconfirmed in a real server: the debug panel staying hidden, the store's
-  "Not on sale yet", a save carried from version 4 to 5. Every asset (1,286: meshes, faces, sounds, catalog items)
-  loads in a Studio playtest (TESTING.md, Asset audit, 2026-10-05).
+- **The live game itself**: version 8 was checked only in a Studio playtest of the cloud place before its publish
+  (both bootstraps ready, 84 tests, all 30 gods as avatars, 121 of 121 wild lambs studded, ProfileStore "data will be
+  saved", a clean console); nobody has played it live yet. Unconfirmed in a real server: the debug panel staying
+  hidden, a real purchase, a save carried from version 5 to 8 (no schema change: Settings is filled in by Reconcile).
+  Every asset (1,286) loads in a Studio playtest (TESTING.md, Asset audit, 2026-10-05).
 
 - **Daily gifts over real days**: the 20-hour wait and the claims were tried with the debug day commands, not by
   waiting; keeping the day across a real rejoin is untested (the mock store). The HUD's wrapped column was seen on
@@ -169,7 +152,7 @@ lamb.
   step 1 in Studio, receipts saved (overnight branch); a real charge, a pass bought in game and receipts while away
   are untested. Store on a phone: Galaxy A06 sideways only.
 
-- **The Merge Shrine's region check** (`PolicyService`, 2026-10-05): not run in Studio or live yet.
+- **The Merge Shrine's region check** (`PolicyService`, live in version 8): not seen answering in a live server yet.
 - **Merge Shrine with two players** (another player mustn't see your picks, merge or lamb), **leaving with a lamb on
   the altar** (should go to the pen), **touch and gamepad** in its menu, and **a Titan's grow-up** (none rolled yet).
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
@@ -198,8 +181,8 @@ lamb.
 - **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
   teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
-- **The free gift's favorite prompt**: skipped in Studio before the publish (PlaceId 0); `PromptSetFavorite` in the
-  live game, its answer and the claim after it are untested.
+- **The free gift's favorite prompt**: `PromptSetFavorite` in the live game (version 8), its answer and the claim after
+  it are untested.
 - **Climbing in play**: playtested 2026-10-05 on tiers 1-3 and 6 with one player (TESTING.md); not on tiers 13-30,
   not with two players, not on touch or gamepad.
 - **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's

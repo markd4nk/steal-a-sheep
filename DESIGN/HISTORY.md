@@ -6,6 +6,25 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
+  it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game
+  page icon change yet; "set it to mild" (Fear) but no genre yet; "just ship it. It still needs to stay private".
+  - *Merge*: main fast-forwarded to `t3code/overnight-rc` (3667692): the publish prep, the studs, the Settings menu,
+    the gods' asset audit, game page tools and trailer on top of the avatar gods. `check.ps1` passes on main.
+  - *The cloud place* (the main Studio, Team Create; reopened at 00:05 after a mistaken close, BRAIN proposal S45):
+    main's 127 scripts swapped in (`rojo build tools/sync.project.json`, then `GetObjects` in Edit; 0 differences, none
+    missing or extra); High Olympus rebuilt in place for the gods' new order by `tools/UpperMountain.luau` (loaded as
+    `tools/preview-upper-mountain.luau` writes it); the five stud materials made by `studio/SheepStuds.luau`. Against a
+    fresh `build-place.ps1` build of main: the same 44,493 Workspace instances and names, every part's position and
+    size equal except High Olympus's clouds (STUDIO_CONTENT.md).
+  - *Checked*: a playtest of the cloud place: both bootstraps ready, 84 tests, all 30 gods as avatars, 121 of 121 wild
+    lambs studded, "data will be saved", a clean console; no `TEMP_` instances or debug attributes after it.
+  - *Shipped*: File > Save to Roblox, then Publish to Roblox: "Place published. Editors can now play this place in
+    Roblox", version 8 (Team Create had autosaved the edits as 8 at 08:42; published 08:51). Version History marks 8
+    published. No servers were running, so none restarted. The audience stays Private.
+  - *Questionnaire*: restarted and answered as before except Fear: Yes, Mild, Repeated. The label is still Mild, now
+    with Fear (Repeated/Mild) beside Violence (Repeated/Mild), confirmed after a reload.
+
 - **Overnight publish prep (2026-10-05, branch `t3code/prepare-game-for-publishing`)**. The user asked an overnight
   session to answer the other sessions for them, then fill the gaps so the game is ready to publish, all on a branch
   for their approval in the morning. It merged the store products' branch (`t3code/publish-readiness-checklist`) and

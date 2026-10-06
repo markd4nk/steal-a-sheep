@@ -89,8 +89,9 @@ confirmed or reversed it.
 - **The free gift (2026-10-05)**: worth 3 minutes of the player's stair walker in Climbing and 3 minutes of their
   income in cash, at least 500 of each, so it keeps up with them (the user: "I do like how the reward size is always
   adjusting"); the look with both rewards on one cyan stage and the steps as lit-up pictures of Roblox's game page.
-  Only the favorite can register (no game can see a like). The like step was taken out overnight on 2026-10-05
-  for Roblox's review policy (To review).
+  Only the favorite can register (no game can see a like). The like step is gone (Roblox's review policy forbids
+  rewarding a thumbs up; the user OK'd it, 2026-10-06), and **Claim still needs the favorite**: "that's something that
+  actually is allowed because some games do it" (the user, 2026-10-06). Don't raise it again.
 - **The Merge Shrine is a gamble, like Steal an Egg's Fuse Machine (the user, 2026-10-05).** It replaced Shear a
   Sheep's Mutation Machine in the hub. The model is mock-up C, the **Laurel Ring**: a round dais, three pedestals round
   a centre altar, three fire columns and a floating laurel crown. **The pole of light and the orb exist only during a
@@ -143,13 +144,18 @@ confirmed or reversed it.
   "Climbing gets you up steeper slopes", "take it home" and the escape notice, "Put it down where you like", "Yours has
   your name over the gate", the grow-up celebration; "you get the gist".
 
-## To review
+- **The overnight work as summarized, merged and shipped (the user, 2026-10-06)**: "Yes, it looks good. You can merge
+  it... just ship it. It still needs to stay private though." So version 8 went out with the audience left Private:
+  publishing a new version is fine on their word, opening the game to players isn't yet. The overnight calls below
+  (publish prep, Settings, studs) are confirmed with it; the product icons' OK came in the studs session's thread.
+- **The game page keeps Roblox's default icon and thumbnails for now** (the user, 2026-10-06: "I wouldn't change any of
+  the icons just yet"); the mock-ups in T3 Code's attachments (`gamepage_*`) wait.
+- **Creator Hub (the user, 2026-10-06)**: Fear answered Mild in the questionnaire ("set it to mild"); **no genre yet**
+  ("don't tick the genre yet"). VR stays ticked (not raised).
 
-Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-game-for-publishing`):
+Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-game-for-publishing`; confirmed
+2026-10-06 with the overnight work):
 
-- **The free gift no longer asks for a like** (reverses part of a confirmed rule): Roblox's review policy forbids
-  rewarding a thumbs up. Favoriting still unlocks Claim; no rule names favorites, but it's the same pattern, so the
-  safest step would be letting everyone claim and making the favorite an optional button.
 - **When the hint shows**: Put your sheep to work for 12 s after room opens up in the pen (pen space bought, sheep
   merged away) while sheep are stored, not after a sheep is stored on purpose; the FLOCK button glows meanwhile.
   Train to climb while the slope holds the player under half speed on tier 2 and up (off the walker, not carrying).
@@ -183,8 +189,8 @@ Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-g
   its picture and words in a row; the Merge button stands under the shrine's list where the odds and the button
   don't fit one above the other (the odds keep the left side, shrinking only if they must).
 
-Calls in the Settings menu (2026-10-05, branch t3code/sheep-stud-style-mockups; the mock-up's A, agreed overnight with
-the coordinator, waiting for Mark's OK):
+Calls in the Settings menu (2026-10-05; the mock-up's A, agreed overnight with the coordinator; confirmed 2026-10-06
+with the overnight work):
 
 - **The gear sits in Roblox's top bar**, beside its buttons, round and dark like them; it's there from the first
   second, before the HUD's menu pictures show. The other place mocked up: after the cash pill.
@@ -202,7 +208,7 @@ Calls in the store's product and pass icons (2026-10-05, files waiting for Mark'
 - **The two Robux sheep have the store art's ink outline** (the Golden Fleece vanished into its gold card without it),
   and no studs on their wool, which the game's sheep get on the studs branch.
 
-Calls in the studs on every sheep (2026-10-05, branch t3code/sheep-stud-style-mockups, not merged):
+Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 2026-10-06):
 
 - **What counts as wool**: the puffs (and anything hanging off them), the tail, and add-on pieces tinted as wool.
   Horns, hats, halos, wings and other extras stay smooth, as do the face, ears, legs and body.
@@ -213,6 +219,8 @@ Calls in the studs on every sheep (2026-10-05, branch t3code/sheep-stud-style-mo
 - **Royal (gold) fleeces and silver paints** take metal studs; on glowing or glass families the Royal gold replaces the
   glow or the see-through look, as the gold paint already did.
 - Any other wool material keeps its look without studs (none uses one today).
+
+## To review
 
 Calls in the trailer's first cut (2026-10-05, overnight; `trailer/stealasheep.md`, nothing uploaded):
 
@@ -336,13 +344,15 @@ out based off what you know"). Restarting the questionnaire asks everything agai
 only what's new.
 
 - **Answers**: Violence yes, Mild, Repeated (sliding into players knocks them back; the gods chase and catch thieves);
-  Blood no; Fear no (cartoon-angry gods and chase music, not horror); Crude humor no; Unplayable gambling no; Strong
+  Blood no; Fear yes, Mild, Repeated (since 2026-10-06, the user's OK: the chase music and its sting on every steal,
+  the angry gods, Thanatos's ghosts and skeletons; it was "no" at first); Crude humor no; Unplayable gambling no; Strong
   language no; Romance no (the Cupid sheep's hearts aren't romance); Alcohol no (Dionysus's herd has grapes, no wine);
   Social hangout no; Free-form user creation no; Sensitive issues no (Greek myth isn't a current polarising issue);
   Cross-experience content no; AI interaction no; Paid random items yes (the Merge Shrine: cash, which the store sells
   for Robux, rolls a random lamb) and it respects `ArePaidRandomItemsRestricted`; Paid item trading no (stealing isn't
-  trading); Media sharing no; Continuous media feed no. Result: **Mild**, Violence (Repeated/Mild), no non-compliant
-  regions. Answering Violence "no" would have given Minimal; Mild was the honest reading of slide knockback.
+  trading); Media sharing no; Continuous media feed no. Result: **Mild**, Fear (Repeated/Mild) and Violence
+  (Repeated/Mild), no non-compliant regions. Answering Violence "no" would have given Minimal; Mild was the honest
+  reading of slide knockback.
 - **The Merge Shrine is closed to players whose region restricts paid random items**: Merge answers "Merging isn't
   available in your region". It also stays closed while Roblox's answer is unknown (three tries, 5 s apart).
 - **Product names and lines** (what Roblox's purchase dialog shows): "Golden Fleece Sheep" / "Kronos Sheep" ("A sheep
