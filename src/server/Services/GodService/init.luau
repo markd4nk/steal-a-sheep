@@ -18,8 +18,9 @@ local Rig = require(script.Rig)
 -- The thirty gods, one per tier, all on one state machine: Idle at home, Alert (the thief's head start), Chase along
 -- the ramp, Catch or Disengage, then Return home. A god chases only thieves of its own tier, nearest first with a short
 -- lock on its target, down the whole descent until they cross the foothill safety line. It moves along the floor itself
--- (no pathfinding to get stuck) at one set speed for the whole chase (Economy.GodSpeed), like Steal an Egg's guardians:
--- never scaled by the thief, nor by the stretch it's on. A catch needs the target within reach and nothing solid
+-- (no pathfinding to get stuck) at its set speed (Economy.GodSpeed), like Steal an Egg's guardians, times its thief's
+-- momentum where they are: never slower than its set speed, never scaled by the stretch it's on. A catch
+-- needs the target within reach and nothing solid
 -- between them. Each god is a Roblox avatar (Avatar, Looks), or its block figure (Rig) if the catalog won't load.
 local GodService = {
 	Name = "GodService",
@@ -112,6 +113,21 @@ local function stepTowards(god: God, goal: Vector3, distance: number): number
 	return remaining - move.Magnitude
 end
 
+-- How many times its set speed a god chasing `player` runs: the thief's momentum where they are (Mountain.Momentum,
+-- from this god's tier, on the slide base of the lamb they carry). Both grow by the same share, so a clean chase ends
+-- where it would without momentum, only sooner; the god keeps its boost through a thief's bump, so a bump costs ground.
+local function momentumOf(god: God, player: Player, x: number): number
+	local climb = player:GetAttribute("ClimbPower")
+	local weight = player:GetAttribute("CarryWeight")
+	local tier = god.Tier.Tier
+	local base = Mountain.SlideBase(
+		if type(climb) == "number" then climb else 0,
+		tier,
+		if type(weight) == "number" then weight else 1
+	)
+	return Mountain.Momentum(base, tier, x)
+end
+
 local function eligible(god: God, player: Player): boolean
 	local root = rootOf(player)
 	return god.Thieves[player] == true and root ~= nil and root.Position.X >= Olympus.SafeLineX
@@ -187,9 +203,8 @@ local function update(god: God, dt: number, now: number)
 	if target and god.Mood ~= "Alert" then
 		setMood(god, "Run")
 		local root = rootOf(target) :: BasePart
-		local speed = if god.Gentle[target]
-			then god.Tier.SlideSpeed * TUTORIAL_SHARE
-			else Economy.GodSpeed(god.Tier.Tier)
+		local set = if god.Gentle[target] then god.Tier.SlideSpeed * TUTORIAL_SHARE else Economy.GodSpeed(god.Tier.Tier)
+		local speed = set * momentumOf(god, target, root.Position.X)
 		god.Model:SetAttribute("Speed", speed)
 		stepTowards(god, root.Position, speed * dt)
 		local offset = root.Position - (god.At + Vector3.new(0, god.Hip, 0))

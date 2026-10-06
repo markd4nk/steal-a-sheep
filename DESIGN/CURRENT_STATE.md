@@ -91,6 +91,10 @@ lamb.
 - **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
   gods at one set speed; weight saved and tilting size odds (`Economy.RollWeight`, `SizeOdds`, for the Merge Shrine).
   GAME_DESIGN.md, *Climbing* and *Lamb weight*.
+- **Momentum slides** (2026-10-06, merged into main on the user's word): +15% of a slide's starting speed per sign
+  passed, up to 100 studs/s (`Mountain.SlideBase`/`Momentum`); the god gets the same boost and keeps it through
+  bumps; a bump is won back in 0.25 s and never trips you; the slide stops dead at the safety line. GAME_DESIGN.md,
+  *Climbing*.
 - **Sell Stall** (`UIController/Screens/SellStall`, `FlockService.Sell`, `Roster.CanSell`): the stall's prompt opens
   the stored sheep as cards; tap them or Select all, one Sell after a confirm, two minutes of income each. Sheep in the
   pen never show and the server refuses them; the Flock menu no longer sells.
@@ -189,6 +193,9 @@ lamb.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
 - **The free gift's favorite prompt**: `PromptSetFavorite` in the live game (version 8), its answer and the claim after
   it are untested.
+- **Momentum slides in play**: a tier 20 chase (the god 43 -> 69 studs/s with its thief, caught on tier 16) and tier 3
+  runs to the line in a Studio copy (TESTING.md); not a full Zeus run through the map's trees, not two players, not
+  touch or gamepad, not how 100 studs/s feels to steer.
 - **Climbing in play**: playtested 2026-10-05 on tiers 1-3 and 6 with one player (TESTING.md); not on tiers 13-30,
   not with two players, not on touch or gamepad.
 - **Upper tiers by foot**: tiers 7-12 weren't climbed on foot; tiers 13, 29 and 30 were (15 s a stretch, onto Zeus's
@@ -206,14 +213,15 @@ lamb.
   players steer round them; lanes stay as they are until the user adds obstacles (DECISIONS.md). Every run
   from High Olympus now passes through them: a straight slide from Zeus stuck on stage 6's pavilion (x 1890, mid-lane)
   and was caught. High Olympus's own lane is clear.
-- **Long runs at the top**: about 7.6 minutes' climb to Zeus and about 2.5 minutes' slide home; the user keeps it all on
-  foot (DECISIONS.md).
+- **Long runs at the top**: about 7.6 minutes' climb to Zeus; the slide home is 2.7 minutes at his sign's number (6.8
+  one sign short) on main, 1.5 (2.6) with the momentum branch. The user keeps it all on foot (DECISIONS.md).
 - **High Olympus is sparse**: the user will add obstacles to the higher levels later.
 - **Pacing (2026-10-05 simulation)**: with walker upgrades at 10x, an efficient player reaches Zeus in about 6.5 hours
   (a real one maybe 2-3x that), Climbing about 1.3-5x the next sign. Trail prices are fixed and unreviewed (the user
   hasn't set them yet).
 - **Very fast slides meet the trees hard**: at 150+ studs/s a slide that clips a tree stops dead and its god catches
-  up (seen at x 944 on tier 3). Same decor issue, felt more at high speed.
+  up (seen at x 944 on tier 3). Same decor issue, felt more at high speed. Momentum takes many more slides to 100 on
+  the map's tree-filled stages: no straight lane runs clear from x 2300 down (raycast scan, 2026-10-06).
 - **Plots: 5.** The place's Maximum Visitor Count is 5 (Creator Hub); a sixth player would be kicked with "server full".
 - **Asset ownership**: the sheep meshes, faces, UI images and sounds are uploads by getajobgle, the account that owns
   the game too. Publish it under that account only.

@@ -36,10 +36,17 @@ confirmed or reversed it.
   open; steeper tiers need more and more Climbing to climb at a useful pace. Too little gives a very slow crawl, never
   a slip back down, so it's technically possible but nobody wants to, and a thief that weak is caught carrying the lamb
   down. No delivery lock between tiers. No god lunge.
-- **Your speed vs its speed, like Steal an Egg (2026-10-05)**: each god has one set speed for the whole chase (never
-  slower in lower stretches, never a walking speed); the thief's escape speed comes from Climbing; a slide keeps the
-  speed it starts with all the way down (momentum). Checked against Steal an Egg: each zone has its own guardian,
-  faster higher up, never scaled to the player; you escape with enough Speed over the zone's minimum.
+- **Momentum on the way down, the god too (2026-10-06)**: the user found the slide from the top "very, very slow all
+  the way down" and boring; wanted it to get faster going down "so it feels like momentum", the god speeding up as
+  well so a thief who isn't at the tier's level still can't get away just by reaching the lower tiers; one bump
+  must bring the god closer, never be an instant loss, but the god mustn't drop back to its normal speed either ("it
+  can maybe drop a little bit ... but not a full reset", or a bump means nothing); recovery from a bump almost
+  instant, never lying on the floor for two seconds; and the slide stops dead at the safety line ("they begin
+  walking and it no longer carries them into random pens"). Napkin math, as few numbers as possible.
+- **Your speed vs its speed, like Steal an Egg (2026-10-05)**: each god has its set speed (never slower in lower
+  stretches, never a walking speed; since 2026-10-06 boosted by its thief's momentum, above); the thief's escape speed
+  comes from Climbing and is where a slide's speed starts. Checked against Steal an Egg: each zone has its own
+  guardian, faster higher up, never scaled to the player; you escape with enough Speed over the zone's minimum.
 - **One speed rule (2026-10-05)**: your speed on a tier comes from Climbing / (its sign number x the lamb's weight),
   as few numbers as possible. No cap on the mountain: more Climbing keeps making you faster. Walking in the safe zone
   (the plots and hub) is capped at 7x normal; tier 1 and the safe zone never go below normal. The sign's number is
@@ -230,6 +237,20 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
   lamb").
 
 ## To review
+
+Calls in the momentum slide (2026-10-06, `Mountain.Momentum`, `GodService` pace):
+
+- **+15% of the starting speed per sign passed, up to 100 studs/s.** From Zeus's pasture empty-handed: 1.5 min home at
+  his sign's number (was 2.7), 2.6 min one sign short (was 6.8). 100 stays under the ~150 where a tree stops a slide
+  dead; if 100 feels twitchy among the map's trees, 80 gives 1.7 min from Zeus.
+- **Counted from the lamb's tier when carrying, from where the slide began empty-handed**, so an empty-handed slide
+  that stops dead (stuck half a second) starts its momentum over; a carrier's comes straight back.
+- **The god keeps its full boost through a thief's bump; the thief is back to speed in 0.25 s** (was 2 s) and never
+  trips over (Roblox's FallingDown and Ragdoll states off). Simulated at Zeus's sign with the lightest lamb (the
+  closest chase there is), 58 studs ahead clean: three 0.1 s knocks leave 19, two 0.3 s stops 9, one 0.6 s stop 21;
+  one more of each is caught (before momentum, a second bump of any kind was). I picked no drop at all for the god
+  rather than a small one: one number fewer, and the bump still costs ground.
+- **The safety line stops a slide dead** (its speed along the ground zeroed), then normal walking: no run-out.
 
 Calls in the trailer's first cut (2026-10-05, overnight; `trailer/stealasheep.md`, nothing uploaded):
 
