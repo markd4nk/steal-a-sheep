@@ -48,6 +48,11 @@ local commands: { [string]: Command } = {
 		end
 		return false, "no ready lamb on that tier"
 	end,
+	-- Back inside the player's own gate (a carried lamb stays on their head), as the server's own teleports do.
+	Home = function(player)
+		registry.PlotService:SendHome(player)
+		return true, nil
+	end,
 	-- value: how many times normal speed the player moves (1 for normal), for this play session.
 	SetSpeed = function(player, value)
 		local boost = math.clamp(value or 1, 0.1, 20)

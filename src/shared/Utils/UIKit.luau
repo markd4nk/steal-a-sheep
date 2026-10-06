@@ -1780,7 +1780,7 @@ function UIKit.Arrow(parent: Instance?, name: string, kind: ArrowKind): Frame
 	UIKit.List(arrow, false, 6, Enum.HorizontalAlignment.Center)
 	if wolf then
 		local size = TextSize.Title + 4
-		local label = UIKit.Text(arrow, "Label", "WOLF!", size, wolfColor, UDim2.fromOffset(0, size + 6), {
+		local label = UIKit.Text(arrow, "Label", "", size, wolfColor, UDim2.fromOffset(0, size + 6), {
 			Stroke = Color.Line,
 			Auto = Enum.AutomaticSize.X,
 			Order = 1,
@@ -1791,7 +1791,7 @@ function UIKit.Arrow(parent: Instance?, name: string, kind: ArrowKind): Frame
 		end
 	else
 		local size = TextSize.Title
-		local label = UIKit.Text(arrow, "Label", "Shear it!", size, Color.Snow, UDim2.fromOffset(0, size + 16), {
+		local label = UIKit.Text(arrow, "Label", "", size, Color.Snow, UDim2.fromOffset(0, size + 16), {
 			Stroke = Color.Ink,
 			Auto = Enum.AutomaticSize.X,
 			Order = 1,
@@ -1829,18 +1829,10 @@ end
 -- The raid's line: plain red words with the red notices' black edge, straight over the game, with no box or wolf face
 -- (Mark, 2026-10-03). The TextLabel itself.
 function UIKit.Banner(parent: Instance?, name: string): TextLabel
-	local banner = UIKit.Text(
-		parent,
-		name,
-		"RAID! A wolf is after your sheep!",
-		TextSize.Big,
-		Color.Red500,
-		UDim2.fromOffset(0, TextSize.Big + 6),
-		{
-			Stroke = Color.Line,
-			Auto = Enum.AutomaticSize.X,
-		}
-	)
+	local banner = UIKit.Text(parent, name, "", TextSize.Big, Color.Red500, UDim2.fromOffset(0, TextSize.Big + 6), {
+		Stroke = Color.Line,
+		Auto = Enum.AutomaticSize.X,
+	})
 	banner.Visible = false
 	return banner
 end

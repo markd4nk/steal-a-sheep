@@ -1,13 +1,11 @@
 --!strict
 
 local AvatarEditorService = game:GetService("AvatarEditorService")
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
-local Mountain = require(ReplicatedStorage.Utils.Mountain)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Theme = require(ReplicatedStorage.Config.Theme)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -20,7 +18,7 @@ local Types = require(script.Parent.Parent.Types)
 -- The free gift, in the Shop's look (a Prize Fleece menu): what it gives, big on a stage of rays; the two steps (like
 -- the game, favorite it), each a picture of Roblox's own game page with the button to tap lit up; and Claim. Claim (or
 -- tapping the favorite step) opens Roblox's favorite prompt and claims once that says yes. No game can see a like, so
--- the like is asked, not checked. Opens by itself once a session until it's claimed (GameConfig.Gift).
+-- the like is asked, not checked. It never opens by itself: the HUD's GIFT glows until it's claimed.
 local Gift = {}
 
 local Color = Theme.Color
@@ -152,9 +150,8 @@ function Gift.Build(playerGui: Instance): ScreenGui
 	steps.LayoutOrder = 2
 	UIKit.Grow(steps)
 	UIKit.List(steps, true, 12)
-	step(steps, "LikeStep", "1", "Like the game", LIKE_PICTURE, "Tap 👍 on the game's page")
-	local favorite =
-		step(steps, "FavoriteStep", "2", "Favorite the game", FAVORITE_PICTURE, "Tap here, or ⭐ on its page")
+	step(steps, "LikeStep", "1", "Like the game", LIKE_PICTURE, "Thumbs up on its page")
+	local favorite = step(steps, "FavoriteStep", "2", "Favorite the game", FAVORITE_PICTURE, "Tap here, or the star")
 	local tap = Instance.new("TextButton")
 	tap.Name = "FavoriteButton"
 	tap.Text = ""
@@ -176,7 +173,6 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local window = panel.Window
 	local stateController = context.Controllers.StateController
 	local sound = context.Controllers.SoundController
-	local player = Players.LocalPlayer
 	local climbLabel = window:FindFirstChild("ClimbLabel", true) :: TextLabel
 	local coinLabel = window:FindFirstChild("CoinLabel", true) :: TextLabel
 	local claimButton = window:FindFirstChild("ClaimButton", true) :: TextButton
@@ -292,32 +288,6 @@ function Gift.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			refresh()
 		end
 	end))
-
-	-- Once a session: AutoOpenSeconds after it could first be claimed, as soon as the player is off the mountain, not
-	-- carrying a lamb, and no other menu is open.
-	task.spawn(function()
-		local readySince: number? = nil
-		while gui.Parent do
-			local data = stateController:Get()
-			if data.FreeGift ~= false or (data.Tutorial or 0) < 1 then
-				readySince = nil
-			else
-				local since = readySince or os.clock()
-				readySince = since
-				local character = player.Character
-				local here = character and character:GetPivot().Position
-				local calm = here ~= nil
-					and not Mountain.IsOnRamp(here)
-					and player:GetAttribute("Carrying") ~= true
-					and not context.Controllers.UIController:IsModalOpen()
-				if calm and os.clock() - since >= GameConfig.Gift.AutoOpenSeconds then
-					context.Open("Gift")
-					return
-				end
-			end
-			task.wait(1)
-		end
-	end)
 
 	return {
 		Modal = true,

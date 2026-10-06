@@ -5,18 +5,18 @@ local ProximityPromptService = game:GetService("ProximityPromptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
-local Olympus = require(ReplicatedStorage.Config.Olympus)
 local PenArea = require(ReplicatedStorage.Utils.PenArea)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local Look = require(script.Look)
 
--- The world's prompts on this device: a station's (Opens: Shop, Sell, Merge) opens its screen, another player's
--- tutorial lamb can't be stolen here (the server refuses it too), and no lamb offers itself while the player carries
--- one. Inside their own fence with a lamb, the lamb on their head offers Put down: a prompt only this device has, which
--- asks the server (Remotes.PutDown) to deliver it there. Only the owner sees their stair walker sign's upgrade prompts.
+-- The world's prompts on this device, drawn in the game's own look (Look): a station's (Opens: Shop, Sell, Merge)
+-- opens its screen, another player's tutorial lamb can't be stolen here (the server refuses it too), and no lamb offers
+-- itself while the player carries one. Inside their own fence with a lamb, the lamb on their head offers Put down: a
+-- prompt only this device has, which asks the server (Remotes.PutDown) to deliver it there. Only the owner sees their
+-- stair walker sign's upgrade prompts.
 local PromptController = { Name = "PromptController" }
 
 local OPENS: { [string]: { Screen: string, Options: { [string]: any }? } } = {
@@ -30,6 +30,65 @@ local registry: Lifecycle.Registry = {}
 local trove = Trove.new()
 local player = Players.LocalPlayer
 local putDownPrompt: ProximityPrompt? = nil
+-- The prompts showing now, each with what draws it.
+type Drawn = { Trove: typeof(Trove.new()), Billboard: BillboardGui }
+local shown: { [ProximityPrompt]: Drawn } = {}
+
+-- Roblox draws no prompt of its own: each is the game's (the server makes them Custom too; this catches any it missed).
+local function customise(descendant: Instance)
+	if descendant:IsA("ProximityPrompt") and descendant.Style ~= Enum.ProximityPromptStyle.Custom then
+		descendant.Style = Enum.ProximityPromptStyle.Custom
+	end
+end
+
+-- Side by side when several show on one spot, in their keys' order (E before R).
+local function arrange(spot: Instance?)
+	if not spot then
+		return
+	end
+	local together: { ProximityPrompt } = {}
+	for prompt in shown do
+		if prompt.Parent == spot then
+			table.insert(together, prompt)
+		end
+	end
+	table.sort(together, function(a: ProximityPrompt, b: ProximityPrompt)
+		return a.KeyboardKeyCode.Value < b.KeyboardKeyCode.Value
+	end)
+	local billboards: { BillboardGui } = {}
+	for _, prompt in together do
+		table.insert(billboards, shown[prompt].Billboard)
+	end
+	Look.Arrange(billboards)
+end
+
+local function hide(prompt: ProximityPrompt)
+	local drawn = shown[prompt]
+	if drawn then
+		shown[prompt] = nil
+		drawn.Trove:Destroy()
+		arrange(prompt.Parent)
+	end
+end
+
+local function show(prompt: ProximityPrompt, inputType: Enum.ProximityPromptInputType)
+	hide(prompt)
+	local trove, billboard = Look.Show(prompt, inputType, Look.Container())
+	local drawn = { Trove = trove, Billboard = billboard }
+	shown[prompt] = drawn
+	arrange(prompt.Parent)
+	-- Its words can change while it shows (the walker sign's price after an upgrade): drawn again.
+	local function redraw()
+		if shown[prompt] == drawn then
+			show(prompt, inputType)
+		end
+	end
+	trove:Connect(prompt:GetPropertyChangedSignal("ActionText"), redraw)
+	trove:Connect(prompt:GetPropertyChangedSignal("ObjectText"), redraw)
+	trove:Connect(prompt.Destroying, function()
+		hide(prompt)
+	end)
+end
 
 local function refreshPrompt(prompt: ProximityPrompt)
 	if prompt.Name ~= "StealPrompt" then
@@ -118,13 +177,12 @@ local function refreshPutDown()
 		return
 	end
 	dropPutDown()
-	local family = player:GetAttribute("CarriedFamily")
+	-- The verb only: the carry card names the lamb.
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "PutDownPrompt"
+	prompt.Style = Enum.ProximityPromptStyle.Custom
 	prompt.ActionText = "Put down"
-	prompt.ObjectText = if type(family) == "string" and Olympus.ByFamily[family]
-		then (string.gsub(Economy.FamilyName(family), "Sheep$", "Lamb"))
-		else ""
+	prompt.ObjectText = ""
 	prompt.HoldDuration = 0
 	prompt.KeyboardKeyCode = Enum.KeyCode.E
 	prompt.GamepadKeyCode = Enum.KeyCode.ButtonX
@@ -143,6 +201,12 @@ function PromptController.Init(_self: any, systems: Lifecycle.Registry)
 end
 
 function PromptController.Start(_self: any)
+	trove:Connect(workspace.DescendantAdded, customise)
+	for _, descendant in workspace:GetDescendants() do
+		customise(descendant)
+	end
+	trove:Connect(ProximityPromptService.PromptShown, show)
+	trove:Connect(ProximityPromptService.PromptHidden, hide)
 	trove:Connect(ProximityPromptService.PromptTriggered, function(prompt: ProximityPrompt)
 		local opens = prompt:GetAttribute("Opens")
 		local spec = if type(opens) == "string" then OPENS[opens] else nil
@@ -200,6 +264,9 @@ end
 function PromptController.Destroy(_self: any)
 	trove:Clean()
 	dropPutDown()
+	for prompt in shown do
+		hide(prompt)
+	end
 end
 
 return PromptController

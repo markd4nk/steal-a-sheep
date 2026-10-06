@@ -579,11 +579,8 @@ function Sheepdex.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			refresh()
 			return
 		end
+		-- The reward tiles beside the button already say what it gave.
 		sound:Play("RevealCoins")
-		panel.Status(
-			`+{Format.Short(Economy.DexReward(family))} cash, +{Format.Short(Economy.DexClimb(family))} Climbing`,
-			"Good"
-		)
 	end)
 	if panel.CloseButton then
 		trove:Connect(panel.CloseButton.Activated, function()

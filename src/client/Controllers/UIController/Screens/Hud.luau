@@ -21,14 +21,16 @@ local SheepIcon = require(script.Parent.Parent.SheepIcon)
 local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
--- The HUD in Shear a Sheep's Ranch Studs look: coins (with the flock's income) and Climbing at the top right, the
--- one-line objective under the top bar, the menu pictures down the left (shown after the first delivery), notices,
--- the friend boost's tile under them (tap to invite), the chase banner, a guide arrow to the next thing to do, the card of the lamb being carried (with Return), and the
--- stair walker's meter while training.
+-- The HUD in Shear a Sheep's Ranch Studs look: coins (with the flock's income) and Climbing at the top right, a hint
+-- under the top bar only when one is needed (with a guide arrow for the first lamb and the first training), the menu
+-- pictures down the left (shown after the first delivery), notices, the friend boost's tile under them (tap to invite),
+-- the chase banner, the card of the lamb being carried (with Return), and the stair walker's meter while training.
 local Hud = {}
 
 local PICTURE_SIZE = 66
 local TILES_BOTTOM = 70 -- the menu pictures stop this far above the bottom, clear of a phone's thumbstick
+local WORK_HINT_SECONDS = 12 -- "Put your sheep to work" shows this long after room opens up in the pen
+local CRAWL_SHARE = 0.5 -- climbing slower than this share of normal speed: "Train to climb"
 local Color = Theme.Color
 local TextSize = Theme.TextSize
 
@@ -95,7 +97,7 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	notice.AnchorPoint = Vector2.new(0.5, 0)
 	notice.Position = UDim2.new(0.5, 0, 0, 120)
 
-	-- The objective (Shear a Sheep's guide line): what to do, how, and a bar for a Climbing goal.
+	-- The hint (Shear a Sheep's guide line): one short line, only while something needs doing.
 	local objective = UIKit.Frame(root, "Objective", UDim2.fromOffset(0, 0))
 	objective.AnchorPoint = Vector2.new(0.5, 0)
 	objective.Position = UDim2.new(0.5, 0, 0, 60)
@@ -108,15 +110,6 @@ function Hud.Build(playerGui: Instance): ScreenGui
 		Auto = Enum.AutomaticSize.X,
 		Order = 1,
 	})
-	UIKit.Text(objective, "SubLabel", "", TextSize.Label, Color.Snow, UDim2.fromOffset(0, TextSize.Label + 6), {
-		Font = Theme.Font.TextHeavy,
-		Stroke = Color.Line,
-		Auto = Enum.AutomaticSize.X,
-		Order = 2,
-	})
-	local bar = UIKit.Bar(objective, "Bar", UDim2.fromOffset(180, 10))
-	bar.LayoutOrder = 3
-	bar.Visible = false
 
 	-- The menu pictures down the left edge, as far as the bottom margin: on a short screen (a phone held sideways) the
 	-- rest wrap into a second column beside the first.
@@ -198,18 +191,13 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	local giveUp = UIKit.Button(carry, "ReturnButton", "Soft", 110, Theme.ButtonHeight.Standard, "Return")
 	giveUp.LayoutOrder = 3
 
-	-- The stair walker's meter, while training.
+	-- The stair walker's meter, while training: a bar to the next god's sign (the rate is on the Climbing counter).
 	local meter = UIKit.Frame(root, "TrainMeter", UDim2.fromOffset(300, 0))
 	meter.AnchorPoint = Vector2.new(0.5, 1)
 	meter.Position = UDim2.new(0.5, 0, 1, -24)
 	meter.AutomaticSize = Enum.AutomaticSize.Y
 	meter.Visible = false
 	UIKit.List(meter, false, 4, Enum.HorizontalAlignment.Center)
-	UIKit.Text(meter, "GainLabel", "", 26, Color.Gold300, UDim2.fromOffset(0, 30), {
-		Stroke = Color.Line,
-		Auto = Enum.AutomaticSize.X,
-		Order = 1,
-	})
 	UIKit.Bar(meter, "Bar", UDim2.fromOffset(260, 12)).LayoutOrder = 2
 	UIKit.Text(meter, "GoalLabel", "", 16, Color.Snow, UDim2.fromOffset(0, 20), {
 		Font = Theme.Font.TextHeavy,
@@ -222,7 +210,7 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	return gui
 end
 
-type Goal = { Title: string, Sub: string?, Progress: number?, Target: Vector3? }
+type Goal = { Title: string?, Target: Vector3? }
 
 function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local trove = Trove.new()
@@ -238,8 +226,6 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local noticeLabel = root:FindFirstChild("NoticeLabel") :: TextLabel
 	local objective = root:FindFirstChild("Objective") :: Frame
 	local objectiveTitle = objective:FindFirstChild("TitleLabel") :: TextLabel
-	local objectiveSub = objective:FindFirstChild("SubLabel") :: TextLabel
-	local objectiveBar = objective:FindFirstChild("Bar") :: Frame
 	local tiles = root:FindFirstChild("Tiles") :: Frame
 	local storeButton = root:FindFirstChild("StoreButton") :: TextButton
 	local banner = root:FindFirstChild("Banner") :: TextLabel
@@ -251,7 +237,6 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local carryName = carryCard:FindFirstChild("NameLabel", true) :: TextLabel
 	local returnButton = carryCard:FindFirstChild("ReturnButton") :: TextButton
 	local meter = root:FindFirstChild("TrainMeter") :: Frame
-	local gainLabel = meter:FindFirstChild("GainLabel") :: TextLabel
 	local meterBar = meter:FindFirstChild("Bar") :: Frame
 	local goalLabel = meter:FindFirstChild("GoalLabel") :: TextLabel
 	local stateController = context.Controllers.StateController
@@ -265,9 +250,9 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		tiles.Size = UDim2.new(0, PICTURE_SIZE + 12, 1, -(below + 8 + TILES_BOTTOM))
 	end)
 
-	-- Notices: one at a time, the rest queued (Shear a Sheep's HUD notices).
+	-- Notices: one at a time, the rest queued (Shear a Sheep's HUD notices). A notice's sound plays when its words show.
 	local noticeRest = noticeLabel.Position
-	local queue: { { Text: string, Kind: string } } = {}
+	local queue: { { Text: string, Kind: string, Cue: string? } } = {}
 	local showing = false
 	noticeLabel.Visible = false
 	local function showNext()
@@ -278,6 +263,9 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 		showing = true
 		noticeLabel.Text = nextNotice.Text
+		if nextNotice.Cue then
+			sound:Play(nextNotice.Cue)
+		end
 		local kind: Style.NoticeKind = Style.NoticeKindOf(nextNotice.Kind)
 		Style.PaintNotice(noticeLabel, kind)
 		noticeRest = noticeLabel.Position
@@ -298,8 +286,8 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			end)
 		end)
 	end
-	local function notice(text: string, kind: string)
-		table.insert(queue, { Text = text, Kind = kind })
+	local function notice(text: string, kind: string, cue: string?)
+		table.insert(queue, { Text = text, Kind = kind, Cue = cue })
 		while #queue > GameConfig.Ui.NoticeQueue do
 			table.remove(queue, 1)
 		end
@@ -379,103 +367,84 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		return Vector3.new(spot.X, Mountain.RampY(spot.X) + 3, Olympus.LaneMiddleZ)
 	end
 
+	-- "Put your sheep to work" waits for room to open up in the pen (more pen space, sheep merged away) while sheep are
+	-- stored, not for a sheep the player stored on purpose.
+	local workUntil = 0
+	local lastFree, lastStored = -1, -1
+	local function watchPen(data: { [string]: any })
+		local stored, equipped = 0, 0
+		for _, sheep in data.Sheep do
+			if sheep.Slot > 0 then
+				equipped += 1
+			elseif not sheep.AtShrine then
+				stored += 1
+			end
+		end
+		local free = math.max(0, (data.PenSlots or 0) - equipped)
+		if lastFree >= 0 and free > lastFree and stored > 0 and stored <= lastStored then
+			workUntil = os.clock() + WORK_HINT_SECONDS
+		end
+		if free == 0 or stored == 0 then
+			workUntil = 0
+		end
+		lastFree, lastStored = free, stored
+	end
+
+	-- Slowed to a crawl on a slope above the player's Climbing.
+	local function crawling(here: Vector3): boolean
+		local climb = player:GetAttribute("ClimbPower")
+		local power = if type(climb) == "number" then climb else 0
+		return Mountain.IsOnRamp(here)
+			and Mountain.TierAt(here.X) >= 2
+			and Mountain.SpeedAt(here.X, power, 1) < GameConfig.Movement.WalkSpeed * CRAWL_SHARE
+	end
+
+	-- The hint, only when one is needed: the first lamb (where it is, then home with it; the Put down prompt takes over
+	-- in the pen), the stair walker after it, the pen when room opens up, and a slope that's too steep.
 	local function goal(): Goal?
 		local data = stateController:Get()
 		if data.Sheep == nil then
 			return nil
 		end
-		local climb = player:GetAttribute("ClimbPower")
-		local power = if type(climb) == "number" then climb else 0
-		if player:GetAttribute("Carrying") == true then
-			local character = player.Character
-			local here = character and character:GetPivot().Position
-			local onRamp = here ~= nil and Mountain.IsOnRamp(here)
+		local character = player.Character
+		local here = character and character:GetPivot().Position
+		local carrying = player:GetAttribute("Carrying") == true
+		if data.Tutorial == 0 then
+			if not carrying then
+				return { Title = `Steal {Olympus.Tiers[1].God}'s lamb`, Target = tutorialLamb() or pasture(1) }
+			end
 			local pen = plotPiece("Pen")
-			if pen and here and PenArea.Contains(pen, here, 0) then
-				local equipped = 0
-				for _, sheep in data.Sheep do
-					if sheep.Slot > 0 then
-						equipped += 1
-					end
-				end
-				return {
-					Title = "Put it down where you like",
-					Sub = if equipped >= (data.PenSlots or 0) then "Your pen is full: it'll be stored" else nil,
-				}
+			if not pen or (here and PenArea.Contains(pen, here, 0)) then
+				return nil
 			end
 			return {
-				Title = if onRamp then "Slide home!" else "Bring it into your pen",
-				Sub = if onRamp then "Run downhill to slide" else nil,
-				Target = if pen then pen.Position else nil,
+				Title = if here and Mountain.IsOnRamp(here) then "Slide home!" else nil,
+				Target = pen.Position,
 			}
 		end
-		if data.Tutorial == 0 then
-			return {
-				Title = `Steal {Olympus.Tiers[1].God}'s lamb`,
-				Sub = "Hold E next to it",
-				Target = tutorialLamb() or pasture(1),
-			}
+		if carrying then
+			return nil
 		end
 		if data.Tutorial == 1 then
 			local walker = plotPiece("Zone")
-			return {
-				Title = "Train on your Stair Walker",
-				Sub = "Climbing gets you up steeper slopes",
-				Target = if walker then walker.Position else nil,
-			}
+			return { Title = "Train on your Stair Walker", Target = if walker then walker.Position else nil }
 		end
-		local stored, equipped = 0, 0
-		for _, sheep in data.Sheep do
-			if sheep.Slot > 0 then
-				equipped += 1
-			else
-				stored += 1
-			end
+		if os.clock() < workUntil then
+			return { Title = "Put your sheep to work" }
 		end
-		if stored > 0 and equipped < data.PenSlots then
-			return { Title = "Put your sheep to work", Sub = "Flock > Equip Best" }
+		if here and player:GetAttribute("Training") ~= true and crawling(here) then
+			return { Title = "Train to climb" }
 		end
-		local reached = Economy.ClimbTier(power)
-		local readiness = Economy.Readiness(power, reached)
-		local _, _, heavy = Economy.Targets(reached)
-		local here = Olympus.Tiers[reached]
-		local nextTier = Olympus.Tiers[reached + 1]
-		if not nextTier then
-			if readiness == "Light" then
-				return {
-					Title = `Train for heavier sheep: {Format.Short(power)}/{Format.Short(heavy)}`,
-					Progress = power / heavy,
-				}
-			end
-			return { Title = "Ready for the heaviest sheep", Sub = "Complete your Sheepdex" }
-		end
-		local delivered = (data.Deliveries[tostring(reached)] or 0) > 0
-		if not delivered then
-			return { Title = `Steal a lamb from {here.God}`, Target = pasture(reached) }
-		end
-		-- ClimbTier is the highest tier whose Reach the player has, so the next one's is always still ahead.
-		return {
-			Title = `Train to climb: {Format.Short(power)}/{Format.Short(nextTier.Reach)}`,
-			Sub = if readiness == "Light" and power < heavy
-				then `Next: {nextTier.God}'s {nextTier.Area}`
-				else `Ready for heavier sheep from {here.God}`,
-			Progress = power / nextTier.Reach,
-		}
+		return nil
 	end
 
 	local current: Goal? = nil
 	local function refreshGoal()
 		current = goal()
-		objective.Visible = current ~= nil and not context.Controllers.UIController:IsModalOpen()
-		if current then
-			objectiveTitle.Text = current.Title
-			objectiveSub.Text = current.Sub or ""
-			objectiveSub.Visible = current.Sub ~= nil
-			objectiveBar.Visible = current.Progress ~= nil
-			if current.Progress then
-				Style.SetBar(objectiveBar, math.clamp(current.Progress, 0, 1))
-			end
-		end
+		local title = current and current.Title
+		objective.Visible = title ~= nil and not context.Controllers.UIController:IsModalOpen()
+		objectiveTitle.Text = title or ""
+		Motion.SetGlow(Motion.FindGlow(tiles:FindFirstChild("FlockButton") :: GuiObject), os.clock() < workUntil)
 	end
 
 	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding. The gift's glows until claimed.
@@ -538,47 +507,26 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end
 	refreshCarry()
 
-	-- The training meter.
+	-- The training meter: from the god the player has reached to the next one's sign. Lamb weight stays hidden, so it
+	-- names no sheep; past Zeus's sign there's no next god and the meter stays away.
 	local function refreshMeter()
-		local training = player:GetAttribute("Training") == true
-		meter.Visible = training
-		if not training then
-			return
-		end
-		local data = stateController:Get()
 		local climb = player:GetAttribute("ClimbPower")
 		local power = if type(climb) == "number" then climb else 0
-		local rate = Economy.TrainingRate(data.WalkerLevel or 0, data.Trail)
-		gainLabel.Text = `+{Format.Rate(rate)} Climbing/s`
 		local reached = Economy.ClimbTier(power)
-		local target = 0
-		local name = ""
-		local reach, light, heavy = Economy.Targets(reached)
 		local nextTier = Olympus.Tiers[reached + 1]
-		local steps: { { At: number, Name: string } } = {
-			{ At = light, Name = "Lightest sheep" },
-			{ At = heavy, Name = "Heavier sheep" },
-			{ At = if nextTier then nextTier.Reach else math.huge, Name = if nextTier then nextTier.God else "" },
-		}
-		for _, step in steps do
-			if power < step.At then
-				target = step.At
-				name = step.Name
-				break
-			end
+		meter.Visible = player:GetAttribute("Training") == true and nextTier ~= nil
+		if not meter.Visible or not nextTier then
+			return
 		end
-		if target > 0 and target < math.huge then
-			Style.SetBar(meterBar, math.clamp((power - reach) / math.max(target - reach, 1), 0, 1))
-			goalLabel.Text = `Next: {name} at {Format.Short(target)}`
-		else
-			Style.SetBar(meterBar, 1, true)
-			goalLabel.Text = "Fully trained"
-		end
+		local reach = Economy.Targets(reached)
+		Style.SetBar(meterBar, math.clamp((power - reach) / math.max(nextTier.Reach - reach, 1), 0, 1))
+		goalLabel.Text = `Next: {nextTier.God} at {Format.Short(nextTier.Reach)}`
 	end
 	trove:Connect(player:GetAttributeChangedSignal("Training"), refreshMeter)
 	trove:Connect(player:GetAttributeChangedSignal("ClimbPower"), refreshMeter)
 
-	trove:Add(stateController.Changed:Connect(function()
+	trove:Add(stateController.Changed:Connect(function(data: { [string]: any })
+		watchPen(data)
 		refreshTiles()
 		refreshGoal()
 		refreshClimb()
@@ -661,10 +609,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 	end))
 	trove:Add(Remotes.Notify:Connect(function(message: string, kind: string, cue: string?)
-		context.Notify(message, kind)
-		if cue then
-			sound:Play(cue)
-		end
+		context.Notify(message, kind, cue)
 	end))
 
 	-- The guide arrow: over its target when it's on screen, on the screen's edge pointing at it when it isn't.
@@ -733,8 +678,8 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			trove:Clean()
 			gui:Destroy()
 		end,
-		Notify = function(_self: Types.Screen, message: string, kind: string)
-			notice(message, kind)
+		Notify = function(_self: Types.Screen, message: string, kind: string, cue: string?)
+			notice(message, kind, cue)
 		end,
 	}
 end

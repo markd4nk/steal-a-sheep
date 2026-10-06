@@ -51,8 +51,11 @@ local function station(
 	local anchor = anchorPart(parent, name, at)
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "StationPrompt"
+	prompt.Style = Enum.ProximityPromptStyle.Custom -- drawn by each client (PromptController)
+	prompt:SetAttribute("PromptKind", "Action")
+	-- The verb only: the sign over the stall names it.
 	prompt.ActionText = action
-	prompt.ObjectText = title
+	prompt.ObjectText = ""
 	prompt.MaxActivationDistance = 12
 	prompt.RequiresLineOfSight = false
 	prompt.KeyboardKeyCode = Enum.KeyCode.E
@@ -206,7 +209,7 @@ function ShopService.Start(_self: any)
 	local shopAt = if stalls[1] then stallFront(stalls[1]) else CFrame.new(275, 63, 205)
 	local sellAt = if stalls[2] then stallFront(stalls[2]) else CFrame.new(275, 63, 175)
 	station(folder, "ShopStation", shopAt, "Shop", "Shop", "SHOP", Color3.fromRGB(255, 214, 90))
-	station(folder, "SellStation", sellAt, "Sell", "Sell sheep", "SELL STALL", Color3.fromRGB(140, 235, 120))
+	station(folder, "SellStation", sellAt, "Sell", "Sell", "SELL STALL", Color3.fromRGB(140, 235, 120))
 	station(
 		folder,
 		"MergeStation",

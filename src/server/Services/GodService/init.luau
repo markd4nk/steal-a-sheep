@@ -140,7 +140,8 @@ local function clearSight(god: God, root: BasePart): boolean
 	return workspace:Raycast(eye, toward, losParams) == nil
 end
 
--- Thieves who crossed the safety line got away: the chase ends for them.
+-- Thieves who crossed the safety line got away: the chase ends for them (the banner and the danger music stop; nothing
+-- more is said).
 local function dropEscapees(god: God)
 	for player in god.Thieves do
 		local root = rootOf(player)
@@ -148,7 +149,6 @@ local function dropEscapees(god: God)
 			god.Thieves[player] = nil
 			god.Gentle[player] = nil
 			Remotes.Chase:Fire(player, nil, nil)
-			Remotes.Notify:Fire(player, `You escaped {god.Tier.God}! Now take it home.`, "Good", "StepDone")
 		end
 	end
 end

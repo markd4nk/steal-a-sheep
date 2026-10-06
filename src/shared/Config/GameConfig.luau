@@ -390,7 +390,7 @@ local GameConfig = {
 
 	-- Picking up a wild lamb and running home with it.
 	Theft = {
-		HoldSeconds = 0.5,
+		HoldSeconds = 0, -- a press, click or tap steals (the user: never "hold E")
 		HeadStart = 1.5, -- seconds before the god sets off
 		RefillSeconds = 15, -- an empty spawn after a delivery
 		DropSeconds = 30, -- a lamb a caught thief dropped lies there this long, then goes back to its pasture
@@ -569,14 +569,11 @@ local GameConfig = {
 		NoticeQueue = 4,
 		BannerSeconds = 4,
 	},
-	-- The free gift's menu opens by itself once a session, this long after the player could first claim it (after
-	-- their first delivery), as soon as they're off the mountain and no other menu is open.
 	Gift = {
-		AutoOpenSeconds = 30,
 		FavoriteTimeout = 60, -- seconds to wait for Roblox's favorite prompt to answer
 	},
-	-- The daily gifts' menu opens by itself once a session, this long after a gift is waiting and the player is free
-	-- (after the free gift's, so the two don't meet).
+	-- The daily gifts' menu opens by itself once a session (never in a player's first), this long after a gift is
+	-- waiting and the player is free.
 	Daily = {
 		AutoOpenSeconds = 45,
 	},

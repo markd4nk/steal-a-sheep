@@ -156,6 +156,7 @@ local function waitOnAltar(model: Model)
 	end
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "ShrinePrompt"
+	prompt.Style = Enum.ProximityPromptStyle.Custom -- drawn in the game's look (PromptController)
 	prompt.ActionText = "Pick up"
 	prompt.ObjectText = (string.gsub(model.Name, "Sheep$", "Lamb"))
 	prompt.HoldDuration = 0
@@ -239,8 +240,8 @@ local function play(show: { [string]: any })
 	end
 	local ui = registry.UIController
 	if ui then
-		local title = if rarity >= 3 then "ROYAL!" elseif rarity == 2 then "RARE!" else "NEW LAMB!"
-		ui:Celebrate(title, "Pick it up and take it home")
+		local title = if rarity >= 3 then "ROYAL!" elseif rarity == 2 then "SHINY!" else "NEW LAMB!"
+		ui:Celebrate(title, "")
 	end
 	task.delay(LANDED_SECONDS, function()
 		if not showing and framed == "Show" then

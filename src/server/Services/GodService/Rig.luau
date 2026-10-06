@@ -469,11 +469,11 @@ local function sign(kind: string, head: BasePart, rightArm: BasePart, leftArm: B
 	end
 end
 
--- The god's name, area and mood over its head (GodService writes the mood).
+-- The god's name and mood over its head (GodService writes the mood).
 function Rig.Nameplate(head: BasePart, tier: Olympus.Tier)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "Nameplate"
-	billboard.Size = UDim2.fromOffset(220, 64)
+	billboard.Size = UDim2.fromOffset(220, 48)
 	billboard.StudsOffsetWorldSpace = Vector3.new(0, 4.2, 0)
 	billboard.MaxDistance = 160
 	billboard.LightInfluence = 0
@@ -495,9 +495,9 @@ function Rig.Nameplate(head: BasePart, tier: Olympus.Tier)
 		stroke.Parent = words
 		words.Parent = billboard
 	end
+	-- The god's name only: the tier's sign names the area.
 	line("Mood", "", 22, Color3.fromRGB(255, 90, 80))
 	line("GodName", tier.God, 26, Color3.new(1, 1, 1))
-	line("Area", tier.Area, 16, Color3.fromRGB(255, 226, 120))
 end
 
 function Rig.Build(tier: Olympus.Tier): Model

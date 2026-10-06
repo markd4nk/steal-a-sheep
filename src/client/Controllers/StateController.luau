@@ -13,7 +13,7 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local StateController = {
 	Name = "StateController",
 	Changed = Signal.new() :: Signal.Signal<{ [string]: any }>,
-	-- The away summary from the first snapshot: (coins, lambs grown).
+	-- The away summary, once a session: (coins, lambs grown). Read it with TakeAway, which hands it out once.
 	Offline = Signal.new() :: Signal.Signal<number, number>,
 }
 
@@ -40,13 +40,28 @@ export type SheepView = {
 
 local trove = Trove.new()
 local state: { [string]: any } = {}
+local firstSession: boolean? = nil
+local awaySeen = false
+-- The away summary until the welcome-back card takes it (TakeAway): it can arrive before that card exists.
+local away: { Coins: number, Matured: number }? = nil
 
 local function apply(snapshot: { [string]: any })
 	if type(snapshot) ~= "table" or snapshot.Sheep == nil then
 		return
 	end
 	state = snapshot
+	if firstSession == nil then
+		firstSession = snapshot.Tutorial == 0
+	end
 	StateController.Changed:Fire(snapshot)
+	-- The away summary rides on one snapshot, whichever comes first: the one asked for, or one the server pushes once the
+	-- time away is credited (after the player's passes are known).
+	local summary = snapshot.Offline
+	if not awaySeen and type(summary) == "table" and type(summary.Coins) == "number" then
+		awaySeen = true
+		away = { Coins = summary.Coins, Matured = summary.Matured or 0 }
+		StateController.Offline:Fire(summary.Coins, summary.Matured or 0)
+	end
 end
 
 function StateController.Init(_self: any, _systems: Lifecycle.Registry) end
@@ -59,10 +74,6 @@ function StateController.Start(_self: any)
 			local ok, snapshot = Remotes.GetState:Invoke()
 			if ok and type(snapshot) == "table" and snapshot.Sheep ~= nil then
 				apply(snapshot)
-				local away = snapshot.Offline
-				if type(away) == "table" and type(away.Coins) == "number" then
-					StateController.Offline:Fire(away.Coins, away.Matured or 0)
-				end
 				return
 			end
 			task.wait(1)
@@ -76,6 +87,22 @@ end
 
 function StateController.Get(_self: any): { [string]: any }
 	return state
+end
+
+-- The away summary (cash, lambs grown) the first time it's asked for after it arrived, then nil.
+function StateController.TakeAway(_self: any): (number?, number?)
+	local summary = away
+	away = nil
+	if summary then
+		return summary.Coins, summary.Matured
+	end
+	return nil, nil
+end
+
+-- Whether this is the player's first session (their save had no delivery when they joined): menus don't open by
+-- themselves in it.
+function StateController.IsFirstSession(_self: any): boolean
+	return firstSession ~= false
 end
 
 local ORDERS: { [string]: (a: SheepView, b: SheepView) -> boolean? } = {

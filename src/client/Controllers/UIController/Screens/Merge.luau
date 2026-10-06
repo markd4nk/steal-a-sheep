@@ -315,11 +315,9 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local function setButton(ready: boolean)
 		local family = pickedFamily()
 		local price = if family then Economy.ShrinePrice(family) else nil
-		if not ready then
-			Buttons.Set(mergeButton, "Disabled", "After 3 deliveries")
-			Buttons.SetValue(mergeButton, nil)
-		elseif #picks < PICKS then
-			Buttons.Set(mergeButton, "Disabled", `Pick {PICKS - #picks} more`)
+		-- The words above say why it can't merge yet (the shrine's opening, the count of picks).
+		if not ready or #picks < PICKS then
+			Buttons.Set(mergeButton, "Disabled", "Merge")
 			Buttons.SetValue(mergeButton, nil)
 		else
 			local cost = price or 0

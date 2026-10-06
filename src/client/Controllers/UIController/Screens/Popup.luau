@@ -10,10 +10,14 @@ local UIKit = require(ReplicatedStorage.Utils.UIKit)
 local Motion = require(script.Parent.Parent.Motion)
 local Types = require(script.Parent.Parent.Types)
 
--- Moments over everything: the big celebration (a lamb's adult size, Titan the biggest; a merged lamb landing on the
--- Merge Shrine's altar) and the welcome-back card with the coins
--- earned while away (Shear a Sheep's celebration and pop-up card).
+-- Moments over everything: the big celebration (a merged lamb landing on the Merge Shrine's altar) and the
+-- welcome-back card with the cash earned while away (Shear a Sheep's celebration and pop-up card). A lamb growing up
+-- has no celebration (the user: not needed): the label over it shows its size, and only the rare sizes, Giant and
+-- Titan, get a notice.
 local Popup = {}
+
+-- Grow-ups worth a notice, with their sound.
+local BIG_SIZES: { [string]: string } = { Giant = "RevealFanfare", Titan = "RevealFireworks" }
 
 function Popup.Build(playerGui: Instance): ScreenGui
 	local gui = Instance.new("ScreenGui")
@@ -72,24 +76,27 @@ function Popup.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end
 
 	trove:Add(Remotes.Reveal:Connect(function(name: string, size: string)
-		sound:Play(
-			if size == "Titan"
-				then "RevealFireworks"
-				elseif size == "Giant" then "RevealFanfare"
-				elseif size == "Large" then "Reveal"
-				else "StepDone"
-		)
-		celebrate(if size == "Standard" then "Grown up!" else `{string.upper(size)}!`, name)
+		local cue = BIG_SIZES[size]
+		if cue then
+			context.Notify(`{name} grew up {string.upper(size)}!`, "Rare", cue)
+		end
 	end))
-	trove:Add(stateController.Offline:Connect(function(coins: number, matured: number)
+	-- The welcome-back card, once: the summary may have come before this screen was made.
+	local function showAway()
+		local coins, matured = stateController:TakeAway()
+		if not coins then
+			return
+		end
 		coinsLabel.Text = `+{Format.Short(coins)} cash`
-		detailLabel.Text = if matured > 0
+		detailLabel.Text = if matured and matured > 0
 			then `{matured} lambs grew up while you were away`
 			else "Your flock kept earning"
 		card.Visible = true
 		Motion.PopIn(card, nil)
 		sound:Play("RevealCoins")
-	end))
+	end
+	trove:Add(stateController.Offline:Connect(showAway))
+	task.defer(showAway)
 	trove:Connect(okButton.Activated, function()
 		Motion.PopOut(card, nil, function()
 			card.Visible = false

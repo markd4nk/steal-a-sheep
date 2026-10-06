@@ -172,6 +172,8 @@ local function push(player: Player)
 	end
 	state.Dirty = false
 	local snapshot = FlockService:Snapshot(player)
+	-- The away summary goes out once (the client shows it once, from this or from its own first request).
+	state.Offline = nil
 	local reached = snapshot.ClimbTier
 	if type(reached) == "number" then
 		if reached > state.ClimbTier then
@@ -548,6 +550,8 @@ function FlockService.Deliver(_self: any, player: Player, wild: Wild, at: CFrame
 	local key = tostring(tier.Tier)
 	data.Deliveries[key] = (data.Deliveries[key] or 0) + 1
 
+	-- One notice for the moment: home, or stored. The Sheepdex's badge counts a first find, and the HUD's counters show
+	-- the first delivery's bonus.
 	local name = Economy.Name(sheep)
 	local state = states[player]
 	if slot then
@@ -557,24 +561,17 @@ function FlockService.Deliver(_self: any, player: Player, wild: Wild, at: CFrame
 		local rate = Economy.Income(sheep, Economy.BestIncome(data.Sheep)) * (boosts(player))
 		notify(player, `{name} is home! +{Format.Rate(rate)}/s`, "Good", "Coin")
 	else
-		notify(player, "Stored - not earning. Your pen is full.", "Bad", "Notice")
+		notify(player, `{name} is stored: your pen is full`, "Bad", "Notice")
 	end
 	if not data.Dex[wild.Family] then
 		-- Its reward waits in the Sheepdex for a claim (SheepdexService).
 		data.Dex[wild.Family] = true
-		notify(
-			player,
-			`New in your Sheepdex: {Economy.FamilyName(wild.Family)}! Claim its reward there`,
-			"Rare",
-			"DexReward"
-		)
 	end
 	if data.Tutorial == 0 then
 		data.Tutorial = 1
 		registry.DataService:AdjustCoins(player, Economy.TutorialCoins)
 		data.ClimbPower += Economy.TutorialClimb
 		registry.DataService:Replicate(player)
-		notify(player, `+{Economy.TutorialCoins} cash and +{Economy.TutorialClimb} Climbing!`, "Rare", "Upgrade")
 	end
 	FlockService.Delivered:Fire(player, sheep)
 	refreshPen(player)
@@ -608,7 +605,7 @@ local function act(player: Player, data: any, action: string, id: string?): (boo
 	elseif action == "Unequip" then
 		sheep.Slot = 0
 		sheep.Pinned = false
-		return true, "Stored - not earning"
+		return true, nil
 	elseif action == "Lock" or action == "Unlock" then
 		sheep.Locked = action == "Lock"
 		return true, nil

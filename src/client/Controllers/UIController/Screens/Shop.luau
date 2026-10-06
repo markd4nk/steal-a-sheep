@@ -106,13 +106,12 @@ function Shop.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			nameLabel.Text = `Stair Walker Lv {level + 1}`
 			local cost = Economy.WalkerCost(level)
 			if cost then
-				detailLabel.Text =
-					`Gain {Format.Short(Economy.WalkerRate(level + 1))} Climbing per second (now {Format.Short(
-						Economy.WalkerRate(level)
-					)})`
+				detailLabel.Text = `{Format.Short(Economy.WalkerRate(level))} → {Format.Short(
+					Economy.WalkerRate(level + 1)
+				)} Climbing/s`
 				price(button, cost, "Upgrade")
 			else
-				detailLabel.Text = `{Format.Short(Economy.WalkerRate(level))} Climbing per second`
+				detailLabel.Text = `{Format.Short(Economy.WalkerRate(level))} Climbing/s`
 				Buttons.Set(button, "Owned", "MAX")
 				Buttons.SetValue(button, nil)
 			end
@@ -134,7 +133,7 @@ function Shop.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		for index, trail in Economy.Trails do
 			local nameLabel, detailLabel, button = tile(`Trail{trail.Id}`)
 			nameLabel.Text = trail.Name
-			detailLabel.Text = `{trail.Multiplier}x climbing training (training only)`
+			detailLabel.Text = `{trail.Multiplier}x training`
 			if trails[trail.Id] then
 				local worn = data.Trail == trail.Id
 				Buttons.Set(button, if worn then "Owned" else "Action", if worn then "Equipped" else "Equip")

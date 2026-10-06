@@ -429,6 +429,8 @@ end
 local function prompt(anchor: BasePart, name: string, key: Enum.KeyCode, pad: Enum.KeyCode): ProximityPrompt
 	local p = Instance.new("ProximityPrompt")
 	p.Name = name
+	p.Style = Enum.ProximityPromptStyle.Custom -- drawn by each client (PromptController)
+	p:SetAttribute("PromptKind", if name == "RobuxPrompt" then "Robux" else "Buy")
 	p.ActionText = "Upgrade"
 	p.KeyboardKeyCode = key
 	p.GamepadKeyCode = pad

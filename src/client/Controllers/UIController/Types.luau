@@ -5,8 +5,9 @@ export type Context = {
 	-- Opens a screen; `options` reaches its Open.
 	Open: (name: string, options: { [string]: any }?) -> (),
 	Close: (name: string) -> (),
-	-- A notice on whatever the player is looking at: the open menu's bottom edge, or the HUD.
-	Notify: (message: string, kind: string) -> (),
+	-- A notice on whatever the player is looking at: the open menu's bottom edge, or the HUD. `cue` is a sound that
+	-- plays when its words show.
+	Notify: (message: string, kind: string, cue: string?) -> (),
 }
 
 export type Screen = {
@@ -15,8 +16,9 @@ export type Screen = {
 	Open: (self: Screen, options: { [string]: any }?) -> (),
 	Close: (self: Screen) -> (),
 	Destroy: (self: Screen) -> (),
-	-- A menu that shows notices at its bottom edge while it's open ("Good", "Bad", "Rare").
-	Notify: ((self: Screen, message: string, kind: string) -> ())?,
+	-- A menu that shows notices at its bottom edge while it's open ("Good", "Bad", "Rare"); the HUD queues them under
+	-- its top row with their sound (`cue`).
+	Notify: ((self: Screen, message: string, kind: string, cue: string?) -> ())?,
 }
 
 export type ScreenModule = {

@@ -59,7 +59,6 @@ type Carry = {
 local CARRY_CHECK = 0.1
 -- How a theft ended -> whether the lamb is left lying where the thief was.
 local DROPS: { [string]: boolean } = { Caught = true, Died = true }
-local WRONG_PLOT_EVERY = 3
 local ANNOUNCED_RARITY = 5 -- Legendary and Mythic lambs are announced, like Royal fleeces
 local FALL_Y = -50
 
@@ -68,7 +67,8 @@ local trove = Trove.new()
 local spawns: { Spawn } = {}
 local tutorialSpawns: { [Player]: Spawn } = {}
 local carries: { [Player]: Carry } = {}
-local wrongPlotAt: { [Player]: number } = {}
+-- The plot a thief is standing in that isn't theirs, so they're told once each time they walk into one.
+local wrongPlot: { [Player]: Instance } = {}
 local random = Random.new()
 local wildFolder: Folder? = nil
 local carriedFolder: Folder? = nil
@@ -183,10 +183,12 @@ local function fill(spawn: Spawn)
 	-- Clients graze it like a lamb in a pen (AnimController).
 	model:SetAttribute("Lamb", true)
 	card(model, rolled)
+	-- Just the action: the lamb's card over it already names it.
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "StealPrompt"
+	prompt.Style = Enum.ProximityPromptStyle.Custom -- drawn by each client (PromptController)
 	prompt.ActionText = "Steal"
-	prompt.ObjectText = Economy.Name(asSheep(rolled))
+	prompt.ObjectText = ""
 	prompt.HoldDuration = GameConfig.Theft.HoldSeconds
 	prompt.MaxActivationDistance = GameConfig.Theft.PromptDistance
 	prompt.RequiresLineOfSight = false
@@ -244,6 +246,7 @@ local function endCarry(player: Player): Carry?
 		return nil
 	end
 	carries[player] = nil
+	wrongPlot[player] = nil
 	clearAttributes(player)
 	registry.GodService:Release(player)
 	Remotes.Chase:Fire(player, nil, nil)
@@ -436,9 +439,12 @@ local function checkCarriers()
 		if player:GetAttribute("InPen") ~= (if home then true else nil) then
 			player:SetAttribute("InPen", if home then true else nil)
 		end
-		if here and not home and os.clock() - (wrongPlotAt[player] or 0) > WRONG_PLOT_EVERY then
-			wrongPlotAt[player] = os.clock()
-			notify(player, "That's not your plot! Yours has your name over the gate.", "Bad", "Denied")
+		local elsewhere = if here and not home then here.Model else nil
+		if elsewhere ~= wrongPlot[player] then
+			wrongPlot[player] = elsewhere
+			if elsewhere then
+				notify(player, "That's not your plot!", "Bad", "Denied")
+			end
 		end
 	end
 end
@@ -562,7 +568,7 @@ function WildService.Start(_self: any)
 	trove:Connect(Players.PlayerRemoving, function(player: Player)
 		WildService:Fail(player, "Left")
 		dropTutorialLamb(player)
-		wrongPlotAt[player] = nil
+		wrongPlot[player] = nil
 	end)
 	trove:Add(Remotes.ReturnSheep:Connect(function(player: Player)
 		WildService:Fail(player, "Returned")

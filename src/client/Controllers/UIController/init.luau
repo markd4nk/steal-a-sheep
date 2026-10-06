@@ -80,19 +80,24 @@ local function open(name: string, options: { [string]: any }?)
 	screen:Open(options)
 end
 
-local function notify(message: string, kind: string)
+local function notify(message: string, kind: string, cue: string?)
 	for name in openScreens do
 		local screen = screens[name]
 		local show = screen.Notify
 		if screen.Modal and show then
 			show(screen, message, kind)
+			local sound = registry.SoundController
+			if cue and sound then
+				sound:Play(cue)
+			end
 			return
 		end
 	end
+	-- The HUD may make it wait its turn: its sound waits with it.
 	local hud = screens.Hud
 	local show = hud and hud.Notify
 	if hud and show then
-		show(hud, message, kind)
+		show(hud, message, kind, cue)
 	end
 end
 
@@ -200,8 +205,8 @@ function UIController.IsModalOpen(_self: any): boolean
 	return false
 end
 
-function UIController.Notify(_self: any, message: string, kind: string)
-	notify(message, kind)
+function UIController.Notify(_self: any, message: string, kind: string, cue: string?)
+	notify(message, kind, cue)
 end
 
 -- A big moment in the middle of the screen (the Popup screen's celebration): a merge, a lamb grown up.

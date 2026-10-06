@@ -22,8 +22,8 @@ local Types = require(script.Parent.Parent.Types)
 -- The daily gifts (DailyService), as the user picked from DESIGN/ui/mockups/daily-gifts.html (layout B): Days 1-6 as
 -- cards in a grid, Day 7's Pegasus Sheep big on the right over Claim. Days claimed go dark with a tick, today's is
 -- gold and glowing, the days ahead blue, each showing what it gives this player now. Once claimed, Claim counts down
--- to the next. Opens by itself once a session while a gift waits (GameConfig.Daily); the HUD's DAILY opens it any
--- time. Claiming Day 7 brings the Pegasus up on its own card.
+-- to the next. Opens by itself once a session while a gift waits (GameConfig.Daily), but never in a player's first
+-- session; the HUD's DAILY opens it any time. Claiming Day 7 brings the Pegasus up on its own card.
 local Daily = {}
 
 type DayState = "Done" | "Today" | "Ahead"
@@ -404,7 +404,12 @@ function Daily.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		local readySince: number? = nil
 		while gui.Parent do
 			local data = daily()
-			if not data or not isReady(data) or (stateController:Get().Tutorial or 0) < 1 then
+			if
+				not data
+				or not isReady(data)
+				or (stateController:Get().Tutorial or 0) < 1
+				or stateController:IsFirstSession()
+			then
 				readySince = nil
 			else
 				local since = readySince or os.clock()
