@@ -665,6 +665,23 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 
 	-- The guide arrow: over its target when it's on screen, on the screen's edge pointing at it when it isn't.
 	local SCREEN_MARGIN = 70
+	local HINT_GAP = 8 -- points kept between the arrow and the hint
+	-- Where the arrow (hanging from its point, in points) would cover the hint, it hangs just under the hint instead,
+	-- pointing up: a lamb far up the mountain sits right behind the hint's words. True when it moved.
+	local function underHint(x: number, y: number, scale: number): (number, boolean)
+		if not objective.Visible then
+			return y, false
+		end
+		local topLeft = (objective.AbsolutePosition - gui.AbsolutePosition) / scale
+		local size = objective.AbsoluteSize / scale
+		local box = arrow.AbsoluteSize / scale
+		local acrossHint = x + box.X / 2 > topLeft.X - HINT_GAP and x - box.X / 2 < topLeft.X + size.X + HINT_GAP
+		local downHint = y > topLeft.Y - HINT_GAP and y - box.Y < topLeft.Y + size.Y + HINT_GAP
+		if acrossHint and downHint then
+			return topLeft.Y + size.Y + HINT_GAP + box.Y, true
+		end
+		return y, false
+	end
 	trove:Connect(RunService.RenderStepped, function()
 		local target = current and current.Target
 		local camera = workspace.CurrentCamera
@@ -685,8 +702,10 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		local viewport = camera.ViewportSize
 		local inset = gui.AbsolutePosition
 		if onScreen then
-			arrow.Position = UDim2.fromOffset((point.X - inset.X) / scale, (point.Y - inset.Y) / scale)
-			pointer.Rotation = 0
+			local x = (point.X - inset.X) / scale
+			local y, moved = underHint(x, (point.Y - inset.Y) / scale, scale)
+			arrow.Position = UDim2.fromOffset(x, y)
+			pointer.Rotation = if moved then 180 else 0
 			return
 		end
 		-- Behind or off to the side: along the screen's edge, in the target's direction from the middle.
@@ -713,7 +732,8 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			SCREEN_MARGIN
 		)
 		at = Vector2.new(math.clamp(at.X, left, right), math.clamp(at.Y, SCREEN_MARGIN, bottom))
-		arrow.Position = UDim2.fromOffset((at.X - inset.X) / scale, (at.Y - inset.Y) / scale)
+		local edgeX = (at.X - inset.X) / scale
+		arrow.Position = UDim2.fromOffset(edgeX, (underHint(edgeX, (at.Y - inset.Y) / scale, scale)))
 		pointer.Rotation = math.deg(math.atan2(unit.Y, unit.X)) - 90
 	end)
 
