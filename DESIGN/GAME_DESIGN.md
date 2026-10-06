@@ -73,9 +73,10 @@ gods and personifications, each on a stage that suits them. Above its old summit
 rising a degree or so a god from 32 to 52 (the user: no steeper than about 60, gradual but noticeable; 52 at the top
 kept), up to Zeus's throne plaza: five more minor gods, then the thirteen Olympians from the youngest, Dionysus, to
 Zeus's siblings, Hera and Zeus. Below the Twelve the myths set no order, so the minor gods follow the stages' themes.
-The climb is all on foot. High Olympus's stretches have each god's obstacles, rock outcrops and a knoll with the
-god's landmark, a winding path up the middle that nothing stands on, and moving scenery (bobbing islands, turning
-cogs, circling birds; still with Reduce motion).
+The climb is all on foot. High Olympus's stretches have each god's obstacles, dunes and the god's landmark, a
+winding path up the middle, and moving scenery (bobbing islands, turning cogs, circling birds; still with Reduce
+motion). On the whole descent only ramps are solid (the user): the dunes, mounds and pyramids you can jump off or
+ride; trees, columns, lamps and the gods' obstacles are scenery you slide through.
 
 Each god has six sheep families (below); the table's is the god's own, their Common. Their lambs all look alike but
 for their marks (*Mystery lambs*).

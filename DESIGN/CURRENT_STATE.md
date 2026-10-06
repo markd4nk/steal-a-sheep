@@ -155,11 +155,13 @@ lamb.
   `Utils/ChaseFeel`, `GameConfig.Chase`), "safe" on getting away; `Remotes.Chase` says how a chase ended. The user OK'd
   the mock-up's sounds and picked alarm C; every voice one person in one take, goddesses deeper (their words, in
   DECISIONS.md); every voice-board take but M1, said at random without repeats (`Config/Sounds` Voices, `art/chase/`).
-- **High Olympus's lanes (2026-10-06, branch `t3code/olympus-obstacle-mockups`, uncommitted, not merged)**: all
-  eighteen stretches have each god's obstacles, rock outcrops, a knoll with the god's landmark, a winding path nothing
-  stands on, particles and birds, everything standing tilted with the slope; scenery moves (`SceneryController`).
-  `tools/UpperMountain.luau`'s `Lane`; `tools/check-lanes.luau` checks it. Not in the cloud place yet: it needs the
-  builder run there (STUDIO_CONTENT.md) when it ships. HISTORY.md has the details.
+- **High Olympus's lanes (2026-10-06, merged into main at 30182d3, not published)**: all eighteen stretches have each
+  god's obstacles, dunes, the god's landmark, a winding path, particles and birds, everything standing tilted with the
+  slope; scenery moves (`SceneryController`). `tools/UpperMountain.luau`'s `Lane`; `tools/check-lanes.luau` checks it.
+  Not in the cloud place yet: it needs the builder run there (STUDIO_CONTENT.md) when it ships. HISTORY.md.
+- **Only ramps are solid on the descent (2026-10-06, branch `t3code/olympus-obstacle-mockups`, not merged)**: the
+  user's rule. High Olympus's obstacles are scenery, its ramps stage 7's dunes; the old stages' trees, spires, arches,
+  pavilion, lamps and columns in the lane are passed through too (`UpperMountain.ClearOldLanes`).
 
 - **Game page art and a trailer, first cuts** (overnight 2026-10-05, nothing uploaded): icon and thumbnail mock-ups
   (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and
@@ -247,22 +249,18 @@ lamb.
   far under a tier's sign it's about 4 minutes a stretch.
 - **High Olympus theft to delivery**: a tier-30 slide was measured through all eighteen stretches (no hops, Zeus
   falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; and the climb speed check wasn't tried there.
-- **High Olympus's new lanes in play**: a scripted Zeus theft at full Climbing slid through all eighteen stretches
-  (following the path: 51.7 s, no bumps; straight down: 54 s, 10 bumps, not caught). Not tried: a real player
-  steering at 100 studs/s, a close chase there, climbing them on foot, two players, the moving scenery on a phone.
+- **The ramps-only descent in play**: a scripted Zeus theft at full Climbing slid straight down from Zeus to the
+  safety line in 74 s with no bumps or stops, 6 s in the air off dunes, not caught. Not tried: a real player, a close
+  chase, a dune at a normal speed (50-100), climbing over the dunes on foot, two players, a phone.
 
 ## Known issues
 
 - **180 sheep previews**: SheepService builds a preview model of every family for the menus' 3D views at startup
   (`ReplicatedStorage.SheepLooks`, about 5,800 parts); the Sheepdex draws a tier's sheep only when it scrolls near.
 
-- **The descent is full of the map's own trees, rocks and arches.** A slide that hits one slows, and stops if blocked;
-  players steer round them. Every run from High Olympus passes through them: a straight slide from Zeus stuck on
-  stage 6's pavilion (x 1890, mid-lane) and was caught. High Olympus's lanes now have their own obstacles too, with
-  a clear path (above).
 - **Long runs at the top**: about 7.6 minutes' climb to Zeus; the slide home is 2.7 minutes at his sign's number (6.8
   one sign short) on main, 1.5 (2.6) with the momentum branch. The user keeps it all on foot (DECISIONS.md).
-- **High Olympus's lanes add about 5,400 parts** (the workspace 26,700 -> 32,000) and 110 particle emitters, all
+- **High Olympus's lanes add about 4,800 parts** (the workspace 26,700 -> 31,500) and 110 particle emitters, all
   loaded at join (streaming off); untried on a phone.
 - **Pacing (2026-10-05 simulation)**: with walker upgrades at 10x, an efficient player reaches Zeus in about 6.5 hours
   (a real one maybe 2-3x that), Climbing about 1.3-5x the next sign. Trail prices are fixed and unreviewed (the user

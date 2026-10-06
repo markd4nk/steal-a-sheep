@@ -1,8 +1,8 @@
 --!strict
 -- High Olympus's lane check, without Studio, in each stretch's own frame (x across, y up from the floor, z uphill):
 --   * decor (each stretch's Decor) stays out of the slide lane (|x| < 56) unless it's 16 or more studs up;
---   * the lane's own obstacles and terrain (its Lane model) leave a slider 30 studs somewhere across at every point
---     down the stretch, never stand on the path (its Path tiles) and keep off the wild lambs' spots and the god's.
+--   * in the lane (its Lane model) only the dunes (the Ramp attribute) are solid: everything else is passed through;
+--   * the dunes never stand on the path (its Path tiles) and keep off the wild lambs' spots and the god's.
 -- Only collidable parts lower than 16 studs count. Usage, after scripts/build-place.ps1:
 --   lune run tools/check-lanes.luau [StealASheep.rbxl]
 
@@ -16,7 +16,6 @@ local CFrame, Vector3 = roblox.CFrame, roblox.Vector3
 local LANE_HALF = 56
 local CLEAR_ABOVE = 16
 local MIDDLE_Z = 193.45 -- UpperMountain's corridor middle
-local MIN_GAP = 28 -- the builder keeps 30 by its footprints; real parts may reach a stud past them
 local PATH_HALF = 6 -- half the path's width: nothing solid on it
 local SPOT_CLEAR = 6
 local CELL = 2
@@ -67,7 +66,9 @@ for _, section in UpperMountain.Layout() do
 			if part.CanCollide then
 				local minX, maxX, minY = bounds(inverse, part)
 				if minX < LANE_HALF and maxX > -LANE_HALF and minY < CLEAR_ABOVE then
-					fail(`decor in the lane: {part.Parent.Name}.{part.Name}, x {minX // 0.1 / 10} to {maxX // 0.1 / 10}`)
+					fail(
+						`decor in the lane: {part.Parent.Name}.{part.Name}, x {minX // 0.1 / 10} to {maxX // 0.1 / 10}`
+					)
 				end
 			end
 		end
@@ -97,8 +98,17 @@ for _, section in UpperMountain.Layout() do
 		if part.Name == "Path" then
 			local p = inverse * part.CFrame.Position
 			pathX[row(p.Z)] = p.X
+		elseif part.CanCollide and not part:GetAttribute("Ramp") then
+			fail(`solid but not a ramp: {part.Parent and part.Parent.Name}.{part.Name}`)
 		elseif part.CanCollide then
-			local minX, maxX, minY, minZ, maxZ = bounds(inverse, part)
+			-- A dune stands above the floor over about 0.3 of its size each way from its middle (UpperMountain's
+			-- DUNE_REACH); its box is mostly under the floor.
+			local local_ = inverse * part.CFrame
+			local yaw = math.atan2(local_.LookVector.X, local_.LookVector.Z)
+			local hx = 0.3 * (math.abs(math.cos(yaw)) * part.Size.X + math.abs(math.sin(yaw)) * part.Size.Z)
+			local hz = 0.3 * (math.abs(math.sin(yaw)) * part.Size.X + math.abs(math.cos(yaw)) * part.Size.Z)
+			local p = local_.Position
+			local minX, maxX, minY, minZ, maxZ = p.X - hx, p.X + hx, 0, p.Z - hz, p.Z + hz
 			if minY < CLEAR_ABOVE and maxX > -LANE_HALF and minX < LANE_HALF then
 				local owner = part.Parent and part.Parent.Name or part.Name
 				for r = math.max(1, row(minZ)), math.min(rows, row(maxZ)) do
@@ -112,23 +122,10 @@ for _, section in UpperMountain.Layout() do
 	end
 	total += laneParts
 
-	-- The gap at every row, and the path's tiles clear.
-	local narrowest, narrowAt = math.huge, 0
+	-- The path's tiles clear.
 	local onPath = {}
 	for r = 1, rows do
 		local cells = solid[r] or {}
-		local best, run = 0, 0
-		for col = 1, columns do
-			if cells[col] then
-				run = 0
-			else
-				run += 1
-				best = math.max(best, run)
-			end
-		end
-		if best * CELL < narrowest then
-			narrowest, narrowAt = best * CELL, r
-		end
 		-- The path's tiles are 6 apart: check the rows between from the nearest tile.
 		local px = pathX[r] or pathX[r - 1] or pathX[r + 1] or pathX[r - 2] or pathX[r + 2]
 		if px then
@@ -140,9 +137,6 @@ for _, section in UpperMountain.Layout() do
 				end
 			end
 		end
-	end
-	if narrowest < MIN_GAP then
-		fail(`only {narrowest} studs across at z {(narrowAt * CELL - length / 2) // 1}`)
 	end
 
 	-- Lamb and god spots.
@@ -156,7 +150,8 @@ for _, section in UpperMountain.Layout() do
 	end
 	table.insert(spots, Vector3.new(section.XEnd - 22, 0, 217))
 	for _, spot in spots do
-		local local_ = inverse * Vector3.new(spot.X, section.YStart + (spot.X - section.XStart) * math.tan(grade), spot.Z)
+		local local_ = inverse
+			* Vector3.new(spot.X, section.YStart + (spot.X - section.XStart) * math.tan(grade), spot.Z)
 		local r0 = row(local_.Z)
 		local c0 = math.floor((local_.X + LANE_HALF) / CELL) + 1
 		local reach = math.ceil(SPOT_CLEAR / CELL)
@@ -170,7 +165,13 @@ for _, section in UpperMountain.Layout() do
 			end
 		end
 	end
-	print(`  {count} decor parts, {laneParts} lane parts, narrowest gap {narrowest}`)
+	local dunes = 0
+	for _, part in lane:GetDescendants() do
+		if part:IsA("BasePart") and part:GetAttribute("Ramp") then
+			dunes += 1
+		end
+	end
+	print(`  {count} decor parts, {laneParts} lane parts, {dunes} dunes`)
 end
 print(`{total} parts checked, {failures} problems`)
 process.exit(if failures > 0 then 1 else 0)

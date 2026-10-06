@@ -4,6 +4,11 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-06, only ramps solid** (branch `t3code/olympus-obstacle-mockups`, not merged): `tools/UpperMountain.luau`
+  now also turns off CanCollide, CanQuery and CanTouch on the commissioned stages' lane decor
+  (`UpperMountain.ClearOldLanes`) and on everything in High Olympus's lanes but their `Dune` MeshParts (clones of stage
+  7's dune, `Ramp` attribute; the builder needs stage 7's 229-stud dunes). Not in the cloud place yet: the builder run
+  there does both.
 - **2026-10-06, High Olympus's lanes** (branch `t3code/olympus-obstacle-mockups`; only in local copies so far, not in
   the cloud place). `tools/UpperMountain.luau` now adds to each `Tier.. God` model a `Lane` model (`Outcrops` with the
   `Knoll`, `Obstacles`, `Patches` with the flat `Path` tiles, `Life` with particle holders and bird `Flock`s) and

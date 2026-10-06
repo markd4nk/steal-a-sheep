@@ -6,6 +6,23 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Only ramps are solid on the descent (2026-10-06, branch `t3code/olympus-obstacle-mockups`, after the lanes were
+  merged)**. The user, seeing the lanes: dodging at a slide's speed is too hard; make the obstacles have no collision,
+  keep only "the things that function as ramps", like the earlier levels' mounds you can jump off, jump over or use
+  for speed.
+  - *How*: `Lane.Build` ends by turning off CanCollide, CanQuery and CanTouch on everything in a lane but its dunes
+    (`Ramp` attribute). The stepped outcrops and knoll became stage 7's dune mesh (`c.Dune`, laid gentle side uphill):
+    a big one beside the path under the god's landmark and two or three smaller ones at the sides; dunes skip the
+    30-stud gap rule. `UpperMountain.ClearOldLanes` does the same on the commissioned stages: Models under 60 parts
+    that reach the lane (trees, bamboo, rocks, spires, arches, blossom trees, fences, the pavilion, lamps), except
+    stage 4's two-part pyramids, and in the big models only pieces under 40 studs across centred in the lane (the
+    aqueduct's and temple's columns and capitals). Floors, terraces, dunes, pyramids, unions and mountains stay.
+    Checked on a fresh build (Lune) that only columns left the big models. `tools/check-lanes.luau` now fails on any
+    solid lane part that isn't a dune.
+  - *Checked*: `check.ps1`; the lane check, 0 problems (2-4 dunes a stretch); own Studio copy: 101 tests, a clean
+    console. A jump off Hypnos's big dune at about 160 studs/s: 0.7 s in the air, up to 11 studs over the crest, a
+    clean landing. A straight slide from Zeus (no steering) to the safety line: 74 s, no bumps, no stops, 6 s of air,
+    not caught (before, a straight slide stuck on stage 6's pavilion). Filmed sliding through Ares and onto a dune.
 - **High Olympus's lanes: obstacles, terrain and moving scenery on tiers 13-30 (2026-10-06, branch
   `t3code/olympus-obstacle-mockups`, not merged)**. The user: High Olympus is "just an empty path that needs to go
   up"; add obstacles and terrain, reuse the existing structures and keep their style, make it "feel like it's still

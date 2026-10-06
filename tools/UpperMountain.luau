@@ -109,6 +109,13 @@ end
 -- The lane's obstacles and terrain (defined below the shared props).
 local Lane = {}
 
+-- The commissioned stages' lane (z between these, with each piece's reach) and what in it stays solid.
+local OLD_LANE_Z = { 140, 244 }
+-- Models of more parts than this are a stage's floor, terraces or a big building: only their pillars in the lane go.
+local DECOR_MOST_PARTS = 60
+-- Stage 4's pyramids (two wedges each) lean into the lane's edges as banks: ramps, so they stay.
+local PYRAMID_PARTS = 2
+
 -- Scenery the client sets moving (src/client/Controllers/SceneryController): a tag and its numbers as attributes.
 local Motion = {}
 
@@ -392,6 +399,62 @@ local function parts(root: any): { any }
 	return list
 end
 
+-- Only ramps are solid in the commissioned stages' lane too (the user, 2026-10-06: at a slide's speed, dodging
+-- things is too hard): its trees, bamboo, spires, arches, blossom trees, fences, the pavilion, lamps and the aqueduct's
+-- and temple's columns are passed through, and left out of ground checks and the gods' line of sight. The floors,
+-- terraces, dunes, pyramids and backdrop mountains stay. Returns how many parts it changed.
+function UpperMountain.ClearOldLanes(stages: any): number
+	local changed = 0
+	local function pass(part: any)
+		if part.CanCollide or part.CanQuery then
+			changed += 1
+		end
+		part.CanCollide = false
+		part.CanQuery = false
+		part.CanTouch = false
+	end
+	local function inLane(part: any): boolean
+		local reach = part.Size.Magnitude / 2
+		local z = part.CFrame.Position.Z
+		return z + reach > OLD_LANE_Z[1] and z - reach < OLD_LANE_Z[2]
+	end
+	for index = 1, 7 do
+		local stage = stages:FindFirstChild(`Stage{index}`)
+		if not stage then
+			continue
+		end
+		for _, child in stage:GetChildren() do
+			if not child:IsA("Model") then
+				continue -- the dunes, backdrop mountains and stage 4's unions
+			end
+			local list = parts(child)
+			if #list > DECOR_MOST_PARTS then
+				-- Columns and their capitals standing in the lane; floors and roofs are far wider, terraces outside it.
+				for _, part in list do
+					local z = part.CFrame.Position.Z
+					if math.max(part.Size.X, part.Size.Z) < 40 and z > OLD_LANE_Z[1] and z < OLD_LANE_Z[2] then
+						pass(part)
+					end
+				end
+			elseif #list ~= PYRAMID_PARTS then
+				local reaches = false
+				for _, part in list do
+					if part.CanCollide and inLane(part) then
+						reaches = true
+						break
+					end
+				end
+				if reaches then
+					for _, part in list do
+						pass(part)
+					end
+				end
+			end
+		end
+	end
+	return changed
+end
+
 function UpperMountain.Build(env: Env, workspace: any)
 	local Instance, CFrame, Vector3, Color3, Enum = env.Instance, env.CFrame, env.Vector3, env.Color3, env.Enum
 	local rgb = Color3.fromRGB
@@ -405,6 +468,18 @@ function UpperMountain.Build(env: Env, workspace: any)
 
 	-- The old summit's end wall (stage 7's 80-part terrace across the path's top) goes: the path carries on.
 	local stage7 = stages:FindFirstChild("Stage7")
+	-- Stage 7's dunes, the template for the lanes' ramps (the four 229-stud ones on its path).
+	local duneTemplate
+	if stage7 then
+		for _, child in stage7:GetChildren() do
+			if child:IsA("MeshPart") and math.abs(child.Size.X - 229) < 2 then
+				duneTemplate = child
+				break
+			end
+		end
+	end
+	assert(duneTemplate, "UpperMountain: stage 7's dunes are missing")
+	UpperMountain.ClearOldLanes(stages)
 	if stage7 then
 		for _, child in stage7:GetChildren() do
 			if child:IsA("Model") and #parts(child) == 80 then
@@ -819,6 +894,19 @@ function UpperMountain.Build(env: Env, workspace: any)
 			return frame * CFrame.new(x, lift or 0, z)
 		end
 
+		-- One of the map's dunes lying in the lane at (x, z), `size` studs, gentle side uphill, turned `yaw` degrees: the
+		-- only solid thing in a lane (its Ramp attribute).
+		local function dune(x: number, z: number, size: any, yaw: number, color: any, parent: any): any
+			local part = duneTemplate:Clone()
+			part.Name = "Dune"
+			part.Size = size
+			part.CFrame = frame * CFrame.new(x, 0, z) * CFrame.Angles(0, math.pi + math.rad(yaw), 0)
+			part.Color = color
+			part:SetAttribute("Ramp", true)
+			part.Parent = parent
+			return part
+		end
+
 		-- A particle emitter on an invisible part. `spec`: Texture, Color (Color3 or two), Size and Transparency
 		-- ({ { time, value } }), Lifetime, Speed (numbers or { min, max }), Rate and any other emitter property.
 		local function emitter(parent: any, cf: any, size: any, spec: { [string]: any }): any
@@ -890,6 +978,7 @@ function UpperMountain.Build(env: Env, workspace: any)
 			Tilted = tilted,
 			Stand = stand,
 			Emitter = emitter,
+			Dune = dune,
 			LaneRandom = newRandom(section.Tier * 101 + 57),
 			-- Filled by Lane.Build: the outcrops and knoll as { X1, X2, Z1, Z2 }, for the edge props to keep off.
 			Walls = {},
@@ -1159,8 +1248,20 @@ local SPACING = 6
 -- Kept clear: the foot of each stretch (its gate and sign) and its top.
 local FOOT_CLEAR = 30
 local TOP_CLEAR = 14
--- Where the terraces' first blocks stand: the outcrops grow from there.
-local WALL_X = 63
+-- The map's dunes (stage 7's rolling mounds; one mesh): the share of their size each way that stands above the
+-- floor, how high their crest is for their height, and how far downhill of their middle it sits. Laid with their
+-- gentle side uphill, so a slide rides up and leaves the crest in a jump; their steep side faces down the mountain.
+local DUNE_REACH = 0.3
+local DUNE_TOP = 0.32
+local DUNE_CREST = 0.08
+
+-- The box a dune `w` by `l` turned `yaw` degrees at (x, z) stands on above the floor.
+local function duneBox(x: number, z: number, w: number, l: number, yaw: number): { [string]: any }
+	local a = math.rad(yaw)
+	local hx = DUNE_REACH * (math.abs(math.cos(a)) * w + math.abs(math.sin(a)) * l)
+	local hz = DUNE_REACH * (math.abs(math.sin(a)) * w + math.abs(math.cos(a)) * l)
+	return { X1 = x - hx, X2 = x + hx, Z1 = z - hz, Z2 = z + hz, Ramp = true }
+end
 -- Studs kept clear round a lamb spot and the god's spot.
 local SPOT_CLEAR = 10
 -- The path up the lane, a line nothing solid stands on (the user, 2026-10-06): its centre swings PATH_SWING studs
@@ -1171,11 +1272,15 @@ local PATH_BEND = 52
 local PATH_CLEAR = 11
 local PATH_WIDTH = 12
 
--- The narrowest open run across the lane at `z`, given the shapes (circles { X, Z, R }, boxes { X1, X2, Z1, Z2 }).
+-- The narrowest open run across the lane at `z`, given the shapes (circles { X, Z, R }, boxes { X1, X2, Z1, Z2 });
+-- dunes (`Ramp`) don't close it.
 local function gapAt(shapes: { any }, z: number): number
 	local cells: { [number]: boolean } = {}
 	local count = LANE_HALF -- two-stud cells across the lane
 	for _, shape in shapes do
+		if shape.Ramp then
+			continue
+		end
 		local lo, hi
 		if shape.R then
 			local dz = math.abs(z - shape.Z)
@@ -1282,7 +1387,7 @@ local function fits(c: any, shapes: { any }, shape: any, spots: { { number } }):
 		end
 	end
 	table.insert(shapes, shape)
-	local z = z1
+	local z = if shape.Ramp then z2 + 1 else z1
 	while z <= z2 do
 		if gapAt(shapes, z) < MIN_GAP then
 			table.remove(shapes)
@@ -1291,50 +1396,6 @@ local function fits(c: any, shapes: { any }, shape: any, spots: { { number } }):
 		z += 2
 	end
 	return true
-end
-
--- Stacked blocks like the terraces': each layer narrower than the one below, its top capped. Grows from `outer`
--- towards `inner` (x, either sign) over z1..z2.
-function Lane.Stack(
-	c: any,
-	theme: any,
-	parent: any,
-	inner: number,
-	outer: number,
-	z1: number,
-	z2: number,
-	layers: number
-)
-	local random = c.LaneRandom
-	local V = c.Vector3
-	local side = if outer > inner then 1 else -1
-	local y = 0
-	local edge = math.abs(inner)
-	local from, to = z1, z2
-	for layer = 1, layers do
-		local h = random.Number(4, 6)
-		local width = math.abs(outer) - edge
-		if width < 4 or to - from < 6 then
-			break
-		end
-		local x = side * (edge + width / 2)
-		local z = (from + to) / 2
-		local color = if layer % 2 == 0 then theme.SideB else theme.SideA
-		c.Tilted(x, y + h / 2, z, V.new(width, h, to - from), color, { Parent = parent })
-		local cap = if theme.CapAt then theme.CapAt(V.new(x, 0, z), random) else theme.Cap
-		c.Tilted(x - side * 0.4, y + h + 0.5, z, V.new(width + 0.8, 1, to - from + 0.8), cap, { Parent = parent })
-		-- A loose block on the step's edge now and then, as on the map's terraces.
-		if random.Number(0, 1) < 0.6 then
-			local s = random.Number(2.5, 4)
-			local bz = random.Number(from + s, to - s)
-			c.Tilted(side * (edge + s / 2 + 1), y + h + 1 + s / 2, bz, V.new(s, s, s * 1.4), color, { Parent = parent })
-		end
-		y += h + 1
-		edge += random.Number(4, 8)
-		from += random.Number(2, 6)
-		to -= random.Number(2, 6)
-	end
-	return y
 end
 
 function Lane.Build(c: any, theme: any)
@@ -1361,54 +1422,42 @@ function Lane.Build(c: any, theme: any)
 	end
 	c.PathX = pathX
 
-	-- The knoll first, the stretch's landmark: a stepped mound in the lane with the god's landmark on top, beside the
-	-- path.
+	-- The knoll first, the stretch's landmark: a big dune beside the path with the god's landmark on its crest.
 	for _ = 1, 200 do
-		local w, l = random.Number(24, 30), random.Number(36, 46)
-		local x = random.Number(-LANE_HALF + w / 2 + 6, LANE_HALF - w / 2 - 6)
-		local z = random.Number(-c.Half + FOOT_CLEAR + l / 2, c.Half - TOP_CLEAR - l / 2)
-		local box = { X1 = x - w / 2, X2 = x + w / 2, Z1 = z - l / 2, Z2 = z + l / 2 }
+		local w, l, h = random.Number(64, 76), random.Number(60, 72), random.Number(34, 40)
+		local yaw = random.Number(-15, 15)
+		local x = random.Number(-LANE_HALF + w * DUNE_REACH + 4, LANE_HALF - w * DUNE_REACH - 4)
+		local z = random.Number(-c.Half + FOOT_CLEAR + l * DUNE_REACH, c.Half - TOP_CLEAR - l * DUNE_REACH)
+		local box = duneBox(x, z, w, l, yaw)
 		if fits(c, shapes, box, spots) then
 			local model = Instance.new("Model")
 			model.Name = "Knoll"
 			model.Parent = outcrops
-			local V = c.Vector3
-			local y = 0
-			local ww, ll = w, l
-			for layer = 1, 3 do
-				local h = random.Number(3, 4.5)
-				local color = if layer % 2 == 0 then theme.SideB else theme.SideA
-				c.Tilted(x, y + h / 2, z, V.new(ww, h, ll), color, { Parent = model })
-				c.Tilted(x, y + h + 0.5, z, V.new(ww + 0.8, 1, ll + 0.8), theme.Cap, { Parent = model })
-				y += h + 1
-				ww -= random.Number(5, 8)
-				ll -= random.Number(6, 10)
-			end
+			c.Dune(x, z, c.Vector3.new(w, h, l), yaw, theme.Cap, model)
 			table.insert(c.Walls, { 0, 0, box.Z1, box.Z2 })
 			if theme.Knoll then
-				theme.Knoll(c, x, y, z, model)
+				theme.Knoll(c, x, h * DUNE_TOP, z - l * DUNE_CREST, model)
 			end
 			break
 		end
 	end
 
-	-- Outcrops, alternating sides along the stretch.
-	local outcropCount = theme.Outcrops or (if c.Index <= 6 then 3 else 4)
+	-- Smaller dunes at the lane's sides, alternating, spread along the stretch.
+	local duneCount = theme.Dunes or (if c.Index <= 6 then 2 else 3)
 	local side = random.Side()
-	for i = 1, outcropCount do
-		for _ = 1, 12 do
-			local reach = random.Number(22, 30)
-			local length = random.Number(36, 54)
-			local z = -c.Half + FOOT_CLEAR + usable * (i - 0.5) / outcropCount + random.Number(-18, 18)
-			local inner = WALL_X - reach
-			local box = if side > 0
-				then { X1 = inner, X2 = LANE_HALF, Z1 = z - length / 2, Z2 = z + length / 2 }
-				else { X1 = -LANE_HALF, X2 = -inner, Z1 = z - length / 2, Z2 = z + length / 2 }
+	for i = 1, duneCount do
+		for _ = 1, 40 do
+			local w, l, h = random.Number(46, 56), random.Number(42, 52), random.Number(24, 30)
+			local x = side * random.Number(36, 46)
+			local z = -c.Half + FOOT_CLEAR + usable * (i - 0.5) / duneCount + random.Number(-20, 20)
+			local yaw = random.Number(-25, 25)
+			local box = duneBox(x, z, w, l, yaw)
+			box.X1, box.X2 = math.max(box.X1, -LANE_HALF), math.min(box.X2, LANE_HALF)
 			if fits(c, shapes, box, spots) then
 				local model = Instance.new("Model")
 				model.Name = "Outcrop"
 				model.Parent = outcrops
-				Lane.Stack(c, theme, model, side * inner, side * (WALL_X + 8), box.Z1, box.Z2, random.Int(3, 4))
+				c.Dune(x, z, c.Vector3.new(w, h, l), yaw, theme.Cap, model)
 				table.insert(c.Walls, { side, 0, box.Z1, box.Z2 })
 				break
 			end
@@ -1484,6 +1533,16 @@ function Lane.Build(c: any, theme: any)
 	end
 	if theme.Birds then
 		Lane.Birds(c, life, theme.Birds)
+	end
+	-- Only the dunes are solid (the user, 2026-10-06: at a slide's speed, dodging things is too hard; only what works as
+	-- a ramp should have collision). Everything else in the lane, the landmark too, is passed through, and left out of
+	-- ground checks and the gods' line of sight.
+	for _, part in lane:GetDescendants() do
+		if part:IsA("BasePart") and not part:GetAttribute("Ramp") then
+			part.CanCollide = false
+			part.CanQuery = false
+			part.CanTouch = false
+		end
 	end
 end
 

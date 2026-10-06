@@ -78,6 +78,9 @@ confirmed or reversed it.
   things. The first mock-up's density less 20%; everything standing on the mountain tilted with the slope; scenery
   moving ("cogs turning, islands bopping ... much more immersive"); a winding path up each stretch that obstacles keep
   off.
+- **Only ramps are solid on the descent (the user, 2026-10-06)**: "make the obstacles not have any sort of collision
+  ... only the things that function as ramps should ... have collision", because dodging at a slide's speed is too
+  hard; the mounds of the earlier levels that you can jump off, jump over or use for speed are the kind to keep.
 - **The stair walker is a real StairMaster the player climbs (the user, 2026-10-05)**: level 1 looks like a plain gym
   machine and each upgrade looks better, ending in the Olympus look (marble and gold); the player snaps onto it like a
   treadmill and climbs the moving steps; the steps get faster with each machine level.
@@ -277,20 +280,27 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
 
 ## To review
 
-Calls in High Olympus's lanes (2026-10-06; the user's own calls are under Confirmed rules):
+Calls in High Olympus's lanes and the ramps-only rule (2026-10-06; the user's own calls are under Confirmed rules):
 
-- **Always a 30-stud gap** across the lane at every point down a stretch, and nothing solid within 10 studs of a wild
-  lamb's spot or the god's, nor in the first 30 studs of a stretch (its gate and sign) or its last 14.
+- **The ramps-only rule covers the whole descent, tiers 1-30**: on the commissioned stages their trees, bamboo, small
+  rocks, spires, arches, blossom trees, fences, the pavilion, lamps and the aqueduct's and temple's columns in the lane
+  are passed through. Solid: the floors, terraces, stage 6 and 7's dunes, stage 4's pyramids (their faces lean into
+  the lane's edges like banks) and the backdrop mountains. Easy to limit to High Olympus if wanted.
+- **High Olympus's ramps are stage 7's dunes** (its own mesh), recoloured: a big one beside the path under the god's
+  landmark (crest 11-13 studs over the floor) and two or three smaller ones at the lane's sides (7-11), gentle side
+  uphill so a slide rides up and leaves the crest in a jump. Measured at about 160 studs/s: 0.7 s in the air, 11 studs
+  over the crest, a clean landing. They keep off the path, the lamb and god spots and the gate.
+- **Passed-through things are also left out of ground checks and the gods' line of sight** (CanQuery off), so they no
+  longer give a thief cover; the dunes still do.
+- **The stepped rock outcrops and knoll are gone**, replaced by the dunes.
+- **Nothing solid within 10 studs of a wild lamb's spot or the god's**, nor in the first 30 studs of a stretch (its gate
+  and sign) or its last 14.
 - **The path**: swings 18 studs either side, one bend every 330 studs or so (gentle enough to follow at 100 studs/s,
   main's top slide speed); obstacles keep 11 studs from its centre line; 12 studs wide. Poseidon's is a stream and
   Hera's a royal carpet, the others a shade of the floor.
 - **How many**: obstacles 10 at tier 13 rising to 14 at Zeus (12 to 18 less the user's 20%; a crowded stretch can
-  come out one or two short); three rock outcrops a stretch up to tier 18, four above; one knoll each, with the god's
-  landmark.
-- **Which obstacles**: each god's own (HISTORY.md lists them), mostly ones to steer round; a few low enough to jump
-  (fallen logs and columns, tombs, benches, barricades).
-- **Gods glide through obstacles** as on the old stages (no pathfinding); obstacles and knolls block a god's line of
-  sight, so they give a thief cover.
+  come out one or two short), all scenery now; two smaller dunes a stretch up to tier 18, three above, plus the big one.
+- **Which obstacles**: each god's own (HISTORY.md lists them).
 - **Moving scenery is the player's own**: each device moves what's within 600 studs of its camera; Reduce motion holds
   it all still. Birds and bobbing things can't be touched.
 
