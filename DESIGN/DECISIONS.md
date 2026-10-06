@@ -147,6 +147,9 @@ confirmed or reversed it.
   need to do besides just playing the game. After the onboarding, it should just be their own experience. They can
   figure out how to do it." So no "<God>'s <Area> is in reach!", and no hint, tip or nudge that tells a player what to
   do once the onboarding is over. Onboarding itself is the onboarding session's (`t3code/simplify-onboarding-guidance`).
+- **The stair walker (the user, 2026-10-06)**: no "Next" line or bar to the next god while training; "all it needs to
+  indicate is that you're gaining plus speed, whatever you're making per second ... above the player". And "the
+  player should be moving on the treadmill way faster ... at higher levels and higher speeds."
 
 - **The overnight work as summarized, merged and shipped (the user, 2026-10-06)**: "Yes, it looks good. You can merge
   it... just ship it. It still needs to stay private though." So version 8 went out with the audience left Private:
@@ -465,12 +468,15 @@ Calls building the stair walker (2026-10-05).
 - **The sign** stands by the machine's entry, turned to the gate, written on both sides ("UPGRADE", the next level, its
   price in cash and R$).
 - **On and off**: walking into the entry snaps the owner on (only the owner, not while carrying a lamb); jumping puts
-  them down behind the entry facing away; "Jump to get off" shows the first time each session. Training only counts
+  them down behind the entry facing away; "Jump to get off" shows only on the onboarding's first climb. Training only counts
   while snapped on.
 - **The sign's prompts**: E upgrades with cash, R with Robux; only the owner sees them; they go at the top level, and
   the board says MAX LEVEL. An empty plot's machine shows level 1 with no floating tag.
-- **Step speed by level**: a step takes `0.25 + 0.35 x 0.9^(level-1)` seconds: 0.60 at level 1, 0.48 at 5, 0.40 at
-  10, 0.30 at 20, 0.27 at 30.
+- **Step speed by training rate** (2026-10-06, replacing step speed by level): steps a second rise evenly with each
+  tenfold of the climber's rate, so a trail speeds them up too. Without a trail a step takes 0.60 s at level 1, 0.40
+  at 3, 0.31 at 5, 0.21 at 10, 0.14 at 20, 0.10 at 30 (Sunlight trail on top: 0.10, the fastest).
+- **While training** your own screen shows the Climbing shoe and "+N/s" in lime over your head, with a small punch
+  each second; other players don't see it over you.
 - **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor; the
   machine's sides, hood, console and the sign are solid, the entry step and stairs aren't.
 

@@ -16,9 +16,17 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     to climb".
   - *Listed for the user, untouched*: the Merge Shrine's "Bigger sheep in, more luck" and its empty-list lines, the
     Sell Stall's "Tap the sheep to sell", the gift's "Tap here, or the star", refusals with advice tails ("Your flock
-    is full: merge or sell first"), the HUD's glows and red badges (GIFT, DAILY, SHEEPDEX), the training meter's
-    "Next: <God> at <N>", the rare-spawn notice.
-  - *Checked*: `check.ps1` passes. Not playtested: the cloud place's Studio was shared with seven busy sessions.
+    is full: merge or sell first"), the HUD's glows and red badges (GIFT, DAILY, SHEEPDEX), the rare-spawn notice.
+  - *The stair walker* (the user, same thread: the "Next" line and its bar go, "all it needs to indicate is that you're
+    gaining plus speed ... above the player"; "the player should be moving on the treadmill way faster ... at higher
+    levels and higher speeds. Right now it's still the same thing every single time"): TrainingService sets the
+    player's `TrainRate` attribute while training. Every client runs a machine's steps at its climber's rate
+    (`StairClimb.StepSeconds(rate)`): steps a second rise evenly with each tenfold of the rate, from 0.6 s a step on
+    the free machine to 0.1 s on the top one with the Sunlight trail (`GameConfig.StairWalker.SlowestStep`,
+    `FastestStep`), so trails speed it up too. It was 0.6 s to 0.27 s by level, most of it in the first levels. Your
+    own client shows the Climbing shoe and "+N/s" over your head (`WalkerController`, `TrainGain` in PlayerGui), with
+    a small punch each second. The HUD's meter came out on the onboarding branch (it owns `Hud.luau`).
+  - *Checked*: `check.ps1` passes.
 
 - **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
   it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game
