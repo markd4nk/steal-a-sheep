@@ -66,6 +66,26 @@ function Mountain.SpeedAt(x: number, climb: number, weight: number): number
 	return math.max(movement.CrawlSpeed, movement.WalkSpeed * factor)
 end
 
+-- A slide's speed before momentum, set when it starts: the escape speed (Economy.EscapeSpeed) for the carried lamb's
+-- tier and weight, or the tier slid from (weight 1) empty-handed; never under walking speed, so a player too weak for
+-- the slope still gets home.
+function Mountain.SlideBase(climb: number, tier: number, weight: number): number
+	return math.max(Economy.EscapeSpeed(climb, tier, weight), GameConfig.Movement.WalkSpeed)
+end
+
+-- Momentum: how many times its base speed a slide from `fromTier` (the carried lamb's tier, or where it began
+-- empty-handed) goes at `x`. MomentumPerTier more for every tier below that, never lifting it past MomentumTop; none
+-- below the safety line, where slides end. A god chasing a thief takes the thief's, so the gap between them changes
+-- for every stud slid exactly as it would without it: every chase ends where it would anyway, only sooner.
+function Mountain.Momentum(base: number, fromTier: number, x: number): number
+	if x < Olympus.SafeLineX then
+		return 1
+	end
+	local movement = GameConfig.Movement
+	local below = math.max(0, fromTier - math.max(Mountain.TierAt(x), 1))
+	return math.min(1 + movement.MomentumPerTier * below, math.max(1, movement.MomentumTop / math.max(base, 1e-3)))
+end
+
 -- On the ramp between the safety line and the summit, near its floor (not on a roof or cloud above it).
 function Mountain.IsOnRamp(position: Vector3): boolean
 	if position.X < Olympus.SafeLineX or position.X > top + 20 then
