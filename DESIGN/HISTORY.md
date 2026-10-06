@@ -6,6 +6,40 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **The Robux store (2026-10-05)**. The user: a shop "just to buy stuff for Robux", reusing Shear a Sheep's store:
+  pay-to-win sheep, 2x Growth and 2x Money passes, 2x Speed (3 Robux in Steal an Egg), the treadmill's upgrade for
+  Robux beside its cash price, six Climbing ("speed") packs and five cash packs (24K for 45 up to 8M for 720); mock-ups
+  first. Five rounds: A (HTML in the game's icons, from Studio's cache), B (their reference: square studs, bigger art
+  that grows with the pack, a designed 2x Speed), C (containers redrawn as single icons: "the chest ... looks sloppy"),
+  D (the climbing shoe as Hermes' winged sandal, from their picture; cash, never coins), E (the tabs outside the window,
+  no scrollbar). Their calls: red then the sandal with white wings (gold on 2x Speed only), 2x Speed re-buyable at
+  three times the price each buy, the walker 19 then +20% a level, the filled-in prices kept, tabs tighter and closer.
+  - *Shared*: `Config/Store` (what's sold, prices, ladders, product keys; Creator Hub ids empty), `Economy.RobuxSheep`
+    (Golden Fleece 10x, Kronos 3x the flock's best other sheep: `BestIncome`), income functions take `best`,
+    `Earn`/`Offline` take the growth multiplier, `DoubleClimb`; `GameConfig` looks for the two (Shear a Sheep's Golden
+    Fleece colours with new gold sparkles, its Time Sheep build); `Theme.Icons.Store*` and `HudRobux`, `HudShoe` now
+    the sandal.
+  - *Server*: `StoreService` (the remote `RequestPurchase`: picks 2x Speed's next step or the walker's level, one dialog
+    at a time, Studio grants what isn't on Roblox; mirrors `Pass<Key>` and `PassesChecked`); `PurchaseService` maps a
+    receipt's product id to its key, `Products` grants by key (cash, Climbing, 2x Speed, walker, sheep); `FlockService`
+    multiplies income by 2x Money everywhere it shows and growth by 2x Growth (offline credit waits for the passes),
+    `AddRobuxSheep`; Robux sheep can't be sold (`Roster.CanSell`) or merged. Main's StairMaster sign (its placeholder
+    Robux prices were waiting on this session) now asks `StoreService` too, and shows the store's price.
+  - *Client*: `Screens/Store` (built at runtime from UIKit: sections, cards, the 3D sheep, the outside tabs that light
+    with the section in view and scroll on a tap, shrinking on a short window), `Prices` (Roblox's price once a product
+    has an id), the HUD's STORE on the right edge, the Flock menu's line for store sheep. `Motion.PopIn` now follows a
+    window's Fit if it changes mid-pop: on a phone the store and the Free Gift opened at full size, past the bottom.
+  - *Art*: `art/store/make_store_art.py` draws every picture (SVG containers and sandals, gvesster's pack icons placed
+    as they are, one outline round each) and exports them for upload; the output stays out of git (the pack's licence).
+  - *Checked*: `check.ps1` passes; 66 tests pass in Studio (new: prices and ladders, every product key granted, Robux
+    sheep income, 2x Growth offline). Main's Studio with the branch's scripts swapped in (put back after, not saved):
+    both bootstraps ready, no errors; STORE opens the store; Golden Fleece bought (income 79K/s to 794K/s, its label
+    +715K/s, 10x the best other sheep's 71.5K/s); 2x Speed twice (Climbing 25 to 50 to 100, price 3 to 9 to 27); the
+    walker for Robux then cash (level 1 to 3, prices 19 to 27 and 1.2K to 7.5K); 2x Money doubled income exactly and
+    showed Owned, a second buy refused; a Robux sheep refused at the Sell Stall and the Merge Shrine. Galaxy A06
+    sideways: the window fits after the Motion fix, all five tabs fit, the Cash tab scrolls there. Screenshots in the
+    session (`steal-a-sheep-store-built-*.jpg` in T3 Code's attachments).
+
 - **Friend boost (2026-10-05)**. The user asked for a simple friend multiplier like other games: each friend in the
   server multiplies your income. Mock-ups A (a pill under the cash) and B (a tile under the menus, tap to invite) on
   a real HUD screenshot; the user picked B, the INVITE state at 0 friends, and +20% a friend (over the proposed +10%).

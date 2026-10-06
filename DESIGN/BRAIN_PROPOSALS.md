@@ -120,6 +120,12 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   forbid prizes 'in exchange for a thumb up on your game': ask for likes without tying the reward to them. In an
   unpublished place PlaceId is 0 and there's nothing to favorite." Seen 2026-10-05 building Steal a Sheep's free gift
   (docs and DevForum; the live prompt itself not yet tried).
+- **S21** (`BRAIN/PATTERNS/ui.md`): "A ScrollingFrame with `ScrollBarThickness = 0` still draws a 1-pixel line where
+  its bar would be; set `ScrollBarImageTransparency = 1` as well to hide the bar." Seen 2026-10-05 on Steal a Sheep's
+  store, whose tabs stand outside the window instead of a bar.
+- **S22** (`BRAIN/PATTERNS/testing-studio.md`): "`user_mouse_input`'s `instance_path` can't reach an instance whose name
+  has a dot in it ('Instance not found'): the dot splits the path. Name UI elements without dots (or tap by x/y)."
+  Seen 2026-10-05 clicking the store's `Sheep.GoldenFleece` card.
 
 ## Done
 

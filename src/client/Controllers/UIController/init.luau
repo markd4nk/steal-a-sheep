@@ -153,7 +153,7 @@ end
 
 function UIController.Start(_self: any)
 	-- The HUD first, so the menus' notices have somewhere to go.
-	local order = { "Hud", "Popup", "Flock", "Shop", "Sheepdex", "Merge", "SellStall", "Gift", "DebugPanel" }
+	local order = { "Hud", "Popup", "Flock", "Shop", "Sheepdex", "Merge", "SellStall", "Gift", "Store", "DebugPanel" }
 	task.spawn(function()
 		for _, name in order do
 			local module = screenModules[name]

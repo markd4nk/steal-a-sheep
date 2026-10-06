@@ -48,14 +48,19 @@ lamb.
 - **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
   Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
   `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
+- **Robux store** (2026-10-05, branch `t3code/design-robux-shop`, not merged): the HUD's STORE (right edge) opens one
+  scrolling page with its section tabs outside the window: two Robux-only sheep, 2x Money / 2x Growth passes, 2x Speed
+  (re-buyable, tripling), the walker's next level, Climbing and Cash packs. `Config/Store` (catalog, prices, ladders),
+  `StoreService` (dialogs, passes), `PurchaseService/Products` (grants by key), `Screens/Store`; art from
+  `art/store/make_store_art.py`. No products or passes exist on Roblox yet: Studio grants them with no dialog.
 - **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
   `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
 
-- **Server**: `DataService`, `PurchaseService` (pack; the walker's Robux levels, no products made yet), `SheepService`, `PlotService`, `FlockService`,
+- **Server**: `DataService`, `PurchaseService` (grants by Config/Store key), `StoreService`, `SheepService`, `PlotService`, `FlockService`,
   `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
   `GiftService`, `DebugService` (Studio only).
-- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Popup,
-  Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
+- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Store,
+  Popup, Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
   `Utils/Economy` (every formula), `Utils/Mountain` (ramp height, tiers by position, floor checks).
 - **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
@@ -69,6 +74,10 @@ lamb.
 
 ## In progress
 
+- **The Robux store** is on `t3code/design-robux-shop`, playtested, waiting for the user to say merge. Before it can
+  sell: make the 2 passes and the developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) in
+  Creator Hub at Config/Store's prices and put their ids in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`).
+
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
@@ -77,6 +86,10 @@ lamb.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 
 ## Not verified
+
+- **Real Robux purchases**: no product or pass exists yet, so nothing went through Roblox's dialog or ProcessReceipt;
+  the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and
+  the one-dialog-at-a-time rule with a real dialog are untested. Store on a phone: Galaxy A06 sideways only.
 
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
   `IsFriendsWithAsync` pairs and the join notices between two real friends are untested until the place is published.

@@ -49,6 +49,8 @@ local SHEEP_PERKS = { "Arrives grown" }
 local SCROLL_TIME = 0.35
 local SCROLL_MARGIN = 6
 local BACK_ACTION = "StoreBack"
+local PRICE_SIZE = 24
+local PRICE_HERO = 32
 
 local CLIMB_ART = {
 	Theme.Icons.StoreClimb1,
@@ -86,6 +88,11 @@ local SECTIONS: { SectionSpec } = {
 	{ Name = "Cash", Title = "CASH", Tab = "Cash", Icon = Theme.Icons.HudCash },
 }
 
+-- A card's instance name: its key without the dot.
+local function cardName(key: string): string
+	return (string.gsub(key, "%.", ""))
+end
+
 local function hex(color: Color3): string
 	return string.format("#%02X%02X%02X", color.R * 255, color.G * 255, color.B * 255)
 end
@@ -97,7 +104,7 @@ end
 
 -- A card: its colour, lighter at the top, with the header's studs and the thick ink edge.
 local function card(parent: Instance, name: string, size: UDim2, tint: Color3): Frame
-	local frame = UIKit.Frame(parent, name, size, tint)
+	local frame = UIKit.Frame(parent, cardName(name), size, tint)
 	frame.BackgroundTransparency = 0
 	UIKit.Corner(frame, CARD_RADIUS)
 	UIKit.Studs(frame, CARD_RADIUS)
@@ -191,8 +198,20 @@ local function chip(parent: Instance, text: string, gold: boolean): GuiObject
 end
 
 local function buyButton(parent: Instance, width: number, height: number?): TextButton
-	local button = UIKit.Button(parent, "BuyButton", "Robux", width, height or Theme.ButtonHeight.Standard, "...")
+	local faceHeight = height or Theme.ButtonHeight.Standard
+	local button = UIKit.Button(parent, "BuyButton", "Robux", width, faceHeight, "...")
 	button.ZIndex = 5
+	-- The price as big as the mock-ups': a size up from a button's usual label.
+	local size = if faceHeight >= Theme.ButtonHeight.Hero then PRICE_HERO else PRICE_SIZE
+	local line = button:FindFirstChild("Line", true)
+	local words = line and line:FindFirstChild("Label")
+	local icon = line and line:FindFirstChild("Icon")
+	if line and line:IsA("Frame") and words and words:IsA("TextLabel") and icon and icon:IsA("ImageLabel") then
+		line.Size = UDim2.fromOffset(0, size + 4)
+		words.TextSize = size
+		words.Size = UDim2.fromOffset(0, size + 4)
+		icon.Size = UDim2.fromOffset(math.floor(size * 1.05), math.floor(size * 1.05))
+	end
 	return button
 end
 
@@ -307,6 +326,7 @@ function StoreScreen.Build(playerGui: Instance): ScreenGui
 	list.BorderSizePixel = 0
 	-- No bar: the tabs outside the window show where you are (the user, 2026-10-05).
 	list.ScrollBarThickness = 0
+	list.ScrollBarImageTransparency = 1
 	list.CanvasSize = UDim2.new()
 	list.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	list.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -514,6 +534,10 @@ function StoreScreen.Build(playerGui: Instance): ScreenGui
 	tabs.AutomaticSize = Enum.AutomaticSize.Y
 	tabs.Position = UDim2.new(1, TAB_GAP, 0, TAB_TOP)
 	tabs.ZIndex = 5
+	-- Smaller on a short window, so all five fit beside it (StoreScreen.new sets it).
+	local tabScale = Instance.new("UIScale")
+	tabScale.Name = "Fit"
+	tabScale.Parent = tabs
 	UIKit.List(tabs, false, 2, Enum.HorizontalAlignment.Center)
 	for index, spec in SECTIONS do
 		local button = Instance.new("TextButton")
@@ -567,8 +591,8 @@ function StoreScreen.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local lit: string? = nil
 
 	local function find(name: string): Instance
-		local found = window:FindFirstChild(name, true)
-		assert(found, `Store has no {name}`)
+		local found = window:FindFirstChild(cardName(name), true)
+		assert(found, `Store has no {cardName(name)}`)
 		return found
 	end
 	local function buttonIn(holder: Instance, name: string?): TextButton
@@ -816,6 +840,18 @@ function StoreScreen.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			scrollTo(spec.Name)
 		end)
 	end
+	-- The tabs start under the header where the window is tall enough, and higher up beside it on a short one (a
+	-- phone held sideways), shrinking only as much as they still must.
+	local tabScale = tabs:FindFirstChild("Fit") :: UIScale
+	local function fitTabs()
+		local natural = #SECTIONS * (TAB_FACE + 16) + (#SECTIONS - 1) * 2
+		local height = window.Size.Y.Offset
+		local top = math.clamp(height - natural - 8, 8, TAB_TOP)
+		tabs.Position = UDim2.new(1, TAB_GAP, 0, top)
+		tabScale.Scale = math.clamp((height - top - 8) / natural, 0.5, 1)
+	end
+	trove:Connect(window:GetPropertyChangedSignal("Size"), fitTabs)
+	fitTabs()
 	trove:Connect(list:GetPropertyChangedSignal("CanvasPosition"), function()
 		if not scrollTween then
 			pinned = nil

@@ -111,8 +111,12 @@ Calls made building the Robux store (2026-10-05):
   last level's cash price.
 - **Passes count offline too**: 2x Money on the offline cash, 2x Growth on growth while away. Every income shown (HUD,
   flock cards, pen labels, the income boards) includes 2x Money.
-- **HUD**: a STORE button (the icon pack's golden Robux coin) under INVITE, hidden like the others until the first
-  delivery. The store window's corner picture is the basket, as in the mock-ups.
+- **HUD**: a STORE button (the icon pack's golden Robux coin) on the right edge, halfway down: the left column is full
+  on a phone (GIFT, FLOCK, SHOP, SHEEPDEX, INVITE). Hidden like the others until the first delivery. The store window's
+  corner picture is the basket, as in the mock-ups.
+- **The tabs**: 2 points apart, 6 from the window (the user: tighter and closer). Where the window is short (a phone held
+  sideways) they start beside the header and shrink just enough for all five; on a phone they're about 0.8 size.
+- **Climbing's icon everywhere is the white-winged sandal** (HUD, store, the free gift); 2x Speed's has gold wings.
 - **Words**: "ROBUX ONLY" on the sheep, "CHEAP!" on 2x Speed with "Next: 9" under its price, "BEST VALUE" on +10B and
   +8M, "Owned", "Sold out" and "MAX" when done; the walker card counts levels from 1, as the shop does.
 - **Before the products exist on Roblox**: in Studio a store button grants its product at once, with no dialog; a live
