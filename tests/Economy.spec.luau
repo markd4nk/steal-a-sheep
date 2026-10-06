@@ -216,9 +216,9 @@ return function(t: Run.Suite)
 		t.Expect((Economy.CanMerge(top))).ToBe(false)
 	end)
 
-	t.Test("selling pays 15 seconds of current income", function()
-		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(45)
-		t.Expect(Economy.SellValue(sheep({}))).ToBe(15)
+	t.Test("selling pays two minutes of current income", function()
+		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(360)
+		t.Expect(Economy.SellValue(sheep({}))).ToBe(120)
 	end)
 
 	t.Test("offline: a quarter of at most two hours, lamb rate until grown", function()
@@ -247,5 +247,14 @@ return function(t: Run.Suite)
 			t.Expect(weight >= 1 and weight <= 1.5).ToBe(true)
 			t.Expect(size >= 1 and size <= 3).ToBe(true)
 		end
+	end)
+
+	t.Test("the free gift: three minutes of walker and income, at least 500 of each", function()
+		local coins, climb = Economy.GiftReward(0, 0)
+		t.Expect(coins).ToBe(500)
+		t.Expect(climb).ToBe(500)
+		local laterCoins, laterClimb = Economy.GiftReward(2, 13.5)
+		t.Expect(laterCoins).ToBe(2430)
+		t.Expect(laterClimb).ToBe(7200)
 	end)
 end

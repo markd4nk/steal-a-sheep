@@ -30,6 +30,9 @@ confirmed or reversed it.
   as few numbers as possible. No cap on the mountain: more Climbing keeps making you faster. Walking in the safe zone
   (the plots and hub) is capped at 7x normal; tier 1 and the safe zone never go below normal. The sign's number is
   just enough for the lightest lamb on that tier; an average lamb leaves about 95% of the god's speed there.
+- **Caught thieves are punched three tiers down (2026-10-05)**, not sent home, and drop the lamb where they were caught.
+  Walker upgrades are properly expensive (about ten minutes of income each). Most escapes should feel close: tune
+  towards Climbing sitting just over the next sign, not far past it.
 - **Hidden lamb weight (2026-10-05)**: no Light/Stout/Heavy words and no numbers on screen: players feel it. A smooth
   range, not three kinds. Saved with the sheep; heavier lambs tend to grow bigger, but a light one can still grow
   large, just less likely. The carry card shows no speeds.
@@ -62,6 +65,17 @@ confirmed or reversed it.
 - **Leaderboards live on the map's billboards in the safe zone, not behind a HUD icon** (the user, 2026-10-05): This
   Server (the richest here, by income), Top Income (the richest overall, each player's best ever), Most Steals and
   Climb Power (titled CLIMBING since Climbing replaced Climb Power on screen). Titles are words only, no icon; otherwise the boards' look (dark panel, medal rows, headshots) is OK'd.
+- **The Sell Stall shows stored sheep only** (the user, 2026-10-05): sheep in the pen never appear there, so a player
+  can't sell their best by mistake (a way to move the best stored ones into the pen comes later); the server refuses
+  pen sheep too. Layout A of `DESIGN/ui/mockups/sell-stall.html`: the grid with a sell tile on the right, nothing
+  picked when it opens, each sheep tapped, and a Select all (kept, 2026-10-05).
+- **Selling pays two minutes of the sheep's income** (the user, 2026-10-05: "two minutes' worth would be fine", Steal
+  an Egg pays about 100 s; a start, to be tuned later). It was 15 s.
+
+- **The free gift (2026-10-05)**: worth 3 minutes of the player's stair walker in Climbing and 3 minutes of their
+  income in cash, at least 500 of each, so it keeps up with them (the user: "I do like how the reward size is always
+  adjusting"); the look with both rewards on one cyan stage and the steps as lit-up pictures of Roblox's game page.
+  Only the favorite can register (no game can see a like); the like step is asked, not checked.
 
 ## To review
 
@@ -77,6 +91,35 @@ the menus during the tutorial was left to the agent (kept).
 - **The tile hides with the other menu pictures** until the first lamb is home; the boost works meanwhile.
 - **Tapping it opens Roblox's invite** with friends here too, not only at 0; where invites aren't allowed it says
   "Invites aren't available here".
+
+Calls made building the free gift (2026-10-05).
+
+- **Once per player, ever**; a new player's 25 Climbing becomes 525.
+- **What unlocks Claim**: favoriting, through Roblox's own favorite prompt that Claim opens. The like is asked (step 1)
+  but can't be checked by any game. Roblox's rules forbid rewards "in exchange for a thumb up"; see the question to the
+  user in this task's summary.
+- **When it shows**: a GIFT button at the top of the left column (red "!", glowing) until claimed; the menu also opens
+  by itself once a session, 30 s after the first delivery (or after joining), when the player is off the mountain, not
+  carrying and in no other menu, every session until claimed.
+- **Look**: the Shop's Prize Fleece menu (Large, 470 tall), cyan header like the reference, no cash chip in its header,
+  no "LIMITED TIME" (it isn't). Step pictures are Roblox's real game page (another game's, counts hidden), lit up.
+  Tapping the favorite card opens the prompt too. A player who favorited the game before can claim without a prompt.
+
+Calls building the Sell Stall (2026-10-05).
+
+- **Order**: cheapest first; the header's button switches to Best (dearest first). Oldest first on a tie.
+- **Locked sheep show**, dark with their padlock, and can't be picked ("Locked: unlock it in Your Flock"); Select all
+  skips them. Select all reads Clear once everything pickable is picked.
+- **Cards**: the family's name, what it sells for, and a chip over the picture's foot: LAMB (green), MERGED or
+  ASCENDED (purple), or the size above Standard (LARGE, GIANT, TITAN). No income on the card (the price is two minutes
+  of it).
+- **The tile**: the four dearest picked as a fan with "+N" for the rest, the total, Select all / Clear, Sell N.
+- **One confirm for the lot**: "Sell 7 sheep?", the dearest one's token with "x7", the cash, "This can't be undone".
+  Afterwards: "Sold 7 for 5.1K cash".
+- **Never the whole flock**: a sale that would leave no sheep is refused (only possible when the pen is empty).
+- **The Flock menu no longer sells**: its Sell button and confirm are gone; the stall is the one place to sell.
+- **The header picture** is the HUD's cash stack (`Theme.Icons.HudCash`); the mock-up had the pack's single bill,
+  which isn't uploaded.
 
 Calls building the stair walker (2026-10-05).
 
@@ -239,8 +282,7 @@ Calls made while building the MVP on 2026-10-05:
 - **Plots**: the stair walker by the back fence (map hay and trees where it goes are moved out of the way, kept in
   ServerStorage.ClearedDecor). Each penned sheep shows "+X/s" (and a lamb its growth %).
 - **Manual Equip pins a sheep**: Equip Best keeps pinned sheep and refills the rest; Store unpins.
-- **Selling is at the Sell Stall only** (the map's stall at z 175); the Flock menu opened there adds Sell with a
-  confirm showing the coins and the income lost. The Shop is the stall at z 205; the Merge Shrine is Shear a Sheep's Mutation
+- **Selling is at the Sell Stall only** (the map's stall at z 175), in its own menu (Screens/SellStall). The Shop is the stall at z 205; the Merge Shrine is Shear a Sheep's Mutation
   Machine between the stalls (opens after 3 deliveries).
 - **Merge picks the three**: the biggest of the group, then the two that earn least (stored ones first). The preview
   shows the sizes used, the three's income against the result's, and the flock's income before and after.

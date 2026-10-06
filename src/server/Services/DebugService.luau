@@ -87,6 +87,13 @@ local commands: { [string]: Command } = {
 		registry.FlockService:Push(player)
 		return true, nil
 	end,
+	-- The free gift can be claimed again.
+	ResetGift = function(player)
+		local data = registry.DataService:GetData(player)
+		data.FreeGift = false
+		registry.FlockService:Push(player)
+		return true, nil
+	end,
 	-- value: the stair walker level to show (1 is the free machine).
 	SetWalker = function(player, value)
 		local data = registry.DataService:GetData(player)

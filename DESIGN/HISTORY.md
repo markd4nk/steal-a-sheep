@@ -24,6 +24,78 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     paid 6.57/s -> 9.19/s (x1.40); 4 friends +80%, 9 capped at +80%, back to INVITE at -1; the join notice drawn;
     tapping the tile opened Roblox's Invite Friends dialog (closed without inviting). Real friends untested.
 
+- **Free gift for liking and favoriting (2026-10-05)**. The user, with a reference from another game (a "Free Gift!"
+  panel: the reward big, numbered steps with a picture of the game page's button, Claim): give players something
+  like climbing speed and cash for liking and favoriting the game (no community to join yet), in the Shop's UI.
+  - *Reward*: `Economy.GiftReward(walkerLevel, income)`: 180 s of the stair walker's rate (no trail) in Climbing and
+    180 s of the flock's income in coins, at least 500 of each, so it's worth the same few minutes whenever it's
+    claimed. The snapshot carries `FreeGift`, `GiftCoins`, `GiftClimb`; the menu shows those.
+  - *Claim*: `GiftService` (`Remotes.ClaimGift`, no arguments) gives it once per player (saved `FreeGift`) and returns
+    what it gave. Claim first opens Roblox's favorite prompt (`AvatarEditorService:PromptSetFavorite(PlaceId, Asset,
+    true)`) and claims only on `PromptSetFavoriteCompleted` = Success; in an unpublished place (PlaceId 0) the prompt is
+    skipped. No game can see a like, so step 1 is asked, not checked; the server can't check the favorite either and
+    takes the claim on trust, capped at one.
+  - *UI*: `Screens/Gift` (a Medium Prize Fleece menu, cyan `Lab` header, the gift on a stage, the two rewards, two
+    step tiles with a thumb-up row and a Favorite star under red pointers, a green Claim). HUD: `GiftButton` (GIFT,
+    top of the left column) with a red "!" and the hint glow, gone once claimed. It opens by itself once a session, 30 s
+    after it can be claimed (after the first delivery), once the player is off the mountain, not carrying, and no menu
+    is open. Claiming closes it and plays the "FREE GIFT!" celebration with what was given.
+  - *Checked*: `check.ps1` passes. Own Studio on `build/GiftPlaytest.rbxl` (branch code via `rojo build` +
+    `GetObjects`): both bootstraps ready, 38 tests pass, no warnings. After a debug delivery the menu opened by itself
+    at 31 s; Claim gave +500 Climb Power and +500 coins (25 → 525, opening tier 2, before main's Climbing rework), celebrated, hid the HUD button; a
+    second claim was refused; `ResetGift` brought the button back and it opened the menu; the coin line then read +900
+    (income 5/s). Two looks rendered as mock-ups (cyan, gold). Not checked: the real favorite prompt (needs a published
+    place), phones. Then main's Climbing rework merged in: the gift now reads +500 Climbing; replayed on the
+    merged build (42 tests pass, opened at 31 s, Claim gave +500 Climbing and +500 coins, console clean).
+  - *Redesign, the user's notes*: no gift picture inside (the header's badge is enough), show off what they get, and
+    the like and favorite steps looked too basic (emoji, plain arrows): make them professional and say exactly what to
+    do. Now a Large panel 470 tall: the rewards ("+500 CLIMBING + +500 CASH") big on one stage of rays (variant B: each
+    on its own gold or green stage, `SPLIT_PRIZE`); each step a numbered card with a picture of Roblox's real game page
+    (roblox.com in its dark theme via Playwright at 4x, vote counts hidden, the other buttons faded, the one to tap
+    glowing green or gold with a 👆 tapping it; `build/gift-art`) and one line ("Tap 👍 on the game's page", "Tap
+    here, or ⭐ on its page"). Tapping the favorite card opens the prompt and ticks it. The pictures are Studio-local
+    (`rbxasset://sas/gift-*-2.png`) until uploaded. Checked after merging main (pens, leaderboards, cash): 54 tests
+    pass, opened at 31 s, the favorite card ticked with "Favorited! Now claim your gift", Claim gave +500 Climbing
+    and +500 cash, console clean.
+  - *The user's calls*: variant A (one stage); upload the pictures; it has to really register the like and the
+    favorite and give the gift. No game can see a like (no API: AvatarEditorService covers favorites only; nothing
+    in the docs for votes), so the gift registers the favorite: Claim or the favorite card checks
+    `GetFavoriteAsync` first (someone who favorited before has nothing to say yes to), then prompts, then checks
+    again. Pictures uploaded through the Studio MCP's `upload_image` (served on 127.0.0.1): like
+    rbxassetid://79093897520396, favorite rbxassetid://94266843104437; `art/gift/step-pictures.js` remakes them.
+    Checked in a playtest: both pictures load from Roblox, Claim gave +500 Climbing and the cash, a second claim was
+    refused, 54 tests pass, console clean. Not checked: the real favorite prompt (needs a published place).
+  - *Merged into main* on the user's word, after main's StairMaster walker, Sell Stall and punch were merged in and
+    played again (59 tests pass, opened at 31 s, +500 Climbing and +900 cash at 5/s income, second claim refused).
+
+- **The Sell Stall's menu, and a two-minute sell price (2026-10-05)**. The user sent Steal an Egg's Sell Pets (and
+  its Free Gift) and asked for mock-ups of the menu the Sell Stall by the plots opens: like the reference, made easier.
+  - *Mock-ups* (`DESIGN/ui/mockups/sell-stall.html`, two rounds): A, the grid four across with a sell tile on the
+    right; B, the reference's layout (sort on the left, the total along the bottom); a pick-everything-stored button;
+    one confirm for the lot.
+  - *The user's calls*: A; it opens with nothing picked and each sheep is tapped; keep Select all; the pen's sheep
+    don't show at the stall at all, so the best can't be sold by mistake (moving the best stored ones into the pen
+    comes later); selling pays two minutes of income to start (Steal an Egg pays about 100 s).
+  - *Server*: `Economy.SellSeconds` 120 (was 15). `Remotes.Sell` (ids, up to the flock's 100; 4 a second) ->
+    `FlockService.Sell`: `Roster.CanSell` (stored only, unlocked, each once, never the whole flock), then every price
+    paid at once and one snapshot. The one-at-a-time `FlockAction "Sell"` is gone.
+  - *Client*: `Screens/SellStall`, built at runtime from UIKit like the other menus: `MenuParts.CardGrid` cards with a
+    red ring and tick when picked and a LAMB / MERGED / size chip, a `SellTile` (fan of picked tokens, total, Select
+    all / Clear, Sell N), the menu's confirm with the count, the Sell accent (`Theme.Fleece.Accent.Sell`). The stall's
+    prompt opens it (`PromptController`); the Flock menu lost its sell mode. UIController mounts screens from an
+    explicit order list: the new screen had to go in it (it was missing at first and never mounted).
+  - *Kit*: `DESIGN/ui/` (README): Shear a Sheep's Prize Fleece CSS, `kit.js` with this game's token and HUD,
+    `export-data.luau` (Lune loads `GameConfig`, `Olympus` and `Economy`, so every price is the game's) and
+    `render.mjs`. The mock-ups were HTML: when they were made, five Studios were open and 2.6 GB of RAM was free.
+  - *Checked*: `check.ps1` passes; 57 tests pass in Studio (new: `CanSell`, the two-minute price). Playtested in this
+    session's own Studio (`build/SellPlaytest.rbxl`, code swapped in from `content/sas/sell-sync.rbxm`), on main's
+    code too after merging it: both bootstraps ready; the stall's prompt (E) opened the menu with only the 8 stored
+    sheep (the 6 in the pen absent); taps picked with ring and tick and summed (120 + 360 = 480); the locked lamb
+    refused with its notice; Select all took the 7 unlocked (5.1K) and turned into Clear; the confirm showed x7 and
+    5.1K; Sell left only the locked lamb, income unchanged (3,865/s), "Sold 7 for 5.1K cash". Called directly, the
+    server refused a pen sheep, a locked one and a missing id, and the old FlockAction Sell. Your Flock has no Sell.
+    Console clean. Not checked: a phone screen, gamepad, two players. The user then said build it and merge it; it
+    was checked again on main's latest code (57 tests, a sale, a pen sheep refused) and merged into main.
 - **Stair walker: a StairMaster outside the pen (2026-10-05)**. After the study below, the user: the first five looks
   are good, stick with five for now; the level floats over the machine; place it outside the pen, very close, like
   Steal an Egg's treadmill; an upgrade sign beside it to upgrade directly with cash or Robux. Earlier calls: gym at

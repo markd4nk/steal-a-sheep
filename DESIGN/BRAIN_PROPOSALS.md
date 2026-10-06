@@ -106,6 +106,13 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   one line. Through an untyped registry (`registry.X`) the type checker can't see the bad call, so it only fails when it
   runs. Start such a line with a local (`local character = thing :: Model`) instead." Seen 2026-10-05 in Steal a Sheep:
   a merge added a call before the stair walker's exit `PivotTo`, so jumping off would have errored.
+- **S19** (`BRAIN/PATTERNS/purchases.md`, or a new "Free rewards" note): "A reward for favoriting: open Roblox's own
+  prompt with `AvatarEditorService:PromptSetFavorite(game.PlaceId, Enum.AvatarItemType.Asset, true)` on the client
+  and wait for `PromptSetFavoriteCompleted` = `Success`; the server can't see favorites, so it takes the claim on trust
+  and allows one per player. No API shows whether a player liked (voted on) the game, and Roblox's Community Rules
+  forbid prizes 'in exchange for a thumb up on your game': ask for likes without tying the reward to them. In an
+  unpublished place PlaceId is 0 and there's nothing to favorite." Seen 2026-10-05 building Steal a Sheep's free gift
+  (docs and DevForum; the live prompt itself not yet tried).
 
 ## Done
 

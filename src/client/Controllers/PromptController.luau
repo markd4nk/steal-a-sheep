@@ -20,7 +20,7 @@ local PromptController = { Name = "PromptController" }
 
 local OPENS: { [string]: { Screen: string, Options: { [string]: any }? } } = {
 	Shop = { Screen = "Shop" },
-	Sell = { Screen = "Flock", Options = { Sell = true } },
+	Sell = { Screen = "SellStall" },
 	Merge = { Screen = "Merge" },
 }
 local PUT_DOWN_CHECK = 0.1

@@ -8,3 +8,6 @@ globalTypes.version
 *.rbxlx.lock
 __pycache__/
 /StealASheep.rbxl
+
+# Rendered mock-ups (make them again with: node DESIGN/ui/render.mjs)
+DESIGN/ui/renders/
