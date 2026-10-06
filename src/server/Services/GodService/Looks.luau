@@ -89,7 +89,7 @@ local Looks: { [string]: Look } = {
 		Accessories = {
 			{ Id = 128885797383834, Type = "Hair" }, -- Curly Up-do Roman Beauty Hair in Blonde (Dynasty of Dragons)
 			{ Id = 8918679960, Type = "Hat" }, -- Flower Crown (inkwaves)
-			{ Id = 97145004642533, Type = "DressSkirt" }, -- White and gold celestial goddess dress (Blue infinity)
+			{ Id = 113009608248583, Type = "DressSkirt" }, -- Pink & gold celestial goddess dress (Blue infinity studios)
 		},
 		Prop = "Cup",
 	},
@@ -280,7 +280,7 @@ local Looks: { [string]: Look } = {
 		Accessories = {
 			{ Id = 91555226687899, Type = "Hair" }, -- Blonde Princess Curls w/ Braids Hair (Dynasty of Dragons)
 			{ Id = 77058499029907, Type = "Hat" }, -- Harvest Festival Wheat Crown (OtisLittleUGC)
-			{ Id = 72278982864491, Type = "DressSkirt" }, -- Lime green draped column dress (Blue infinity studios)
+			{ Id = 82630914709053, Type = "DressSkirt" }, -- Dark Green Evening Dress (Layered Clothing UGC): not lime
 		},
 		Prop = "Wheat",
 	},

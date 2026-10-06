@@ -95,9 +95,9 @@ lamb.
 - **Gods in rank order and Zeus as a Roblox avatar** (merged into main 2026-10-05 on the user's word):
   `Config/Olympus` reordered (Pan tier 1 to Zeus 30), new High Olympus stretches for the eleven Olympians who moved
   up; Zeus a catalog-dressed avatar. Not in a published version yet.
-- **All 30 gods as Roblox avatars** (branch `t3code/order-olympian-gods`, not merged; lineup shown to the user
-  2026-10-05, waiting for their word): each god's catalog look in `GodService/Looks.luau`, its held symbol in
-  `GodService/Props.luau`; all 30 load, 76 tests pass. Review shots: `studio/GodLineup.luau`.
+- **All 30 gods as Roblox avatars** (merged into main 2026-10-05 on the user's word, after their changes to Hebe and
+  Demeter): each god's catalog look in `GodService/Looks.luau`, its held symbol in `GodService/Props.luau`; all 30
+  load, 76 tests pass. Review shots: `studio/GodLineup.luau`. Not in a published version yet.
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).

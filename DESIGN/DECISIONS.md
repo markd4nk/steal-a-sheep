@@ -175,9 +175,9 @@ the rest"; three helpers chose catalog items by sight, every id checked and load
   apple, Phobos's and Deimos's dark spears, Aphrodite's rose.
 - **Animations**: Roblox's own idle, walk (going home) and run (chasing), sped up to the god's speed; it points at
   the thief when it spots them and laughs when it catches them. Only gods within 220 studs of the camera animate.
-- **Swapped after the first lineup**: Nike's windswept hair hid her face; she has an updo now.
-- **To look at**: Hebe and Themis both wear cream-white gowns (Themis's blindfold tells them apart); Demeter's green
-  is a bright lime.
+- **Swapped after the first lineup**: Nike's windswept hair hid her face; she has an updo now. The user's calls:
+  Hebe a coloured dress (her celestial gown in rose and gold, so she isn't white like Themis), Demeter a darker
+  leaf green (a long dark green evening gown; the lime was too bright), Poseidon keeps his blue beard.
 
 Calls made ordering the gods by rank (2026-10-05):
 
