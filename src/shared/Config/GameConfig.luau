@@ -481,12 +481,11 @@ local GameConfig = {
 		TickSeconds = 0.25,
 	},
 
-	-- The stair walker machine outside each pen. A step takes StepSeconds + StepRange x StepDecay^(level - 1) seconds
-	-- (level 1 is the free machine), so each upgrade runs faster.
+	-- The stair walker machine outside each pen. Its steps run at the climber's training rate: SlowestStep seconds a
+	-- step on the free machine, FastestStep on the top one with the best trail (Utils/StairClimb.StepSeconds).
 	StairWalker = {
-		StepSeconds = 0.25,
-		StepRange = 0.35,
-		StepDecay = 0.9,
+		SlowestStep = 0.5,
+		FastestStep = 0.1,
 		AnimateRange = 220, -- studs from the camera within which machines and climbers move
 	},
 

@@ -7,6 +7,14 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 
 ## Waiting
 
+- **S49** (`BRAIN/PATTERNS/testing-studio.md`, replacing "`screen_capture` leaves out BillboardGuis"): "`screen_capture`
+  leaves out BillboardGuis with `AlwaysOnTop` on; the others show, in Workspace or in PlayerGui with an `Adornee`. To
+  see an AlwaysOnTop one, turn it off for the capture from a Client `execute_luau`, or use the desktop tools'
+  `screenshot` of the Studio window (`desktop.md`)." Seen 2026-10-06 in a Steal a Sheep playtest: the stair walker's
+  "+N/s" over the player's head (PlayerGui, AlwaysOnTop) was enabled, sized and adorned but missing from two captures,
+  moved into the Head and still missing, then showed at once with AlwaysOnTop off; the walker's own "LV 1" billboard
+  (not AlwaysOnTop) shows in every capture.
+
 - **S11** (`BRAIN/GOTCHAS.md`): "Roblox's moderation removes AI-generated limb meshes as if they broke the rules:
   `generate_mesh` split two characters into head, torso, arms and legs, and within the hour two of the bare-skin limbs
   (a leg, an arm: smooth skin-coloured tubes with rounded ends) were removed, with a notice to the account. Don't
@@ -291,13 +299,13 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   don't use `Looped`: jump both `TimePosition`s from a loop end back to a loop start you've measured (a bar multiple
   where the audio matches), and resync the second to the first when they drift. Find them by searching the track's
   name." Seen 2026-10-06 in Steal a Sheep's chase music (cross-correlated offline, playing in sync in a playtest).
-- **S51** (`BRAIN/GOTCHAS.md`): "A part with `CanQuery` off still blocks characters and PathfindingService if it's
+- **S50** (`BRAIN/GOTCHAS.md`): "A part with `CanQuery` off still blocks characters and PathfindingService if it's
   `CanCollide`, but raycasts, `Blockcast` and `GetPartBoundsInBox` don't see it. Imported maps often switch
   `CanQuery` off on fences, hay and props, so 'is the way clear?' checks with rays pass straight through a fence the
   player can't. To find a walkable way, ask PathfindingService rather than testing with rays first." Seen 2026-10-06
   porting Shear a Sheep's guide trail to Steal a Sheep. 305 of the plots' collidable fence parts had `CanQuery` off;
   `ComputeAsync` still routed out through the gate (30-300 ms for about 250 studs, in Edit as well).
-- **S50** (`BRAIN/PATTERNS/ui.md`): "A menu that remakes its cards on every state push swallows taps once the state
+- **S51** (`BRAIN/PATTERNS/ui.md`): "A menu that remakes its cards on every state push swallows taps once the state
   pushes every second (a countdown, something growing): a tap that starts on one card and ends on its replacement never
   fires `Activated`. Remake the cards only when the list itself changes (a key of the ids in order and the fields the
   cards are made from) and update the numbers in place; redraw a ViewportFrame only when what it shows changes." Seen

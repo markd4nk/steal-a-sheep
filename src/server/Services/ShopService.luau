@@ -169,7 +169,7 @@ local function buy(player: Player, item: string, which: string?): (boolean, stri
 			local index = table.find(Economy.Trails, trail) or 1
 			local previous = Economy.Trails[index - 1]
 			if previous and not data.Trails[previous.Id] then
-				return false, `Buy the {previous.Name} first`
+				return false, `Needs the {previous.Name}`
 			end
 			if not registry.DataService:AdjustCoins(player, -trail.Cost) then
 				return false, `Need {Format.Short(trail.Cost - data.Coins)} more cash`

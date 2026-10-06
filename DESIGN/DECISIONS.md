@@ -157,6 +157,23 @@ confirmed or reversed it.
   E" (and holding at all: a click or E on a computer, a tap on a phone, with a proper UI), "Claim its reward there",
   "Climbing gets you up steeper slopes", "take it home" and the escape notice, "Put it down where you like", "Yours has
   your name over the gate", the grow-up celebration; "you get the gist".
+- **No hand-holding after onboarding (the user, 2026-10-06)**: "I don't want to tell the player anything that they
+  need to do besides just playing the game. After the onboarding, it should just be their own experience. They can
+  figure out how to do it." So no "<God>'s <Area> is in reach!", and no hint, tip or nudge that tells a player what to
+  do once the onboarding is over. Onboarding itself is the onboarding session's (`t3code/simplify-onboarding-guidance`).
+  On the audit's list the user said: cut the menu tips ("Bigger sheep in, more luck", "Tap the sheep to sell", the
+  gift's "Tap here, or the star"; the Merge Shrine's empty list reads "No sheep to merge yet", or "Opens after 3
+  deliveries"); refusals say the fact without the advice ("Your flock is full", "Your hands are full", "Not in your
+  pen", "Too far from the altar", "Not ready yet", "It's locked", "Not found yet", "Needs the Dust Trail", "Not
+  favorited yet"); **keep** the HUD's glows and red badges (GIFT, DAILY, SHEEPDEX) and the daily gift opening itself
+  once a session; **keep** the rare-lamb notice ("A Royal ... appeared in Zeus's pasture!").
+- **The stair walker (the user, 2026-10-06)**: no "Next" line or bar to the next god while training; "all it needs to
+  indicate is that you're gaining plus speed, whatever you're making per second ... above the player". And "the
+  player should be moving on the treadmill way faster ... at higher levels and higher speeds." Then, on the video
+  mock-up: like other games, numbers pop off the player, more of them the faster you train ("level one, if it's two
+  per second ... plus one, plus one in one second ... at level 30, I want like 10 things to say plus ... 2.5T"):
+  "much better now". One decimal ("+2.5T"), the shoe stays on each pop, and the machine's floating level hides while
+  you climb.
 
 - **Onboarding is a trail on the floor to a place (the user, 2026-10-06)**: too much said "steal this god's sheep" and
   pointed at the sheep; instead chevrons on the floor "just like in Shear a Sheep" leading "to the place where the
@@ -308,7 +325,7 @@ Calls in the momentum slide (2026-10-06, `Mountain.Momentum`, `GodService` pace)
   rather than a small one: one number fewer, and the bump still costs ground.
 - **The safety line stops a slide dead** (its speed along the ground zeroed), then normal walking: no run-out.
 
-Calls in the onboarding trail (2026-10-06, branch `t3code/7bbf5a87`):
+Calls in the onboarding trail (2026-10-06, merged into main):
 
 - **Where the first trail ends**: the front of Pan's meadow, mid-lane (45% up tier 1), a few studs past the tutorial
   lamb; it stops once the player is within 4 studs of that line or past it, so it never points back.
@@ -558,12 +575,17 @@ Calls building the stair walker (2026-10-05).
 - **The sign** stands by the machine's entry, turned to the gate, written on both sides ("UPGRADE", the next level, its
   price in cash and R$).
 - **On and off**: walking into the entry snaps the owner on (only the owner, not while carrying a lamb); jumping puts
-  them down behind the entry facing away; "Jump to get off" shows the first time each session. Training only counts
+  them down behind the entry facing away; "Jump to get off" shows only on the onboarding's first climb. Training only counts
   while snapped on.
 - **The sign's prompts**: E upgrades with cash, R with Robux; only the owner sees them; they go at the top level, and
   the board says MAX LEVEL. An empty plot's machine shows level 1 with no floating tag.
-- **Step speed by level**: a step takes `0.25 + 0.35 x 0.9^(level-1)` seconds: 0.60 at level 1, 0.48 at 5, 0.40 at
-  10, 0.30 at 20, 0.27 at 30.
+- **Step speed by training rate** (2026-10-06, replacing step speed by level): steps a second rise evenly with each
+  tenfold of the climber's rate, so a trail speeds them up too. Without a trail a step takes 0.50 s at level 1 (two a
+  second, the user's example), 0.36 at 3, 0.29 at 5, 0.20 at 10, 0.13 at 20, 0.10 at 30 (Sunlight trail on top: 0.10,
+  the fastest).
+- **The pops** (your own screen only): one a step, the shoe and "+N" in lime, N what that step earned; each starts
+  just over your head somewhere across a 6-stud-tall space, rises about 4.8 studs in 0.9 s, fading for the last 0.3;
+  sized in studs, so they keep their size beside the character on any screen. Reduce Motion: they fade in place.
 - **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor; the
   machine's sides, hood, console and the sign are solid, the entry step and stairs aren't.
 
@@ -622,7 +644,7 @@ Calls made building Climbing (2026-10-05):
 - **Gods**: 0.8 x the tier's SlideSpeed, 19 at tier 1 to 48 at tier 30; the tutorial lamb's god 0.7.
 - **Tier 1's sign is 25** (what the tutorial gives), so a high level speeds you up there too.
 - **On screen**: tier signs "<God>'s <Area> / Climbing N"; the HUD's goals "Train to climb", "Train for heavier
-  sheep", "Ready for the heaviest sheep"; "<God>'s <Area> is in reach!" when Climbing passes the next sign; the player
+  sheep", "Ready for the heaviest sheep"; the player
   list column is Climbing; the HUD pill reads CLIMBING; the wild lamb's card and the flock menu no longer name a burden.
 - **Server check**: a player found further up the ramp than their Climbing allows (30% slack, 10 studs or 1 second's
   lead for lag) is put back at their allowed spot.

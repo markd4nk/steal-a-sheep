@@ -38,13 +38,13 @@ local function claim(player: Player): (boolean, string?, { [string]: any }?)
 	end
 	local now = os.time()
 	if not Economy.DailyReady(data.DailyAt, now) then
-		return false, "Come back when the timer's done", nil
+		return false, "Not ready yet", nil
 	end
 	local day = data.DailyDay
 	local prize = Economy.DailyWeek[day]
 	local isSheep = prize.Kind == "Lamb" or prize.Kind == "Pegasus"
 	if isSheep and registry.FlockService:Count(player) >= GameConfig.Theft.InventoryLimit then
-		return false, "Your flock is full: sell some first", nil
+		return false, "Your flock is full", nil
 	end
 	data.DailyDay = day % #Economy.DailyWeek + 1
 	data.DailyAt = now

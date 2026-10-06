@@ -108,9 +108,18 @@ lamb.
   (GAME_DESIGN.md, *Merge Shrine*).
 - **The gods** (version 8): thirty in mythological rank, Pan tier 1 to Zeus 30, each a catalog-dressed Roblox avatar
   (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load.
+- **Onboarding trail and less hand-holding** (merged into main 2026-10-06 on the user's word, not published yet): Shear
+  a Sheep's floor chevrons (`UIController/GuidePath`) guide only the first lamb (to Pan's meadow, home from the
+  mountain's foot, then to the stair walker), no words, no floating arrow, no carried lamb's card or Return, and no
+  chase banner (the chase is ChaseController's sounds and red screen). After
+  onboarding nothing tells the player what to do: no hints, no "in reach", no menu tips; refusals say only the fact.
+  GAME_DESIGN.md, *Onboarding*; DECISIONS.md, *No hand-holding after onboarding*.
+- **Stair walker pops** (merged into main 2026-10-06, not published yet): steps run at the climber's training rate
+  (0.5 s to 0.1 s a step), each popping a shoe and "+N" off your head ("+1" twice a second at level 1, about ten
+  "+2.5T" at level 30); your machine's floating level hides while you climb; no training meter.
 - **What the HUD says** (version 8): one message per moment (`Screens/Hud`); every ProximityPrompt drawn as the menus'
-  button for the device, press or tap (`PromptController/Look`). HISTORY.md, the overnight entry. On the onboarding
-  branch below the HUD gives no hints in words at all.
+  button for the device, press or tap (`PromptController/Look`). HISTORY.md, the overnight entry. Since the merge above
+  the HUD gives no hints in words at all.
 - **Settings menu** (version 8; `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound
   effects in four steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in
   the save, `SoundController` volumes).
@@ -119,11 +128,6 @@ lamb.
   `studio/SheepStuds.luau` (in the cloud place since 2026-10-06); without them the wool stays plain and the server warns
   once.
 
-- **Onboarding trail** (merged 2026-10-06, not published): Shear a Sheep's floor chevrons (`UIController/GuidePath`)
-  guide only the first lamb, to Pan's meadow, home from the mountain's foot, then to the stair walker; no words, no
-  floating arrow. Also gone from the HUD: Train to climb, Put your sheep to work, the walker's training meter, the
-  carried lamb's card with its Return button (no giving up a run now), and the chase banner (its music stays).
-  GAME_DESIGN.md, *Onboarding*.
 - **Mystery lambs** (merged 2026-10-06, not published): every lamb is a bare white lamb with one spot per step of its
   family's rarity in its grown sheep's colour (mock-up D), bigger and rounder the heavier, nothing over it and nothing
   naming it; it earns nothing, shows a clock and time left in the pen, and at 100% its fleece pops on at its real size
@@ -252,6 +256,7 @@ lamb.
   in play.
 - **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
   little sunk in the straw.
-- Studio MCP screenshots don't show the prompts' buttons (billboards in `PlayerGui.PromptUI`); they work in play.
+- Studio MCP screenshots don't show the prompts' buttons (AlwaysOnTop billboards in `PlayerGui.PromptUI`, BRAIN
+  proposal S49); they work in play.
 - **Phones**: the map is about 31,700 parts with StreamingEnabled off, so all of it loads at join; untried on a real
   phone (memory, join time). Turning streaming on needs the client's mountain code checked first.

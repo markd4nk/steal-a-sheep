@@ -103,10 +103,6 @@ function SellStall.Build(playerGui: Instance): ScreenGui
 	more.AnchorPoint = Vector2.new(1, 0.5)
 	more.Position = UDim2.new(1, -8, 0.5, 0)
 	more.ZIndex = 8
-	UIKit.Text(pile, "HintLabel", "Tap the sheep to sell", 15, Fleece.Muted, UDim2.fromScale(1, 1), {
-		Font = Theme.Font.TextHeavy,
-		Wrap = true,
-	})
 	local total = UIKit.Frame(tile, "Total", UDim2.new(1, 0, 0, 40))
 	total.LayoutOrder = 2
 	UIKit.List(total, true, 5, Enum.HorizontalAlignment.Center)
@@ -174,7 +170,6 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local fan = tile:FindFirstChild("Fan", true) :: Frame
 	local more = tile:FindFirstChild("MoreChip", true) :: Frame
 	local moreLabel = more:FindFirstChild("MoreLabel") :: TextLabel
-	local hint = tile:FindFirstChild("HintLabel", true) :: TextLabel
 	local totalLabel = tile:FindFirstChild("TotalLabel", true) :: TextLabel
 	local selectButton = tile:FindFirstChild("SelectButton", true) :: TextButton
 	local sellButton = tile:FindFirstChild("SellButton", true) :: TextButton
@@ -270,7 +265,6 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		fan.Visible = #views > 0
 		more.Visible = #views > FAN
 		moreLabel.Text = `+{#views - FAN}`
-		hint.Visible = #views == 0
 		totalLabel.Text = totalText(sum, lambs)
 		totalLabel.TextColor3 = if #views > 0 then Color.Lime else Fleece.Faint
 

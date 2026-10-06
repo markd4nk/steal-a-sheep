@@ -2,6 +2,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 
 -- The stair walker's moving stairs and the climb on them, shared by the server (which builds the machine and places
@@ -36,6 +37,14 @@ local TOE = math.rad(-30)
 local BOB = 0.05
 local R6_SWING = math.rad(32)
 
+-- The training rates at the ends of the step speeds: the free machine's, and the top machine's with the best trail.
+local SLOWEST_RATE = Economy.WalkerRate(0)
+local bestTrail = 1
+for _, trail in Economy.Trails do
+	bestTrail = math.max(bestTrail, trail.Multiplier)
+end
+local FASTEST_SPAN = math.log(Economy.WalkerRate(Economy.MaxWalker) * bestTrail / SLOWEST_RATE)
+
 type Joint = { Instance: any, C0: CFrame, C1: CFrame }
 type Leg = { Hip: Joint, Knee: Joint, Ankle: Joint, Thigh: Vector3, Shin: Vector3, Sole: Vector3 }
 type Arm = { Shoulder: Joint, Elbow: Joint, Wrist: Joint, Upper: Vector3, Fore: Vector3, Side: number }
@@ -69,10 +78,14 @@ function StairClimb.Tread(u: number): Vector3
 	return Vector3.new(0, TREAD_TOP + u * StairClimb.Rise, TREAD_BACK - u * StairClimb.Run)
 end
 
--- Seconds a step takes to come down one step, on a machine of this level (1 is the free one).
-function StairClimb.StepSeconds(level: number): number
+-- Seconds a step takes to come down one step for a climber training `rate` Climbing a second. Steps a second rise by
+-- the same amount with every tenfold of the rate, from the free machine to the top one with the best trail, so each
+-- upgrade and trail visibly speeds the climb up.
+function StairClimb.StepSeconds(rate: number): number
 	local config = GameConfig.StairWalker
-	return config.StepSeconds + config.StepRange * config.StepDecay ^ (math.max(level, 1) - 1)
+	local share = math.clamp(math.log(math.max(rate, SLOWEST_RATE) / SLOWEST_RATE) / FASTEST_SPAN, 0, 1)
+	local slow, fast = 1 / config.SlowestStep, 1 / config.FastestStep
+	return 1 / (slow + (fast - slow) * share)
 end
 
 -- Where step `index` (1 to Steps) is, in steps above the lower foot, `cycle` steps into the run.

@@ -25,7 +25,8 @@ end
 -- 950 -> "950", 1500 -> "1.5K", 12345 -> "12.3K", 4900000 -> "4.9M", then B, T, Qa, Qi and Sx; past 999Sx it counts
 -- on in Sx ("1,234Sx"). Keeps three digits and rounds down, so a balance never reads higher than it is. Integer maths
 -- throughout, dividing only by exact powers of ten, so 2900 can't come out as "2.89K" (nor 9.2e18 as "9.19Qi").
-function Format.Short(value: number): string
+-- `maxDecimals` keeps fewer digits after the point (1: 2.57T -> "2.5T"), for words that flash by.
+function Format.Short(value: number, maxDecimals: number?): string
 	local sign = if value < 0 then "-" else ""
 	local whole = math.floor(math.abs(value))
 	if whole < 1000 then
@@ -40,6 +41,7 @@ function Format.Short(value: number): string
 		return sign .. Format.Number(whole // unit) .. SUFFIXES[index]
 	end
 	local decimals = if whole < 10 * unit then 2 elseif whole < 100 * unit then 1 else 0
+	decimals = math.min(decimals, maxDecimals or decimals)
 	local scale = 10 ^ decimals
 	local kept = whole // (unit // scale)
 	local text = string.format("%d", kept // scale)
@@ -57,13 +59,13 @@ function Format.Cash(value: number): string
 	return "$" .. Format.Short(value)
 end
 
--- An income or a Climbing: tenths under 100 (12.5 -> "12.5", 3 -> "3"), then like Short.
-function Format.Rate(value: number): string
+-- An income or a Climbing: tenths under 100 (12.5 -> "12.5", 3 -> "3"), then like Short (`maxDecimals` as there).
+function Format.Rate(value: number, maxDecimals: number?): string
 	if value < 100 then
 		local tenths = math.floor(value * 10 + 1e-6)
 		return if tenths % 10 == 0 then `{tenths // 10}` else string.format("%.1f", tenths / 10)
 	end
-	return Format.Short(value)
+	return Format.Short(value, maxDecimals)
 end
 
 -- 133 -> "2:13", and from an hour on 5025 -> "1:23:45". Rounds up, so a countdown never reads 0:00 while any time is

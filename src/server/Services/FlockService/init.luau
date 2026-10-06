@@ -49,7 +49,6 @@ type PlayerState = {
 	Arrivals: { [string]: Arrival },
 	Dirty: boolean,
 	Offline: { Coins: number, Matured: number }?,
-	ClimbTier: number,
 }
 
 local TICK = 1
@@ -199,11 +198,6 @@ local function push(player: Player)
 	state.Offline = nil
 	local reached = snapshot.ClimbTier
 	if type(reached) == "number" then
-		if reached > state.ClimbTier then
-			local tier = Olympus.Tiers[reached]
-			notify(player, `{tier.God}'s {tier.Area} is in reach!`, "Rare", "Upgrade")
-		end
-		state.ClimbTier = math.max(state.ClimbTier, reached)
 		player:SetAttribute("ClimbTier", reached)
 	end
 	player:SetAttribute("Income", snapshot.Income)
@@ -397,7 +391,6 @@ local function onLoaded(player: Player, data: any)
 		Arrivals = {},
 		Dirty = true,
 		Offline = nil,
-		ClimbTier = Economy.ClimbTier(data.ClimbPower),
 	}
 	-- A save from when the pen started smaller is brought up to today's start.
 	data.PenSlots = math.clamp(data.PenSlots, Economy.StartPens, Economy.MaxPens)
@@ -677,7 +670,7 @@ function FlockService.Sell(_self: any, player: Player, ids: { string }): (boolea
 		return false, "Still loading"
 	end
 	if player:GetAttribute("Carrying") == true then
-		return false, "Deliver your sheep first"
+		return false, "Your hands are full"
 	end
 	local ok, why = Roster.CanSell(data.Sheep, ids, data.PenSlots)
 	if not ok then
@@ -741,14 +734,14 @@ function FlockService.ShrineMerge(
 		return false, "Still loading", nil
 	end
 	if player:GetAttribute("Carrying") == true then
-		return false, "Take your sheep home first", nil
+		return false, "Your hands are full", nil
 	end
 	if Economy.TotalDeliveries(data.Deliveries) < Economy.MergeAfterDeliveries then
 		return false, `Opens after {Economy.MergeAfterDeliveries} deliveries`, nil
 	end
 	for _, sheep in data.Sheep do
 		if sheep.Shrine then
-			return false, "Pick up your lamb first", nil
+			return false, "Your lamb is still on the altar", nil
 		end
 	end
 	local inputs: { Sheep } = {}
