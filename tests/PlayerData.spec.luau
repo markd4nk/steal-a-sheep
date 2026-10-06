@@ -47,6 +47,24 @@ return function(t: Run.Suite)
 		t.Expect((PlayerData.Validate({ Sheep = { ["2"] = sheep("1") } }))).ToBe(false)
 	end)
 
+	t.Test("the daily gifts: the day to claim next and when the last was claimed", function()
+		t.Expect(PlayerData.Template.DailyDay).ToBe(1)
+		t.Expect(PlayerData.Template.DailyAt).ToBe(0)
+		t.Expect((PlayerData.Validate({ DailyDay = 7, DailyAt = 1790000000 }))).ToBe(true)
+		t.Expect((PlayerData.Validate({ DailyDay = 0 }))).ToBe(false)
+		t.Expect((PlayerData.Validate({ DailyDay = 8 }))).ToBe(false)
+		t.Expect((PlayerData.Validate({ DailyAt = -5 }))).ToBe(false)
+	end)
+
+	t.Test("a special family's sheep keeps the tier it earns as", function()
+		local pegasus = sheep("1")
+		pegasus.Family = "Pegasus"
+		pegasus.Tier = 9
+		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = pegasus } }))).ToBe(true)
+		pegasus.Tier = 0
+		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = pegasus } }))).ToBe(false)
+	end)
+
 	t.Test("the free gift is a flag", function()
 		t.Expect(PlayerData.Template.FreeGift).ToBe(false)
 		t.Expect((PlayerData.Validate({ FreeGift = true }))).ToBe(true)

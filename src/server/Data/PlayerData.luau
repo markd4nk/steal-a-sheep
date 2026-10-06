@@ -22,6 +22,8 @@ export type Data = {
 	Tutorial: number, -- 0 until the first delivery, then 1; 2 once the stair walker was used
 	LastSeen: number, -- os.time() of the last settlement, for offline earnings; 0 for a new player
 	FreeGift: boolean, -- the like-and-favorite gift was claimed
+	DailyDay: number, -- the daily gift's day to claim next, 1 to 7 (Economy.DailyWeek)
+	DailyAt: number, -- os.time() of the last daily gift claimed, 0 for never
 }
 
 local PlayerData = {}
@@ -44,6 +46,8 @@ PlayerData.Template = {
 	Tutorial = 0,
 	LastSeen = 0,
 	FreeGift = false,
+	DailyDay = 1,
+	DailyAt = 0,
 } :: Data
 
 -- migrations[n] upgrades data from schema n to n + 1, in place.
@@ -96,6 +100,7 @@ local function validSheep(id: any, sheep: any): boolean
 		and type(sheep.Pinned) == "boolean"
 		and isHome(sheep.HomeX)
 		and isHome(sheep.HomeZ)
+		and (sheep.Tier == nil or isWhole(sheep.Tier, 1, 100))
 end
 
 local function flags(value: any): boolean
@@ -125,7 +130,7 @@ function PlayerData.Validate(data: any): (boolean, string?)
 			return false, `{field} is not an amount >= 0`
 		end
 	end
-	for _, field in { "WalkerLevel", "PenSlots", "NextId", "Tutorial", "LastSeen" } do
+	for _, field in { "WalkerLevel", "PenSlots", "NextId", "Tutorial", "LastSeen", "DailyAt" } do
 		if data[field] ~= nil and not isNatural(data[field]) then
 			return false, `{field} is not a whole number >= 0`
 		end
@@ -151,6 +156,9 @@ function PlayerData.Validate(data: any): (boolean, string?)
 	end
 	if data.FreeGift ~= nil and type(data.FreeGift) ~= "boolean" then
 		return false, "FreeGift is not a boolean"
+	end
+	if data.DailyDay ~= nil and not isWhole(data.DailyDay, 1, #Economy.DailyWeek) then
+		return false, "DailyDay is not a day of the week"
 	end
 	if data.Deliveries ~= nil then
 		if type(data.Deliveries) ~= "table" then

@@ -121,29 +121,37 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	tiles.Position = UDim2.fromOffset(8, 70)
 	tiles.AutomaticSize = Enum.AutomaticSize.Y
 	UIKit.List(tiles, false, 12, Enum.HorizontalAlignment.Center)
-	-- The free gift, until it's claimed: a red "!" on its corner.
+	-- A red "!" on a button's corner: something waiting there.
+	local function alertOn(button: TextButton)
+		local alert =
+			UIKit.Text(button, "Alert", "!", 20, Color.Snow, UDim2.fromOffset(26, 26), { Stroke = Color.Line })
+		alert.BackgroundTransparency = 0
+		alert.BackgroundColor3 = Color.Red500
+		alert.AnchorPoint = Vector2.new(0.5, 0.5)
+		alert.Position = UDim2.new(1, -8, 0, 6)
+		alert.ZIndex = 5
+		UIKit.Corner(alert)
+		local ring = Instance.new("UIStroke")
+		ring.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		ring.Color = Color.Line
+		ring.Thickness = Theme.Line.Normal
+		ring.Parent = alert
+	end
+	-- The free gift, until it's claimed, then the daily gifts (the golden calendar): the rewards at the top.
 	local gift = UIKit.PictureButton(tiles, "GiftButton", Theme.Icons.MenuGift, PICTURE_SIZE, "GIFT")
 	gift.LayoutOrder = 0
-	local alert = UIKit.Text(gift, "Alert", "!", 20, Color.Snow, UDim2.fromOffset(26, 26), { Stroke = Color.Line })
-	alert.BackgroundTransparency = 0
-	alert.BackgroundColor3 = Color.Red500
-	alert.AnchorPoint = Vector2.new(0.5, 0.5)
-	alert.Position = UDim2.new(1, -8, 0, 6)
-	alert.ZIndex = 5
-	UIKit.Corner(alert)
-	local ring = Instance.new("UIStroke")
-	ring.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	ring.Color = Color.Line
-	ring.Thickness = Theme.Line.Normal
-	ring.Parent = alert
+	alertOn(gift)
+	local daily = UIKit.PictureButton(tiles, "DailyButton", Theme.Icons.HudDaily, PICTURE_SIZE, "DAILY")
+	daily.LayoutOrder = 1
+	alertOn(daily)
 	local flock = UIKit.PictureButton(tiles, "FlockButton", Theme.Icons.Wool, PICTURE_SIZE, "FLOCK")
-	flock.LayoutOrder = 1
+	flock.LayoutOrder = 2
 	local shop = UIKit.PictureButton(tiles, "ShopButton", Theme.Icons.MenuStore, PICTURE_SIZE, "SHOP")
-	shop.LayoutOrder = 2
+	shop.LayoutOrder = 3
 	local dex = UIKit.PictureButton(tiles, "SheepdexButton", Theme.Icons.MenuSheepdex, PICTURE_SIZE, "SHEEPDEX")
-	dex.LayoutOrder = 3
+	dex.LayoutOrder = 4
 	local friends = UIKit.PictureButton(tiles, "FriendButton", Theme.Icons.HudInvite, PICTURE_SIZE, "INVITE")
-	friends.LayoutOrder = 4
+	friends.LayoutOrder = 5
 
 	local banner = UIKit.Banner(root, "Banner")
 	banner.AnchorPoint = Vector2.new(0.5, 0)
@@ -454,12 +462,27 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 
 	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding. The gift's glows until claimed.
 	local giftButton = tiles:FindFirstChild("GiftButton") :: TextButton
+	local dailyButton = tiles:FindFirstChild("DailyButton") :: TextButton
+	local dailyAlert = dailyButton:FindFirstChild("Alert") :: GuiObject
+	local dailyLabel = dailyButton:FindFirstChild("NameLabel") :: TextLabel
+	-- DAILY glows with its "!" while a gift waits; once claimed its name is the countdown to the next.
+	local function refreshDaily()
+		local daily = stateController:Get().Daily
+		local readyAt = if type(daily) == "table" and type(daily.ReadyAt) == "number" then daily.ReadyAt else 0
+		local left = math.max(0, math.ceil(readyAt - workspace:GetServerTimeNow()))
+		dailyAlert.Visible = left <= 0
+		dailyLabel.Text = if left <= 0
+			then "DAILY"
+			else string.format("%d:%02d:%02d", left // 3600, left % 3600 // 60, left % 60)
+		Motion.SetGlow(Motion.FindGlow(dailyButton), left <= 0 and tiles.Visible)
+	end
 	local function refreshTiles()
 		local data = stateController:Get()
 		tiles.Visible = (data.Tutorial or 0) >= 1
 		local unclaimed = data.FreeGift == false
 		giftButton.Visible = unclaimed
 		Motion.SetGlow(Motion.FindGlow(giftButton), unclaimed and tiles.Visible)
+		refreshDaily()
 	end
 
 	-- The carry card.
@@ -533,6 +556,18 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 
 	trove:Connect(giftButton.Activated, function()
 		context.Open("Gift")
+	end)
+	trove:Connect(dailyButton.Activated, function()
+		context.Open("Daily")
+	end)
+	-- The countdown under DAILY, once a second.
+	local sinceDaily = 0
+	trove:Connect(RunService.Heartbeat, function(deltaTime: number)
+		sinceDaily += deltaTime
+		if sinceDaily >= 1 then
+			sinceDaily = 0
+			refreshDaily()
+		end
 	end)
 	trove:Connect((tiles:FindFirstChild("FlockButton") :: TextButton).Activated, function()
 		context.Open("Flock")

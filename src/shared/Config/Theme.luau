@@ -572,6 +572,15 @@ local Theme = {
 		HudAlert = "rbxassetid://93541923107912",
 		-- The pack's golden calendar: the daily gift's card and its HUD button.
 		HudDaily = "rbxassetid://139738111276874",
+		-- The daily gifts' prizes (DailyService; uploaded 2026-10-05): the Robux store mock-up's cash and Hermes' winged
+		-- sandal, growing with the day (one stack, a pile, a chest; one sandal, three), and the Pegasus Sheep rendered as
+		-- the user picked it (DESIGN/ui/art/pegasus.py, gold tips and halo).
+		DailyCash1 = "rbxassetid://110594024344007",
+		DailyCash3 = "rbxassetid://99815525266403",
+		DailyCash5 = "rbxassetid://74973272469452",
+		DailyClimb1 = "rbxassetid://101308607707704",
+		DailyClimb3 = "rbxassetid://109688563927025",
+		Pegasus = "rbxassetid://123310213143784",
 		-- The OP Pack's crown and the Pro Pack's golden upgrade arrow (Mark, 2026-10-02): their pictures on the Store's
 		-- cards and the HUD's pack offer.
 		HudCrown = "rbxassetid://72910266249238",

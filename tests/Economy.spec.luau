@@ -298,4 +298,55 @@ return function(t: Run.Suite)
 		t.Expect(laterCoins).ToBe(2430)
 		t.Expect(laterClimb).ToBe(7200)
 	end)
+
+	t.Test("daily gifts: a week, cash and Climbing as minutes of income and walker, each at least its floor", function()
+		t.Expect(#Economy.DailyWeek).ToBe(7)
+		t.Expect(Economy.DailyWeek[4].Kind).ToBe("Lamb")
+		t.Expect(Economy.DailyWeek[7].Kind).ToBe("Pegasus")
+		-- A new player: the floors.
+		t.Expect(Economy.DailyAmount(1, 0, 0)).ToBe(250)
+		t.Expect(Economy.DailyAmount(2, 0, 0)).ToBe(150)
+		t.Expect(Economy.DailyAmount(6, 0, 0)).ToBe(2500)
+		-- The mock-up's player: 6,410.5 a second in the pen, a level-6 walker (9,000 a second).
+		t.Expect(Economy.DailyAmount(1, 6410.5, 6)).ToBe(1153890)
+		t.Expect(Economy.DailyAmount(2, 6410.5, 6)).ToBe(540000)
+		t.Expect(Economy.DailyAmount(3, 6410.5, 6)).ToBe(3846300)
+		t.Expect(Economy.DailyAmount(5, 6410.5, 6)).ToBe(1620000)
+		t.Expect(Economy.DailyAmount(6, 6410.5, 6)).ToBe(11538900)
+		t.Expect(Economy.DailyAmount(4, 6410.5, 6)).ToBe(0)
+		t.Expect(Economy.DailyAmount(7, 6410.5, 6)).ToBe(0)
+	end)
+
+	t.Test("daily gifts: the next opens 20 hours after a claim", function()
+		t.Expect(Economy.DailyReady(0, 1000)).ToBe(true)
+		t.Expect(Economy.DailyReady(1000, 1000 + 20 * 3600 - 1)).ToBe(false)
+		t.Expect(Economy.DailyReady(1000, 1000 + 20 * 3600)).ToBe(true)
+	end)
+
+	t.Test("the Pegasus Sheep earns one tier above the highest god stolen from", function()
+		t.Expect(Economy.HighestStolen({})).ToBe(1)
+		t.Expect(Economy.HighestStolen({ ["3"] = 2, ["8"] = 1, ["12"] = 0 })).ToBe(8)
+		local tier = Economy.PegasusTier({ ["8"] = 1 })
+		t.Expect(tier).ToBe(9)
+		local pegasus = adult({ Family = "Pegasus", Tier = tier })
+		local royal = adult({ Family = Olympus.Tiers[8].Family, Rarity = 3 })
+		t.Expect(near(Economy.AdultIncome(pegasus), Economy.BaseIncome(9))).ToBe(true)
+		-- About a Royal sheep of that god (bases round, so not to the cash).
+		t.Expect(math.abs(Economy.AdultIncome(pegasus) / Economy.AdultIncome(royal) - 1) < 0.01).ToBe(true)
+		t.Expect(Economy.Name(pegasus)).ToBe("Pegasus Sheep")
+		t.Expect(Economy.Name(sheep({ Family = "Pegasus", Tier = tier }))).ToBe("Pegasus Lamb")
+		t.Expect(Economy.FamilyOrder("Pegasus") > Economy.FamilyOrder("Thunder")).ToBe(true)
+		t.Expect(GameConfig.Breeds.Pegasus ~= nil).ToBe(true)
+	end)
+
+	t.Test("the Pegasus Sheep can't go in the Merge Shrine", function()
+		local three = {
+			adult({ Id = "1", Family = "Pegasus", Tier = 5 }),
+			adult({ Id = "2", Family = "Pegasus", Tier = 5 }),
+			adult({ Id = "3", Family = "Pegasus", Tier = 5 }),
+		}
+		local ok, why = Economy.CanShrine(three)
+		t.Expect(ok).ToBe(false)
+		t.Expect(why).ToBe("Pegasus Sheep can't be merged")
+	end)
 end
