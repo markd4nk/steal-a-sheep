@@ -5,13 +5,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
-local Format = require(ReplicatedStorage.Utils.Format)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Mountain = require(ReplicatedStorage.Utils.Mountain)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
-local Theme = require(ReplicatedStorage.Config.Theme)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- The gods' wild lambs: four spawns a tier, each rolled once (fleece, hidden weight, and the adult size it will grow
@@ -20,6 +18,8 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- your fence) or lose it. A thief who's caught or dies on the ramp drops it where they were: anyone can steal it from
 -- there (its god then chases them), and it goes back to its pasture after DropSeconds. Giving up, falling off the world
 -- or leaving puts it straight back. New players also get one private, light, ordinary tier 1 lamb for the tutorial.
+-- A lamb shows nothing of what it'll grow into but its marks (SheepService.BuildLamb): nothing over it, and nothing
+-- that names its family on its model or its thief (the user, 2026-10-06).
 local WildService = { Name = "WildService" }
 
 type Roll = {
@@ -101,60 +101,12 @@ local function asSheep(rolled: Roll): Economy.Sheep
 	}
 end
 
--- The inspection card over a wild lamb: its family's rarity, its name and what it will earn grown up. Its weight stays
--- hidden.
-local function card(model: Model, rolled: Roll)
-	local root = model.PrimaryPart
-	if not root then
-		return
-	end
-	local sheep = asSheep(rolled)
-	local low, high = Economy.FutureRange(sheep)
-	local billboard = Instance.new("BillboardGui")
-	billboard.Name = "Card"
-	billboard.Size = UDim2.fromOffset(190, 64)
-	billboard.StudsOffsetWorldSpace = Vector3.new(0, 4, 0)
-	billboard.MaxDistance = 45
-	billboard.LightInfluence = 0
-	billboard.Parent = root
-	local list = Instance.new("UIListLayout")
-	list.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	list.Parent = billboard
-	local function line(text: string, height: number, color: Color3)
-		local words = Instance.new("TextLabel")
-		words.BackgroundTransparency = 1
-		words.Size = UDim2.new(1, 0, 0, height)
-		words.FontFace = Font.fromEnum(Enum.Font.FredokaOne)
-		words.TextScaled = true
-		words.TextColor3 = color
-		words.Text = text
-		local stroke = Instance.new("UIStroke")
-		stroke.Thickness = 2
-		stroke.Parent = words
-		words.Parent = billboard
-	end
-	local kind = Economy.FamilyRarities[Economy.FamilyRarity(rolled.Family)].Name
-	line(string.upper(kind), 18, Theme.Fleece.Rarity[kind].Hi)
-	local rarity = Economy.Rarities[rolled.Rarity]
-	line(Economy.Name(sheep), 24, if rolled.Rarity > 1 then rarity.Color else Color3.new(1, 1, 1))
-	line(`Grows to +{Format.Rate(low)}-{Format.Rate(high)}/s`, 20, Color3.fromRGB(190, 255, 90))
-end
-
-local function setCard(model: Model?, visible: boolean)
-	local root = model and model.PrimaryPart
-	local found = root and root:FindFirstChild("Card")
-	if found and found:IsA("BillboardGui") then
-		found.Enabled = visible
-	end
-end
-
 -- Puts the lamb down, ready to steal: at its pasture spot, or at `at` (dropped by a thief).
 local function place(spawn: Spawn, at: CFrame?)
 	local model = spawn.Model
 	if model then
 		registry.SheepService:Place(model, at or spawn.At)
 		model.Parent = wildFolder
-		setCard(model, true)
 	end
 	local prompt = spawn.Prompt
 	if prompt then
@@ -174,16 +126,14 @@ local function fill(spawn: Spawn)
 	end
 	local rolled = spawn.Roll
 	local scale = GameConfig.SheepSize * Economy.LambScale(rolled.Weight)
-	local model = registry.SheepService:Build(rolled.Family, rolled.Rarity, scale)
+	-- Clients graze it like a lamb in a pen (AnimController): it has the Lamb attribute.
+	local model = registry.SheepService:BuildLamb(rolled.Family, rolled.Rarity, rolled.Weight, scale)
 	if not model then
 		return
 	end
-	model.Name = `Wild_{rolled.Family}`
+	model.Name = "WildLamb"
 	model:SetAttribute("Tier", spawn.Tier)
-	-- Clients graze it like a lamb in a pen (AnimController).
-	model:SetAttribute("Lamb", true)
-	card(model, rolled)
-	-- Just the action: the lamb's card over it already names it.
+	-- Just the action: nothing names the lamb.
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "StealPrompt"
 	prompt.Style = Enum.ProximityPromptStyle.Custom -- drawn by each client (PromptController)
@@ -207,7 +157,8 @@ local function fill(spawn: Spawn)
 	place(spawn)
 end
 
--- A Royal fleece, or a Legendary or Mythic family: "A Mythic King of Olympus Lamb appeared in Zeus's pasture!"
+-- A Royal fleece, or a Legendary or Mythic family, without giving away which: "A Mythic Lamb appeared in Zeus's
+-- pasture!", "A Royal Lamb appeared ..." (Economy.Name of a lamb).
 local function announce(spawn: Spawn)
 	local tier = Olympus.Tiers[spawn.Tier]
 	local rolled = spawn.Roll
@@ -233,7 +184,6 @@ end
 local function clearAttributes(player: Player)
 	player:SetAttribute("Carrying", false)
 	player:SetAttribute("InPen", nil)
-	player:SetAttribute("CarriedFamily", nil)
 	player:SetAttribute("CarriedScale", nil)
 	player:SetAttribute("CarryTier", nil)
 	player:SetAttribute("CarryWeight", nil)
@@ -293,8 +243,6 @@ function WildService.Fail(_self: any, player: Player, reason: string)
 	if reason == "Caught" then
 		notify(player, `{tier.God} punched you! You dropped the lamb`, "Bad", "Denied")
 		registry.MountainService:Punch(player)
-	elseif reason == "Returned" then
-		notify(player, `The lamb ran back to {tier.God}`, "Bad", "Notice")
 	elseif reason == "Blocked" then
 		notify(player, "The lamb slipped away", "Bad", "Denied")
 	end
@@ -357,7 +305,7 @@ tryPickUp = function(player: Player, spawn: Spawn)
 		return
 	end
 	if registry.FlockService:Count(player) >= GameConfig.Theft.InventoryLimit then
-		notify(player, "Your flock is full: merge or sell first", "Bad", "Denied")
+		notify(player, "Your flock is full", "Bad", "Denied")
 		return
 	end
 	local model = spawn.Model :: Model
@@ -370,7 +318,6 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	if spawn.Prompt then
 		spawn.Prompt.Enabled = false
 	end
-	setCard(model, false)
 	if not registry.SheepService:Carry(model, character) then
 		place(spawn)
 		return
@@ -378,7 +325,6 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	model.Parent = carriedFolder
 	carries[player] = { Spawn = spawn, Started = os.clock() }
 	local rolled = spawn.Roll
-	player:SetAttribute("CarriedFamily", rolled.Family)
 	player:SetAttribute("CarriedScale", model:GetScale())
 	player:SetAttribute("CarryTier", spawn.Tier)
 	player:SetAttribute("CarryWeight", rolled.Weight)
@@ -465,7 +411,7 @@ local function putDown(player: Player)
 		return
 	end
 	if registry.PlotService:PenAt(root.Position, -GameConfig.Theft.PutDownSlack) ~= plot then
-		notify(player, "Bring it inside your own fence first", "Bad", "Denied")
+		notify(player, "Not in your pen", "Bad", "Denied")
 		return
 	end
 	local look = root.CFrame.LookVector * Vector3.new(1, 0, 1)
@@ -576,9 +522,6 @@ function WildService.Start(_self: any)
 		dropTutorialLamb(player)
 		wrongPlot[player] = nil
 	end)
-	trove:Add(Remotes.ReturnSheep:Connect(function(player: Player)
-		WildService:Fail(player, "Returned")
-	end))
 	trove:Add(Remotes.PutDown:Connect(putDown))
 
 	local sinceCheck = 0
@@ -618,14 +561,20 @@ end
 
 -- A merged lamb from the Merge Shrine (ShrineService) goes over its owner's head to be carried home like a stolen one,
 -- with no god after it. False if they can't take it now.
-function WildService.CarryLamb(_self: any, player: Player, model: Model, id: string, weight: number): boolean
+function WildService.CarryLamb(
+	_self: any,
+	player: Player,
+	model: Model,
+	id: string,
+	family: string,
+	weight: number
+): boolean
 	if carries[player] then
 		return false
 	end
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	local family = model:GetAttribute("Family")
-	local tier = if type(family) == "string" then Olympus.ByFamily[family] else nil
+	local tier = Olympus.ByFamily[family]
 	if not character or not humanoid or humanoid.Health <= 0 or not tier then
 		return false
 	end
@@ -634,7 +583,6 @@ function WildService.CarryLamb(_self: any, player: Player, model: Model, id: str
 	end
 	model.Parent = carriedFolder
 	carries[player] = { Lamb = { Id = id, Model = model }, Started = os.clock() }
-	player:SetAttribute("CarriedFamily", family)
 	player:SetAttribute("CarriedScale", model:GetScale())
 	player:SetAttribute("CarryTier", tier.Tier)
 	player:SetAttribute("CarryWeight", weight)

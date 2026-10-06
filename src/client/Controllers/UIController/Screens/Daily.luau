@@ -352,10 +352,12 @@ function Daily.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			panel.Status(`+{Format.Short(given.Amount or 0)} Climbing`, "Good")
 		elseif given.Kind == "Lamb" then
 			sound:Play("Reveal")
+			-- A lamb, unnamed until it grows up ("Shiny Lamb").
+			local name = string.lower(given.Name or "Lamb")
 			if given.Stored then
-				panel.Status(`{given.Name} is stored: your pen is full`, "Bad")
+				panel.Status(`Your {name} is stored: your pen is full`, "Bad")
 			else
-				panel.Status(`{given.Name} is in your pen!`, "Good")
+				panel.Status(`Your {name} is in your pen!`, "Good")
 			end
 		else
 			showPegasus(given)

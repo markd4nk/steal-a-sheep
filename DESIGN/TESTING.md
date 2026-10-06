@@ -74,8 +74,10 @@ its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labe
   swapped in from `content/sas/chase-sync.rbxm`.
 - A chase that lasts: `Debug Steal` (tier), then a Client `RenderStepped` loop that pivots the character a set
   distance downhill of its god (`god.PrimaryPart.Position.X - D`, `Mountain.Floor` + 3): D shrinking walks the level
-  up; held at 18 studs it stays near the top. Past `Olympus.SafeLineX` = an escape. Return the carried lamb
-  (`Remotes.ReturnSheep:Fire()`) before the next steal, or it's refused ("You're already carrying one").
+  up; held at 18 studs it stays near the top. Past `Olympus.SafeLineX` = an escape. End the carry before the next
+  steal, or it's refused ("You're already carrying one"): there's no giving up a run since the onboarding trail
+  (no `Remotes.ReturnSheep`), so put it down at home (`Debug Home`, then `Remotes.PutDown:Fire()`) or let the god
+  catch you.
 - What to watch: `PlayerGui.ChaseScreen.Top.BackgroundTransparency` (edges), `Lighting.ChaseGrade.Saturation`,
   `SoundService.GameSounds.RunForYourLife`/`RunForYourLifeDrums` Volume and IsPlaying, the `Heartbeat1`/`2` pool, and
   `Sound.Played` on the god's descendants (its sounds are made on first use, so watch `DescendantAdded` too).
@@ -298,6 +300,24 @@ Useful measurements:
   `true, nil` without stealing (no chase). `Remotes.PutDown:Fire()` after `Home` delivers it.
 - **No straight lane through the map's middle**: from x 2300 down every z from 145 to 240 meets a part or mesh within
   about 400 studs (raycast scan along the floor at 2.5 and 5 studs up); tier 3 down is clear at z 185.
+
+## Mystery lambs (2026-10-06)
+
+- **Lamb looks without playing**: `studio/LambMockup.luau` (wrapped as a ModuleScript in an .rbxmx under Studio's
+  `content\sas_mock\`, then `require(game:GetObjects(...)[1])` in Edit) builds lambs and adults as TEMP_ models in Pan's
+  pasture: `Shots.Herd(god, x, adults?, pattern?, style?)`, `Styles`, `Weights`, `Cards`, `Growing` (in a plot's pen)
+  and `One`. Its marking styles (Bold, Spots, Details, Count, Grow) were the mock-ups; the game's is Count (D), in
+  `Utils/LambLook`. Cards over sheep are drawn on camera-facing SurfaceGuis there, since captures leave billboards out.
+- **Staging the branch in the shared cloud Studio**: `rojo build tools/sync.project.json` into `content\sas\` under a
+  name of its own, then in Edit move each same-named child of ReplicatedStorage, ServerScriptService and
+  StarterPlayerScripts (and `ServerStorage.Tests`) into `ServerStorage.TEMP_MainScripts` and parent the new ones; to
+  update, destroy the staged ones and parent the rebuilt ones (the backup stays); afterwards put the backup back.
+- **The lamb flow in one call**: `Debug Steal` 1, `Debug Home`, step 8 studs in, `Remotes.PutDown:Fire()`; then
+  `Debug GrowAll` with a `Remotes.Reveal` listener to see the grow-up. `Debug GiveSheep 30.6` gives a Zeus Mythic lamb
+  that takes 8 minutes to grow (a tier 1 lamb grows up while you rejoin).
+- **Opening menus**: a TEMP_ LocalScript in StarterPlayerScripts that calls `UIController:Open(name)` when the
+  LocalPlayer's `TempOpen` attribute changes (Sheep looks, above). Cards on a Galaxy A06 need the 47 px x offset
+  (Robux store, above): aim at `AbsolutePosition + AbsoluteSize / 2 + (47, 0)`.
 
 ## Asset audit (2026-10-05, before launch)
 

@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
+local LambLook = require(ReplicatedStorage.Utils.LambLook)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Theme = require(ReplicatedStorage.Config.Theme)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -18,19 +19,22 @@ local Types = require(script.Parent.Parent.Types)
 -- The Sell Stall (Mark's pick A of DESIGN/ui/mockups/sell-stall.html, after Steal an Egg's Sell Pets): the stored
 -- sheep as cards, cheapest first, tap the ones to sell (or Select all), and one Sell for all of them in the tile on the
 -- right, after a confirm. Sheep in the pen never show here, so the best ones can't be sold by mistake; locked ones show
--- dark with their padlock. It opens with nothing picked.
+-- dark with their padlock. It opens with nothing picked. A lamb's price is a secret like the rest of it ("?", the
+-- user, 2026-10-06): it sells for two minutes of what it'll earn grown, shown once it's sold.
 local SellStall = {}
 
 type View = {
 	Id: string,
-	Family: string,
+	Family: string?, -- nil for a lamb
 	Rarity: number,
 	Size: number,
 	Rank: number,
 	Locked: boolean,
 	Slot: number,
 	Adult: boolean,
-	Sell: number,
+	Sell: number?, -- nil for a lamb
+	Name: string,
+	Look: LambLook.Look?,
 }
 
 local Color = Theme.Color
@@ -99,10 +103,6 @@ function SellStall.Build(playerGui: Instance): ScreenGui
 	more.AnchorPoint = Vector2.new(1, 0.5)
 	more.Position = UDim2.new(1, -8, 0.5, 0)
 	more.ZIndex = 8
-	UIKit.Text(pile, "HintLabel", "Tap the sheep to sell", 15, Fleece.Muted, UDim2.fromScale(1, 1), {
-		Font = Theme.Font.TextHeavy,
-		Wrap = true,
-	})
 	local total = UIKit.Frame(tile, "Total", UDim2.new(1, 0, 0, 40))
 	total.LayoutOrder = 2
 	UIKit.List(total, true, 5, Enum.HorizontalAlignment.Center)
@@ -140,9 +140,22 @@ function SellStall.Build(playerGui: Instance): ScreenGui
 	return gui
 end
 
--- A family's name without "Sheep" ("Meadow"), for a card.
-local function shortName(family: string): string
-	return (string.gsub(Economy.FamilyName(family), " Sheep$", ""))
+-- A card's name: a family's without "Sheep" ("Meadow"), or "Lamb".
+local function shortName(sheep: View): string
+	return if sheep.Family then (string.gsub(Economy.FamilyName(sheep.Family), " Sheep$", "")) else sheep.Name
+end
+
+local function paintToken(token: Instance, sheep: View)
+	if sheep.Family then
+		SheepIcon.Paint(token, sheep.Family, sheep.Rarity)
+	else
+		SheepIcon.PaintLamb(token, sheep.Look, sheep.Rarity)
+	end
+end
+
+-- A total, and "+ ?" for the lambs in it.
+local function totalText(sum: number, lambs: number): string
+	return if lambs > 0 then `{Format.Short(sum)} + ?` else Format.Short(sum)
 end
 
 function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
@@ -157,7 +170,6 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local fan = tile:FindFirstChild("Fan", true) :: Frame
 	local more = tile:FindFirstChild("MoreChip", true) :: Frame
 	local moreLabel = more:FindFirstChild("MoreLabel") :: TextLabel
-	local hint = tile:FindFirstChild("HintLabel", true) :: TextLabel
 	local totalLabel = tile:FindFirstChild("TotalLabel", true) :: TextLabel
 	local selectButton = tile:FindFirstChild("SelectButton", true) :: TextButton
 	local sellButton = tile:FindFirstChild("SellButton", true) :: TextButton
@@ -169,6 +181,9 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local shown: { View } = {}
 	local cards: { [string]: TextButton } = {}
 	local busy = false
+	-- What the cards were last made for: a growing lamb in the pen sends a new snapshot every second, and remaking the
+	-- cards for nothing would swallow taps on them.
+	local cardsKey = ""
 
 	-- The stored sheep (the pen's are never offered, nor a merged lamb still on the Merge Shrine's altar), cheapest or
 	-- dearest first, oldest first on a tie.
@@ -181,24 +196,34 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 		local cheapest = SORTS[sortIndex] == "Cheapest"
 		table.sort(views, function(a: View, b: View)
-			if a.Sell ~= b.Sell then
-				return if cheapest then a.Sell < b.Sell else a.Sell > b.Sell
+			-- Lambs, their prices unknown, after the rest.
+			if (a.Sell == nil) ~= (b.Sell == nil) then
+				return a.Sell ~= nil
+			end
+			local sellA, sellB = a.Sell or 0, b.Sell or 0
+			if sellA ~= sellB then
+				return if cheapest then sellA < sellB else sellA > sellB
 			end
 			return (tonumber(a.Id) or 0) < (tonumber(b.Id) or 0)
 		end)
 		return views
 	end
 
-	local function pickedList(): ({ View }, number)
+	-- What's picked, the total of the known prices, and how many lambs (unknown prices) are in it.
+	local function pickedList(): ({ View }, number, number)
 		local views: { View } = {}
-		local sum = 0
+		local sum, lambs = 0, 0
 		for _, sheep in shown do
 			if picked[sheep.Id] then
 				table.insert(views, sheep)
-				sum += sheep.Sell
+				if sheep.Sell then
+					sum += sheep.Sell
+				else
+					lambs += 1
+				end
 			end
 		end
-		return views, sum
+		return views, sum, lambs
 	end
 
 	local function paintPick(card: TextButton, on: boolean)
@@ -219,11 +244,11 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end
 
 	local function showTile()
-		local views, sum = pickedList()
+		local views, sum, lambs = pickedList()
 		-- The fan: the dearest few, the dearest in front.
 		local front = table.clone(views)
 		table.sort(front, function(a: View, b: View)
-			return a.Sell < b.Sell
+			return (a.Sell or 0) < (b.Sell or 0)
 		end)
 		local from = math.max(#front - FAN + 1, 1)
 		local count = #front - from + 1
@@ -232,7 +257,7 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			local sheep = front[from + index - 1]
 			token.Visible = index <= count and sheep ~= nil
 			if token.Visible then
-				SheepIcon.Paint(token, sheep.Family, sheep.Rarity)
+				paintToken(token, sheep)
 			end
 		end
 		fan.Size = UDim2.fromOffset(FAN_TOKEN + FAN_STEP * math.max(count - 1, 0), FAN_TOKEN)
@@ -240,8 +265,7 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		fan.Visible = #views > 0
 		more.Visible = #views > FAN
 		moreLabel.Text = `+{#views - FAN}`
-		hint.Visible = #views == 0
-		totalLabel.Text = Format.Short(sum)
+		totalLabel.Text = totalText(sum, lambs)
 		totalLabel.TextColor3 = if #views > 0 then Color.Lime else Fleece.Faint
 
 		local pickable, allPicked = 0, true
@@ -280,6 +304,16 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 				picked[id] = nil
 			end
 		end
+		local parts: { string } = {}
+		for _, sheep in shown do
+			table.insert(parts, `{sheep.Id}/{sheep.Locked}/{sheep.Sell or "?"}`)
+		end
+		local key = table.concat(parts, ",")
+		if key == cardsKey then
+			showTile()
+			return
+		end
+		cardsKey = key
 		cardTrove:Clean()
 		cards = {}
 		for _, child in list:GetChildren() do
@@ -291,15 +325,15 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			local card = MenuParts.NewCard(list, `Sheep{sheep.Id}`, order)
 			local face = card:FindFirstChild("Face") :: Frame
 			Style.PaintCard(card, SheepIcon.FamilyLook(sheep.Family), sheep.Locked)
-			SheepIcon.Paint(face:FindFirstChild("Token") :: Frame, sheep.Family, sheep.Rarity)
+			paintToken(face:FindFirstChild("Token") :: Frame, sheep)
 			local lock = face:FindFirstChild("Lock")
 			if lock and lock:IsA("GuiObject") then
 				lock.Visible = sheep.Locked
 			end
 			local name = face:FindFirstChild("NameLabel") :: TextLabel
-			name.Text = shortName(sheep.Family)
+			name.Text = shortName(sheep)
 			local price = face:FindFirstChild("PriceLabel", true) :: TextLabel
-			price.Text = Format.Short(sheep.Sell)
+			price.Text = if sheep.Sell then Format.Short(sheep.Sell) else "?"
 			local chip = face:FindFirstChild("SizeChip") :: Frame
 			local chipLabel = chip:FindFirstChild("SizeLabel") :: TextLabel
 			local chipText = if not sheep.Adult
@@ -341,13 +375,13 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end
 
 	local function sellPicked()
-		local views, sum = pickedList()
+		local views, sum, lambs = pickedList()
 		if #views == 0 or busy then
 			return
 		end
 		local dearest = views[1]
 		for _, sheep in views do
-			if sheep.Sell > dearest.Sell then
+			if (sheep.Sell or 0) > (dearest.Sell or 0) then
 				dearest = sheep
 			end
 		end
@@ -359,11 +393,11 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		MenuParts.Confirm(
 			gui,
 			title,
-			`{Format.Short(sum)} cash`,
+			`{totalText(sum, lambs)} cash`,
 			"This can't be undone",
 			`Sell {#views}`,
 			function(token)
-				SheepIcon.Paint(token, dearest.Family, dearest.Rarity)
+				paintToken(token, dearest)
 			end,
 			function()
 				busy = true

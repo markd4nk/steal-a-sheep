@@ -48,6 +48,17 @@ return function(t: Run.Suite)
 		t.Expect(Roster.Income(flock, 3)).ToBe(2 + 5 + 3)
 	end)
 
+	t.Test("Equip Best keeps a growing lamb in by its likely worth, not its family", function()
+		local lamb = make("1", 1, 0)
+		lamb.Grown = 0
+		lamb.Family = Olympus.Tiers[3].Family
+		local flock = { ["1"] = lamb, ["2"] = make("2", 1, 1), ["3"] = make("3", 1, 0) }
+		Roster.EquipBest(flock, 2)
+		-- Tier 3's lamb is worth more than tier 1's grown sheep, though it earns nothing yet.
+		t.Expect(flock["1"].Slot > 0).ToBe(true)
+		t.Expect(Roster.Income(flock, 2)).ToBe(2)
+	end)
+
 	t.Test("Normalize stores sheep past the pen's size and splits shared slots", function()
 		local flock = { ["1"] = make("1", 1, 5), ["2"] = make("2", 1, 2), ["3"] = make("3", 1, 2) }
 		Roster.Normalize(flock, 3)

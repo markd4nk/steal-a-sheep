@@ -94,10 +94,10 @@ end
 local function merge(player: Player, ids: { string }): (boolean, string?)
 	local root = rootOf(player)
 	if not root or (root.Position - GameConfig.Shrine.At.Position).Magnitude > GameConfig.Shrine.MenuDistance + 8 then
-		return false, "Come closer to the shrine"
+		return false, "Too far from the shrine"
 	end
 	if waiting[player] then
-		return false, "Pick up your lamb first"
+		return false, "Your lamb is still on the altar"
 	end
 	if not mayMerge[player] then
 		return false, "Merging isn't available in your region"
@@ -130,11 +130,14 @@ local function merge(player: Player, ids: { string }): (boolean, string?)
 		ReadyAt = now + GameConfig.Shrine.MergeSeconds,
 		GoesAt = now + GameConfig.Shrine.MergeSeconds + GameConfig.Shrine.LambWaitSeconds,
 	}
+	-- The lamb lands on the altar as a lamb, marked like any other (SheepService.LambLook).
 	Remotes.ShrineShow:Fire(player, {
 		Inputs = inputs,
 		Family = lamb.Family,
 		Rarity = lamb.Rarity,
 		Scale = scale,
+		Weight = lamb.Weight,
+		Look = registry.SheepService:LambLook(lamb.Family),
 	})
 	return true, nil
 end
@@ -147,20 +150,20 @@ local function collect(player: Player)
 		return
 	end
 	if (root.Position - top.Position).Magnitude > GameConfig.Shrine.CollectDistance + 4 then
-		notify(player, "Get closer to the altar", "Bad", "Denied")
+		notify(player, "Too far from the altar", "Bad", "Denied")
 		return
 	end
 	if player:GetAttribute("Carrying") == true then
-		notify(player, "Take your sheep home first", "Bad", "Denied")
+		notify(player, "Your hands are full", "Bad", "Denied")
 		return
 	end
-	local model = registry.SheepService:Build(lamb.Family, lamb.Rarity, lamb.Scale)
+	local model = registry.SheepService:BuildLamb(lamb.Family, lamb.Rarity, lamb.Weight, lamb.Scale)
 	if not model then
 		return
 	end
-	model.Name = `Shrine_{lamb.Family}`
+	model.Name = "ShrineLamb"
 	model:PivotTo(top)
-	if not registry.WildService:CarryLamb(player, model, lamb.Id, lamb.Weight) then
+	if not registry.WildService:CarryLamb(player, model, lamb.Id, lamb.Family, lamb.Weight) then
 		model:Destroy()
 		return
 	end

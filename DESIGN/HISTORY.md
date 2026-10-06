@@ -34,6 +34,104 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     point, run or laugh. It now waits up to 3 s. Replayed after the merge: 97 tests; a tier 1 theft showed Pan's point,
     the lunge (half laid at 1.5 s), flat while gliding, getting up on the catch, the laugh, the walk home, his sounds,
     the ChaseScreen; a clean console.
+- **Mystery lambs (2026-10-06, branch `t3code/mystery-lamb-mockup`, merged into main on the user's word)**.
+  The user: lambs should be a mystery "so that the player doesn't actually know what they're getting", like Steal an
+  Egg's eggs, with only a little indication (which is bigger, heavier, more basic), a default lamb look ("no wool, ...
+  a very slim body where you can tell that it's just a lamb") and a bit of the colour of what it'll be. Mock-ups in Pan's
+  pasture (`studio/LambMockup.luau`, pictures `lamb-mystery-*.png` in T3's attachments): A, marks bolder with rarity,
+  was "that clear"; of the subtler C (a touch more a rarity), D (a spot more) and E (bigger spots) the user picked
+  **D**. Their calls: nothing over a wild lamb ("it should just be unnamed"), weight as size is fine, the reveal only
+  when it's grown ("the lamb gets bigger and bigger ... until it hits 100%, and then that's when the wool actually
+  spawns"), no income while growing with "a little timer", a lamb sells for about two minutes of what it'll earn, and
+  the announcements' rework is a later session's.
+  How it works: `SheepService` makes plain lambs at start (`SheepService/Lambs`: the rig in `GameConfig.LambBreed` with
+  its wool taken off, the head moved onto the bare body over a round neck, horns shrunk to buds; one per horn style,
+  also in `ReplicatedStorage.SheepLooks` for the menus) and takes each family's main colour from its plain adult
+  (`LambLook.MainColor`: by area, not white or cream, skipping the shorn body). `SheepService.BuildLamb` clones the
+  plain lamb and `LambLook.Dress`es it (body as wide as its weight, `Economy.FamilyRarity` spots on an ellipsoid fit
+  to the body); `SheepService.LambLook` is what a lamb shows (colour, spots, horns). Wild lambs, carried ones, pen
+  lambs and the shrine's merged lamb all use it, with no family on the model or its thief (`CarriedFamily` is gone;
+  carrying poses every lamb as `GameConfig.LambBreed`). `Economy.Income` is 0 for a lamb; `Economy.LambSize` grows
+  it 60% from `LambScale` (now 0.55-0.88, spread at the light end); `SellValue` is two minutes of `AdultIncome` for
+  everything; `Worth` (Equip Best) ranks a lamb by its likely worth; `Name` of a lamb is "Lamb" (fleece first), so the
+  announcements say "A Mythic Lamb". The flock snapshot sends a lamb without its family or price, with `Look` and
+  `GrowLeft`; the Flock menu, Sell Stall ("?", "900 + ?") and Daily menu show "Lamb" (the HUD's carry card did too, until it went). The pen label
+  is a clock and the time left (`Pens.Label`), just over a lamb's back. At 100% the pen rebuilds the model as its
+  family's, marks it `GrewAt`, and each device pops its fleece on (`AnimController`); `Remotes.Reveal` now carries the
+  family's rarity and every grow-up gets a notice; the Sheepdex finds a family at grow-up (offline too), not at
+  delivery. The Flock menu and Sell Stall now remake their cards only when the flock changes: a lamb's per-second
+  snapshot remade them under the cursor and swallowed clicks.
+  Checked: `check.ps1`; in the cloud place's Studio with the branch's scripts staged in (then main's put back): both
+  bootstraps ready, 88 tests pass, a clean console; 121 wild lambs with no card or family attribute; a Pan lamb stolen
+  (carry card "Lamb" with green spots), put down ("0:42" under a clock, no income, no family in the snapshot), grown
+  with `GrowAll` ("Your lamb grew up: Legendary Blossom Sheep!", +16/s, Sheepdex badge 1); a tier 1 lamb grown while
+  away; the Flock menu's lamb card and detail; the Sell Stall's "?" and "900 + ?". The test save was wiped back to new.
+  Not seen: the fleece pop itself, the shrine's lamb, a Titan, the gift lambs, a lamb sold, two players, a phone.
+  *Then the user*: keep a notice for every grow-up, unnamed known lambs are fine, and remove "Slide home!", "Pan wants
+  their sheep back!", the "Lamb / Return" card and the floating arrow with its distance ("the blue thing"). All but the
+  chase banner were already gone on the onboarding branch (session 7bbf5a87, done but not merged); the user chose to
+  merge it with this one, and it reached main first with the less-hand-holding branch. The chase banner went here (`Screens/Hud` has no chase handler at all now: ChaseController,
+  merged from the chase session, owns the chase's sounds and red screen; `GameConfig.Ui.BannerSeconds` gone), and with the carry card gone, so did WildService's `CarriedColor` and
+  `CarriedSpots`.
+  *Checked together* (main fcb605a with the chase, onboarding and less hand-holding merged in; the branch's scripts
+  staged in the cloud place, then version 20's put back and verified): both bootstraps ready, 96 tests, a clean
+  console; a steal showed only the counters (no banner, card, arrow or hint; the chase's red screen on); the lamb put
+  down read "Lamb", earned 0, "0:43" under a clock; `GrowAll` revealed "Clover Sheep | Standard | Uncommon". The test
+  save was wiped back to new. Main fast-forwarded to the branch; not published.
+- **Less hand-holding after onboarding, and a faster stair walker (2026-10-06, branch `t3code/remove-gameplay-hints`,
+  merged into main with the onboarding trail on the user's word)**. The user: after the
+  onboarding the game shouldn't tell players what to do ("no is in reach"), and asked for every other part of the UI
+  like that. Done alongside the onboarding session (`t3code/simplify-onboarding-guidance`), which owns `Hud.luau`.
+  - *Cut*: FlockService's "<God>'s <Area> is in reach!" notice when Climbing passed a sign (its per-player `ClimbTier`
+    state went with it; the `ClimbTier` attribute stays for the rare-spawn notice). TrainingService's "Jump to get off"
+    showed on the first climb of every session; now only while `Tutorial < 2` (the onboarding's first climb).
+  - *Cut by the onboarding session* in its `goal()` rewrite: "Put your sheep to work" (and the FLOCK glow) and "Train
+    to climb".
+  - *The rest of the audit, on the user's answers*: menu tips cut (Merge Shrine "Bigger sheep in, more luck", Sell
+    Stall "Tap the sheep to sell", the gift's "Tap here, or the star"); the Merge Shrine's empty list says "No sheep to
+    merge yet" or "Opens after 3 deliveries"; every refusal that said what to do now says what's wrong ("Your flock is
+    full: merge or sell first" -> "Your flock is full", "Take your sheep home first" -> "Your hands are full", "Bring it
+    inside your own fence first" -> "Not in your pen", and the rest in DECISIONS.md). Kept, on the user's word: the
+    HUD's glows and red badges (GIFT, DAILY, SHEEPDEX) and the rare-lamb notice.
+  - *The stair walker* (the user, same thread: the "Next" line and its bar go, "all it needs to indicate is that you're
+    gaining plus speed ... above the player"; "the player should be moving on the treadmill way faster ... at higher
+    levels and higher speeds. Right now it's still the same thing every single time"): TrainingService sets the
+    player's `TrainRate` attribute while training. Every client runs a machine's steps at its climber's rate
+    (`StairClimb.StepSeconds(rate)`): steps a second rise evenly with each tenfold of the rate, from 0.6 s a step on
+    the free machine to 0.1 s on the top one with the Sunlight trail (`GameConfig.StairWalker.SlowestStep`,
+    `FastestStep`), so trails speed it up too. It was 0.6 s to 0.27 s by level, most of it in the first levels. The
+    HUD's meter came out on the onboarding branch (it owns `Hud.luau`).
+  - *The pops* (the user, after a static "+N/s" over the head: "depending on how much they make per second, it also
+    depends how fast ... level one ... plus one, plus one in one second ... at level 30, I want like 10 things to say
+    plus ... 2.5T", "show me a mock-up ... a video"): `WalkerController` pops one "+N" a step off your own head, N =
+    rate x step time, so level 1 (now 0.5 s a step) shows "+1" twice a second and level 30 about ten "+2.5T"
+    (`Format.Rate(amount, 1)`: `Format.Short` and `Rate` take a `maxDecimals`, rounding down as before; new
+    `tests/Format.spec`). The pops are drawn on a canvas scaled to 6 studs over the head (`TrainGain` in PlayerGui,
+    the `Fit` UIScale), so they keep their size beside the character on a phone: the first try, in screen points,
+    covered half the Galaxy A06's screen. Your machine's floating level tag hides on your screen while you climb
+    (the pops rose through it) and comes back when you step off. The user, on the video (filmed in the cloud place on
+    the Galaxy A06 emulator, `record` of Studio's window in the background at 15 fps): "much better now"; one decimal,
+    keep the shoe, hide the level.
+  - *Checked after the user's OK* (main d8fc2b3 merged in, the branch's 19 scripts staged in the cloud place, then put
+    back and verified): both bootstraps ready, 88 tests (the new `Format.spec` with them), a clean console; level 1
+    popped "+1" at 2.0 a second, level 30 "+2.5T" at 9.7 a second; the level tag hid while climbing and came back on
+    stepping off. The Studio save was left a new player's, as found.
+  - *Merged with the onboarding trail* (the user: "Yes"): only the docs clashed (both sides kept). The pair, 23
+    scripts staged over main in the cloud place, then put back and verified: both bootstraps ready, 88 tests, a clean
+    console; no TrainMeter, Objective, GuideArrow or CarryCard in the HUD; the floor trail up for a new save; on the
+    walker the Climbing pill read +2/s and "+1" pops rose over the head. Main had meanwhile taken the chase work
+    (`t3code/guardian-theft-horror`): merged in with no code conflicts (Hud, Remotes, WildService and GameConfig merged
+    on their own; the docs kept both sides; BRAIN proposals renumbered S48 chase, S49 screenshots, S50 CanQuery),
+    `check.ps1` passes. Not playtested with the chase in: the cloud Studio was in another session's use. Main
+    fast-forwarded to it; not published (the live version is still 20).
+  - *Checked*: `check.ps1` passes. A playtest of the cloud place with the branch's 17 scripts staged in
+    (`scripts/stage_branch.py --base 3667692`, then put back and verified): both bootstraps ready, 84 tests, a clean
+    console. Snapped onto the walker: `TrainRate` 2, the steps measured on the client at 1.67 steps a second; at level
+    30 (debug `SetWalker`) `TrainRate` 25T and 9.71 steps a second at 60 fps, both as the formula says; "+2/s" and
+    "+25T/s" over the head (the static label before the pops; screenshots; AlwaysOnTop billboards don't show in captures, BRAIN proposal S49, so it now
+    draws normally). "Jump to get off" showed on the Tutorial 0 save. The Studio save was put back as found (walker
+    level 1, Climbing 0). Not seen in play: the trimmed refusals and the menus without their tips.
+
 - **A scarier steal and chase (2026-10-06, branch `t3code/guardian-theft-horror`, merged into main on the user's
   word: "it's good. We can merge to main"; not published)**. The user: make stealing "way more
   terrifying", like Steal an Egg (an alarm, the player sees red, heart racing, the animal's roars getting closer), with
@@ -121,6 +219,39 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     bootstraps ready, 86 tests, 30 gods, "data will be saved", a clean console); File > Save to Roblox, then Publish
     to Roblox at 17:34 UTC: "Place published. Editors can now play this place in Roblox", v20. Audience still Private;
     no schema or remote changes, so no servers to restart.
+
+- **The onboarding trail (2026-10-06, branch `t3code/simplify-onboarding-guidance`, merged into main with the
+  less-hand-holding branch on the user's word)**. The user: too much said "steal this
+  person's sheep" and pointed at the sheep; instead chevrons on the floor "just like in Shear a Sheep" to "the place
+  where the player has to actually go", only for the first lamb, "very simple ... I don't want to hand-hold them the
+  entire time", and look at how Steal an Egg does it.
+  - *Steal an Egg* (frames of two fresh-account first plays, KreekCraft and Bloxtian PH, saved as `sae-*.jpg` in T3
+    Code's attachments): a short line per step ("Steal an Egg!", "RUN!!", "Go to your Pen!", "Hatch the Egg!") and a
+    red chevron trail to one egg just past the safe zone, flipping to point home on the grab, into the pen; on the
+    second steal nothing at all. The treadmill gets one line much later, when it's bought at $1K.
+  - *Built*: `UIController/GuidePath`, Shear a Sheep's `Guide/Path` (its solid white chevrons with a black edge, 17
+    at most, 3.4 studs apart at 13 studs/s, Reduce motion keeps them still) with two changes for this map. The way
+    always comes from PathfindingService, because the plots' fences, the hay and the leaderboards can't be seen by
+    rays (`CanQuery` off) and Shear a Sheep only asked for a way round when a ray hit something. The ground is found
+    near `Mountain.RampY`, not the goal's height, since the trail climbs the ramp. `Screens/Hud`'s `goal()` gives the
+    trail its target: the front of Pan's meadow until the player is in it, their pen from the mountain's foot while
+    carrying the first lamb (none on the slope), then the walker's `Zone` until `Tutorial` 2. The hint line, the
+    floating guide arrow with its distance, Train to climb and Put your sheep to work (with the FLOCK glow) are
+    removed, and so is the walker's training meter (Mark, via the less-hand-holding session t3code-b39d69ab, which
+    handles the hints after the onboarding).
+  - *Then the user*: "remove the thing that says wild lamb return. That is never necessary". The carried lamb's card at
+    the bottom (picture, name, Return) is gone, and so is `Remotes.ReturnSheep` with WildService's "The lamb ran back"
+    notice: nothing gives up a run now (a catch, a fall, a reset or leaving still ends one). Checked in a second
+    playtest of the cloud place (the four changed scripts swapped in, then main's put back): a debug steal carried the
+    lamb with no card or Return on screen, the chase banner as before, 84 tests, a clean console.
+  - *Checked*: `check.ps1`. A playtest of the cloud place, with the two scripts swapped in from a rojo-built model and
+    put back after: a blank save (`DebugBlankProfile`) on Plot1, with Studio's phone emulation on. Both bootstraps were
+    ready and 84 tests passed, with nothing from our code in the console. The player was walked by script along a
+    path. The trail went out through the gate and round the stalls; it ended by the tutorial lamb and showed no words
+    or arrow. A steal followed by standing still was punched by Pan, as before. A debug steal then slid to the foot,
+    where the trail turned to the pen and disappeared inside the fence. Put down gave `Tutorial` 1, the menus showed,
+    and a trail led to the walker. Stepping on gave `Tutorial` 2 and the trail was gone. Pictures are
+    `onboarding-*.jpg` in T3 Code's attachments.
 
 - **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
   it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game

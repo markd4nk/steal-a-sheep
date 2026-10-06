@@ -4,6 +4,7 @@ local CollectionService = game:GetService("CollectionService")
 local ContentProvider = game:GetService("ContentProvider")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
@@ -13,7 +14,8 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 local Wander = require(ReplicatedStorage.Utils.Wander)
 
 -- Presentation on this device only. The sheep in the pens walk where the server sends them (their Spot and WalkAt
--- attributes, Utils/Wander) and hop down off their thief's head when put down (DropFrom, DroppedAt). The nearest come
+-- attributes, Utils/Wander) and hop down off their thief's head when put down (DropFrom, DroppedAt); a lamb that just
+-- grew up (GrewAt) has its fleece and trimmings pop on in a burst of sparkles. The nearest come
 -- to life: lambs graze nearly all the time (head down to the grass, nibbling, then up to chew with a chewing face),
 -- grown sheep now and then; between times they breathe, look about, wag and blink (Utils/SheepClips), and baa now and
 -- then. A carried lamb sways on its thief's head. The block gods swing their limbs as they run, shake their arms when
@@ -178,17 +180,86 @@ local function forget(model: Model)
 	end
 end
 
+-- How a lamb's fleece comes in when it grows up (the user, 2026-10-06: "that's when the wool actually spawns"): each
+-- piece from nothing to its size, one after another, within Window seconds of the grow-up.
+local FLEECE_POP = {
+	Window = 2,
+	Seconds = 0.45,
+	Stagger = 0.05,
+	Sparkles = 24,
+}
+local POP_TWEEN = TweenInfo.new(FLEECE_POP.Seconds, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+
+-- Whether `part` is a piece of the fleece or its trimmings (the Wool and Addons folders).
+local function isFleece(model: Model, part: Instance): boolean
+	for _, folderName in { "Wool", "Addons" } do
+		local folder = model:FindFirstChild(folderName)
+		if folder and part:IsDescendantOf(folder) then
+			return true
+		end
+	end
+	return false
+end
+
+local function popPiece(part: BasePart, delay: number)
+	local size = part.Size
+	part.Size = size * 0.05
+	TweenService:Create(
+		part,
+		TweenInfo.new(POP_TWEEN.Time, POP_TWEEN.EasingStyle, POP_TWEEN.EasingDirection, 0, false, delay),
+		{ Size = size }
+	):Play()
+end
+
+-- Pops on the pieces already here (`late`: seconds since the grow-up) and bursts sparkles; pieces that arrive after
+-- pop as they come (addSheep).
+local function popFleece(model: Model, late: number)
+	local count = 0
+	for _, descendant in model:GetDescendants() do
+		if descendant:IsA("BasePart") and isFleece(model, descendant) then
+			popPiece(descendant, math.max(0, count * FLEECE_POP.Stagger - late))
+			count += 1
+		end
+	end
+	local body = model:FindFirstChild("Body")
+	if body and body:IsA("BasePart") then
+		local burst = Instance.new("ParticleEmitter")
+		burst.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+		burst.LightEmission = 1
+		burst.Rate = 0
+		burst.Lifetime = NumberRange.new(0.5, 0.9)
+		burst.Speed = NumberRange.new(4, 8)
+		burst.SpreadAngle = Vector2.new(180, 180)
+		burst.Size = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0),
+			NumberSequenceKeypoint.new(0.2, 0.5),
+			NumberSequenceKeypoint.new(1, 0),
+		})
+		burst.Parent = body
+		burst:Emit(FLEECE_POP.Sparkles)
+		task.delay(1.5, function()
+			burst:Destroy()
+		end)
+	end
+end
+
 local function addSheep(instance: Instance)
 	if not instance:IsA("Model") or not instance:IsDescendantOf(workspace) or sheep[instance] then
 		return
 	end
 	local entry = rig(instance)
 	sheep[instance] = entry
+	local grewAt = instance:GetAttribute("GrewAt")
+	local sinceGrown = if typeof(grewAt) == "number" then workspace:GetServerTimeNow() - grewAt else math.huge
+	local popUntil = os.clock() + FLEECE_POP.Window - sinceGrown
 	-- A sheep made while this player is here can arrive in pieces, its tag before its joints and face: take those as
-	-- they come, or it walks about stiff and never changes face.
+	-- they come, or it walks about stiff and never changes face (and a just-grown one's late fleece pops on too).
 	table.insert(
 		entry.Connections,
 		instance.DescendantAdded:Connect(function(descendant: Instance)
+			if os.clock() < popUntil and descendant:IsA("BasePart") and isFleece(instance, descendant) then
+				popPiece(descendant, 0)
+			end
 			if descendant:IsA("Motor6D") then
 				entry.Joints[descendant.Name] = descendant
 			elseif
@@ -202,6 +273,9 @@ local function addSheep(instance: Instance)
 			end
 		end)
 	)
+	if sinceGrown < FLEECE_POP.Window then
+		popFleece(instance, math.max(sinceGrown, 0))
+	end
 	local spot = instance:GetAttribute("Spot")
 	if typeof(spot) ~= "CFrame" then
 		return

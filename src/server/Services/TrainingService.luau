@@ -24,7 +24,6 @@ local trove = Trove.new()
 local sessions: { [Player]: Session } = {}
 -- False after stepping off, until the player has left the entry: walking away doesn't snap them straight back on.
 local armed: { [Player]: boolean } = {}
-local told: { [Player]: boolean } = {}
 
 local function rootOf(player: Player): (BasePart?, Humanoid?)
 	local character = player.Character
@@ -73,8 +72,9 @@ local function stepOn(player: Player)
 	sessions[player] = { Plot = plot, At = at }
 	player:SetAttribute("OnWalker", plot.Index)
 	plot.Pieces.Walker.Model:SetAttribute("Climber", player.UserId)
-	if not told[player] then
-		told[player] = true
+	-- Only on the onboarding's first climb: after it the player is left to play.
+	local data = registry.DataService:GetData(player)
+	if data and data.Tutorial < 2 then
 		Remotes.Notify:Fire(player, "Jump to get off", "Good")
 	end
 end
@@ -109,11 +109,16 @@ local function tick(dt: number)
 		if player:GetAttribute("Training") ~= training then
 			player:SetAttribute("Training", training)
 		end
-		if not training then
+		-- Every client runs this climber's steps at their rate, and their own shows it over their head.
+		local rate = if training then Economy.TrainingRate(data.WalkerLevel, data.Trail) else nil
+		if player:GetAttribute("TrainRate") ~= rate then
+			player:SetAttribute("TrainRate", rate)
+		end
+		if not training or not rate then
 			continue
 		end
 		local before = Economy.ClimbTier(data.ClimbPower)
-		data.ClimbPower += Economy.TrainingRate(data.WalkerLevel, data.Trail) * dt
+		data.ClimbPower += rate * dt
 		player:SetAttribute("ClimbPower", data.ClimbPower)
 		local stepped = data.Tutorial == 1
 		if stepped then
@@ -156,7 +161,6 @@ function TrainingService.Start(_self: any)
 	trove:Connect(Players.PlayerRemoving, function(player: Player)
 		stepOff(player, false)
 		armed[player] = nil
-		told[player] = nil
 	end)
 end
 

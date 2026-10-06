@@ -67,7 +67,7 @@ confirmed or reversed it.
   towards Climbing sitting just over the next sign, not far past it.
 - **Hidden lamb weight (2026-10-05)**: no Light/Stout/Heavy words and no numbers on screen: players feel it. A smooth
   range, not three kinds. Saved with the sheep; heavier lambs tend to grow bigger, but a light one can still grow
-  large, just less likely. The carry card shows no speeds.
+  large, just less likely.
 - **High Olympus's stretches are 275 studs along the floor** (the user, 2026-10-05: at 210 they felt shorter than the
   first levels, about 250, so a bit longer than those). 169-233 across the ground, so the steep ones still look
   shorter than they climb.
@@ -161,6 +161,32 @@ confirmed or reversed it.
   E" (and holding at all: a click or E on a computer, a tap on a phone, with a proper UI), "Claim its reward there",
   "Climbing gets you up steeper slopes", "take it home" and the escape notice, "Put it down where you like", "Yours has
   your name over the gate", the grow-up celebration; "you get the gist".
+- **No hand-holding after onboarding (the user, 2026-10-06)**: "I don't want to tell the player anything that they
+  need to do besides just playing the game. After the onboarding, it should just be their own experience. They can
+  figure out how to do it." So no "<God>'s <Area> is in reach!", and no hint, tip or nudge that tells a player what to
+  do once the onboarding is over. Onboarding itself is the onboarding session's (`t3code/simplify-onboarding-guidance`).
+  On the audit's list the user said: cut the menu tips ("Bigger sheep in, more luck", "Tap the sheep to sell", the
+  gift's "Tap here, or the star"; the Merge Shrine's empty list reads "No sheep to merge yet", or "Opens after 3
+  deliveries"); refusals say the fact without the advice ("Your flock is full", "Your hands are full", "Not in your
+  pen", "Too far from the altar", "Not ready yet", "It's locked", "Not found yet", "Needs the Dust Trail", "Not
+  favorited yet"); **keep** the HUD's glows and red badges (GIFT, DAILY, SHEEPDEX) and the daily gift opening itself
+  once a session; **keep** the rare-lamb notice ("A Royal ... appeared in Zeus's pasture!").
+- **The stair walker (the user, 2026-10-06)**: no "Next" line or bar to the next god while training; "all it needs to
+  indicate is that you're gaining plus speed, whatever you're making per second ... above the player". And "the
+  player should be moving on the treadmill way faster ... at higher levels and higher speeds." Then, on the video
+  mock-up: like other games, numbers pop off the player, more of them the faster you train ("level one, if it's two
+  per second ... plus one, plus one in one second ... at level 30, I want like 10 things to say plus ... 2.5T"):
+  "much better now". One decimal ("+2.5T"), the shoe stays on each pop, and the machine's floating level hides while
+  you climb.
+
+- **Onboarding is a trail on the floor to a place (the user, 2026-10-06)**: too much said "steal this god's sheep" and
+  pointed at the sheep; instead chevrons on the floor "just like in Shear a Sheep" leading "to the place where the
+  player has to actually go", only for the first lamb, "very simple ... I don't want to hand-hold them the entire
+  time", modelled on Steal an Egg's. The words, the floating arrow with its distance, Train to climb and Put your sheep
+  to work are gone (GAME_DESIGN.md, *Onboarding*).
+- **No card for the lamb being carried (the user, 2026-10-06)**: "remove the thing that says wild lamb return. That is
+  never necessary". The card at the bottom (the lamb's picture, its name, Return) is gone, and with it giving up a run:
+  a lamb only goes back when its god catches the thief, or they fall, reset or leave.
 
 - **The overnight work as summarized, merged and shipped (the user, 2026-10-06)**: "Yes, it looks good. You can merge
   it... just ship it. It still needs to stay private though." So version 8 went out with the audience left Private:
@@ -174,10 +200,6 @@ confirmed or reversed it.
 Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-game-for-publishing`; confirmed
 2026-10-06 with the overnight work):
 
-- **When the hint shows**: Put your sheep to work for 12 s after room opens up in the pen (pen space bought, sheep
-  merged away) while sheep are stored, not after a sheep is stored on purpose; the FLOCK button glows meanwhile.
-  Train to climb while the slope holds the player under half speed on tier 2 and up (off the walker, not carrying).
-  Slide home! only on the first lamb's run; nothing in the pen (the Put down button says it).
 - **Grow-ups**: Giant and Titan get one notice ("Fortune Sheep grew up GIANT!") with their fanfare; Standard and
   Large only update the label over the sheep.
 - **Menus that open themselves**: none in a player's first session; after that the daily gifts once a session
@@ -189,8 +211,7 @@ Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-g
   (52 pt) with no key; on a computer the key in a white cap beside it; prices and the shrine lamb's name in a small
   line above; prompts on one spot side by side; the Put down button over the carried lamb.
 - **Wording**: the shrine's landing says SHINY! for a Shiny fleece; the walker row "8 → 12 Climbing/s"; trails
-  "1.5x training"; Merge's button "Merge" (greyed until three picks); gods' nameplates show the name only; the
-  training meter "Next: <God> at <sign>" (no lamb weights named), nothing past Zeus's sign.
+  "1.5x training"; Merge's button "Merge" (greyed until three picks); gods' nameplates show the name only.
 - **Merge odds**: exact percentages, long ones to five significant digits; "Size and fleece roll separately. Odds
   are rounded, so they may not add up to exactly 100%." under the odds.
 - **Names**: Eris's area is Chaos Rift and her Mythic shows as Mayhem Sheep (was "Discord"; the saved id is
@@ -200,8 +221,7 @@ Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-g
 - **Signs in studs**: the plots' name signs 24 x 6.8, the stalls' names 15 x 3.5, the walkers' level tags 6.3 x 2.35,
   the same size as before at their usual distance and smaller further away.
 - **Layout fixes**: on a computer or a tablet the Climbing and cash counters stand left of Roblox's player list (it
-  opens over the top right by default there); the guide arrow hangs under the hint, pointing up, when its target is behind the hint's
-  words; menus that open by themselves wait for the welcome-back card and 4 s after it; the HUD's STORE button
+  opens over the top right by default there); menus that open by themselves wait for the welcome-back card and 4 s after it; the HUD's STORE button
   hides while a menu is open.
 - **Phone layouts**: the Flock menu's sheep picture shrinks so Store and Lock stay inside; the free gift's step shows
   its picture and words in a row; the Merge button stands under the shrine's list where the odds and the button
@@ -238,6 +258,20 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
   glow or the see-through look, as the gold paint already did.
 - Any other wool material keeps its look without studs (none uses one today).
 
+- **Mystery lambs (the user, 2026-10-06; built on `t3code/mystery-lamb-mockup`)**: a lamb doesn't show what it will
+  grow into. Wild lambs have nothing over them: no card, no name ("it should just be unnamed"). Lambs are bare white
+  lambs (no wool, horn buds) marked in the colour of the sheep they grow into, the rarity hint subtle: mock-up **D**,
+  one spot per step of rarity (A's bolder ladder was "that clear": out; C and E not picked). Weight shows as size,
+  heavier lambs bigger and rounder ("that's fine"). The family, rarity and size show only when it grows up: it grows
+  bigger in the pen until 100%, then its wool appears and it takes its real size, Titan included. Growing lambs earn
+  nothing; a small timer shows the time left. A lamb sells for about two minutes of what it will really earn. Every
+  grow-up gets a notice saying what it became ("keep it"), and every lamb is unnamed until grown, even a merged or gift
+  lamb whose family is known ("sure"). How rare-lamb announcements work is for a later session; the user wants them
+  simpler ("a rare lamb or a mythic lamb").
+- **No words during a chase (the user, 2026-10-06)**: no "Pan wants their sheep back!" banner, with "Slide home!", the
+  floating arrow and its distance, and the carried lamb's card ("Lamb", Return) gone too (the onboarding trail's
+  removals); the chase's music and its scare sound stay.
+
 ## To review
 
 Calls in the god lunge, belly glide and surf (2026-10-06, `Utils/BodyClips`, `GodController`, `SlideController`):
@@ -255,6 +289,27 @@ Calls in the god lunge, belly glide and surf (2026-10-06, `Utils/BodyClips`, `Go
   third of the way into the ramp's slope; empty hands out for balance, aimed by direction so T-pose avatars look the
   same. A carrier's arms and waist stay CarryController's. Seen by everyone near (200 studs). R6 avatars keep the sit.
 
+Calls in the mystery lambs (2026-10-06, branch `t3code/mystery-lamb-mockup`):
+
+- **The grow-up notice's words**: "Your lamb grew up: Epic Toadstool Sheep, GIANT!", the family's rarity named from
+  Rare up, the size from Large up; sound louder for Epic+ or Giant+. No celebration (the user's earlier call).
+- **Announcements name no family** already: a lamb's name is "Lamb", so they read "A Mythic Lamb appeared in Zeus's
+  pasture!" (the user's simpler wording; anything more is the later session's).
+- **A lamb's price shows as "?"** at the Sell Stall, and a pick with lambs totals "900 + ?"; the cash shows in the sold
+  notice. Lambs sort after the priced sheep.
+- **Equip Best ranks a lamb by its likely worth** (its god's base x the herd's average family multiplier x fleece x
+  its weight's size odds x rank), not by its 0 income, so growing lambs aren't benched, and the same for every family
+  of a herd so the order gives nothing away.
+- **Shiny and Royal lambs keep their sparkle** (blue, gold) but not the gold paint.
+- **Lamb cards** are Common's grey with no rarity chip; their number is the time left (clock icon), "Stored - not
+  growing" when stored.
+- **Sizes**: a lamb starts at 0.55 of an adult's rig (lightest) to 0.88 (the heaviest wild weight and up) and grows
+  60% bigger by 100%; its body is 0.92 to 1.30 as wide.
+- **The pen label** sits just over a lamb's back (it was at an adult's height) and reads like "0:42".
+- **The Sheepdex finds a family when it grows up**, so Day 4's gift lamb now counts too.
+- **The fleece pops on** piece by piece over about half a second with a burst of sparkles when a lamb grows up.
+- **Delivery notice**: "Your lamb is home! Grows up in 0:45" (was the lamb's name and income).
+
 Calls in the scarier steal and chase (2026-10-06; the user's own calls are under *Confirmed rules*; `art/chase/`,
 GameConfig.Chase, Config/Sounds):
 
@@ -265,7 +320,7 @@ GameConfig.Chase, Config/Sounds):
 - **Scariness follows distance**: the god 90 studs or more away is the calmest a chase gets, 8 or closer the scariest;
   the head start sits at 0.3 of the way. Heartbeat 80 to 160 a minute; drums from 0.42, all in at 0.75.
 - **Red edges**: 25% to 75% opaque, a throb on every heartbeat; colour drained 35% and a red cast at the scariest. Under
-  the HUD (the banner and buttons stay clear).
+  the HUD (its buttons stay clear).
 - **Shake and zoom**: a 6-degree zoom jolt and a small shake on the steal; the god's footsteps shake the view from 0.72;
   a big shake on the catch. None of it with Reduce Motion on (flashes stay).
 - **The god's voice**: yells every 2.5-4.5 s while running, a snarl every 1.6-2.6 s within 16 studs of its thief; an
@@ -288,6 +343,18 @@ Calls in the momentum slide (2026-10-06, `Mountain.Momentum`, `GodService` pace)
   one more of each is caught (before momentum, a second bump of any kind was). I picked no drop at all for the god
   rather than a small one: one number fewer, and the bump still costs ground.
 - **The safety line stops a slide dead** (its speed along the ground zeroed), then normal walking: no run-out.
+
+Calls in the onboarding trail (2026-10-06, merged into main):
+
+- **Where the first trail ends**: the front of Pan's meadow, mid-lane (45% up tier 1), a few studs past the tutorial
+  lamb; it stops once the player is within 4 studs of that line or past it, so it never points back.
+- **No trail on the slope with the lamb**: the slide carries the player down; the trail home starts at the mountain's
+  foot (off the ramp) and ends inside the player's own fence.
+- **One trail to the stair walker after the first delivery**, no words, until the player steps on (Steal an Egg
+  points at its treadmill only once it's bought, about $1K in).
+- **No words at all**, unlike Steal an Egg's line per step ("Steal an Egg!", "Go to your Pen!").
+- **The trail hides while a menu is open**, and follows the walkable way (pathfinding: out through the gate, round
+  the stalls), straight when no way is found or it's over 1.3x the straight line plus 16 studs.
 
 Calls in the trailer's first cut (2026-10-05, overnight; `trailer/stealasheep.md`, nothing uploaded):
 
@@ -472,8 +539,7 @@ Calls made building the Merge Shrine (2026-10-05):
   "Not <family>". Picks stand on the pedestals in order (1 left, 2 back, 3 right) at their real sizes. Walking 26
   studs from the shrine closes it.
 - **One lamb at a time**: you can't merge again until the last lamb has left the altar ("Pick up your lamb first").
-- **Pick up**: an instant E prompt ("Pick up", the lamb's name) within 14 studs of the altar; the carry card's Return
-  button sends a shrine lamb to the pen.
+- **Pick up**: an instant E prompt ("Pick up", the lamb's name) within 14 studs of the altar.
 - **Celebration** when it lands: "NEW LAMB!" ("RARE!" or "ROYAL!" by fleece) with "Pick it up and take it home";
   sounds: LabZap at the merge, LabRiser on the rise, RevealSparkle at the pop, PenDrop on landing. A Titan grow-up
   plays RevealFireworks.
@@ -528,12 +594,17 @@ Calls building the stair walker (2026-10-05).
 - **The sign** stands by the machine's entry, turned to the gate, written on both sides ("UPGRADE", the next level, its
   price in cash and R$).
 - **On and off**: walking into the entry snaps the owner on (only the owner, not while carrying a lamb); jumping puts
-  them down behind the entry facing away; "Jump to get off" shows the first time each session. Training only counts
+  them down behind the entry facing away; "Jump to get off" shows only on the onboarding's first climb. Training only counts
   while snapped on.
 - **The sign's prompts**: E upgrades with cash, R with Robux; only the owner sees them; they go at the top level, and
   the board says MAX LEVEL. An empty plot's machine shows level 1 with no floating tag.
-- **Step speed by level**: a step takes `0.25 + 0.35 x 0.9^(level-1)` seconds: 0.60 at level 1, 0.48 at 5, 0.40 at
-  10, 0.30 at 20, 0.27 at 30.
+- **Step speed by training rate** (2026-10-06, replacing step speed by level): steps a second rise evenly with each
+  tenfold of the climber's rate, so a trail speeds them up too. Without a trail a step takes 0.50 s at level 1 (two a
+  second, the user's example), 0.36 at 3, 0.29 at 5, 0.20 at 10, 0.13 at 20, 0.10 at 30 (Sunlight trail on top: 0.10,
+  the fastest).
+- **The pops** (your own screen only): one a step, the shoe and "+N" in lime, N what that step earned; each starts
+  just over your head somewhere across a 6-stud-tall space, rises about 4.8 studs in 0.9 s, fading for the last 0.3;
+  sized in studs, so they keep their size beside the character on any screen. Reduce Motion: they fade in place.
 - **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor; the
   machine's sides, hood, console and the sign are solid, the entry step and stairs aren't.
 
@@ -585,19 +656,20 @@ Calls made building Climbing (2026-10-05):
 - **Size odds by weight** (Standard / Large / Giant / Titan): 1.0: 85/14/1/0, 1.1: 60/35/5/0, 1.5: 15/60/25/0,
   3.0: 0/20/50/30, straight lines between. Wild lambs overall come out about 72/25/3 (was 75/23/2.5). Titan (x5 income,
   2.1 scale; x5 the user's call) only from Huge weights, so never wild.
-- **Weight's only visible hint** is the lamb's size: 0.6 of an adult at the lightest, 0.8 at 1.5.
+- **Weight's only visible hint** is the lamb's size: 0.55 of an adult's rig at the lightest, 0.88 at 1.5, and
+  rounder (mystery lambs, 2026-10-06).
 - **Slides**: the god's speed x your speed factor, at least walking speed, kept all the way down; they reach it in
   about 2 seconds (speeding up by at least 26 studs/s each second).
 - **Gods**: 0.8 x the tier's SlideSpeed, 19 at tier 1 to 48 at tier 30; the tutorial lamb's god 0.7.
 - **Tier 1's sign is 25** (what the tutorial gives), so a high level speeds you up there too.
 - **On screen**: tier signs "<God>'s <Area> / Climbing N"; the HUD's goals "Train to climb", "Train for heavier
-  sheep", "Ready for the heaviest sheep"; "<God>'s <Area> is in reach!" when Climbing passes the next sign; the player
+  sheep", "Ready for the heaviest sheep"; the player
   list column is Climbing; the HUD pill reads CLIMBING; the wild lamb's card and the flock menu no longer name a burden.
 - **Server check**: a player found further up the ramp than their Climbing allows (30% slack, 10 studs or 1 second's
   lead for lag) is put back at their allowed spot.
 - **Saved sheep**: schema 2 turns Burden 1/2/3 into Weight 1.05/1.2/1.35; sizes already rolled stay.
 - **Dropped lambs** (the user: a caught thief's lamb stays where it fell, anyone can steal it, its god chases them):
-  being caught or dying on the ramp drops it; giving up, falling off the world, resetting or leaving puts it straight
+  being caught or dying on the ramp drops it; falling off the world, resetting or leaving puts it straight
   back, and the tutorial lamb always goes back. A dropped lamb lies there 30 s, then returns to its pasture. Gods still
   walk home slowly (the user's call).
 - **The punch** (the user: a caught thief is launched down about three or four tiers, not sent home): three tiers
@@ -671,11 +743,9 @@ Calls made while building the MVP on 2026-10-05:
 - **Manual Equip pins a sheep**: Equip Best keeps pinned sheep and refills the rest; Store unpins.
 - **Selling is at the Sell Stall only** (the map's stall at z 175), in its own menu (Screens/SellStall). The Shop is
   the stall at z 205; the Merge Shrine (opens after 3 deliveries) stands between the stalls.
-- **HUD**: menu buttons (Flock, Shop, Sheepdex) appear after the first delivery; the objective line always shows the
-  next useful step (steal, slide home, train, put sheep to work, train for Light/Heavy, climb to the next god), with a
-  guide arrow to it; a training meter shows the next Climb Power target while on the walker.
-- **Tutorial**: a new player's private, Light, ordinary tier 1 lamb (Pan's) sits in the meadow (others can't take it); its
-- **Tutorial**: a new player's private, Light, Plain Demeter lamb sits in the meadow (others can't take it); its
-  run is protected from slide hits; any first delivery gives +60 coins and +25 Climb Power and removes it.
+- **HUD**: menu buttons (Flock, Shop, Sheepdex) appear after the first delivery; no hints in words (the onboarding's
+  floor trail is the only guide, GAME_DESIGN.md, *Onboarding*).
+- **Tutorial**: a new player's private, Light, ordinary tier 1 lamb (Pan's) sits just short of the meadow (others can't
+  take it); its run is protected from slide hits; any first delivery gives +60 coins and +25 Climb Power and removes it.
 - **Sounds**: Shear a Sheep's cues: the danger music during a chase, WolfScare on the alert, IntroWhip on a slide,
   Yelp/Scuffle on hits, Coin/DexReward/Upgrade/Reveal on rewards.

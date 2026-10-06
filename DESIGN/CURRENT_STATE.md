@@ -109,9 +109,18 @@ lamb.
 - **The gods** (version 8): thirty in mythological rank, Pan tier 1 to Zeus 30, each a catalog-dressed Roblox avatar
   (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load. Live,
   they chase with Roblox's run; the lunge and belly glide are in main for the next version (below).
-- **What the HUD says** (version 8): one message per moment, hints only when needed (`Screens/Hud`, `goal()`); every
-  ProximityPrompt drawn as the menus' button for the device, press or tap (`PromptController/Look`). HISTORY.md, the
-  overnight entry.
+- **Onboarding trail and less hand-holding** (merged into main 2026-10-06 on the user's word, not published yet): Shear
+  a Sheep's floor chevrons (`UIController/GuidePath`) guide only the first lamb (to Pan's meadow, home from the
+  mountain's foot, then to the stair walker), no words, no floating arrow, no carried lamb's card or Return, and no
+  chase banner (the chase is ChaseController's sounds and red screen). After
+  onboarding nothing tells the player what to do: no hints, no "in reach", no menu tips; refusals say only the fact.
+  GAME_DESIGN.md, *Onboarding*; DECISIONS.md, *No hand-holding after onboarding*.
+- **Stair walker pops** (merged into main 2026-10-06, not published yet): steps run at the climber's training rate
+  (0.5 s to 0.1 s a step), each popping a shoe and "+N" off your head ("+1" twice a second at level 1, about ten
+  "+2.5T" at level 30); your machine's floating level hides while you climb; no training meter.
+- **What the HUD says** (version 8): one message per moment (`Screens/Hud`); every ProximityPrompt drawn as the menus'
+  button for the device, press or tap (`PromptController/Look`). HISTORY.md, the overnight entry. Since the merge above
+  the HUD gives no hints in words at all.
 - **Settings menu** (version 8; `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound
   effects in four steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in
   the save, `SoundController` volumes).
@@ -119,6 +128,12 @@ lamb.
   `GameConfig.Sheep.Studs`), glowing on Neon wool, see-through on glass. The five MaterialVariants are made by
   `studio/SheepStuds.luau` (in the cloud place since 2026-10-06); without them the wool stays plain and the server warns
   once.
+
+- **Mystery lambs** (merged 2026-10-06, not published): every lamb is a bare white lamb with one spot per step of its
+  family's rarity in its grown sheep's colour (mock-up D), bigger and rounder the heavier, nothing over it and nothing
+  naming it; it earns nothing, shows a clock and time left in the pen, and at 100% its fleece pops on at its real size
+  with a "Your lamb grew up: ..." notice (the Sheepdex finds it then). `Utils/LambLook`, `SheepService/Lambs`,
+  `SheepService.BuildLamb`/`LambLook`. GAME_DESIGN.md, *Mystery lambs*.
 
 ## In progress
 
@@ -158,6 +173,12 @@ lamb.
 - **The lunge, glide and surf beyond one blocky avatar on tier 1**: seen in a solo Studio playtest (a chase lost at the
   safety line, a catch); not on High Olympus's steep stretches, not with another player watching (the pose is drawn
   on each device from the Sliding attribute), not on skinned or T-pose avatars, R6, a phone or a gamepad.
+- **Mystery lambs, not yet seen**: the fleece popping on at grow-up (the notice and the grown model were seen, not the
+  pop itself), the merged lamb on the Merge Shrine's altar and carried home, a Titan's grow-up, the Day 4 and Pegasus
+  gift lambs, selling a lamb for real (its price is unit-tested), two players, a real phone or gamepad.
+- **The onboarding trail on a real phone**: seen in a Studio playtest with Studio's phone emulation, walked by script
+  (pen to meadow, the trail home, the walker); a player's own first run, a real phone's frame rate with the trail's
+  pathfinding (a route each 1.5 s) and other plots than Plot1 weren't tried.
 - **Studs on every sheep on a phone and in a live server**: seen in a Studio playtest and in Edit on all 183 families,
   not on a real device; their cost on a low-end phone wasn't measured (no extra parts, only materials).
 - **The live game itself**: version 8 was checked only in a Studio playtest of the cloud place before its publish
@@ -242,6 +263,7 @@ lamb.
   in play.
 - **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
   little sunk in the straw.
-- Studio MCP screenshots don't show the prompts' buttons (billboards in `PlayerGui.PromptUI`); they work in play.
+- Studio MCP screenshots don't show the prompts' buttons (AlwaysOnTop billboards in `PlayerGui.PromptUI`, BRAIN
+  proposal S49); they work in play.
 - **Phones**: the map is about 31,700 parts with StreamingEnabled off, so all of it loads at join; untried on a real
   phone (memory, join time). Turning streaming on needs the client's mountain code checked first.

@@ -170,11 +170,10 @@ return function(t: Run.Suite)
 		local _, maturedFast = Economy.Offline({ fast }, need / 2, 7200, 1, nil, 2)
 		t.Expect(#maturedPlain).ToBe(0)
 		t.Expect(#maturedFast).ToBe(1)
-		-- Grown halfway through the time away, it earns the adult rate for the second half.
+		-- Grown halfway through the time away, it earns the adult rate for the second half only.
 		local coins = Economy.Earn(sheep("3", {}), need, nil, 2)
 		local half = need / 2
-		t.Expect(math.abs(coins - (half * Economy.LambIncome(plain) + half * Economy.AdultIncome(plain))) < 1e-6)
-			.ToBe(true)
+		t.Expect(math.abs(coins - half * Economy.AdultIncome(plain)) < 1e-6).ToBe(true)
 	end)
 	t.Test("every product and pass has its own Roblox id", function()
 		local seen: { [number]: string } = {}

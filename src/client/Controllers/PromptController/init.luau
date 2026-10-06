@@ -177,7 +177,7 @@ local function refreshPutDown()
 		return
 	end
 	dropPutDown()
-	-- The verb only: the carry card names the lamb.
+	-- The verb only.
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "PutDownPrompt"
 	prompt.Style = Enum.ProximityPromptStyle.Custom
