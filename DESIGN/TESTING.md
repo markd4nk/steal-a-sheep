@@ -12,6 +12,7 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 | `AddCash` | coins (1000) | Coins |
 | `AddClimb` | Climbing (100) | Climbing, and a fresh snapshot |
 | `Steal` | tier | Teleports to that tier's first ready lamb and steals it (the climb check starts from there) |
+| `Home` | - | Back inside the player's own gate (a carried lamb stays on their head), as the server's own teleports do |
 | `GiveSheep` | tier, and after the point the herd slot (30.6 = Zeus's Mythic) | A Plain lamb of it straight into the flock, as if delivered |
 | `FillDex` | how many of each herd, Common first (6) | Marks them found in the Sheepdex, rewards unclaimed |
 | `GrowAll` | - | Every lamb grows up on the next tick (with its reveal) |
@@ -223,3 +224,26 @@ Useful measurements:
 - **Glow**: Neon wool in a pale colour renders almost white; saturated ones (255, 90, 0) keep their colour.
 - **Where accessories show**: a sheep turned -35 degrees for a picture faces the camera with its -X side; the wool
   reaches about 1.5 studs out from the body, so anything on a flank (the shield) sits at x -1.6 or it's hidden.
+
+## Overnight publish prep (2026-10-05)
+
+- **Own place copy**: `build/Overnight.rbxl` from `lune run tools/assemble.luau` (the map, the assets, `build/game.rbxl`),
+  code swapped in from `content/overnight/sync<time>.rbxm` (a new name each build, older ones deleted) by an Edit
+  `execute_luau` that moves each child of the built folders over its namesake. That Studio opened in the Device
+  Simulator's Galaxy A06 (705 x 338 drawn), so prompts showed their touch look.
+- **Remotes answer `callOk` first**: `Remotes.Debug:Invoke("Steal", 1)` returns `true, false, "no ready lamb..."` when
+  the steal itself is refused. Read the second value.
+- **The game's prompts are billboards** (`PlayerGui.PromptUI`, PromptController/Look): `screen_capture` leaves them out.
+  Shoot them with the desktop tools' `screenshot` of a screen region (the phone's screen in the simulator was
+  x 140, y 249, 1445 x 652 on this PC with Studio maximized). Trigger one with `prompt:InputHoldBegin()` and
+  `InputHoldEnd()`, as its button does.
+- **Getting around**: a client `PivotTo` far across the map is put back by MountainService's ground-speed check. Use
+  `Debug Steal` / `Debug Home`, or step 2.5 studs every 0.2 s (the walker's entry snaps a player on if the path
+  crosses it; the sign's board is the `UpgradeSign.Board` part, not `SignAnchor`, which is the plot's name sign).
+- **A held camera pins**: after a call that bound a Scriptable camera, release it with
+  `task.delay(0.6, function() camera.CameraType = Enum.CameraType.Custom ... end)` from a call that returns at once;
+  until then no prompt shows.
+- **One monitor, several Studios**: `screen_capture` and the desktop screenshots need the Studio window in front;
+  `start_stop_play` brings its window forward. Sessions took turns (a "screen free" message), running logic-only
+  checks while another session's window was in front.
+

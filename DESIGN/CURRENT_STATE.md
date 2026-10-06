@@ -27,8 +27,9 @@ history: one line per item, details in the files below. Keep it under 300 lines 
   Shrine) and that the game respects `ArePaidRandomItemsRestricted`, which only the next publish brings: publish
   before opening the game to anyone.
 - **Store on Roblox** (2026-10-05): 49 developer products and 2 passes in the universe at Config/Store's prices, on
-  sale, Roblox's default picture; their ids are in `Config/Store` on branch `t3code/publish-readiness-checklist`
-  (not merged into main yet, not published: live servers still answer "Not on sale yet").
+  sale, Roblox's default picture; their ids are in `Config/Store` on branch `t3code/prepare-game-for-publishing`
+  (merged there from `t3code/publish-readiness-checklist`; not in main, not published: live servers still answer "Not
+  on sale yet"). Icons for all 51 are drawn, not uploaded (T3 Code attachments, `product_icons/`).
 - The main Studio is now that cloud place (Team Create: edits there last without a Save and ship with the next
   publish). `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is
   the local copy sessions build their own Studios from; the main checkout's was rebuilt from 3989273.
@@ -53,8 +54,9 @@ lamb.
   the place by `tools/UpperMountain.luau` (Lune, in `build-place.ps1`); `tools/preview-upper-mountain.luau` previews it
   in an open Studio. Its layout and `Config/Olympus` (tier x ranges, `Ramp`) must agree: a test checks the chain.
 
-- **Free gift** (like + favorite): Climbing and cash once (`Economy.GiftReward`), `GiftService`, `Screens/Gift`, the
-  HUD's GIFT button; Claim needs the game favorited (Roblox's prompt, or favorited before). A like can't be seen.
+- **Free gift** (favorite): Climbing and cash once (`Economy.GiftReward`), `GiftService`, `Screens/Gift`, the HUD's
+  GIFT button; Claim needs the game favorited (Roblox's prompt, or favorited before). The overnight branch dropped the
+  like step (Roblox's review policy forbids rewarding a thumbs up); main still asks for one.
 - **Stair walker**: a StairMaster outside each pen by the gate (`PlotService/Walker`: five looks, the level floating
   over it, an upgrade sign with cash and Robux prompts); walk in to snap on, jump to get off (`TrainingService`); every
   client runs the steps and poses climbers' legs on them (`WalkerController`, `Utils/StairClimb`).
@@ -97,6 +99,15 @@ lamb.
 
 ## In progress
 
+- **Overnight publish prep** (branch `t3code/prepare-game-for-publishing`, 2026-10-05, waiting for the user's
+  review, not merged): one message per moment (no always-on objective, hints only when needed), the game's own prompts
+  for each device (press or tap, no hold), Roblox-rules fixes (no reward for a like, exact merge odds, no "Discord"
+  names), a server audit's exploit fixes, phone layout and world-sign fixes, and the store products' ids. HISTORY.md
+  has the details, DECISIONS.md the calls to review.
+- **Done overnight on other branches, waiting for the user**: studs on every sheep (`t3code/sheep-stud-style-mockups`,
+  needs `studio/SheepStuds.luau` run on the cloud place), store product icons (same branch, `art/store/`), a Settings
+  menu (same branch, in progress), game page icon and thumbnail mock-ups, an asset audit (all 1,286 assets load) and a
+  trailer (`t3code/order-olympian-gods`).
 - **Gods in rank order and Zeus as a Roblox avatar** (merged into main 2026-10-05 on the user's word):
   `Config/Olympus` reordered (Pan tier 1 to Zeus 30), new High Olympus stretches for the eleven Olympians who moved
   up; Zeus a catalog-dressed avatar. Not in a published version yet.
@@ -142,8 +153,7 @@ lamb.
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
   `IsFriendsWithAsync` pairs and the join notices between two real friends are untested. The place is Private, so
   friends can't join until they get edit permission or the audience changes (Limited needs a maturity label first).
-  The left column (GIFT, FLOCK, SHOP, SHEEPDEX, the friend tile) runs off the bottom of a Galaxy A06 (800 x 360):
-  SHEEPDEX is half off and the friend tile gone (seen 2026-10-05).
+  On a Galaxy A06 (800 x 360) the left column wraps into three columns of two, all six showing (overnight branch).
 
 - **Sheepdex claim pressed with the mouse or a finger**: claims were made through `Remotes.ClaimDex` in a playtest (the
   menu then showed Claimed!, the badges and the green herd bar); the button itself wasn't clicked. Saving the claims
@@ -159,8 +169,8 @@ lamb.
 - **Saving**: a Studio playtest of the published place loaded a save from the real DataStore (`PlayerData_Studio`);
   saves in the live game (`PlayerData`), rejoin, offline credit on a real rejoin and session locking are untested (the
   offline maths is unit-tested).
-- **Touch and gamepad**: only keyboard and mouse in Studio. Prompts (Steal, Put down), HUD buttons and the slide use
-  Roblox's own input.
+- **Touch and gamepad**: the overnight branch's prompts and HUD were checked on a Galaxy A06 in the Device Simulator
+  (touch); a real phone, a tablet and a gamepad are untested. The slide uses Roblox's own input.
 - **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
   teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
@@ -198,4 +208,6 @@ lamb.
   in play.
 - **Sheep may stroll across the map's flat hay scatter** (anything under 0.4 studs high isn't an obstacle), legs a
   little sunk in the straw.
-- Studio MCP screenshots don't show ProximityPrompt buttons (Steal, Put down); they work in play.
+- Studio MCP screenshots don't show the prompts' buttons (billboards in `PlayerGui.PromptUI`); they work in play.
+- **Phones**: the map is about 31,700 parts with StreamingEnabled off, so all of it loads at join; untried on a real
+  phone (memory, join time). Turning streaming on needs the client's mountain code checked first.

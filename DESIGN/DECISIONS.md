@@ -87,7 +87,8 @@ confirmed or reversed it.
 - **The free gift (2026-10-05)**: worth 3 minutes of the player's stair walker in Climbing and 3 minutes of their
   income in cash, at least 500 of each, so it keeps up with them (the user: "I do like how the reward size is always
   adjusting"); the look with both rewards on one cyan stage and the steps as lit-up pictures of Roblox's game page.
-  Only the favorite can register (no game can see a like); the like step is asked, not checked.
+  Only the favorite can register (no game can see a like). The like step was taken out overnight on 2026-10-05
+  for Roblox's review policy (To review).
 - **The Merge Shrine is a gamble, like Steal an Egg's Fuse Machine (the user, 2026-10-05).** It replaced Shear a
   Sheep's Mutation Machine in the hub. The model is mock-up C, the **Laurel Ring**: a round dais, three pedestals round
   a centre altar, three fire columns and a floating laurel crown. **The pole of light and the orb exist only during a
@@ -134,7 +135,44 @@ confirmed or reversed it.
   Climbing 1 minute of the stair walker (at least 150), Day 3 cash 10 minutes (800), Day 4 a Rare lamb from the
   highest god stolen from, Day 5 Climbing 3 minutes (450), Day 6 cash 30 minutes (2,500), Day 7 the Pegasus Sheep.
 
+- **One message per moment, no always-on objective (the user, 2026-10-05, on the UI audit)**: the objective line
+  "doesn't need to be a thing at all"; "train to climb as needed, put your sheep to work as needed". Not wanted: "Hold
+  E" (and holding at all: a click or E on a computer, a tap on a phone, with a proper UI), "Claim its reward there",
+  "Climbing gets you up steeper slopes", "take it home" and the escape notice, "Put it down where you like", "Yours has
+  your name over the gate", the grow-up celebration; "you get the gist".
+
 ## To review
+
+Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-game-for-publishing`):
+
+- **The free gift no longer asks for a like** (reverses part of a confirmed rule): Roblox's review policy forbids
+  rewarding a thumbs up. Favoriting still unlocks Claim; no rule names favorites, but it's the same pattern, so the
+  safest step would be letting everyone claim and making the favorite an optional button.
+- **When the hint shows**: Put your sheep to work for 12 s after room opens up in the pen (pen space bought, sheep
+  merged away) while sheep are stored, not after a sheep is stored on purpose; the FLOCK button glows meanwhile.
+  Train to climb while the slope holds the player under half speed on tier 2 and up (off the walker, not carrying).
+  Slide home! only on the first lamb's run; nothing in the pen (the Put down button says it).
+- **Grow-ups**: Giant and Titan get one notice ("Fortune Sheep grew up GIANT!") with their fanfare; Standard and
+  Large only update the label over the sheep.
+- **Menus that open themselves**: none in a player's first session; after that the daily gifts once a session
+  (45 s after a gift waits); the free gift never (its button glows).
+- **The first delivery's bonus** (+60 cash, +25 Climbing) shows on the counters only; "That's not your plot!" once
+  each time a thief walks into another plot.
+- **Prompts**: the menus' studded button with the action's verb only (Steal, Put down, Pick up, Shop, Sell, Merge,
+  Upgrade); green for actions, blue for the stalls, purple for the walker's Robux upgrade; on a phone a bigger button
+  (52 pt) with no key; on a computer the key in a white cap beside it; prices and the shrine lamb's name in a small
+  line above; prompts on one spot side by side; the Put down button over the carried lamb.
+- **Wording**: the shrine's landing says SHINY! for a Shiny fleece; the walker row "8 → 12 Climbing/s"; trails
+  "1.5x training"; Merge's button "Merge" (greyed until three picks); gods' nameplates show the name only; the
+  training meter "Next: <God> at <sign>" (no lamb weights named), nothing past Zeus's sign.
+- **Merge odds**: exact percentages, long ones to five significant digits; "Size and fleece roll separately. Odds
+  are rounded, so they may not add up to exactly 100%." under the odds.
+- **Names**: Eris's area is Chaos Rift and her Mythic shows as Mayhem Sheep (was "Discord"; the saved id is
+  unchanged).
+- **Old price steps**: a 2x Speed step the player is past pays its Robux price in Climbing at the 1M-for-99 pack's
+  rate; a walker level they're past pays that level's cash price.
+- **Signs in studs**: the plots' name signs 24 x 6.8, the stalls' names 15 x 3.5, the walkers' level tags 6.3 x 2.35,
+  the same size as before at their usual distance and smaller further away.
 
 Calls in Zeus's Blender model (2026-10-05, a mock-up waiting for the user's OK):
 

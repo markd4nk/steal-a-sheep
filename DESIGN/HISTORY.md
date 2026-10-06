@@ -6,6 +6,46 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Overnight publish prep (2026-10-05, branch `t3code/prepare-game-for-publishing`)**. The user asked an overnight
+  session to answer the other sessions for them, then fill the gaps so the game is ready to publish, all on a branch
+  for their approval in the morning. It merged the store products' branch (`t3code/publish-readiness-checklist`) and
+  main (all 30 avatar gods) in, then:
+  - *Say each moment once* (the user's calls on the UI audit in `t3code/audit-ui-hod`: the objective "doesn't need
+    to be a thing at all", train to climb and put your sheep to work "as needed", no "Hold E", no "claim its reward
+    there", no "steeper slopes", no "take it home" or escape notice, no "put it down where you like", no "yours has
+    your name over the gate", no grow-up celebration, "you get the gist"). The HUD's hint (`Hud.goal`) shows only
+    for the first lamb (Steal Pan's lamb, then Slide home! with the arrow), Train on your Stair Walker after it, Put
+    your sheep to work for 12 s when room opens up in the pen while sheep are stored (`watchPen`; the FLOCK button
+    glows), and Train to climb while a slope holds the player under half speed. A delivery is one notice; the
+    Sheepdex badge and the HUD counters say the rest. Giant and Titan grow-ups get one notice, others none. Menus
+    don't open themselves in a first session; afterwards only the daily gifts, once (the free gift never does). The
+    welcome-back card no longer goes missing when the away credit is settled after the first snapshot
+    (`StateController.TakeAway`). Notice sounds play when their words show. Wording trimmed in the shop, Sheepdex,
+    flock, merge and gift menus, and gods' nameplates show the name only.
+  - *Prompts for each device* (`PromptController/Look`): every ProximityPrompt is Style Custom and drawn as the menus'
+    studded button: the key in a cap beside it on a computer (a click works too), a bigger tap button on a phone, the
+    controller's glyph on a gamepad. Prompts on one spot stand side by side (the walker sign's cash and Robux
+    upgrades); the Put down button floats over the carried lamb (`PromptLift`). Stealing is a press or a tap
+    (`Theft.HoldSeconds` 0).
+  - *Compliance* (a review of Roblox's October 2026 rules): the free gift no longer asks for a like (the review
+    policy forbids rewarding a thumbs up); the Merge Shrine's odds are exact or five significant digits, with "Size
+    and fleece roll separately. Odds are rounded..."; Eris's area is Chaos Rift and her Mythic shows as Mayhem Sheep
+    (filters treat "Discord" as an off-platform app; the id is unchanged).
+  - *Security* (a server audit): no steal or put-down during a punch's flight (`MountainService:IsLaunched`); a god
+    under or over its thief for a second catches them at any height; the 2x Speed and walker products grant their
+    step only when it's the player's next (a step they're past pays its price in Climbing or cash: the ladders could
+    be bought at the first step's price); a lag spike's overshoot is placed at the furthest legal point, with 2 s of
+    budget; pass lookups retry; each player's tick and the leaderboards' loops run guarded; a thief who steals before
+    their god has loaded is chased once it has.
+  - *Phone layout* (Galaxy A06 in the Device Simulator): the hint, notices and chase banner stand right of the
+    wrapped menu pictures; the edge arrow keeps clear of them and of the thumbstick; the plots', stalls' and
+    walkers' signs are sized in studs, so from the mountain's foot they no longer pile up across the screen.
+  - *Checked*: `check.ps1`; 78 unit tests (a new one for the price steps); playtests in this session's own copy of
+    the place (`build/Overnight.rbxl`, phone emulation): the first lamb's hints, the steal and put-down buttons, one
+    notice per delivery, training, Put your sheep to work after buying pen space, Train to climb on tier 5, no menu
+    opening itself in a first session, a Giant's notice, a god's catch and punch with a steal refused mid-flight, the
+    walker sign's two buttons. Pictures in T3 Code's attachments (`night_before_*`, `night_after_*`).
+
 - **The thirty gods as Roblox avatars (2026-10-05)**. The user wanted real god models. Roblox's mesh generator kept
   missing (third arms, bare chests; moderation removed two limb meshes), and a Blender pipeline (`art/gods/`, Zeus and
   Hera built from shapes, rigged) looked good. Then they asked for "a little cuter version that fits the Roblox niche"
