@@ -280,6 +280,11 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		placeMiddle()
 	end)
 	trove:Connect(tiles:GetPropertyChangedSignal("Visible"), placeMiddle)
+	local wrapping = tiles:FindFirstChildOfClass("UIListLayout")
+	if wrapping then
+		-- After the pictures wrap again (a resized window, the gift's picture gone), not before.
+		trove:Connect(wrapping:GetPropertyChangedSignal("AbsoluteContentSize"), placeMiddle)
+	end
 
 	-- Notices: one at a time, the rest queued (Shear a Sheep's HUD notices). A notice's sound plays when its words show.
 	local noticeRest = noticeHome
@@ -689,7 +694,10 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		-- pointer still turns to the target.
 		local right = viewport.X - SCREEN_MARGIN
 		local left = math.min(inset.X + (tilesRight + 40) * scale, right)
-		local bottom = if UserInputService.TouchEnabled then viewport.Y * 0.6 else viewport.Y - SCREEN_MARGIN
+		local bottom = math.max(
+			if UserInputService.TouchEnabled then viewport.Y * 0.6 else viewport.Y - SCREEN_MARGIN,
+			SCREEN_MARGIN
+		)
 		at = Vector2.new(math.clamp(at.X, left, right), math.clamp(at.Y, SCREEN_MARGIN, bottom))
 		arrow.Position = UDim2.fromOffset((at.X - inset.X) / scale, (at.Y - inset.Y) / scale)
 		pointer.Rotation = math.deg(math.atan2(unit.Y, unit.X)) - 90

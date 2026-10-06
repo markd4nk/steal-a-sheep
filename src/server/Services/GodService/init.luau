@@ -134,6 +134,9 @@ local function pickTarget(god: God, now: number): Player?
 		end
 	end
 	if best ~= current then
+		if current then
+			god.Over[current] = nil
+		end
 		god.Target = best
 		god.TargetSince = now
 	end
