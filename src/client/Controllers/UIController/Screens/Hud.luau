@@ -466,15 +466,6 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end)
 	end)
 
-	-- A chase's music: no words (the user, 2026-10-06, no "Pan wants their sheep back!").
-	trove:Add(Remotes.Chase:Connect(function(god: string?)
-		if god then
-			sound:SetDanger(true)
-			sound:Play("WolfScare")
-		else
-			sound:SetDanger(false)
-		end
-	end))
 	trove:Add(Remotes.Notify:Connect(function(message: string, kind: string, cue: string?)
 		context.Notify(message, kind, cue)
 	end))

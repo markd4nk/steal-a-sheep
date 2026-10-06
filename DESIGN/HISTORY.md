@@ -46,6 +46,53 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   merge it with this one. The chase banner went here (`Screens/Hud`: the chase plays its music and scare sound, no
   words; `GameConfig.Ui.BannerSeconds` gone), and with the carry card gone, so did WildService's `CarriedColor` and
   `CarriedSpots`.
+- **A scarier steal and chase (2026-10-06, branch `t3code/guardian-theft-horror`, merged into main on the user's
+  word: "it's good. We can merge to main"; not published)**. The user: make stealing "way more
+  terrifying", like Steal an Egg (an alarm, the player sees red, heart racing, the animal's roars getting closer), with
+  human sounds since the guardians are gods. A 19 s video mock-up over the trailer's raw takes came first
+  (`art/chase/mockup.py`); the user: the alarm "sounds like heavy metal music" and should be a classic "went, went,
+  went" nuclear-style alarm; "the roar is good", "the chase I think sounds good", "right behind you is good, the laugh
+  is good"; asked to hear each sound alone (`art/chase/soundboard.py`: an alarm board A-E and every other sound
+  numbered); "let's just start with that".
+  - *How it works*: `Remotes.Chase` now carries how a chase ended ("Caught", "Escaped" at the safety line, or nil).
+    `ChaseController` (the thief) plays the alarm (board A, Red Alert Alarm), a red flash, a zoom jolt and a shake on
+    the steal, then follows one level (`Utils/ChaseFeel`: 0 with the god 90 studs off, 1 at 8): heartbeat 80-160 a
+    minute, red edges (four UIGradient frames) throbbing on each beat, colour drained with a red cast
+    (`Lighting.ChaseGrade`), the god's footfalls shaking the view near the top. `SoundController` plays the chase music
+    as two APM mixes of "Run For Your Life" in sync, the drums faded in with the level, looping 50.88 back to 8.21;
+    it now cuts sounds at their `Length`, takes a volume share, and plays repeated 3D sounds from a part (`PlayOn`).
+    `GodController` gives every god a voice by its Mood, for everyone near: a roar (a human growl and a yell, slowed),
+    footfalls timed to its run, yells, a snarl within 16 studs of its thief, the punch and a laugh on a catch, an
+    angry yell when the thief gets away; the 14 goddesses (`Olympus.Goddess`) have women's yells and laugh. Caught:
+    music cut dead, white flash, a whoosh in flight and a thud on landing (`MovementController`, in place of the
+    comic clangs). Escaped: the Notice hit, the music gone in 0.3 s, the red and heartbeat winding down over 1.2 s.
+    Gone: the horror sting on every steal, the boink on lifting a stolen lamb (`CarryStolen`). Reduce Motion stops
+    the zoom and shakes. Volumes were set from each file's measured loudness to match the mock-up's mix.
+  - *Checked*: `check.ps1`; a playtest of a private place copy (`build/ChasePlaytest.rbxl`, its own Studio): both
+    bootstraps ready, 89 tests (5 new, `ChaseFeel.spec`); a steal from Hecate standing still (alert, run, caught in
+    3.5 s: edges 0.47 to 0.70, drums in, punch, goddess laugh); a scripted run ahead of Phobos closing from 70 to 14
+    studs (roar, footfalls every 0.27 s, yells at 3.5 and 7.8 s, heartbeat volume and drums rising, caught, laugh, the
+    flight's whoosh and landing); a getaway from Tyche across the safety line ("Escaped", safe chime, music stopped
+    by 0.7 s, two slowing beats, calm music back 3 s later); screenshots of the steal's flash and Eris 18 studs
+    behind; a clean console. Not checked by ear in the game, nor on a phone, nor with two players.
+  - *After the build*: the user likes alarm A or C and asked for ones in between (second alarm board: F a low console
+    alarm, G and H steady tones from C's APM family, I = C slowed, J = A and C together); the goddesses "a little bit
+    deeper because they're still huge beings" (now 0.77 speed, a goddess board at three depths); each god's own catch
+    sound later. A stays the alarm until they pick.
+  - *Then*: the user picked alarm C, and heard the layered roar (a growl under a yell) and the goddess laugh (one file
+    of several laughs; her yells came from a set of two women) as more than one person: "look for different sounds".
+    A voice board (`chase_voices_one_person.mp4`) of single takes, each checked for one voice segment at a steady
+    pitch (`art/chase/` voicefeat measurements, spectrograms); the game now plays M1, F1, FY1/FY2, FL1 and keeps the
+    god's laugh. Checked in the playtest Studio: all 15 chase sounds load; a goddess steal plays alarm C, one roar, a
+    yell, the punch and one laugh; a god's the same with his; a clean console.
+  - *Then*: "all of them are pretty good except M1 ... switch them out so ... a little bit more variety every time".
+    Each moment is now a pool (`Config/Sounds` Voices: roars M2-M4 / F1-F3, laughs ML1-ML3 / FL1-FL3, the yells);
+    `GodController` picks at random, never the god's last take nor its last at that moment (the first try only
+    skipped the last line, and a laugh came up three catches running). Checked: 90 tests (the pools name real sounds);
+    five catches by a god (roars 3 1 3 1 3, laughs 2 1 3 2 1) and four by a goddess, no repeat; a clean console.
+  - *Merged*: main's momentum slides (102b44d) merged in first (only the design logs conflicted: both kept); a god's
+    momentum Speed drives its footfalls as before. Checked after: `check.ps1`, 92 tests, a catch by Hecate and a
+    getaway from Tyche in the playtest Studio, a clean console. Then main fast-forwarded. Not published.
 
 - **Momentum slides, the god boosted too, quick bump recovery, a dead stop at the safety line (2026-10-06, branch
   `t3code/speed-up-downhill-sliding`, merged into main on the user's word)**.

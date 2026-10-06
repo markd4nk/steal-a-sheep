@@ -28,8 +28,9 @@ local Remotes = {
 
 	-- A notice under the HUD's top row: words, "Good" | "Bad" | "Rare", and a sound cue's name (Config/Sounds).
 	Notify = Net.ToClient("Notify") :: Net.ToClient<(string, string, string?)>,
-	-- A god set off after this player (their name), or nil when the chase ended.
-	Chase = Net.ToClient("Chase") :: Net.ToClient<(string?, number?)>,
+	-- A god set off after this player (its name and tier), or nil when the chase ended: then how, "Caught" or "Escaped"
+	-- (across the safety line), or nil (home, gave up, fell).
+	Chase = Net.ToClient("Chase") :: Net.ToClient<(string?, number?, string?)>,
 	-- A lamb grew up and shows what it is: its name, its size ("Giant") and its family's rarity ("Epic").
 	Reveal = Net.ToClient("Reveal") :: Net.ToClient<(string, string, string)>,
 	-- Coins earned while away and how many lambs grew up meanwhile.

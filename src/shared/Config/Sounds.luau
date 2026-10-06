@@ -18,6 +18,7 @@ export type Effect = {
 	Start: number?, -- seconds into the audio each play starts, to skip silence at its head
 	Length: number?, -- seconds of audio played from Start; the rest is cut (one hit out of a clip of several)
 	Range: number?, -- studs a 3D play carries (DefaultRange when left out)
+	Near: number?, -- studs from a 3D play inside which it's at full volume (10 when left out)
 }
 
 export type Track = {
@@ -162,6 +163,126 @@ local Sounds = {
 		Badge = { Id = "rbxassetid://9040476898", Volume = 0.6 }, -- APM "Early Bird - Hit1"
 		BadgeBig = { Id = "rbxassetid://9043138254", Volume = 0.8 }, -- APM "Best Is Yet To Come - Hit2"
 
+		-- The steal and the god chase (2026-10-06): the user picked the chase, "right behind you" and the god's laugh by
+		-- ear from art/chase's mock-up and sound boards (its README has the sounds' store names and how each was
+		-- measured), and asked for every voice to be one person in one take, never two sounds layered. Volumes match the
+		-- mock-up's mix: each sound's loudness was measured, then set against the calm music's. The god's own sounds
+		-- (Gods, Goddesses below) play from the god, so they grow as it closes.
+		-- The alarm on a steal (2D, the thief only): APM "Electronic Alarms (D)" (KPM's "(d)": "Low pitched pulsing"),
+		-- a clean electronic wenh... wenh..., from its first pulse. The user's pick (option C) over the mock-up's APM
+		-- "Wild Intruder Alarm Tag 2" ("sounds like heavy metal") and the buzzier Red Alert Alarm (A, 9118113271).
+		-- Quieter than A for the same loudness: a 2 kHz tone sounds louder.
+		StealAlarm = { Id = "rbxassetid://1840227705", Volume = 2.4, Start = 1.9, Length = 4 },
+		-- The thief's heartbeat, retriggered faster and louder as the god closes: one lub-dub of APM "HEARTBEAT 01
+		-- 96BPM" (Epic Score, Horror Tools).
+		Heartbeat = { Id = "rbxassetid://9043365727", Volume = 1.6, Length = 0.62, Voices = 2 },
+		-- Flying off from the punch, and landing (2D, the thief): Whoosh Fast Swish By 7, slowed; Body Impact 2.
+		Fly = { Id = "rbxassetid://9120711172", Volume = 0.5, Speed = 0.75 },
+		Land = { Id = "rbxassetid://9113524237", Volume = 1.9, Speed = 0.8 },
+		-- Across the safety line with the lamb: the Notice hit (APM "Magical Meetup - Hit2").
+		ChaseSafe = { Id = "rbxassetid://9048764475", Volume = 0.9 },
+
+		-- From the god, for everyone near (Voices below picks which line). Its roar as it sees the thief, one of three
+		-- single takes, slowed so they sound huge (voice board M2-M4; the user turned down M1, and a growl layered
+		-- under a yell, as "more than one person"): Goblin Growl 1 (SFX), "Human Generated Roar", and two of the Male
+		-- Scream Short Yelling Bursts.
+		GodRoar1 = { Id = "rbxassetid://9114624345", Volume = 1.6, Speed = 0.85, Near = 30, Range = 300 },
+		GodRoar2 = { Id = "rbxassetid://9125651408", Volume = 0.8, Speed = 0.72, Near = 30, Range = 300 },
+		GodRoar3 = { Id = "rbxassetid://9125652955", Volume = 0.7, Speed = 0.72, Near = 30, Range = 300 },
+		-- Its footfalls while it runs: the first 0.32 s of Boomy Footsteps Giant Thumpy Dinosaur Footstep 1 (SFX).
+		GodStep = {
+			Id = "rbxassetid://9125404769",
+			Volume = 1,
+			Speed = 1.2,
+			Length = 0.32,
+			Jitter = 0.05,
+			Voices = 3,
+			Near = 12,
+			Range = 220,
+		},
+		-- Yells every few seconds while it runs (two of the Male Scream Short Yelling Bursts, slowed), and a snarl
+		-- (Goblin Growl 1 (SFX), "Human Generated Roar", slowed, a cut of it) when it's right behind the thief.
+		GodYell1 = { Id = "rbxassetid://9125651083", Volume = 0.9, Speed = 0.8, Jitter = 0.04, Near = 15, Range = 260 },
+		GodYell2 = { Id = "rbxassetid://9125651408", Volume = 0.9, Speed = 0.76, Jitter = 0.04, Near = 15, Range = 260 },
+		GodSnarl = {
+			Id = "rbxassetid://9114624345",
+			Volume = 1.1,
+			Speed = 0.72,
+			Start = 0.2,
+			Length = 0.6,
+			Jitter = 0.04,
+			Near = 10,
+			Range = 160,
+		},
+		-- The catch: Whoosh Heavy Punches 1 and Body Impact 2 with Boxing Hits 5 over it, then a laugh: Laugh Evil Male
+		-- Various Versions 4, 3 or 5 (voice board ML1-ML3), slowed: a deep HA HA HA, each one man in one take.
+		PunchSwing = { Id = "rbxassetid://9120728815", Volume = 1, Near = 20, Range = 160 },
+		PunchHit = { Id = "rbxassetid://9113524237", Volume = 3.4, Near = 20, Range = 160 },
+		PunchSmack = { Id = "rbxassetid://9113570506", Volume = 6, Near = 20, Range = 160 },
+		GodLaugh1 = { Id = "rbxassetid://9116239313", Volume = 1.6, Speed = 0.8, Start = 0.3, Near = 25, Range = 260 },
+		GodLaugh2 = {
+			Id = "rbxassetid://9116239157",
+			Volume = 0.9,
+			Speed = 0.8,
+			Start = 0.3,
+			Length = 2.6,
+			Near = 25,
+			Range = 260,
+		},
+		GodLaugh3 = {
+			Id = "rbxassetid://9116239334",
+			Volume = 0.8,
+			Speed = 0.8,
+			Start = 0.3,
+			Length = 3.2,
+			Near = 25,
+			Range = 260,
+		},
+		-- The thief got away: another of the man's yells, slowed, heard from wherever the god stopped.
+		GodFrustrated = { Id = "rbxassetid://9125652955", Volume = 0.5, Speed = 0.7, Near = 10, Range = 400 },
+		-- The goddesses (Olympus Goddess), each sound one woman in one take (the user, 2026-10-06; the first ones were
+		-- from a set of two women and a file of several laughs): single yells from Female Voices 2 Women Short Screams
+		-- Yells (voice board F1-F3, FY1, FY2) and laughs from Adult Female Laughter 3 and 1 and Female Laugh 1 (SFX),
+		-- a cackle, a giggle into a cackle, a bigger laugh (FL1-FL3). All slowed "a little bit deeper because they're
+		-- still huge beings" (the user).
+		GoddessRoar1 = { Id = "rbxassetid://9114399675", Volume = 2.2, Speed = 0.77, Near = 30, Range = 300 },
+		GoddessRoar2 = { Id = "rbxassetid://9114399696", Volume = 2.1, Speed = 0.77, Near = 30, Range = 300 },
+		GoddessRoar3 = { Id = "rbxassetid://9114399178", Volume = 2.4, Speed = 0.77, Near = 30, Range = 300 },
+		GoddessYell1 = {
+			Id = "rbxassetid://9114399869",
+			Volume = 2.6,
+			Speed = 0.77,
+			Jitter = 0.04,
+			Near = 15,
+			Range = 260,
+		},
+		GoddessYell2 = {
+			Id = "rbxassetid://9114399465",
+			Volume = 2.1,
+			Speed = 0.77,
+			Jitter = 0.04,
+			Near = 15,
+			Range = 260,
+		},
+		GoddessLaugh1 = {
+			Id = "rbxassetid://9113043479",
+			Volume = 1.8,
+			Speed = 0.8,
+			Start = 0.2,
+			Near = 25,
+			Range = 260,
+		},
+		GoddessLaugh2 = { Id = "rbxassetid://9113043410", Volume = 3.7, Speed = 0.8, Near = 25, Range = 260 },
+		GoddessLaugh3 = {
+			Id = "rbxassetid://9114396740",
+			Volume = 1.15,
+			Speed = 0.8,
+			Start = 0.2,
+			Near = 25,
+			Range = 260,
+		},
+		GoddessFrustrated = { Id = "rbxassetid://9114399696", Volume = 1.45, Speed = 0.7, Near = 10, Range = 400 },
+
 		-- Wolves and dogs, heard from the animal by everyone near.
 		-- Coyotes Gruff Barking 9: Roblox has no licensed dog bark, and this one is quiet at the source.
 		Bark = { Id = "rbxassetid://9113955402", Volume = 3, Jitter = 0.1, Range = 90 },
@@ -210,6 +331,25 @@ local Sounds = {
 		DistantBleat = { Id = "rbxassetid://9119066777", Volume = 0.25, Speed = 0.92 },
 	} :: { [string]: Effect },
 
+	-- A god's lines for each moment, by voice (Olympus Goddess): GodController picks one at random each time, never the
+	-- take that god said last (the user, 2026-10-06: "a little bit more variety every time, different voice lines").
+	Voices = {
+		God = {
+			Roar = { "GodRoar1", "GodRoar2", "GodRoar3" },
+			Yell = { "GodYell1", "GodYell2" },
+			Snarl = { "GodSnarl" },
+			Laugh = { "GodLaugh1", "GodLaugh2", "GodLaugh3" },
+			Frustrated = { "GodFrustrated" },
+		},
+		Goddess = {
+			Roar = { "GoddessRoar1", "GoddessRoar2", "GoddessRoar3" },
+			Yell = { "GoddessYell1", "GoddessYell2" },
+			Snarl = { "GodSnarl" },
+			Laugh = { "GoddessLaugh1", "GoddessLaugh2", "GoddessLaugh3" },
+			Frustrated = { "GoddessFrustrated" },
+		},
+	} :: { [string]: { [string]: { string } } },
+
 	-- The player's own shears (Snip and WoolPop together). Shears that land together, a sweep through the flock in one
 	-- frame, play one every Spacing seconds with at most MaxQueued waiting: a big sweep sounds like a handful of
 	-- shears, not one, and not twenty at once. Spacing stays over Snip's and WoolPop's Gaps, so neither is dropped.
@@ -231,12 +371,19 @@ local Sounds = {
 			{ Name = "PeacefulWhistlingFast", Id = "rbxassetid://1839464262", Volume = 0.5 }, -- acoustic, whistling
 			{ Name = "SailBoat", Id = "rbxassetid://1840007459", Volume = 0.5 }, -- bright, breezy folk
 		} :: { Track },
-		-- While a wolf is after your sheep, 2026-10-01 (picked from its description, not heard yet): APM "Evasion (60)",
-		-- "Deep strings and forceful piano bass create a foreboding thriller cue that builds with tense strings" (Juice
-		-- Music, Thriller Trailers). It was "Cheeky Plucker (c)", comedic light tension: too cute for a wolf.
-		Danger = { Name = "Evasion", Id = "rbxassetid://1840028287", Volume = 0.5 } :: Track,
+		-- While a god chases you (2026-10-06, the user: "the chase I think sounds good", heard in art/chase's mock-up):
+		-- APM "Run For Your Life", "up-tempo relentless action, sweeping pads over dramatic bass and electronic jungle
+		-- drum pattern", about 90 BPM. Two of APM's mixes of it play together: the drumless one ("(80%)") all along,
+		-- the full one (with drums) faded in as the god closes (GameConfig.Chase). They line up to about 10 ms, and
+		-- both jump from DangerLoop's End back to its Start (16 bars, the best match in the track), before the ending.
+		-- It was APM "Evasion" (1840028287), never heard.
+		Danger = { Name = "RunForYourLife", Id = "rbxassetid://1845015064", Volume = 2.5 } :: Track,
+		DangerDrums = { Name = "RunForYourLifeDrums", Id = "rbxassetid://1845015012", Volume = 1.12 } :: Track,
+		DangerLoop = { Start = 8.21, End = 50.88 },
 		FadeSeconds = 1.5,
-		CalmDelay = 3, -- seconds after the last wolf leaves before the calm music comes back
+		DangerInSeconds = 0.25, -- the calm music cut on a steal
+		QuickSeconds = 0.3, -- the chase music cut on reaching safety
+		CalmDelay = 3, -- seconds after a chase ends before the calm music comes back
 	},
 
 	-- A looping meadow: Pro Sound Effects "Birds Park 1" (made to loop; quiet at the source).

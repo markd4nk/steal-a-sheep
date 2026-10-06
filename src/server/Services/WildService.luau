@@ -188,9 +188,11 @@ local function clearAttributes(player: Player)
 	player:SetAttribute("CarryTier", nil)
 	player:SetAttribute("CarryWeight", nil)
 	player:SetAttribute("CarryTutorial", nil)
+	player:SetAttribute("CarryStolen", nil)
 end
 
-local function endCarry(player: Player): Carry?
+-- `ending` tells the thief's client how the chase ended (Remotes.Chase).
+local function endCarry(player: Player, ending: string?): Carry?
 	local carry = carries[player]
 	if not carry then
 		return nil
@@ -199,7 +201,7 @@ local function endCarry(player: Player): Carry?
 	wrongPlot[player] = nil
 	clearAttributes(player)
 	registry.GodService:Release(player)
-	Remotes.Chase:Fire(player, nil, nil)
+	Remotes.Chase:Fire(player, nil, nil, ending)
 	return carry
 end
 
@@ -221,7 +223,7 @@ end
 -- back to its pasture. A merged lamb from the Merge Shrine is its carrier's already, so it goes to their pen instead.
 function WildService.Fail(_self: any, player: Player, reason: string)
 	local drop = if DROPS[reason] then dropSpot(player) else nil
-	local carry = endCarry(player)
+	local carry = endCarry(player, if reason == "Caught" then "Caught" else nil)
 	if not carry then
 		return
 	end
@@ -327,6 +329,7 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	player:SetAttribute("CarryTier", spawn.Tier)
 	player:SetAttribute("CarryWeight", rolled.Weight)
 	player:SetAttribute("CarryTutorial", if spawn.Owner then true else nil)
+	player:SetAttribute("CarryStolen", true)
 	player:SetAttribute("Carrying", true)
 	local tier = Olympus.Tiers[spawn.Tier]
 	Remotes.Chase:Fire(player, tier.God, spawn.Tier)

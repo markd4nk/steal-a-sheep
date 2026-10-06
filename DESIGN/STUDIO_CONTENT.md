@@ -100,7 +100,9 @@ here. Newest first.
   `TierSigns` (a floating sign at the foot of each tier from 2: "<God>'s <Area> / Climbing N"), `Stations`,
   `MergeShrine` (the Laurel Ring, ShrineService/Model; on each client `ShrineLocal` holds its pedestal previews and lamb), `ReplicatedStorage.SheepLooks` (a plain adult of
   every family, and the plain lambs `Lamb` and `Lamb<HornStyle>` that every lamb is marked on), the leaderboards' screens,
-  every ScreenGui, and on a new player's client the onboarding's `workspace.GuidePath` (17 `Chevron` models of four
+  every ScreenGui; on each client the chase's `ChaseScreen` (DisplayOrder -1, under the HUD) and
+  `Lighting.ChaseGrade` (a ColorCorrectionEffect, off outside a chase), and the gods' chase sounds inside their Head
+  and HumanoidRootPart (made on first use); and on a new player's client the onboarding's `workspace.GuidePath` (17 `Chevron` models of four
   parts, `UIController/GuidePath`). The trail needs nothing in the place: it reads each plot's `Pen` and the walker's
   `Zone` (PlotService) and walks round the map with PathfindingService.
 - Set on the published place (2026-10-05): Maximum Visitor Count 5 (one player a plot, Creator Hub > Places > Access),

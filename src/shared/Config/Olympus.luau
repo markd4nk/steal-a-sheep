@@ -23,6 +23,7 @@ export type Tier = {
 	Skin: Color3,
 	Accent: Color3,
 	Sign: string, -- their signature accessory (GodService builds it)
+	Goddess: boolean?, -- she has a goddess's voice in a chase (Config/Sounds' Goddess sounds)
 }
 
 local Herds = require(script.Parent.Herds)
@@ -48,6 +49,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 2,
 		God = "Tyche",
+		Goddess = true,
 		Area = "Fortune Terraces",
 		Family = "Fortune",
 		FamilyName = "Fortune Sheep",
@@ -63,6 +65,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 3,
 		God = "Hecate",
+		Goddess = true,
 		Area = "Moonlit Crossroads",
 		Family = "Spirit",
 		FamilyName = "Spirit Sheep",
@@ -93,6 +96,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 5,
 		God = "Eris",
+		Goddess = true,
 		Area = "Chaos Rift", -- not "Discord": Roblox's filters treat it as an off-platform app
 		Family = "Chaos",
 		FamilyName = "Chaos Sheep",
@@ -123,6 +127,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 7,
 		God = "Hebe",
+		Goddess = true,
 		Area = "Ambrosia Garden",
 		Family = "Ambrosia",
 		FamilyName = "Ambrosia Sheep",
@@ -138,6 +143,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 8,
 		God = "Themis",
+		Goddess = true,
 		Area = "Court of Justice",
 		Family = "Justice",
 		FamilyName = "Justice Sheep",
@@ -168,6 +174,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 10,
 		God = "Iris",
+		Goddess = true,
 		Area = "Rainbow Bridge",
 		Family = "Prism",
 		FamilyName = "Prism Sheep",
@@ -183,6 +190,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 11,
 		God = "Nike",
+		Goddess = true,
 		Area = "Victory Stair",
 		Family = "Victory",
 		FamilyName = "Victory Sheep",
@@ -273,6 +281,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 17,
 		God = "Nemesis",
+		Goddess = true,
 		Area = "Reckoning Ridge",
 		Family = "Avenger",
 		FamilyName = "Avenger Sheep",
@@ -348,6 +357,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 22,
 		God = "Aphrodite",
+		Goddess = true,
 		Area = "Rose Garden",
 		Family = "Rose",
 		FamilyName = "Rose Sheep",
@@ -363,6 +373,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 23,
 		God = "Artemis",
+		Goddess = true,
 		Area = "Moonlit Forest",
 		Family = "Moon",
 		FamilyName = "Moon Sheep",
@@ -393,6 +404,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 25,
 		God = "Athena",
+		Goddess = true,
 		Area = "Olive Grove",
 		Family = "Laurel",
 		FamilyName = "Laurel Sheep",
@@ -408,6 +420,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 26,
 		God = "Demeter",
+		Goddess = true,
 		Area = "Harvest Fields",
 		Family = "Meadow",
 		FamilyName = "Meadow Sheep",
@@ -423,6 +436,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 27,
 		God = "Hestia",
+		Goddess = true,
 		Area = "Eternal Hearth",
 		Family = "Hearth",
 		FamilyName = "Hearth Sheep",
@@ -453,6 +467,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 29,
 		God = "Hera",
+		Goddess = true,
 		Area = "Royal Courtyard",
 		Family = "Crown",
 		FamilyName = "Crown Sheep",

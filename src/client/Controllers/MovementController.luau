@@ -190,6 +190,10 @@ local function step(dt: number)
 			root.AssemblyLinearVelocity = Vector3.zero
 			stunUntil = now + GameConfig.Theft.PunchStun
 			knockUntil = 0
+			local sound = registry.SoundController
+			if sound then
+				sound:Play("Land")
+			end
 			return
 		end
 		humanoid.PlatformStand = true
@@ -330,9 +334,10 @@ function MovementController.Start(_self: any)
 			return
 		end
 		flight = { From = root.Position, To = landing, Start = os.clock(), Seconds = math.max(seconds, 0.3) }
+		-- The punch itself sounds from the god (GodController); this is the thief flying off.
 		local sound = registry.SoundController
 		if sound then
-			sound:Play("Scuffle")
+			sound:Play("Fly")
 		end
 	end))
 	trove:Add(Remotes.Knockback:Connect(function(direction: Vector3)
