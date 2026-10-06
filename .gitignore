@@ -14,3 +14,6 @@ DESIGN/ui/renders/
 
 # Mock-up pictures made from gvesster's icon pack (its licence: use, not pass on); DESIGN/ui/README.md says where they come from
 DESIGN/ui/local/
+
+# God model builds and mock-up renders (art/gods/README.md)
+art/gods/out/

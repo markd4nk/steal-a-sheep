@@ -4,13 +4,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
+local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Roster = require(ServerScriptService.Services.FlockService.Roster)
 local Run = require(script.Parent.Run)
 
 local function make(id: string, size: number, slot: number, pinned: boolean?): Economy.Sheep
 	local sheep: Economy.Sheep = {
 		Id = id,
-		Family = "Meadow",
+		Family = Olympus.Tiers[1].Family,
 		Rarity = 1,
 		Weight = 1,
 		Size = size,

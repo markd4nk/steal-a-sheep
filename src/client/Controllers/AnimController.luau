@@ -16,7 +16,7 @@ local Wander = require(ReplicatedStorage.Utils.Wander)
 -- attributes, Utils/Wander) and hop down off their thief's head when put down (DropFrom, DroppedAt). The nearest come
 -- to life: lambs graze nearly all the time (head down to the grass, nibbling, then up to chew with a chewing face),
 -- grown sheep now and then; between times they breathe, look about, wag and blink (Utils/SheepClips), and baa now and
--- then. A carried lamb sways on its thief's head. The gods swing their limbs as they run, shake their arms when
+-- then. A carried lamb sways on its thief's head. The block gods swing their limbs as they run, shake their arms when
 -- alerted and hop when they catch someone. Offsets go onto the joints in PreSimulation and come off in PostSimulation,
 -- so nothing piles up.
 local AnimController = { Name = "AnimController" }
@@ -553,8 +553,9 @@ function AnimController.Start(_self: any)
 		if not folder then
 			return
 		end
+		-- Only the block figures: the avatar gods (with a Humanoid) are GodController's.
 		local function addGod(child: Instance)
-			if child:IsA("Model") then
+			if child:IsA("Model") and not child:FindFirstChildOfClass("Humanoid") then
 				gods[child] = rig(child)
 			end
 		end

@@ -32,7 +32,8 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 ## The game, and where each part lives
 
 The MVP built in one pass on 2026-10-05 (HISTORY.md); the user now refines it as they go (GAME_DESIGN.md). Thirty
-tiers: twelve up the commissioned map (Aeolus on its old summit) and eighteen on High Olympus above it, Zeus at the top.
+tiers, the gods in mythological rank: twelve minor gods up the commissioned map (Pan first, Aeolus on its old summit),
+then five more and the thirteen Olympians on High Olympus above it, Zeus at the top.
 A god each, four wild lambs each, stair walker training, overhead carrying, the automatic downhill slide with steering,
 braking and slide hits, pursuit, putting lambs down anywhere in your pen, roaming and grazing sheep, income, growth,
 size reveal, Equip Best, locks, selling, merging, trails, pen space, the Sheepdex, offline earnings and the tutorial
@@ -91,6 +92,19 @@ lamb.
 
 ## In progress
 
+- **Gods in rank order and Zeus as a Roblox avatar** (merged into main 2026-10-05 on the user's word):
+  `Config/Olympus` reordered (Pan tier 1 to Zeus 30), new High Olympus stretches for the eleven Olympians who moved
+  up; Zeus is a catalog-dressed avatar (`GodService/Looks.luau`), the other 29 keep their block figures until their
+  looks are in (branch `t3code/order-olympian-gods` continues). Not in a published version yet.
+- **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus built from shapes
+  in code (`art/gods/`, README there): one 6,000-triangle mesh, one 1024 texture, 16 bones; walk and run in
+  `art/gods/gait.py` (bolt raised while walking, held upright while running). The rules are in DECISIONS.md
+  (Confirmed). A test import worked in a Studio copy (mesh 74120242072184, an earlier texture), posed from Blender's
+  numbers. Not wired in.
+- **Hera mock-up in Blender (2026-10-05, the user asked to see the style on his wife)**: same pipeline and shared
+  style (`art/gods/style.py`, `hera.py`): purple gown with a peacock-eye hem, cape, diadem, sceptre with a neon
+  peacock eye carried upright. Shown in Blender only, waiting for the user's word.
+- **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
 - **The Robux store can't sell yet** (merged 2026-10-05; the user: Creator Hub later): the game now exists on Roblox,
   so the 2 passes and 49 developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) can be made in
   universe 10769564664 at Config/Store's prices, their ids put in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`). Until
