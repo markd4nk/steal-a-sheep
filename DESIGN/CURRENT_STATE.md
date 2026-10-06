@@ -32,7 +32,7 @@ history: one line per item, details in the files below. Keep it under 300 lines 
   each with its store card's icon (uploaded 2026-10-06: `art/store/make_product_icons.py`, then
   `upload_product_icons.py` through Open Cloud; Roblox's moderation was clearing them the same hour). The Open Cloud key
   "Steal a Sheep products and passes" (developer products and game passes, read and write, this game only, no expiry;
-  Roblox drops keys unused for 60 days) is in `~/.roblox/steal-a-sheep-open-cloud.key` on Mark's main PC, never in git.
+  Roblox drops keys unused for 60 days) is in `.roblox/steal-a-sheep-open-cloud.key` under `C:/Users/markf` (that PC only), never in git.
 - The main Studio is that cloud place (Team Create: edits there last without a Save and ship with the next publish).
   `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is the local
   copy sessions build their own Studios from; the main checkout's was rebuilt from 3667692.
