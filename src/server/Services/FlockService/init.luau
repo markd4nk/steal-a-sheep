@@ -423,7 +423,8 @@ local function tickPlayer(player: Player, state: PlayerState, dt: number)
 	data.LastSeen = os.time()
 	for _, sheep in grewUp do
 		local size = Economy.Sizes[sheep.Size].Name
-		Remotes.Reveal:Fire(player, Economy.Name(sheep), size)
+		-- Its name without the size: the notice says the size once ("Fortune Sheep grew up GIANT!").
+		Remotes.Reveal:Fire(player, Economy.Name(sheep, false), size)
 		state.Dirty = true
 	end
 	refreshPen(player)
