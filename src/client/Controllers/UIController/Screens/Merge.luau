@@ -64,15 +64,19 @@ local SIZE_DOTS = {
 	Color3.fromRGB(255, 170, 40),
 }
 
+-- Roblox's rule for paid random items: exact percentages, or long ones rounded no further than four places past their
+-- first non-zero digit, with a disclaimer (the panel's last line). So five significant digits, trailing zeros dropped:
+-- 27.5%, 58.123%, 0.20341%.
 local function percent(value: number): string
-	if value >= 9.95 then
-		return `{math.floor(value + 0.5)}%`
-	elseif value >= 0.995 then
-		return `{string.format("%.1f", value)}%`
-	elseif value >= 0.005 then
-		return `{string.format("%.2f", value)}%`
+	if value <= 0 then
+		return "0%"
 	end
-	return "<0.01%"
+	local places = math.max(0, 4 - math.floor(math.log10(value)))
+	local text = string.format(`%.{places}f`, value)
+	if string.find(text, ".", 1, true) then
+		text = string.gsub(string.gsub(text, "0+$", ""), "%.$", "")
+	end
+	return `{text}%`
 end
 
 local function times(multiplier: number): string
@@ -95,12 +99,12 @@ local function oddsRow(parent: Instance, name: string, order: number, color: Col
 	edge.Color = Theme.Color.Line
 	edge.Thickness = 1.5
 	edge.Parent = dot
-	local label = UIKit.Text(row, "NameLabel", "", 15, Theme.Color.Snow, UDim2.new(1, -86, 1, 0), {
+	local label = UIKit.Text(row, "NameLabel", "", 15, Theme.Color.Snow, UDim2.new(1, -106, 1, 0), {
 		Stroke = Theme.Color.Line,
 		AlignX = Enum.TextXAlignment.Left,
 	})
 	label.Position = UDim2.fromOffset(22, 0)
-	local chance = UIKit.Text(row, "ChanceLabel", "", 15, Theme.Color.Snow, UDim2.new(0, 64, 1, 0), {
+	local chance = UIKit.Text(row, "ChanceLabel", "", 15, Theme.Color.Snow, UDim2.new(0, 84, 1, 0), {
 		Stroke = Theme.Color.Line,
 		AlignX = Enum.TextXAlignment.Right,
 	})
@@ -150,6 +154,14 @@ local function buildOdds(root: Instance)
 	UIKit.Text(odds, "HintLabel", "Bigger sheep in, more luck", 13, Theme.Fleece.Muted, UDim2.new(1, 0, 0, 18), {
 		Font = Theme.Font.TextHeavy,
 		Order = 20,
+	})
+	-- Roblox's odds rules: every outcome is a size and a fleece, rolled apart; rounded odds say so.
+	local rules = "Size and fleece roll separately. Odds are rounded, so they may not add up to exactly 100%."
+	UIKit.Text(odds, "RulesLabel", rules, 12, Theme.Fleece.Muted, UDim2.new(1, 0, 0, 0), {
+		Font = Theme.Font.TextHeavy,
+		Wrap = true,
+		Auto = Enum.AutomaticSize.Y,
+		Order = 21,
 	})
 end
 

@@ -269,8 +269,9 @@ Herds.Looks = table.freeze({
 		Extras = { extra("Crown") },
 	},
 
+	-- Its id stays "Discord" (saved data); players see Mayhem: Roblox's filters treat "Discord" as an off-platform app.
 	Discord = {
-		Name = "Discord Sheep",
+		Name = "Mayhem Sheep",
 		Build = "GlitchSheep",
 		Mutation = "Rainbow",
 		Face = "Laughing",

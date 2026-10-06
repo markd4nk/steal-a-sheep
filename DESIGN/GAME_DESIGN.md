@@ -70,7 +70,7 @@ Each god has six sheep families (below); the table's is the god's own, their Com
 | 2 | Tyche | bamboo: Fortune Terraces | Fortune Sheep (Pirate Sheep) |
 | 3 | Hecate | snow: Moonlit Crossroads | Spirit Sheep (Ghost Sheep) |
 | 4 | Phobos | lava: Fear Ledge | Fright Sheep (Wolf in Sheep's Clothing) |
-| 5 | Eris | lava: Discord Rift | Chaos Sheep (Glitch Sheep) |
+| 5 | Eris | lava: Chaos Rift | Chaos Sheep (Glitch Sheep) |
 | 6 | Eros | rose garden: Heart Garden | Cupid Sheep (pink Cloud wool + back wings) |
 | 7 | Hebe | rose garden: Ambrosia Garden | Ambrosia Sheep (Cupcake Sheep, honey) |
 | 8 | Themis | marble temple: Court of Justice | Justice Sheep (white Ringlets + blindfold) |

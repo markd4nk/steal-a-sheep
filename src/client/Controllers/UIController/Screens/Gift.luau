@@ -15,10 +15,10 @@ local Panel = require(script.Parent.Parent.Panel)
 local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
--- The free gift, in the Shop's look (a Prize Fleece menu): what it gives, big on a stage of rays; the two steps (like
--- the game, favorite it), each a picture of Roblox's own game page with the button to tap lit up; and Claim. Claim (or
--- tapping the favorite step) opens Roblox's favorite prompt and claims once that says yes. No game can see a like, so
--- the like is asked, not checked. It never opens by itself: the HUD's GIFT glows until it's claimed.
+-- The free gift, in the Shop's look (a Prize Fleece menu): what it gives, big on a stage of rays; the step (favorite
+-- the game), a picture of Roblox's own game page with the button to tap lit up; and Claim. Claim (or tapping the step)
+-- opens Roblox's favorite prompt and claims once that says yes. It never asks for a like: Roblox's review rules forbid
+-- rewarding a thumbs up. It never opens by itself: the HUD's GIFT glows until it's claimed.
 local Gift = {}
 
 local Color = Theme.Color
@@ -26,8 +26,7 @@ local ACCENT = "Lab"
 local PANEL_HEIGHT = 470
 local PRIZE_HEIGHT = 96
 local AMOUNT_TEXT = 44
--- Roblox's game page with the button to tap lit up (art/gift/step-pictures.js makes them).
-local LIKE_PICTURE = "rbxassetid://79093897520396"
+-- Roblox's game page with the button to tap lit up (art/gift/step-pictures.js makes it).
 local FAVORITE_PICTURE = "rbxassetid://94266843104437"
 local PICTURE_ASPECT = 912 / 376
 
@@ -74,21 +73,15 @@ local function prize(parent: Instance): Frame
 	return line
 end
 
--- A step: its number and title, the game page's picture (Picture, a check on its corner once done), and one line.
-local function step(parent: Instance, name: string, number: string, title: string, picture: string, line: string)
-	local tile = UIKit.Tile(parent, name, UDim2.new(0.5, -6, 1, 0))
-	tile.LayoutOrder = tonumber(number) or 0
+-- The step: its title, the game page's picture (Picture, a check on its corner once done), and one line.
+local function step(parent: Instance, name: string, title: string, picture: string, line: string)
+	local tile = UIKit.Tile(parent, name, UDim2.fromScale(1, 1))
 	UIKit.Padding(tile, 10, 10, 8, 8)
 	UIKit.List(tile, false, 6, Enum.HorizontalAlignment.Center)
 	local head = UIKit.Frame(tile, "Head", UDim2.fromOffset(0, 30))
 	head.AutomaticSize = Enum.AutomaticSize.X
 	head.LayoutOrder = 1
 	UIKit.List(head, true, 8)
-	local accent = UIKit.Accent(ACCENT)
-	local disc = UIKit.Frame(head, "Number", UDim2.fromOffset(28, 28), accent.Base)
-	UIKit.Corner(disc)
-	UIKit.Surface(disc, accent.Lo, 2, Color.Line, Theme.Line.Normal)
-	UIKit.Text(disc, "Label", number, 18, Color.Snow, UDim2.fromScale(1, 1), { Stroke = Color.Line })
 	UIKit.Text(head, "TitleLabel", title, 22, Color.Snow, UDim2.fromOffset(0, 30), {
 		Stroke = Color.Line,
 		Auto = Enum.AutomaticSize.X,
@@ -150,8 +143,7 @@ function Gift.Build(playerGui: Instance): ScreenGui
 	steps.LayoutOrder = 2
 	UIKit.Grow(steps)
 	UIKit.List(steps, true, 12)
-	step(steps, "LikeStep", "1", "Like the game", LIKE_PICTURE, "Thumbs up on its page")
-	local favorite = step(steps, "FavoriteStep", "2", "Favorite the game", FAVORITE_PICTURE, "Tap here, or the star")
+	local favorite = step(steps, "FavoriteStep", "Favorite the game", FAVORITE_PICTURE, "Tap here, or the star")
 	local tap = Instance.new("TextButton")
 	tap.Name = "FavoriteButton"
 	tap.Text = ""

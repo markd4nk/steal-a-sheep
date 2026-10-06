@@ -93,7 +93,7 @@ local tiers: { Tier } = {
 	{
 		Tier = 5,
 		God = "Eris",
-		Area = "Discord Rift",
+		Area = "Chaos Rift", -- not "Discord": Roblox's filters treat it as an off-platform app
 		Family = "Chaos",
 		FamilyName = "Chaos Sheep",
 		Reach = 12800,
