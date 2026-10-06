@@ -5,7 +5,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local Format = require(ReplicatedStorage.Utils.Format)
-local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Mountain = require(ReplicatedStorage.Utils.Mountain)
@@ -120,14 +119,17 @@ local function speedBoost(player: Player): number
 end
 
 -- The fastest a player at `x` could legally move across the ground: walking, sliding (carrying or not) or knocked back.
+-- A slide's momentum counts from the carried lamb's tier, or empty-handed from wherever it began: at most the top.
 local function fastest(player: Player, x: number, climb: number): number
 	local tier = player:GetAttribute("CarryTier")
 	local weight = player:GetAttribute("CarryWeight")
-	local escape = if type(tier) == "number" and type(weight) == "number"
-		then Economy.EscapeSpeed(climb, tier, weight)
-		else Economy.EscapeSpeed(climb, math.max(Mountain.TierAt(x), 1), 1)
+	local base, from = Mountain.SlideBase(climb, math.max(Mountain.TierAt(x), 1), 1), Olympus.Count
+	if type(tier) == "number" and type(weight) == "number" then
+		base, from = Mountain.SlideBase(climb, tier, weight), tier
+	end
+	local slide = base * Mountain.Momentum(base, from, x)
 	local knock = GameConfig.SlideHit.KnockStuds / GameConfig.SlideHit.KnockSeconds
-	return math.max(GameConfig.Movement.WalkSpeed, Mountain.SpeedAt(x, climb, 1), escape, knock)
+	return math.max(Mountain.SpeedAt(x, climb, 1), slide, knock)
 end
 
 -- Ground covered (x and z) against the budget, which refills at the fastest legal speed and holds up to
