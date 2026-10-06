@@ -67,6 +67,16 @@ return function(t: Run.Suite)
 		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = pegasus } }))).ToBe(false)
 	end)
 
+	t.Test("the Settings menu's choices: defaults for a new player, and only the right types", function()
+		local settings = PlayerData.Template.Settings
+		t.Expect(settings.MusicVolume).ToBe(1)
+		t.Expect(settings.SfxVolume).ToBe(1)
+		t.Expect(settings.ReduceMotion).ToBe(false)
+		t.Expect((PlayerData.Validate({ Settings = { MusicVolume = 0.25, ReduceMotion = true } }))).ToBe(true)
+		t.Expect((PlayerData.Validate({ Settings = { MusicVolume = 2 } }))).ToBe(false)
+		t.Expect((PlayerData.Validate({ Settings = "loud" }))).ToBe(false)
+	end)
+
 	t.Test("the free gift is a flag", function()
 		t.Expect(PlayerData.Template.FreeGift).ToBe(false)
 		t.Expect((PlayerData.Validate({ FreeGift = true }))).ToBe(true)

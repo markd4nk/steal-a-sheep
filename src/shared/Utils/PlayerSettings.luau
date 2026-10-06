@@ -12,10 +12,10 @@ export type Values = {
 	LowGraphics: boolean,
 }
 
--- The player's own settings (the HUD's Settings menu): music and effects volume, Reduce Motion and Low Graphics.
--- Saved as `Settings` and mirrored on the player as `Setting<Name>` attributes; everything that honours one reads
--- it here. Volumes are 0 to 1 in GameConfig.Settings.VolumeStep steps; the other two are on or off. The client sends
--- toggles as 1 and 0.
+-- The player's own settings (the Settings menu): music and effects volume, Reduce Motion and Low Graphics (kept
+-- from Shear a Sheep; nothing in this game reads it yet, so the menu leaves it out). Saved as `Settings` and
+-- mirrored on the player as `Setting<Name>` attributes; everything that honours one reads it here. Volumes are 0 to 1
+-- in GameConfig.Settings.VolumeStep steps; the other two are on or off. The client sends toggles as 1 and 0.
 local PlayerSettings = {}
 
 local NAMES: { Name } = { "MusicVolume", "SfxVolume", "ReduceMotion", "LowGraphics" }
@@ -38,6 +38,11 @@ end
 
 function PlayerSettings.Attribute(name: string): string
 	return `Setting{name}`
+end
+
+-- How many steps a volume has above silent (4 at a quarter a step).
+function PlayerSettings.Steps(): number
+	return math.round(1 / GameConfig.Settings.VolumeStep)
 end
 
 function PlayerSettings.Defaults(): Values

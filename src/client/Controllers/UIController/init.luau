@@ -26,6 +26,7 @@ local screenModules: { [string]: Types.ScreenModule } = {
 	Merge = require(script.Screens.Merge),
 	SellStall = require(script.Screens.SellStall),
 	Popup = require(script.Screens.Popup),
+	Settings = require(script.Screens.Settings),
 }
 if RunService:IsStudio() then
 	screenModules.DebugPanel = require(script.Screens.DebugPanel)
@@ -159,8 +160,20 @@ end
 
 function UIController.Start(_self: any)
 	-- The HUD first, so the menus' notices have somewhere to go.
-	local order =
-		{ "Hud", "Popup", "Flock", "Shop", "Sheepdex", "Merge", "SellStall", "Gift", "Daily", "Store", "DebugPanel" }
+	local order = {
+		"Hud",
+		"Popup",
+		"Settings",
+		"Flock",
+		"Shop",
+		"Sheepdex",
+		"Merge",
+		"SellStall",
+		"Gift",
+		"Daily",
+		"Store",
+		"DebugPanel",
+	}
 	task.spawn(function()
 		for _, name in order do
 			local module = screenModules[name]

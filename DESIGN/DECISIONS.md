@@ -175,6 +175,17 @@ Calls made overnight preparing the publish (2026-10-05, branch `t3code/prepare-g
   rate; a walker level they're past pays that level's cash price.
 - **Signs in studs**: the plots' name signs 24 x 6.8, the stalls' names 15 x 3.5, the walkers' level tags 6.3 x 2.35,
   the same size as before at their usual distance and smaller further away.
+Calls in the Settings menu (2026-10-05, branch t3code/sheep-stud-style-mockups; the mock-up's A, agreed overnight with
+the coordinator, waiting for Mark's OK):
+
+- **The gear sits in Roblox's top bar**, beside its buttons, round and dark like them; it's there from the first
+  second, before the HUD's menu pictures show. The other place mocked up: after the cash pill.
+- **Music and Sound effects in four steps** each (- and +, the steps lit up, greyed at either end), full by default;
+  the meadow's ambience follows Music. The other way mocked up: On/Off switches only.
+- **Reduce motion** is in (off by default; the menus' bounces and shakes already honour it). **Low graphics** and
+  **Invite** are left out: nothing would use the first, and the HUD's friend tile does the second.
+- Off is red and On green, as the mock-up's switches; each change saves at once.
+
 Calls in the store's product and pass icons (2026-10-05, files waiting for Mark's OK):
 
 - **The seven 2x Speed icons are the same** (the card doesn't number the buys); the 29 walker icons show the card's

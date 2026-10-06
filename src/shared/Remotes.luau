@@ -5,6 +5,7 @@
 -- See BRAIN/PATTERNS/networking.md.
 local GameConfig = require(script.Parent.Config.GameConfig)
 local Net = require(script.Parent.Net)
+local PlayerSettings = require(script.Parent.Utils.PlayerSettings)
 local Guard = Net.Guard
 
 local FLOCK_ACTIONS = { "Equip", "Unequip", "Lock", "Unlock", "EquipBest" }
@@ -74,6 +75,13 @@ local Remotes = {
 	PutDown = Net.ToServer("PutDown", {}, { Count = 4, Window = 1 }) :: Net.ToServer<()>,
 	-- The client's slide state (MovementController): the server checks hits only for sliders it has heard from.
 	Slide = Net.ToServer("Slide", { Guard.Boolean() }, { Count = 20, Window = 1 }) :: Net.ToServer<boolean>,
+	-- The Settings menu changing one of the player's own settings: its name and the new value (a volume 0 to 1, or 1
+	-- and 0 for a toggle). The server cleans it up, saves it and mirrors it as Setting<Name> (SettingsService).
+	SetSetting = Net.ToServer(
+		"SetSetting",
+		{ Guard.OneOf(PlayerSettings.NameList()), Guard.Number(0, 1) },
+		{ Count = 12, Window = 2 }
+	) :: Net.ToServer<PlayerSettings.Name, number>,
 }
 
 return Remotes

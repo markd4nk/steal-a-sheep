@@ -45,6 +45,21 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     notice per delivery, training, Put your sheep to work after buying pen space, Train to climb on tier 5, no menu
     opening itself in a first session, a Giant's notice, a god's catch and punch with a steal refused mid-flight, the
     walker sign's two buttons. Pictures in T3 Code's attachments (`night_before_*`, `night_after_*`).
+- **Settings menu (2026-10-05)**. On branch `t3code/sheep-stud-style-mockups`, not merged, its look waiting for Mark's
+  OK. The overnight coordinator (t3code-60160304) asked for it: the game had music and no way to turn it down
+  (`Utils/PlayerSettings` was there from Shear a Sheep, unused).
+  - *Mock-up* (`DESIGN/ui/mockups/settings.html`, renders in `.t3/userdata/attachments/settings/`): the gear in
+    Roblox's top bar (A) or after the cash pill (B); three rows, Music and Sound effects in four steps and Reduce
+    motion, or switches only. The coordinator picked A with steps; Mark sees the switches as the alternative.
+  - *How it works*: Shear a Sheep's design, ported to code-built UI. `Screens/Settings` builds the menu (a Medium
+    Settings-accent panel, 480 x 300) and the gear (`PlayerGui.SettingsGear`, ScreenInsets TopbarSafeInsets, so it sits
+    in Roblox's bar wherever its buttons end); - and + send `Remotes.SetSetting` (12 a player per 2 s), which
+    `SettingsService` cleans (`PlayerSettings.Clean`, steps of `GameConfig.Settings.VolumeStep` = 0.25), saves in
+    `Settings` (new in `PlayerData`, defaults filled into old saves by Reconcile, no schema bump) and mirrors as
+    `Setting<Name>` attributes. `SoundController` sets each SoundGroup to its mix volume times the setting (Music and
+    Ambience: MusicVolume; Effects: SfxVolume) and again when it changes. Reduce motion was already honoured by the
+    menus' motion and button shakes.
+
 - **Icons for the store's 49 developer products and 2 passes (2026-10-05)**. Files for Mark to approve, not uploaded:
   asked for by the overnight coordinator (t3code-60160304) for Creator Hub, where the products had Roblox's default
   picture. `art/store/make_product_icons.py` reads the products and passes from `Config/Store.luau` (`--store` for a

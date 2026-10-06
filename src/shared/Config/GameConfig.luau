@@ -575,8 +575,9 @@ local GameConfig = {
 		PoseRange = 100,
 	},
 
+	-- The player's own settings (the Settings menu, from the gear in Roblox's top bar). Volumes go in four steps.
 	Settings = {
-		VolumeStep = 0.1,
+		VolumeStep = 0.25,
 		Defaults = {
 			MusicVolume = 1,
 			SfxVolume = 1,
