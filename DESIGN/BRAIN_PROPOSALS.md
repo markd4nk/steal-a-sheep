@@ -217,10 +217,10 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   `list_roblox_studios` name then reads like the cloud place's: address it by id. Server & Clients test players
   (`Player1` -1, `Player2` -2) save under their own keys, away from the owner's Studio save. Put both ids back to 0
   before leaving it." Seen 2026-10-05 in Steal a Sheep, testing saves across sessions and real receipts overnight.
-- **S41** (`BRAIN/PATTERNS/ui.md`): "On a computer or a tablet Roblox opens its player list (the leaderstats) at the top right by
-  default, about 315 px wide: a HUD's top-right counters end up under it. Keep them left of it there (not on a phone,
-  a touch screen whose short side is under about 500 px, nor on a console, where it starts closed)." Seen 2026-10-05
-  in Steal a Sheep: Climbing and cash were hidden at every PC and iPad join.
+- **S41** (`BRAIN/PATTERNS/ui.md`): "On a computer or a tablet Roblox opens its player list (the leaderstats) at the
+  top right by default, about 315 px wide: a HUD's top-right counters end up under it. Keep them left of it there (not
+  on a phone, a touch screen whose short side is under about 500 px, nor on a console, where it starts closed)." Seen
+  2026-10-05 in Steal a Sheep: Climbing and cash were hidden at every PC and iPad join.
 - **S42** (`BRAIN/PATTERNS/ui.md`): "A menu that opens by itself must wait for everything that wants the player's tap,
   not only other menus: a welcome-back card isn't modal, and a daily menu opened under it. Check a 'busy' state that
   includes such cards, and leave a few seconds after it clears." Seen 2026-10-05 in Steal a Sheep.
