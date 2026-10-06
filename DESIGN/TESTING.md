@@ -259,6 +259,19 @@ Useful measurements:
   `start_stop_play` brings its window forward. Sessions took turns (a "screen free" message), running logic-only
   checks while another session's window was in front.
 
+## Momentum slides (2026-10-06)
+
+- **Own place copy**: `scripts/build-place.ps1` in the worktree (it builds the branch's code into `StealASheep.rbxl`),
+  copied to `build/MomentumPlaytest.rbxl` and opened with `RobloxStudioBeta.exe <path>`: no code swap needed.
+- **A chase log**: a Client `execute_luau` that sets Climbing (`Debug AddClimb` by the difference to the wanted value),
+  `Debug Steal`s, drives the slide (Drive a slide, above) and logs every 0.15-0.5 s into `_G` from a `task.spawn`;
+  a second call waits and returns the log. The gods' models (`workspace.Gods`) carry `Tier`, `Speed` and `Mood`
+  attributes. Velocities read flat (x, z): on a 40-degree stretch a 40.9 slide reads 31.3.
+- **Put the last lamb down first**: `Debug Home` keeps a carried lamb on the head, and `Debug Steal` then answers
+  `true, nil` without stealing (no chase). `Remotes.PutDown:Fire()` after `Home` delivers it.
+- **No straight lane through the map's middle**: from x 2300 down every z from 145 to 240 meets a part or mesh within
+  about 400 studs (raycast scan along the floor at 2.5 and 5 studs up); tier 3 down is clear at z 185.
+
 ## Asset audit (2026-10-05, before launch)
 
 Every asset the game uses loads: 1,286 distinct ids, none broken, moderated, deleted or slow.

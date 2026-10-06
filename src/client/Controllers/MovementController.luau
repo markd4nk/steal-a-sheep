@@ -4,7 +4,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Mountain = require(ReplicatedStorage.Utils.Mountain)
@@ -16,9 +15,10 @@ local Trove = require(ReplicatedStorage.Packages.Trove)
 -- (Mountain.SpeedAt; the server checks the uphill part): slower than normal only up a slope too steep for them,
 -- faster the more they've outgrown it. Sliding:
 -- moving downhill on the ramp starts a slide by itself; it speeds up to the escape speed set when it starts
--- (Economy.EscapeSpeed: Climbing against the lamb's tier and weight) and keeps it all the way down, like momentum;
--- it steers within a cone either side of straight downhill with the ordinary movement controls,
--- brakes when pulled back, and runs out to a stop past the safety line. A slider's hit costs it speed; a hit player is
+-- (Mountain.SlideBase: Climbing against the lamb's tier and weight), then gains momentum for every tier it passes
+-- (Mountain.Momentum, from the lamb's tier, or where it began empty-handed); a bump costs speed, won back almost at
+-- once, and never trips the character over. It steers within a cone either side of straight downhill with the ordinary movement controls, brakes when
+-- pulled back, and stops dead at the safety line: the plots are walked. A slider's hit costs it speed; a hit player is
 -- moved back down the slope and stunned for a moment; a god's punch flies them down the mountain (Remotes.Punch).
 -- The stair walker is WalkerController's.
 local MovementController = { Name = "MovementController" }
@@ -35,6 +35,9 @@ local player = Players.LocalPlayer
 local sliding = false
 local slideSpeed = 0
 local slideTarget = 0
+local slideFrom = 1 -- the tier its momentum counts from
+local recovering = false -- knocked under its speed by a bump: it gets back up quickly
+local recoverUntil = 0 -- os.clock() until which a new slide recovers quickly too (it ended stuck)
 local heading = Mountain.Downhill
 local knockUntil = 0
 local stunUntil = 0
@@ -73,14 +76,14 @@ local function carried(): (number?, number?)
 	return tier, weight
 end
 
--- The speed a slide starting at `x` keeps all the way down (Economy.EscapeSpeed), never under walking speed so a
--- player too weak for the slope still gets home.
-local function escapeSpeed(x: number): number
+-- The speed a slide starting at `x` builds its momentum on (Mountain.SlideBase), and the tier the momentum counts from.
+local function slideStart(x: number): (number, number)
 	local tier, weight = carried()
-	local speed = if tier and weight
-		then Economy.EscapeSpeed(climbing(), tier, weight)
-		else Economy.EscapeSpeed(climbing(), math.max(Mountain.TierAt(x), 1), 1)
-	return math.max(speed, GameConfig.Movement.WalkSpeed)
+	if tier and weight then
+		return Mountain.SlideBase(climbing(), tier, weight), tier
+	end
+	local here = math.max(Mountain.TierAt(x), 1)
+	return Mountain.SlideBase(climbing(), here, 1), here
 end
 
 -- Walking speed here (Mountain.SpeedAt, for the carried weight). Faster than normal it's the same every way; slower,
@@ -113,6 +116,15 @@ end
 local function moveInput(humanoid: Humanoid): Vector3
 	local direction = humanoid.MoveDirection
 	return Vector3.new(direction.X, 0, direction.Z)
+end
+
+-- A slide that hits something at speed would otherwise trip the character onto the floor for a second or two.
+local function keepOnFeet(model: Model)
+	local humanoid = model:WaitForChild("Humanoid", 10)
+	if humanoid and humanoid:IsA("Humanoid") then
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+	end
 end
 
 local function loadTrack(humanoid: Humanoid, id: string): AnimationTrack?
@@ -226,7 +238,8 @@ local function step(dt: number)
 			and input.X < 0
 		then
 			slideSpeed = math.max(flat, walk)
-			slideTarget = escapeSpeed(position.X)
+			slideTarget, slideFrom = slideStart(position.X)
+			recovering = now < recoverUntil
 			heading = Vector3.new(
 				-1,
 				0,
@@ -238,35 +251,41 @@ local function step(dt: number)
 		end
 	end
 
-	-- Sliding.
-	local pastLine = position.X < Olympus.SafeLineX
-	if not onRamp and not pastLine and grounded then
+	-- Sliding. The safety line stops it dead, so nobody is carried on into the plots: from there they walk.
+	if position.X < Olympus.SafeLineX then
+		setSliding(false, humanoid)
+		humanoid.WalkSpeed = walkSpeed(position, input) * boost
+		root.AssemblyLinearVelocity = Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
+		return
+	end
+	if not onRamp and grounded then
 		setSliding(false, humanoid)
 		humanoid.WalkSpeed = walk * boost
 		return
 	end
-	local target = if pastLine then 0 else slideTarget
-	local braking = input.X > 0.35
-	if braking or pastLine then
-		-- Past the safety line the slide runs out more gently than a pulled-back brake.
-		local brake = if braking then settings.SlideBrake else settings.SlideBrake * 0.4
-		slideSpeed = math.max(0, slideSpeed - brake * dt)
+	local target = slideTarget * Mountain.Momentum(slideTarget, slideFrom, position.X)
+	if input.X > 0.35 then
+		slideSpeed = math.max(0, slideSpeed - settings.SlideBrake * dt)
 	elseif grounded then
 		if slideSpeed < target then
-			local accel = math.max(settings.SlideAccel, target / settings.SlideRiseSeconds)
-			slideSpeed = math.min(target, slideSpeed + accel * dt)
+			local rise = if recovering then settings.SlideRecoverSeconds else settings.SlideRiseSeconds
+			slideSpeed = math.min(target, slideSpeed + math.max(settings.SlideAccel, target / rise) * dt)
+			recovering = recovering and slideSpeed < target
 		else
 			slideSpeed = math.max(target, slideSpeed - settings.SlideAccel * 0.5 * dt)
 		end
 	end
-	-- Scenery hit: the slide carries on from the speed the character really has, and ends if it stays stuck.
+	-- Scenery hit: the slide carries on from the speed the character really has, once a bump: still against it, it
+	-- pushes back up to speed, so steering slides the character off fast. It ends if it stays stuck.
 	local actual = Vector2.new(velocity.X, velocity.Z).Magnitude
-	if grounded and actual < slideSpeed * 0.6 then
+	if grounded and actual < slideSpeed * 0.6 and not recovering then
 		slideSpeed = math.max(actual + 4, settings.SlideStopSpeed)
+		recovering = true
 	end
 	stuckFor = if actual < settings.SlideStopSpeed then stuckFor + dt else 0
 	if stuckFor > 0.5 then
 		stuckFor = 0
+		recoverUntil = now + settings.SlideRiseSeconds
 		setSliding(false, humanoid)
 		humanoid.WalkSpeed = walk * boost
 		return
@@ -331,7 +350,11 @@ function MovementController.Start(_self: any)
 			sound:Play("Yelp")
 		end
 	end))
-	trove:Connect(player.CharacterAdded, function()
+	if player.Character then
+		task.spawn(keepOnFeet, player.Character)
+	end
+	trove:Connect(player.CharacterAdded, function(model: Model)
+		task.spawn(keepOnFeet, model)
 		flight = nil
 		sitTrack = nil
 		sliding = false
