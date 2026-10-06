@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Steal a Sheep: the Sell Stall</title>
+<link rel="stylesheet" href="/DESIGN/ui/fleece.css">
+<style>
+/* The Sell Stall's menu (the stall at z 175 by the plots), after Steal an Egg's Sell Pets (Mark's reference,
+   2026-10-05): a grid of the flock, tap the ones to sell, one Sell for all of them, in a tile on the right (Mark
+   picked this layout, A, over the reference's own; nothing picked when it opens). Still to decide: a Select all. */
+
+body.board { width: 1896px; }
+.body-row { flex: 1; display: flex; gap: 10px; min-height: 0; }
+.gridwell { flex: none; width: 462px; }
+.gridwell .scroll { padding: 13px 18px 14px 14px; }
+.grid { grid-template-columns: repeat(4, 100px); }
+.card { --cw: 100px; --ch: 124px; }
+
+/* A sell card: the token, the name, what it sells for; PEN (earning) or the padlock top left, its size over the
+   picture's foot, a red ring and tick once it's picked. */
+.card .token { position: absolute; left: 50%; top: 4px; transform: translateX(-50%); filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.22)); }
+.card .name { bottom: 34px; }
+.card .sz {
+	position: absolute; left: 50%; top: 52px; transform: translateX(-50%); z-index: 2;
+	height: 20px; padding: 0 7px 2px; border-radius: 7px; display: flex; align-items: center;
+	background: rgba(10, 12, 20, 0.78); box-shadow: 0 0 0 2px var(--ink);
+	font: 13px/1 var(--display); letter-spacing: 0.04em; color: #fff; white-space: nowrap;
+}
+.card .sz.lamb { background: linear-gradient(180deg, #7cf284, #2fbf3f); box-shadow: 0 0 0 2px var(--ink), inset 0 -2px 0 #1d8a2b; }
+.card .sz.merged { background: linear-gradient(180deg, #bd91ff, #8b55e8); box-shadow: 0 0 0 2px var(--ink), inset 0 -2px 0 #562aab; }
+.card .sz .lbl { paint-order: stroke fill; -webkit-text-stroke: 3.5px var(--ink); }
+.card .pen {
+	position: absolute; left: 5px; top: 5px; z-index: 3;
+	height: 22px; padding: 0 7px 2px; border-radius: 8px; display: flex; align-items: center;
+	background: linear-gradient(180deg, #69c2ff, #2f8ff0); box-shadow: 0 0 0 2px var(--ink), inset 0 -3px 0 #1b5fb0;
+	font: 13px/1 var(--display); color: #fff;
+}
+.card .pen .lbl { paint-order: stroke fill; -webkit-text-stroke: 3.5px var(--ink); }
+.card .padlock { position: absolute; left: 2px; top: 1px; width: 30px; height: 30px; z-index: 3; }
+.card.kept { filter: saturate(0.55) brightness(0.72); }
+.card.pick {
+	transform: translateY(-2px);
+	box-shadow: 0 0 0 3px #ff6b6b, 0 0 0 5.5px var(--ink), 0 0 16px 4px rgba(255, 90, 90, 0.5), 0 7px 0 5.5px var(--ink),
+		inset 0 2px 0 rgba(255, 255, 255, 0.5);
+	z-index: 1;
+}
+.card .tick {
+	position: absolute; right: -8px; top: -9px; z-index: 3; width: 30px; height: 30px; border-radius: 50%;
+	display: grid; place-items: center;
+	background: linear-gradient(180deg, #ff7b7b, #e5383b); box-shadow: 0 0 0 2.5px var(--ink), inset 0 -3px 0 #a01a1d;
+}
+.card .tick svg { width: 18px; height: 18px; margin-bottom: 2px; }
+.card .price .lbl { color: var(--lime); }
+
+/* The sell tile on the right: what's picked, the total, what the flock would lose a second, Sell. */
+.selltile { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 9px 9px 10px; height: calc(100% - 4px); }
+.selltile .pile { position: relative; height: 54px; flex: none; display: flex; align-items: center; justify-content: center; }
+.selltile .pile .token + .token { margin-left: -15px; }
+.selltile .pile .more { margin-left: 4px; }
+.selltile .pile .hint { font: 800 15px/1.1 var(--text); color: var(--muted); text-align: center; padding: 0 10px; }
+.selltile .total { display: flex; align-items: center; justify-content: center; gap: 5px; font: 31px/1 var(--display); color: var(--lime); --sw: 7px; }
+.selltile .total .ico { width: 36px; height: 36px; }
+.selltile .total.zero { color: #6f7a90; }
+.selltile .note { display: flex; align-items: center; justify-content: center; gap: 4px; font: 800 15px/1 var(--text); color: var(--muted); height: 18px; margin-top: -2px; }
+.selltile .note.bad { color: var(--bad); }
+.selltile .note .ico { width: 20px; height: 20px; }
+.selltile .grow { flex: 1; }
+.headbtn { --bh: 36px; font-size: 17px; padding: 0 12px 4px 8px; gap: 5px; }
+.headbtn svg { width: 22px; height: 22px; }
+
+/* The confirm pop-up (UIKit.Confirm, as Prize Fleece's pop-up template). */
+.pop .hdr .title { font-size: 30px; --sw: 7px; }
+.pop .pbody { gap: 9px; padding: calc(var(--hh) + 15px) 14px 16px; }
+.pop .stagebox { height: 84px; display: flex; align-items: center; justify-content: center; }
+.pop .stagebox .fan { position: relative; display: flex; align-items: flex-end; }
+.pop .stagebox .fan .token + .token { margin-left: -24px; }
+.pop .stagebox .more { position: absolute; right: 8px; top: 8px; }
+.pop .pname { display: flex; align-items: center; justify-content: center; gap: 6px; font: 30px/1 var(--display); color: var(--lime); --sw: 7px; margin-top: 2px; }
+.pop .pname .ico { width: 38px; height: 38px; }
+.pop .pline { font: 800 16px/1.25 var(--text); color: var(--muted); text-align: center; margin-top: -3px; }
+.pop .btnrow { display: flex; gap: 10px; margin-top: 4px; }
+.pop .btnrow .btn { flex: 1; }
+.pop .btnrow .btn.primary { flex: 1.5; }
+.frame .dim { position: absolute; inset: 0; background: rgba(9, 12, 22, 0.45); }
+</style>
+</head>
+<body class="board live" data-pending>
+<script type="module">
+import * as K from "/DESIGN/ui/kit.js";
+
+const { DATA, short, rate, ico, lbl, btn, hchip, panel, token, rarityLook } = K;
+
+const TICK = `<svg viewBox="0 0 20 20"><path d="M4.5 10.5l3.6 3.6 7.4-8" fill="none" stroke="#12131a" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 10.5l3.6 3.6 7.4-8" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const SORT = `<svg viewBox="0 0 24 24"><g stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M8 19V5M4 9l4-4 4 4M16 5v14M12 15l4 4 4-4" stroke="#12131a" stroke-width="6"/><path d="M8 19V5M4 9l4-4 4 4M16 5v14M12 15l4 4 4-4" stroke="#fff" stroke-width="2.6"/></g></svg>`;
+
+const COINS = 412380;
+const CLIMB = 48200;
+// Cheapest first: what's worth least comes up first, the earners sink to the bottom.
+const FLOCK = [...DATA.Flock].sort((a, b) => a.Sell - b.Sell || Number(a.Id) - Number(b.Id));
+const byId = Object.fromEntries(FLOCK.map((sheep) => [sheep.Id, sheep]));
+const isStored = (sheep) => sheep.Slot === 0 && !sheep.Locked;
+
+// What the card says over its picture's foot: a lamb, a merge, or a size above Standard.
+function sizeChip(sheep) {
+	if (!sheep.Adult) {
+		return `<span class="sz lamb">${lbl("LAMB")}</span>`;
+	}
+	if (sheep.Rank > 0) {
+		return `<span class="sz merged">${lbl(sheep.RankName.toUpperCase())}</span>`;
+	}
+	return sheep.Size > 1 ? `<span class="sz">${lbl(sheep.SizeName.toUpperCase())}</span>` : "";
+}
+
+function sellCard(sheep, picked) {
+	const family = DATA.Families[sheep.Family];
+	const state = [picked ? "pick" : "", sheep.Locked ? "kept" : ""].join(" ");
+	const shine = sheep.Rarity >= 3 ? "shine" : "";
+	return `<div class="card tier-${rarityLook(sheep.Rarity)} ${shine} ${state}">
+		${token(sheep.Family, { size: 66, rarity: sheep.Rarity })}
+		${sizeChip(sheep)}
+		<div class="name ol fit">${family.Short}</div>
+		<div class="price">${ico("cash", 22)}${lbl(short(sheep.Sell))}</div>
+		${sheep.Slot > 0 ? `<div class="pen">${lbl("PEN")}</div>` : ""}
+		${sheep.Locked ? ico("lock", 32, "padlock") : ""}
+		${picked ? `<div class="tick">${TICK}</div>` : ""}
+	</div>`;
+}
+
+function grid(flock, picked) {
+	return `<div class="well gridwell"><div class="scroll"><div class="grid">${flock
+		.map((sheep) => sellCard(sheep, picked.has(sheep.Id)))
+		.join("")}</div></div><div class="fade"></div><div class="bar-y" style="--st:0%;--sh:44%"><i></i></div></div>`;
+}
+
+function summary(picked) {
+	const list = [...picked].map((id) => byId[id]);
+	const total = list.reduce((sum, sheep) => sum + sheep.Sell, 0);
+	const lost = list.filter((sheep) => sheep.Slot > 0).reduce((sum, sheep) => sum + sheep.Income, 0);
+	return { list, total, lost };
+}
+
+// A small fan of what's picked, the dearest in front, and how many more.
+function pile(list, size, shown) {
+	const front = [...list].sort((a, b) => a.Sell - b.Sell).slice(-shown);
+	const tokens = front.map((sheep) => token(sheep.Family, { size, rarity: sheep.Rarity })).join("");
+	const more = list.length > shown ? `<span class="chip np more">${lbl("+" + (list.length - shown))}</span>` : "";
+	return { tokens, more };
+}
+
+// The Sell Stall. `selectAll` adds the button still to decide: it picks every stored sheep (never one in the pen, never
+// a locked one) and turns into Clear. Without it, Clear shows once something is picked.
+function sellStall({ picked = new Set(), h = 318, notice = "", flock = FLOCK, coins = COINS, selectAll = false }) {
+	const { list, total, lost } = summary(picked);
+	let pileHtml = `<div class="hint">Tap the sheep to sell</div>`;
+	if (list.length > 0) {
+		const { tokens, more } = pile(list, 42, 4);
+		pileHtml = `${tokens}${more}`;
+	}
+	const note = list.length === 0
+		? `<div class="note"></div>`
+		: lost > 0
+			? `<div class="note bad">${ico("warning", 20)}−${rate(lost)}/s income</div>`
+			: `<div class="note">None of them earn</div>`;
+	let quick = list.length > 0 ? btn("soft", lbl("Clear"), { size: "sm wide" }) : "";
+	if (selectAll) {
+		const allPicked = flock.filter(isStored).every((sheep) => picked.has(sheep.Id));
+		quick = allPicked ? btn("soft", lbl("Clear"), { size: "sm wide" }) : btn("soft", `${ico("check", 24)}${lbl("Select all")}`, { size: "sm wide" });
+	}
+	const sell = list.length === 0
+		? btn("off", lbl("Sell"), { size: "wide" })
+		: btn("danger", lbl(`Sell ${list.length}`), { size: "wide", state: "glow" });
+	const body = `<div class="body-row">
+		${grid(flock, picked)}
+		<div class="tile selltile">
+			<div class="well pile">${pileHtml}</div>
+			<div class="total ${list.length === 0 ? "zero" : ""}">${ico("cash", 36)}<span class="ol">${short(total)}</span></div>
+			${note}
+			<div class="grow"></div>
+			${quick}
+			${sell}
+		</div>
+	</div>${notice}`;
+	const sort = btn("soft", `${SORT}${lbl("Cheapest")}`, { size: "sm headbtn" });
+	return panel({
+		w: 700,
+		h,
+		accent: "sell",
+		badge: "cashPile",
+		title: "Sell Stall",
+		chips: `${sort}${hchip(ico("cash", 30), short(coins))}`,
+		body,
+	});
+}
+
+// The confirm: what goes, what it pays, what it costs a second.
+function confirm(picked) {
+	const { list, total, lost } = summary(picked);
+	const { tokens, more } = pile(list, 56, 5);
+	const body = `
+		<div class="stagebox tier-common"><div class="rays"></div><div class="glowdisc"></div><div class="fan">${tokens}</div>${more}</div>
+		<div class="pname">${ico("cash", 38)}<span class="ol">${short(total)}</span></div>
+		<div class="pline">${lost > 0 ? `You lose +${rate(lost)}/s` : "None of them earn"}</div>
+		<div class="btnrow">${btn("soft", lbl("Cancel"))}${btn("danger primary", lbl(`Sell ${list.length}`), { state: "glow" })}</div>`;
+	return panel({ w: 360, h: "auto", accent: "confirm", badge: "question", title: `Sell ${list.length} sheep?`, body, extra: "pop" });
+}
+
+// Tapped one by one: the three Meadows and the Grape, the cheapest four.
+const tapped = new Set(FLOCK.slice(0, 4).map((sheep) => sheep.Id));
+const tappedWithPen = new Set([...tapped, FLOCK.find((sheep) => sheep.Slot > 0 && sheep.Family === "War").Id]);
+const allStored = new Set(FLOCK.filter(isStored).map((sheep) => sheep.Id));
+const sold = summary(tapped);
+const left = FLOCK.filter((sheep) => !tapped.has(sheep.Id));
+const soldNotice = `<div class="notice">${ico("cash", 30)}${lbl(`Sold ${sold.list.length} for ${short(sold.total)}`)}</div>`;
+const phone = (id, content, coins = COINS, over) => K.phoneFrame(id, content, { coins, climb: CLIMB, over });
+
+const boardHead = `<div class="board-head">
+	<div class="kicker">Steal a Sheep · mock-up · 2026-10-05, second round</div>
+	<h1>The Sell Stall</h1>
+	<p>The menu the stall by the plots opens, after Steal an Egg's <b>Sell Pets</b>, in the layout picked (A): the flock as
+	cards, cheapest first, tap the ones to sell, and one <b>Sell</b> for all of them in the tile on the right. It opens
+	with nothing picked. Cards say <b>PEN</b> when they're earning; locked ones are dimmed with a padlock and can't be
+	picked. A sheep now sells for two minutes of its income. A player with tiers 1-8 open and the pen's 8 slots.</p>
+</div>`;
+
+K.boot(() => {
+	document.body.innerHTML += `${boardHead}
+	<div class="section">
+		<h2>Tap to pick</h2>
+		<p>Each sheep tapped one at a time. <b>Clear</b> shows once something is picked.</p>
+		<div class="row">
+			${K.shot(phone("open", sellStall({})), "<b>Opened.</b> Nothing picked.")}
+			${K.shot(phone("tapped", sellStall({ picked: tapped })), "<b>Four tapped</b>: the three Meadows and the Grape.")}
+		</div>
+		<div class="row">
+			${K.shot(phone("confirm", sellStall({ picked: tapped }), COINS, confirm(tapped)), "<b>Sell 4</b> pressed: one confirm for the lot.")}
+			${K.shot(phone("sold", sellStall({ flock: left, coins: COINS + sold.total, notice: soldNotice }), COINS + sold.total), "<b>Sold.</b> The cards close up; the cash ticks up.")}
+		</div>
+	</div>
+	<div class="section">
+		<h2>To decide: a Select all</h2>
+		<p>Steal an Egg's <b>Select All</b>, made safe: one tap picks every stored sheep (not earning), never one in the
+		pen and never a locked one; it turns into <b>Clear</b>. It saves tapping a long row of cheap sheep one by one after
+		a run of steals (the flock holds up to 100). Without it, selling twenty Meadows is twenty taps.</p>
+		<div class="row">${K.shot(phone("select-all", sellStall({ picked: allStored, selectAll: true })), "<b>Select all</b> pressed: the 9 stored sheep. The 8 in the pen and the locked Royal Moon stay.")}</div>
+	</div>
+	<div class="section">
+		<h2>On a computer</h2>
+		<p>A pen sheep tapped too: the tile says what the flock would lose a second.</p>
+		<div class="row">${K.shot(K.pcFrame("pc", sellStall({ picked: tappedWithPen, h: 400 }), { coins: COINS, climb: CLIMB }), "The four and the Large War Sheep from the pen.")}</div>
+	</div>`;
+});
+</script>
+</body>
+</html>

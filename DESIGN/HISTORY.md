@@ -6,8 +6,8 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
-- **The Merge Shrine: the Laurel Ring, a gamble like Steal an Egg's Fuse Machine (2026-10-05)**. Branch
-  t3code/research-sheep-merge, not merged (the user's call: no merging into main unless asked).
+- **The Merge Shrine: the Laurel Ring, a gamble like Steal an Egg's Fuse Machine (2026-10-05)**. Merged into main at
+  the user's request.
   - *How it works*: `ShrineService` builds the Laurel Ring (`ShrineService/Model`) where the Mutation Machine stood
     (`GameConfig.Shrine.At`) and runs the merge: `FlockService.ShrineMerge` checks three grown, unlocked sheep of one
     family and the price (`Economy.ShrinePrice`), takes them and the cash, and makes one lamb from `Economy.ShrineRoll`
@@ -28,7 +28,103 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     (weight on the carry attribute), put down in the pen (the lamb hops in and grazes), the Return button, the 30 s
     auto send home, and the refusals (too far, mixed families, a lamb in, two, the same twice, a second merge while
     a lamb waits, rate limit). Not checked: two players, leaving with a lamb waiting, touch and gamepad, a Titan.
+    The user then: commit and merge it; the price is fine for now; Titan x5; 30 s on the altar is good. After merging
+    main (the Sell Stall, friend boost, free gift): the Sell Stall leaves a waiting lamb out and the server refuses it;
+    60 of 60 tests, console clean, a merge paid, picked up and sent to the pen in a fresh build.
 
+- **Friend boost (2026-10-05)**. The user asked for a simple friend multiplier like other games: each friend in the
+  server multiplies your income. Mock-ups A (a pill under the cash) and B (a tile under the menus, tap to invite) on
+  a real HUD screenshot; the user picked B, the INVITE state at 0 friends, and +20% a friend (over the proposed +10%).
+  - *Shared*: `Economy.FriendShare` 0.2, `MaxFriends` 4, `FriendBoost(friends)`. `Theme.Icons.HudFriend` and
+    `HudInvite`: gvesster's Free Icon Pack v3.1 `Player/Friend` and `Player/Add Player` (1st Outline, 256 px), the
+    cash icon's pack, uploaded through the Studio MCP.
+  - *Server*: `FriendService` asks `IsFriendsWithAsync` once per pair (the later joiner asks), keeps pairs while both
+    stay, sets the `Friends` attribute and sends the join notices. `FlockService`'s tick multiplies the income it pays
+    by `FriendService:Boost`. Studio: `DebugFriends` attribute, debug panel "Friends in server (id)" (`SetFriends`, -1
+    for the real count).
+  - *Client*: `Hud` adds `Tiles.FriendButton` (order 4): HudFriend and "+N%" in lime with friends here, HudInvite
+    and INVITE without; a tap runs `CanSendGameInviteAsync` then `PromptGameInvite`. The cash rate shows income x
+    boost.
+  - *Checked*: `check.ps1`; 57 of 57 tests (FriendBoost new) in a Studio copy of the place with this branch's code;
+    both bootstraps ready, console clean. INVITE tile with the uploaded icon; pretend 2 friends: tile "+40%", cash
+    paid 6.57/s -> 9.19/s (x1.40); 4 friends +80%, 9 capped at +80%, back to INVITE at -1; the join notice drawn;
+    tapping the tile opened Roblox's Invite Friends dialog (closed without inviting). Real friends untested.
+    After merging main (the free gift's GIFT button now tops the same column): 60 of 60 tests, console clean, the
+    five buttons fit a 793-pixel-tall window (INVITE ends at y 690), 1 friend showed +20% and +7.8/s on 6.5/s. The
+    user then: commit and merge it; no notice when a friend leaves; the tile's tutorial hiding left to the agent.
+
+- **Free gift for liking and favoriting (2026-10-05)**. The user, with a reference from another game (a "Free Gift!"
+  panel: the reward big, numbered steps with a picture of the game page's button, Claim): give players something
+  like climbing speed and cash for liking and favoriting the game (no community to join yet), in the Shop's UI.
+  - *Reward*: `Economy.GiftReward(walkerLevel, income)`: 180 s of the stair walker's rate (no trail) in Climbing and
+    180 s of the flock's income in coins, at least 500 of each, so it's worth the same few minutes whenever it's
+    claimed. The snapshot carries `FreeGift`, `GiftCoins`, `GiftClimb`; the menu shows those.
+  - *Claim*: `GiftService` (`Remotes.ClaimGift`, no arguments) gives it once per player (saved `FreeGift`) and returns
+    what it gave. Claim first opens Roblox's favorite prompt (`AvatarEditorService:PromptSetFavorite(PlaceId, Asset,
+    true)`) and claims only on `PromptSetFavoriteCompleted` = Success; in an unpublished place (PlaceId 0) the prompt is
+    skipped. No game can see a like, so step 1 is asked, not checked; the server can't check the favorite either and
+    takes the claim on trust, capped at one.
+  - *UI*: `Screens/Gift` (a Medium Prize Fleece menu, cyan `Lab` header, the gift on a stage, the two rewards, two
+    step tiles with a thumb-up row and a Favorite star under red pointers, a green Claim). HUD: `GiftButton` (GIFT,
+    top of the left column) with a red "!" and the hint glow, gone once claimed. It opens by itself once a session, 30 s
+    after it can be claimed (after the first delivery), once the player is off the mountain, not carrying, and no menu
+    is open. Claiming closes it and plays the "FREE GIFT!" celebration with what was given.
+  - *Checked*: `check.ps1` passes. Own Studio on `build/GiftPlaytest.rbxl` (branch code via `rojo build` +
+    `GetObjects`): both bootstraps ready, 38 tests pass, no warnings. After a debug delivery the menu opened by itself
+    at 31 s; Claim gave +500 Climb Power and +500 coins (25 → 525, opening tier 2, before main's Climbing rework), celebrated, hid the HUD button; a
+    second claim was refused; `ResetGift` brought the button back and it opened the menu; the coin line then read +900
+    (income 5/s). Two looks rendered as mock-ups (cyan, gold). Not checked: the real favorite prompt (needs a published
+    place), phones. Then main's Climbing rework merged in: the gift now reads +500 Climbing; replayed on the
+    merged build (42 tests pass, opened at 31 s, Claim gave +500 Climbing and +500 coins, console clean).
+  - *Redesign, the user's notes*: no gift picture inside (the header's badge is enough), show off what they get, and
+    the like and favorite steps looked too basic (emoji, plain arrows): make them professional and say exactly what to
+    do. Now a Large panel 470 tall: the rewards ("+500 CLIMBING + +500 CASH") big on one stage of rays (variant B: each
+    on its own gold or green stage, `SPLIT_PRIZE`); each step a numbered card with a picture of Roblox's real game page
+    (roblox.com in its dark theme via Playwright at 4x, vote counts hidden, the other buttons faded, the one to tap
+    glowing green or gold with a 👆 tapping it; `build/gift-art`) and one line ("Tap 👍 on the game's page", "Tap
+    here, or ⭐ on its page"). Tapping the favorite card opens the prompt and ticks it. The pictures are Studio-local
+    (`rbxasset://sas/gift-*-2.png`) until uploaded. Checked after merging main (pens, leaderboards, cash): 54 tests
+    pass, opened at 31 s, the favorite card ticked with "Favorited! Now claim your gift", Claim gave +500 Climbing
+    and +500 cash, console clean.
+  - *The user's calls*: variant A (one stage); upload the pictures; it has to really register the like and the
+    favorite and give the gift. No game can see a like (no API: AvatarEditorService covers favorites only; nothing
+    in the docs for votes), so the gift registers the favorite: Claim or the favorite card checks
+    `GetFavoriteAsync` first (someone who favorited before has nothing to say yes to), then prompts, then checks
+    again. Pictures uploaded through the Studio MCP's `upload_image` (served on 127.0.0.1): like
+    rbxassetid://79093897520396, favorite rbxassetid://94266843104437; `art/gift/step-pictures.js` remakes them.
+    Checked in a playtest: both pictures load from Roblox, Claim gave +500 Climbing and the cash, a second claim was
+    refused, 54 tests pass, console clean. Not checked: the real favorite prompt (needs a published place).
+  - *Merged into main* on the user's word, after main's StairMaster walker, Sell Stall and punch were merged in and
+    played again (59 tests pass, opened at 31 s, +500 Climbing and +900 cash at 5/s income, second claim refused).
+
+- **The Sell Stall's menu, and a two-minute sell price (2026-10-05)**. The user sent Steal an Egg's Sell Pets (and
+  its Free Gift) and asked for mock-ups of the menu the Sell Stall by the plots opens: like the reference, made easier.
+  - *Mock-ups* (`DESIGN/ui/mockups/sell-stall.html`, two rounds): A, the grid four across with a sell tile on the
+    right; B, the reference's layout (sort on the left, the total along the bottom); a pick-everything-stored button;
+    one confirm for the lot.
+  - *The user's calls*: A; it opens with nothing picked and each sheep is tapped; keep Select all; the pen's sheep
+    don't show at the stall at all, so the best can't be sold by mistake (moving the best stored ones into the pen
+    comes later); selling pays two minutes of income to start (Steal an Egg pays about 100 s).
+  - *Server*: `Economy.SellSeconds` 120 (was 15). `Remotes.Sell` (ids, up to the flock's 100; 4 a second) ->
+    `FlockService.Sell`: `Roster.CanSell` (stored only, unlocked, each once, never the whole flock), then every price
+    paid at once and one snapshot. The one-at-a-time `FlockAction "Sell"` is gone.
+  - *Client*: `Screens/SellStall`, built at runtime from UIKit like the other menus: `MenuParts.CardGrid` cards with a
+    red ring and tick when picked and a LAMB / MERGED / size chip, a `SellTile` (fan of picked tokens, total, Select
+    all / Clear, Sell N), the menu's confirm with the count, the Sell accent (`Theme.Fleece.Accent.Sell`). The stall's
+    prompt opens it (`PromptController`); the Flock menu lost its sell mode. UIController mounts screens from an
+    explicit order list: the new screen had to go in it (it was missing at first and never mounted).
+  - *Kit*: `DESIGN/ui/` (README): Shear a Sheep's Prize Fleece CSS, `kit.js` with this game's token and HUD,
+    `export-data.luau` (Lune loads `GameConfig`, `Olympus` and `Economy`, so every price is the game's) and
+    `render.mjs`. The mock-ups were HTML: when they were made, five Studios were open and 2.6 GB of RAM was free.
+  - *Checked*: `check.ps1` passes; 57 tests pass in Studio (new: `CanSell`, the two-minute price). Playtested in this
+    session's own Studio (`build/SellPlaytest.rbxl`, code swapped in from `content/sas/sell-sync.rbxm`), on main's
+    code too after merging it: both bootstraps ready; the stall's prompt (E) opened the menu with only the 8 stored
+    sheep (the 6 in the pen absent); taps picked with ring and tick and summed (120 + 360 = 480); the locked lamb
+    refused with its notice; Select all took the 7 unlocked (5.1K) and turned into Clear; the confirm showed x7 and
+    5.1K; Sell left only the locked lamb, income unchanged (3,865/s), "Sold 7 for 5.1K cash". Called directly, the
+    server refused a pen sheep, a locked one and a missing id, and the old FlockAction Sell. Your Flock has no Sell.
+    Console clean. Not checked: a phone screen, gamepad, two players. The user then said build it and merge it; it
+    was checked again on main's latest code (57 tests, a sale, a pen sheep refused) and merged into main.
 - **Stair walker: a StairMaster outside the pen (2026-10-05)**. After the study below, the user: the first five looks
   are good, stick with five for now; the level floats over the machine; place it outside the pen, very close, like
   Steal an Egg's treadmill; an upgrade sign beside it to upgrade directly with cash or Robux. Earlier calls: gym at
@@ -212,6 +308,13 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   Zeus in 4.3 h; climbs never take over a minute (lower tiers zoom); every tier's numbers are in the same proportion
   (a walker level costs 60 s of one adult from the tier below), so nothing breaks, but Climbing outruns the signs
   10-70x between new tiers, so chases are easy most of the time.
+  The user then raised walker costs (10x: about ten minutes of income per upgrade; simulated 6.5 h to Zeus, Climbing
+  1.3-5x the signs), left trails alone (no prices decided yet), and replaced being sent home after a catch with a punch:
+  the god launches the thief three tiers down (same share along the tier; the foot from tiers 1-3). The server picks
+  the landing (`MountainService:Punch`), the thief's device flies them there on a tumbling arc (Remotes.Punch,
+  MovementController), both movement checks wait for the flight, and the server puts them on the spot if they aren't
+  there by then. Checked in Studio: 52 of 52 tests; caught 81% along tier 6, the thief flew 1.7 s and landed 82% along
+  tier 3, 0.4 studs from the spot, no correction; a tier 3 catch landed at the foot (x 342); no script errors.
 
 - **High Olympus's stretches lengthened to 275 (2026-10-05)**. The user felt tiers 13-30 were shorter than the first
   levels; measured from `Config/Olympus` they were: 210 studs along the floor against about 250 for tiers 1-3 and 6-9

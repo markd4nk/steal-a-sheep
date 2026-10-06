@@ -4,6 +4,11 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, friend boost**: no place changes (the HUD tile is made in code).
+
+- **2026-10-05, the free gift**: no place changes (its menu and HUD button are made at runtime; its two step
+  pictures are uploaded images). `StealASheep.rbxl` in the main checkout was rebuilt from main with it, and the open
+  main Studio got main's scripts swapped in (not saved).
 - **2026-10-05, free placement**: no place changes. The plots no longer get
   pads or a delivery pad, so the map's hay and trees inside the plots stay where the map has them (only the stair
   walker's spot is cleared); sheep walk round them. The code still expects `workspace.Base.Terrain` to be the ground

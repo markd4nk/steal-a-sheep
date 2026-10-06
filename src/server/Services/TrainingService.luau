@@ -49,7 +49,10 @@ local function stepOff(player: Player, putDown: boolean)
 	if root then
 		root.Anchored = false
 		if putDown then
-			(player.Character :: Model):PivotTo(StairClimb.ExitAt(session.Plot.Pieces.Walker.Model:GetPivot()))
+			local exit = StairClimb.ExitAt(session.Plot.Pieces.Walker.Model:GetPivot())
+			local character = player.Character :: Model
+			registry.MountainService:Teleported(player, exit.Position.X)
+			character:PivotTo(exit)
 		end
 	end
 end
@@ -65,6 +68,7 @@ local function stepOn(player: Player)
 	local offset = if rig then rig.Offset else StairClimb.Tread(0.5) + Vector3.new(0, 3, 0.2)
 	local at = plot.Pieces.Walker.Model:GetPivot() * CFrame.new(offset)
 	root.Anchored = true
+	registry.MountainService:Teleported(player, at.Position.X)
 	root.CFrame = at
 	sessions[player] = { Plot = plot, At = at }
 	player:SetAttribute("OnWalker", plot.Index)

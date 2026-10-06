@@ -33,6 +33,35 @@ function Roster.Income(flock: Flock, penSlots: number): number
 	return total
 end
 
+-- Whether these sheep can be sold together, and why not: only stored ones (the pen's earners never show at the Sell
+-- Stall, so a player can't sell their best by mistake), none locked, each once, and never the whole flock.
+function Roster.CanSell(flock: Flock, ids: { string }, penSlots: number): (boolean, string?)
+	if #ids == 0 then
+		return false, "Pick the sheep to sell"
+	end
+	local seen: { [string]: boolean } = {}
+	for _, id in ids do
+		local sheep = flock[id]
+		if not sheep or seen[id] then
+			return false, "That sheep is gone"
+		end
+		seen[id] = true
+		if Roster.IsEquipped(sheep, penSlots) then
+			return false, "Sheep in your pen can't be sold"
+		end
+		if sheep.Locked then
+			return false, "Unlock it first"
+		end
+		if sheep.Shrine then
+			return false, "It's waiting at the Merge Shrine"
+		end
+	end
+	if Roster.Count(flock) - #ids < 1 then
+		return false, "You can't sell your last sheep"
+	end
+	return true, nil
+end
+
 -- The lowest pen slot nobody stands in, or nil when the pen is full.
 function Roster.FreeSlot(flock: Flock, penSlots: number): number?
 	local taken: { [number]: boolean } = {}

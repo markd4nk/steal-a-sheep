@@ -101,12 +101,24 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   attachments folder) and delete the folder before committing. To film the game view without taking over the screen,
   pin the camera from a Client `execute_luau` (a RenderStepped that sets `CameraType` Scriptable and the CFrame), turn
   off the core UI, define a viewport over the 3D view, and record that with `foreground: false`." Seen 2026-10-05.
-- **S19** (`BRAIN/PATTERNS/sessions.md`, Worktrees): "To put uncommitted work on top of a newer main, a temporary WIP
+- **S15** (`BRAIN/GOTCHAS.md`): "A statement put in front of a line that starts with `(` joins it: `a:Call(x)` then
+  `(thing :: Model):PivotTo(cf)` on the next line is read as `a:Call(x)(thing):PivotTo(cf)`, and the formatter puts it on
+  one line. Through an untyped registry (`registry.X`) the type checker can't see the bad call, so it only fails when it
+  runs. Start such a line with a local (`local character = thing :: Model`) instead." Seen 2026-10-05 in Steal a Sheep:
+  a merge added a call before the stair walker's exit `PivotTo`, so jumping off would have errored.
+- **S19** (`BRAIN/PATTERNS/purchases.md`, or a new "Free rewards" note): "A reward for favoriting: open Roblox's own
+  prompt with `AvatarEditorService:PromptSetFavorite(game.PlaceId, Enum.AvatarItemType.Asset, true)` on the client
+  and wait for `PromptSetFavoriteCompleted` = `Success`; the server can't see favorites, so it takes the claim on trust
+  and allows one per player. No API shows whether a player liked (voted on) the game, and Roblox's Community Rules
+  forbid prizes 'in exchange for a thumb up on your game': ask for likes without tying the reward to them. In an
+  unpublished place PlaceId is 0 and there's nothing to favorite." Seen 2026-10-05 building Steal a Sheep's free gift
+  (docs and DevForum; the live prompt itself not yet tried).
+- **S20** (`BRAIN/PATTERNS/sessions.md`, Worktrees): "To put uncommitted work on top of a newer main, a temporary WIP
   commit and `git rebase main` work, but undo the commit with `git reset --soft HEAD~1`, never `git reset --soft
   main`: another session can move main while you resolve the rebase, and resetting to the new main makes your tree
   look like it reverts their commit." Seen 2026-10-05 in Steal a Sheep: main gained a merge mid-rebase, and status
   showed the StairMaster's files as deleted until the reset was redone onto the commit the rebase used.
-- **S20** (`BRAIN/PATTERNS/sessions.md`, Tools on Windows): "Python's `open(path, 'w')` on Windows writes CRLF line
+- **S21** (`BRAIN/PATTERNS/sessions.md`, Tools on Windows): "Python's `open(path, 'w')` on Windows writes CRLF line
   endings, so a script that edits a Luau or Markdown file turns every line CRLF. Open files for writing with
   `newline='\n'`, or strip `\r` afterwards." Seen 2026-10-05 in Steal a Sheep: four edited services came back all
   CRLF.

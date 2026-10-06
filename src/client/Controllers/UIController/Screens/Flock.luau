@@ -16,14 +16,13 @@ local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
 -- The player's flock in the Prize Fleece menu (Shear a Sheep's Your pen): every sheep as a card, the picked one big
--- beside them with Equip / Store and Lock, Equip Best in the header. Opened from the Sell Stall it adds Sell, with a
--- confirm showing the proceeds and the income lost.
+-- beside them with Equip / Store and Lock, Equip Best in the header. Selling is the Sell Stall's (Screens/SellStall).
 local Flock = {}
 
 local WIDTH = 780
 
 function Flock.Build(playerGui: Instance): ScreenGui
-	local gui, window = UIKit.MenuGui("Flock", "Day", "Your Flock", nil, true, nil, {
+	local gui, window = UIKit.MenuGui("Flock", "Day", "Your Flock", nil, false, nil, {
 		Accent = "Shop",
 		Badge = Theme.Icons.Wool,
 		Size = "Large",
@@ -45,9 +44,6 @@ function Flock.Build(playerGui: Instance): ScreenGui
 	UIKit.Grow(equip)
 	local lock = UIKit.Button(buttons, "LockButton", "Soft", 80, Theme.ButtonHeight.Standard, "Lock")
 	lock.LayoutOrder = 2
-	local sell = UIKit.Button(buttons, "SellButton", "Danger", 100, Theme.ButtonHeight.Standard, "Sell")
-	sell.LayoutOrder = 3
-	UIKit.Grow(sell)
 	UIKit.Text(
 		page,
 		"EmptyLabel",
@@ -90,14 +86,12 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local growthBar = detail:FindFirstChild("Bar", true) :: Frame
 	local equipButton = detail:FindFirstChild("EquipButton", true) :: TextButton
 	local lockButton = detail:FindFirstChild("LockButton", true) :: TextButton
-	local sellButton = detail:FindFirstChild("SellButton", true) :: TextButton
 	local stateController = context.Controllers.StateController
 	local sound = context.Controllers.SoundController
 
 	local sortButton = window:FindFirstChild("SortButton", true) :: TextButton
 	local sorts = { "Income", "Family", "Size", "Rank" }
 	local sortIndex = 1
-	local sellMode = false
 	local picked: string? = nil
 	local busy = false
 
@@ -143,20 +137,13 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		lines[2].Text = if sheep.Slot > 0
 			then (if sheep.Pinned then "In your pen (pinned)" else "In your pen")
 			else "Stored - not earning"
-		lines[3].Text = if sellMode
-			then `Sells for {Format.Short(sheep.Sell)} cash`
-			elseif sheep.Locked then "Locked: can't be sold or merged"
-			else ""
+		lines[3].Text = if sheep.Locked then "Locked: can't be sold or merged" else ""
 		Buttons.Set(
 			equipButton,
 			if sheep.Slot > 0 then "Soft" else "Action",
 			if sheep.Slot > 0 then "Store" else "Equip"
 		)
 		Buttons.Set(lockButton, "Soft", if sheep.Locked then "Unlock" else "Lock")
-		sellButton.Visible = sellMode
-		if sellMode then
-			Buttons.Set(sellButton, if sheep.Locked then "Disabled" else "Danger", `Sell {Format.Short(sheep.Sell)}`)
-		end
 	end
 
 	local function refresh()
@@ -173,7 +160,7 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 		penLabel.Text = `{equipped}/{data.PenSlots}`
 		if title then
-			title.Text = if sellMode then "Sell Stall" else `Your Flock ({#flock}/{data.Limit})`
+			title.Text = `Your Flock ({#flock}/{data.Limit})`
 		end
 		emptyLabel.Visible = #flock == 0
 		for _, child in list:GetChildren() do
@@ -260,24 +247,6 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			act(if sheep.Locked then "Unlock" else "Lock", sheep.Id)
 		end
 	end)
-	trove:Connect(sellButton.Activated, function()
-		local sheep = sheepById(picked)
-		if not sheep then
-			return
-		end
-		if sheep.Locked then
-			panel.Status("Unlock it first", "Bad")
-			sound:Play("Denied")
-			return
-		end
-		local lost = if sheep.Slot > 0 then `You lose +{Format.Rate(sheep.Income)}/s` else "It isn't earning now"
-		MenuParts.Confirm(gui, "Sell this sheep?", sheep.Name, lost, `Sell {Format.Short(sheep.Sell)}`, function(token)
-			SheepIcon.Paint(token, sheep.Family, sheep.Rarity)
-		end, function()
-			act("Sell", sheep.Id)
-			sound:Play("Purchase")
-		end)
-	end)
 	if panel.CloseButton then
 		trove:Connect(panel.CloseButton.Activated, function()
 			context.Close("Flock")
@@ -292,9 +261,7 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	return {
 		Modal = true,
 		StartsOpen = false,
-		Open = function(_self: Types.Screen, options: { [string]: any }?)
-			sellMode = options ~= nil and options.Sell == true
-			MenuParts.HideConfirm(gui)
+		Open = function(_self: Types.Screen)
 			refresh()
 			panel.Show()
 		end,

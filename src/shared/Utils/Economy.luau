@@ -70,7 +70,7 @@ Economy.RankNames = table.freeze({ [0] = "", [1] = "Merged", [2] = "Ascended" })
 Economy.MaxRank = 2
 Economy.LambShare = 0.5 -- a lamb earns this share of its family's base, times its fleece
 Economy.TutorialGrowth = 30
-Economy.SellSeconds = 15
+Economy.SellSeconds = 120 -- the user, 2026-10-05: two minutes of income, near Steal an Egg's 100 s, to start
 Economy.DexRewardSeconds = 30
 Economy.TutorialCoins = 60
 Economy.TutorialClimb = 25
@@ -81,6 +81,14 @@ Economy.MaxPens = 20
 Economy.MergeAfterDeliveries = 3
 Economy.GodShare = 0.8 -- a god's set speed, as a share of its tier's SlideSpeed
 Economy.SafeZoneCap = 7 -- the most times normal speed anyone walks below the safety line
+-- Each Roblox friend in the server adds this share to the flock's live income (the user, 2026-10-05: +20% each). A
+-- server holds 5, so 4 friends at most; MaxFriends caps it if servers grow.
+Economy.FriendShare = 0.2
+Economy.MaxFriends = 4
+
+Economy.GiftSeconds = 180
+Economy.GiftCoins = 500
+Economy.GiftClimb = 500
 
 -- Climbing a second on the stair walker, by its level (0 is the free one). Each level covers the gap between the
 -- next two tiers' reach in about a minute, and the last carries Zeus's Heavy target.
@@ -289,6 +297,11 @@ function Economy.Income(sheep: Sheep): number
 	return if Economy.IsAdult(sheep) then Economy.AdultIncome(sheep) else Economy.LambIncome(sheep)
 end
 
+-- What the flock's income is multiplied by with `friends` friends in the server.
+function Economy.FriendBoost(friends: number): number
+	return 1 + Economy.FriendShare * math.clamp(math.floor(friends), 0, Economy.MaxFriends)
+end
+
 -- A lamb's adult income from its smallest to its biggest possible size, for its weight (its size stays hidden).
 function Economy.FutureRange(sheep: Sheep): (number, number)
 	local odds = Economy.SizeOdds(sheep.Weight)
@@ -313,12 +326,13 @@ function Economy.DexReward(tier: number): number
 	return Economy.DexRewardSeconds * Economy.BaseIncome(tier)
 end
 
--- The upgrade from walker level L to L + 1: round(120 x 2.5^L).
+-- The upgrade from walker level L to L + 1: round(1200 x 2.5^L), about ten minutes of income from the tier
+-- below, so Climbing stays near the signs instead of racing past them.
 function Economy.WalkerCost(level: number): number?
 	if level >= Economy.MaxWalker then
 		return nil
 	end
-	return Economy.Round(120 * 2.5 ^ level)
+	return Economy.Round(1200 * 2.5 ^ level)
 end
 
 function Economy.WalkerRate(level: number): number
@@ -340,6 +354,14 @@ end
 function Economy.TrainingRate(walkerLevel: number, trail: string?): number
 	local equipped = Economy.Trail(trail)
 	return Economy.WalkerRate(walkerLevel) * (if equipped then equipped.Multiplier else 1)
+end
+
+-- The free gift for liking and favoriting the game: GiftSeconds of the player's stair walker (no trail) in Climbing and
+-- of their flock's income, never less than GiftClimb and GiftCoins, so it's worth the same few minutes whenever it's claimed.
+function Economy.GiftReward(walkerLevel: number, income: number): (number, number)
+	local coins = math.max(Economy.GiftCoins, Economy.Round(income * Economy.GiftSeconds))
+	local climb = math.max(Economy.GiftClimb, Economy.Round(Economy.WalkerRate(walkerLevel) * Economy.GiftSeconds))
+	return coins, climb
 end
 
 local function pick(random: Random, weights: { number }): number

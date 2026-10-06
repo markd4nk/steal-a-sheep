@@ -353,6 +353,8 @@ local GameConfig = {
 		HeadStart = 1.5, -- seconds before the god sets off
 		RefillSeconds = 15, -- an empty spawn after a delivery
 		DropSeconds = 30, -- a lamb a caught thief dropped lies there this long, then goes back to its pasture
+		PunchTiers = 3, -- a caught thief is punched this many tiers down the mountain (or to its foot)
+		PunchStun = 0.5, -- seconds they're held still after landing
 		PromptDistance = 10,
 		CatchStuds = 3.5,
 		CatchCheckEvery = 0.1,
@@ -534,6 +536,12 @@ local GameConfig = {
 		NoticeSeconds = 2.5,
 		NoticeQueue = 4,
 		BannerSeconds = 4,
+	},
+	-- The free gift's menu opens by itself once a session, this long after the player could first claim it (after
+	-- their first delivery), as soon as they're off the mountain and no other menu is open.
+	Gift = {
+		AutoOpenSeconds = 30,
+		FavoriteTimeout = 60, -- seconds to wait for Roblox's favorite prompt to answer
 	},
 }
 
