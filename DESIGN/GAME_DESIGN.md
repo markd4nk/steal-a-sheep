@@ -140,6 +140,15 @@ Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (l
 (`Weight`). Wild lambs: 1-1.1 mostly, 1.1-1.5 for one in twenty. Heavier lambs are slower to carry and tend to grow
 bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look a little bigger as lambs.
 
+## Merge Shrine (the user, 2026-10-05)
+The Laurel Ring in the hub, where the Mutation Machine stood: pick three grown sheep of one family in its menu, pay
+cash, and they merge into one fresh lamb of that family. Its fleece and hidden weight are rerolled (so its adult size
+too): bigger sheep in bring more luck, which makes heavy lambs likelier and opens the huge weights, the only way to a
+Titan. It can come out worse than what went in; the menu shows the odds first. The lamb pops out of an orb that
+appears over the altar only during the merge, lands on the altar, and its player picks it up and carries it home like
+a stolen lamb (no god chases it; nobody else sees or takes it); left there 30 s it goes home by itself. Its size shows
+when it grows up in the pen. `ShrineService` (server), `ShrineController` (the scene on each device), the Merge menu.
+
 ## Not built
 Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, gifting store items.
 These are just not built yet, not ruled out: build them if the user asks.

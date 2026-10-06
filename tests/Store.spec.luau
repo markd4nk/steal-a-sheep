@@ -106,7 +106,7 @@ return function(t: Run.Suite)
 		t.Expect(Economy.BestIncome({ ["2"] = fleece })).ToBe(Economy.BaseIncome(1))
 		t.Expect(Economy.Name(fleece)).ToBe("Golden Fleece")
 		t.Expect(Economy.IsAdult(sheep("4", { Family = "Kronos", Grown = 1 }))).ToBe(true)
-		local ok, why = Economy.CanMerge({
+		local ok, why = Economy.CanShrine({
 			fleece,
 			grown("5", { Family = "GoldenFleece" }),
 			grown("6", { Family = "GoldenFleece" }),

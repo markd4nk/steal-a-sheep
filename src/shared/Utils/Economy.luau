@@ -23,6 +23,7 @@ export type Sheep = {
 	-- Nil until it's been put down; such a sheep gets a free spot in the pen.
 	HomeX: number?,
 	HomeZ: number?,
+	Shrine: boolean?, -- a merged lamb still on the Merge Shrine's altar, waiting to be carried home (ShrineService)
 }
 
 export type Rarity = { Name: string, Multiplier: number, Chance: number, Color: Color3 }
@@ -63,7 +64,7 @@ Economy.Sizes = table.freeze({
 	{ Name = "Standard", Multiplier = 1, Scale = 1 },
 	{ Name = "Large", Multiplier = 1.5, Scale = 1.35 },
 	{ Name = "Giant", Multiplier = 2.5, Scale = 1.7 },
-	{ Name = "Titan", Multiplier = 4, Scale = 2.1 },
+	{ Name = "Titan", Multiplier = 5, Scale = 2.1 },
 } :: { Size })
 
 Economy.RankNames = table.freeze({ [0] = "", [1] = "Merged", [2] = "Ascended" }) :: { [number]: string }
@@ -196,20 +197,27 @@ end
 
 -- A hidden weight: Normal, Heavy or Huge band (Economy.WeightBands), anywhere in it, luck also leaning it towards the
 -- band's top. `luck` 0 (nil) is a wild lamb's; up to 1 makes heavy ones likelier and opens the Huge tail.
-function Economy.RollWeight(random: Random, luck: number?): number
+-- The Huge and Heavy bands' chances at `luck`, and the power that leans a share of a band towards its top.
+local function luckOf(luck: number?): (number, number, number)
 	local lucky = math.clamp(luck or 0, 0, 1)
 	local bands = Economy.WeightBands
 	local function chance(band: WeightBand): number
 		return band.Chance + (band.LuckyChance - band.Chance) * lucky
 	end
+	return chance(bands.Huge), chance(bands.Heavy), 1 / (1 + 2 * lucky)
+end
+
+function Economy.RollWeight(random: Random, luck: number?): number
+	local huge, heavy, lean = luckOf(luck)
+	local bands = Economy.WeightBands
 	local roll = random:NextNumber()
 	local band = bands.Normal
-	if roll < chance(bands.Huge) then
+	if roll < huge then
 		band = bands.Huge
-	elseif roll < chance(bands.Huge) + chance(bands.Heavy) then
+	elseif roll < huge + heavy then
 		band = bands.Heavy
 	end
-	local share = random:NextNumber() ^ (1 / (1 + 2 * lucky))
+	local share = random:NextNumber() ^ lean
 	return band.From + (band.To - band.From) * share
 end
 
@@ -425,12 +433,29 @@ function Economy.RollWild(random: Random): (number, number, number)
 	return rarity, weight, Economy.RollSize(random, weight)
 end
 
--- Three sheep merge when they're unlocked adults of one family, fleece and rank below the top. Returns why not.
-function Economy.CanMerge(sheep: { Sheep }): (boolean, string?)
+-- The Merge Shrine (ShrineService): three grown sheep of one family and a fee make one fresh lamb of that family. Its
+-- fleece and hidden weight are rolled again, so its adult size too: bigger sheep in bring luck, which makes heavy
+-- lambs likelier and opens the Huge weights, the only way to a Titan. The lamb can come out worse than what went in.
+Economy.ShrinePriceSeconds = 120 -- a merge costs this many seconds of one Standard adult's income of the family
+Economy.ShrineBaseLuck = 0.4 -- three Standard adults' luck; each step of size in brings more, three Titans 1
+-- Percent odds of an Ordinary, Rare and Royal lamb when all three sheep in are Ordinary, and when all three are Royal;
+-- the fleeces in between land in between.
+Economy.ShrineFleece = table.freeze({
+	Plain = { 72, 24, 4 },
+	Royal = { 30, 45, 25 },
+})
+
+local SIZE_SAMPLES = 64
+
+function Economy.ShrinePrice(family: string): number
+	return Economy.Round(Economy.ShrinePriceSeconds * Economy.BaseIncome(Economy.Tier(family).Tier))
+end
+
+-- Three sheep go in when they're different, unlocked, grown sheep of one family. Returns why not.
+function Economy.CanShrine(sheep: { Sheep }): (boolean, string?)
 	if #sheep ~= 3 then
 		return false, "Pick three sheep"
 	end
-	local first = sheep[1]
 	local ids: { [string]: boolean } = {}
 	for _, entry in sheep do
 		if ids[entry.Id] then
@@ -444,37 +469,72 @@ function Economy.CanMerge(sheep: { Sheep }): (boolean, string?)
 			return false, "Unlock it first"
 		end
 		if not Economy.IsAdult(entry) then
-			return false, "Lambs can't merge yet"
+			return false, "Only grown sheep can go in"
 		end
-		if entry.Family ~= first.Family or entry.Rarity ~= first.Rarity or entry.Rank ~= first.Rank then
-			return false, "Same family, fleece and rank"
+		if entry.Family ~= sheep[1].Family then
+			return false, "Pick three of one kind"
 		end
-	end
-	if first.Rank >= Economy.MaxRank then
-		return false, "Already Ascended"
 	end
 	return true, nil
 end
 
--- The merged sheep (without an Id): the family and fleece kept, the biggest size, one rank up, already grown.
-function Economy.MergeResult(sheep: { Sheep }): Sheep
-	local size = 1
+-- The luck three sheep bring (0 to 1, Economy.RollWeight): the base, and more for each step of size above Standard.
+function Economy.ShrineLuck(sheep: { Sheep }): number
+	local steps = 0
 	for _, entry in sheep do
-		size = math.max(size, entry.Size)
+		steps += (entry.Size - 1) / (#Economy.Sizes - 1)
 	end
-	local first = sheep[1]
-	return {
-		Id = "",
-		Family = first.Family,
-		Rarity = first.Rarity,
-		Weight = first.Weight,
-		Size = size,
-		Grown = Economy.GrowthSeconds(first),
-		Rank = first.Rank + 1,
-		Locked = false,
-		Slot = 0,
-		Pinned = false,
+	local base = Economy.ShrineBaseLuck
+	return math.clamp(base + (1 - base) * steps / math.max(#sheep, 1), 0, 1)
+end
+
+-- Percent odds of the lamb's fleece (Economy.Rarities) for the three going in.
+function Economy.ShrineFleeceOdds(sheep: { Sheep }): { number }
+	local share = 0
+	for _, entry in sheep do
+		share += (entry.Rarity - 1) / (#Economy.Rarities - 1)
+	end
+	share /= math.max(#sheep, 1)
+	local plain, royal = Economy.ShrineFleece.Plain, Economy.ShrineFleece.Royal
+	local odds = {}
+	for index, chance in plain do
+		odds[index] = chance + (royal[index] - chance) * share
+	end
+	return odds
+end
+
+-- Percent odds of each adult size (Economy.Sizes) for a lamb whose weight is rolled with `luck`: Economy.SizeOdds
+-- over Economy.RollWeight's whole spread, each band at its chance and sampled evenly through its leaning share, so
+-- the menu shows what the roll really does.
+function Economy.LuckySizeOdds(luck: number): { number }
+	local huge, heavy, lean = luckOf(luck)
+	local bands = Economy.WeightBands
+	local totals = table.create(#Economy.Sizes, 0)
+	local parts: { { Band: WeightBand, Chance: number } } = {
+		{ Band = bands.Normal, Chance = 1 - huge - heavy },
+		{ Band = bands.Heavy, Chance = heavy },
+		{ Band = bands.Huge, Chance = huge },
 	}
+	for _, part in parts do
+		local band, chance = part.Band, part.Chance
+		if chance > 0 then
+			for index = 0, SIZE_SAMPLES - 1 do
+				local share = ((index + 0.5) / SIZE_SAMPLES) ^ lean
+				local odds = Economy.SizeOdds(band.From + (band.To - band.From) * share)
+				for size, odd in odds do
+					totals[size] += odd * chance / SIZE_SAMPLES
+				end
+			end
+		end
+	end
+	return totals
+end
+
+-- The lamb's rolls: fleece, hidden weight (with the three's luck) and the adult size it will grow to.
+function Economy.ShrineRoll(random: Random, sheep: { Sheep }): (number, number, number)
+	local rarity = pick(random, Economy.ShrineFleeceOdds(sheep))
+	local weight = Economy.RollWeight(random, Economy.ShrineLuck(sheep))
+	return rarity, weight, Economy.RollSize(random, weight)
 end
 
 -- Coins an equipped sheep earns over `seconds`, growing as it goes (lamb rate until it's grown, adult rate after),

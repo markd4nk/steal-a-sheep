@@ -39,6 +39,31 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     showed Owned, a second buy refused; a Robux sheep refused at the Sell Stall and the Merge Shrine. Galaxy A06
     sideways: the window fits after the Motion fix, all five tabs fit, the Cash tab scrolls there. Screenshots in the
     session (`steal-a-sheep-store-built-*.jpg` in T3 Code's attachments).
+- **The Merge Shrine: the Laurel Ring, a gamble like Steal an Egg's Fuse Machine (2026-10-05)**. Merged into main at
+  the user's request.
+  - *How it works*: `ShrineService` builds the Laurel Ring (`ShrineService/Model`) where the Mutation Machine stood
+    (`GameConfig.Shrine.At`) and runs the merge: `FlockService.ShrineMerge` checks three grown, unlocked sheep of one
+    family and the price (`Economy.ShrinePrice`), takes them and the cash, and makes one lamb from `Economy.ShrineRoll`
+    (fleece from `ShrineFleeceOdds`, weight from the Climbing session's `RollWeight` with `ShrineLuck`, size from
+    `RollSize`), saved at once with `Shrine = true` (out of the pen, can't be equipped or sold). Its owner's client
+    plays the merge (`ShrineController/Show`, the approved mock-up's beats) and leaves the lamb on the altar with a
+    Pick up prompt; `Remotes.ShrineCollect` puts it over their head (`WildService.CarryLamb`, no god), and main's put
+    down delivers it (`FlockService.ShrineArrive`, at the spot). Return, dying, leaving, or 30 s on the altar send it to
+    the pen. The Merge menu (rewritten) is the camera on the shrine with no backdrop, the odds panel
+    (`Economy.LuckySizeOdds`, the real roll's spread), the shop's rows and a big Merge button; picks stand on the
+    pedestals (`ShrineController:Preview`). Titan grow-ups get the biggest sound.
+  - *The user's calls*: DECISIONS.md, *The Merge Shrine is a gamble*. Steal an Egg research: three of the same species,
+    a cash fee, an egg of that species with its weight rerolled (it can come out smaller), mutations lost, rarity never
+    changes; plus a separate secret shrine for two-pet recipes.
+  - *Checked*: check.ps1; 56 tests (a new shrine test: rules, luck, odds summing to 100, the roll). Playtested in my
+    own Studio copy, before and after rebasing onto main's free-roaming pens: the menu, picks on the pedestals, the
+    merge end to end (cash and the three taken, the lamb in the flock), the merge show recorded, pick up and carry
+    (weight on the carry attribute), put down in the pen (the lamb hops in and grazes), the Return button, the 30 s
+    auto send home, and the refusals (too far, mixed families, a lamb in, two, the same twice, a second merge while
+    a lamb waits, rate limit). Not checked: two players, leaving with a lamb waiting, touch and gamepad, a Titan.
+    The user then: commit and merge it; the price is fine for now; Titan x5; 30 s on the altar is good. After merging
+    main (the Sell Stall, friend boost, free gift): the Sell Stall leaves a waiting lamb out and the server refuses it;
+    60 of 60 tests, console clean, a merge paid, picked up and sent to the pen in a fresh build.
 
 - **Friend boost (2026-10-05)**. The user asked for a simple friend multiplier like other games: each friend in the
   server multiplies your income. Mock-ups A (a pill under the cash) and B (a tile under the menus, tap to invite) on

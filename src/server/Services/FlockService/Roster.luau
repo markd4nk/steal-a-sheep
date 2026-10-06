@@ -56,6 +56,9 @@ function Roster.CanSell(flock: Flock, ids: { string }, penSlots: number): (boole
 		if sheep.Locked then
 			return false, "Unlock it first"
 		end
+		if sheep.Shrine then
+			return false, "It's waiting at the Merge Shrine"
+		end
 	end
 	if Roster.Count(flock) - #ids < 1 then
 		return false, "You can't sell your last sheep"
@@ -77,7 +80,8 @@ function Roster.FreeSlot(flock: Flock, penSlots: number): number?
 	return nil
 end
 
--- Makes slots consistent after a load: none past the pen's size, none shared (the later id goes to storage).
+-- Makes slots consistent after a load: none past the pen's size, none shared (the later id goes to storage). A merged
+-- lamb still marked as waiting at the Merge Shrine (the server stopped before it got home) is just stored.
 function Roster.Normalize(flock: Flock, penSlots: number)
 	local ids: { string } = {}
 	for id in flock do
@@ -89,6 +93,7 @@ function Roster.Normalize(flock: Flock, penSlots: number)
 	local taken: { [number]: boolean } = {}
 	for _, id in ids do
 		local sheep = flock[id]
+		sheep.Shrine = nil
 		if sheep.Slot > penSlots or taken[sheep.Slot] then
 			sheep.Slot = 0
 			sheep.Pinned = false
@@ -100,14 +105,14 @@ function Roster.Normalize(flock: Flock, penSlots: number)
 end
 
 -- Equip Best: pinned sheep keep their slots; the rest of the slots go to the highest current earners, ties to the
--- older sheep (lower id). Sheep that stay equipped keep the slot they had.
+-- older sheep (lower id). Sheep that stay equipped keep the slot they had. A lamb waiting at the Merge Shrine stays out.
 function Roster.EquipBest(flock: Flock, penSlots: number)
 	local taken: { [number]: boolean } = {}
 	local candidates: { Sheep } = {}
 	for _, sheep in flock do
 		if sheep.Pinned and Roster.IsEquipped(sheep, penSlots) then
 			taken[sheep.Slot] = true
-		else
+		elseif not sheep.Shrine then
 			sheep.Pinned = false
 			table.insert(candidates, sheep)
 		end

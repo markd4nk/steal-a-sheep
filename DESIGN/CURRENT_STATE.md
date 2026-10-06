@@ -58,9 +58,10 @@ lamb.
 
 - **Server**: `DataService`, `PurchaseService` (grants by Config/Store key), `StoreService`, `SheepService`, `PlotService`, `FlockService`,
   `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
-  `GiftService`, `DebugService` (Studio only).
+  `GiftService`, `ShrineService`, `DebugService` (Studio only).
 - **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Store,
-  Popup, Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
+  Popup, Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`,
+  `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
   `Utils/Economy` (every formula), `Utils/Mountain` (ramp height, tiers by position, floor checks).
 - **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
@@ -70,7 +71,10 @@ lamb.
   the stored sheep as cards; tap them or Select all, one Sell after a confirm, two minutes of income each. Sheep in the
   pen never show and the server refuses them; the Flock menu no longer sells.
 - **From Shear a Sheep**: UIKit, Theme, Style (trimmed), Panel, Buttons, Motion, Scale, the sheep rig, add-ons and
-  breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds, the Mutation Machine (as the Merge Shrine).
+  breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds.
+- **Merge Shrine** (merged 2026-10-05): the Laurel Ring replaces the
+  Mutation Machine; three grown sheep of one family and cash make one rerolled lamb, carried home from the altar
+  (GAME_DESIGN.md, *Merge Shrine*).
 
 ## In progress
 
@@ -91,6 +95,8 @@ lamb.
   the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and
   the one-dialog-at-a-time rule with a real dialog are untested. Store on a phone: Galaxy A06 sideways only.
 
+- **Merge Shrine with two players** (another player mustn't see your picks, merge or lamb), **leaving with a lamb on
+  the altar** (should go to the pen), **touch and gamepad** in its menu, and **a Titan's grow-up** (none rolled yet).
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
   `IsFriendsWithAsync` pairs and the join notices between two real friends are untested until the place is published.
   The left column (GIFT, FLOCK, SHOP, SHEEPDEX, the friend tile) wasn't checked on a phone's short screen.

@@ -83,7 +83,7 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   `AssetFetchStatus.Failure` until Roblox's review clears it (minutes), and a Studio that fetched it before then may go
   on reporting Failure from `PreloadAsync` after it's cleared: check in a freshly opened Studio. In game code, swap in a
   new picture only once it has arrived, or a Decal shows nothing meanwhile." Seen 2026-10-05.
-- **S20** (`BRAIN/PATTERNS/desktop.md` or `ui.md`, mock-ups): "Uploaded images can't be downloaded by asset id without a
+- **S24** (`BRAIN/PATTERNS/desktop.md` or `ui.md`, mock-ups): "Uploaded images can't be downloaded by asset id without a
   login (the thumbnails API returns its placeholder for Image assets, assetdelivery returns 403). Every image any
   Studio on the computer has shown is still on disk: `%LOCALAPPDATA%\Roblox\rbx-storage\<xx>\<file>`, each an `RBXH`
   header followed by the PNG (cut from the `\x89PNG` signature). The files aren't named by asset id: extract them all,
@@ -120,10 +120,19 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   forbid prizes 'in exchange for a thumb up on your game': ask for likes without tying the reward to them. In an
   unpublished place PlaceId is 0 and there's nothing to favorite." Seen 2026-10-05 building Steal a Sheep's free gift
   (docs and DevForum; the live prompt itself not yet tried).
-- **S21** (`BRAIN/PATTERNS/ui.md`): "A ScrollingFrame with `ScrollBarThickness = 0` still draws a 1-pixel line where
+- **S20** (`BRAIN/PATTERNS/sessions.md`, Worktrees): "To put uncommitted work on top of a newer main, a temporary WIP
+  commit and `git rebase main` work, but undo the commit with `git reset --soft HEAD~1`, never `git reset --soft
+  main`: another session can move main while you resolve the rebase, and resetting to the new main makes your tree
+  look like it reverts their commit." Seen 2026-10-05 in Steal a Sheep: main gained a merge mid-rebase, and status
+  showed the StairMaster's files as deleted until the reset was redone onto the commit the rebase used.
+- **S21** (`BRAIN/PATTERNS/sessions.md`, Tools on Windows): "Python's `open(path, 'w')` on Windows writes CRLF line
+  endings, so a script that edits a Luau or Markdown file turns every line CRLF. Open files for writing with
+  `newline='\n'`, or strip `\r` afterwards." Seen 2026-10-05 in Steal a Sheep: four edited services came back all
+  CRLF.
+- **S22** (`BRAIN/PATTERNS/ui.md`): "A ScrollingFrame with `ScrollBarThickness = 0` still draws a 1-pixel line where
   its bar would be; set `ScrollBarImageTransparency = 1` as well to hide the bar." Seen 2026-10-05 on Steal a Sheep's
   store, whose tabs stand outside the window instead of a bar.
-- **S22** (`BRAIN/PATTERNS/testing-studio.md`): "`user_mouse_input`'s `instance_path` can't reach an instance whose name
+- **S23** (`BRAIN/PATTERNS/testing-studio.md`): "`user_mouse_input`'s `instance_path` can't reach an instance whose name
   has a dot in it ('Instance not found'): the dot splits the path. Name UI elements without dots (or tap by x/y)."
   Seen 2026-10-05 clicking the store's `Sheep.GoldenFleece` card.
 

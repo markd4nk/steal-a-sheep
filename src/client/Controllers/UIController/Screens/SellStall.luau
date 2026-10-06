@@ -172,11 +172,12 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local cards: { [string]: TextButton } = {}
 	local busy = false
 
-	-- The stored sheep (the pen's are never offered), cheapest or dearest first, oldest first on a tie.
+	-- The stored sheep (the pen's are never offered, nor a merged lamb still on the Merge Shrine's altar), cheapest or
+	-- dearest first, oldest first on a tie.
 	local function stored(): { View }
 		local views: { View } = {}
 		for _, sheep in stateController:Flock() do
-			if sheep.Slot == 0 then
+			if sheep.Slot == 0 and not sheep.AtShrine then
 				table.insert(views, sheep :: any)
 			end
 		end

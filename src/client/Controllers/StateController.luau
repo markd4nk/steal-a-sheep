@@ -35,6 +35,7 @@ export type SheepView = {
 	Sell: number,
 	Name: string,
 	Robux: boolean?, -- bought in the store: can't be sold or merged
+	AtShrine: boolean, -- a merged lamb still on the Merge Shrine's altar
 }
 
 local trove = Trove.new()

@@ -22,6 +22,7 @@ local registry: { Lifecycle.System } = {
 	require(Services.StoreService),
 	require(Services.GiftService),
 	require(Services.LeaderboardService),
+	require(Services.ShrineService),
 	require(Services.DebugService),
 	require(Services.ComponentService),
 }

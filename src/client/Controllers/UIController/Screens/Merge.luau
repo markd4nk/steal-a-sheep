@@ -1,256 +1,485 @@
 --!strict
 
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
+local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Theme = require(ReplicatedStorage.Config.Theme)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local UIKit = require(ReplicatedStorage.Utils.UIKit)
 local Buttons = require(script.Parent.Parent.Buttons)
-local MenuParts = require(script.Parent.Parent.MenuParts)
 local Panel = require(script.Parent.Parent.Panel)
 local SheepIcon = require(script.Parent.Parent.SheepIcon)
 local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
--- The Merge Shrine: three unlocked adults of one family, fleece and rank become one of the next rank, guaranteed. The
--- cards are the groups that can merge; the preview beside them names the three it uses (the biggest, then the two
--- that earn least), the result, the three's income against the result's, and the flock's income after.
+-- The Merge Shrine's menu (the user's mix, 2026-10-05: Shear a Sheep's mutation lab and the shop): the camera on the
+-- shrine with no backdrop (ShrineController), the odds on the left in the lab's glass panel, your grown sheep on the
+-- right as the shop's rows, and one big Merge button with the price. Picking three of one kind stands them on the
+-- pedestals; Merge pays and the shrine plays the merge (ShrineController), and the lamb lands on its altar to be
+-- carried home. The odds are the shrine's own (Economy.LuckySizeOdds, Economy.ShrineFleeceOdds) for what's picked.
+-- The menu closes when its player walks away from the shrine.
 local Merge = {}
 
 type View = {
 	Id: string,
 	Family: string,
 	Rarity: number,
-	Weight: number,
 	Size: number,
-	Rank: number,
-	Locked: boolean,
-	Slot: number,
 	Adult: boolean,
+	Locked: boolean,
 	Income: number,
-	Name: string,
+	AtShrine: boolean?,
 }
 
-type Group = { Key: string, Members: { View }, Picked: { View } }
+type Row = {
+	Tile: Frame,
+	Token: Frame,
+	Name: TextLabel,
+	Detail: TextLabel,
+	Number: TextLabel,
+	Ring: Frame,
+	Button: TextButton,
+}
 
-local MERGE_SECONDS = 1.6 -- the shrine's moment before the result shows
+local PANEL_WIDTH = 420
+local ROW_HEIGHT = 62
+local TOKEN = 46
+local ODDS_WIDTH = 236
+local ODDS_ROW = 20
+local EDGE = 16
+local ODDS_TOP = 56 -- under Roblox's buttons
+local CHECK_SECONDS = 0.25
+local PICKS = 3
+local GLASS = Color3.fromRGB(8, 14, 38)
+local GOLD_TEXT = Color3.fromRGB(255, 216, 102)
+local SIZE_DOTS = {
+	Color3.fromRGB(196, 202, 214),
+	Color3.fromRGB(94, 227, 106),
+	Color3.fromRGB(90, 168, 255),
+	Color3.fromRGB(255, 170, 40),
+}
+
+local function percent(value: number): string
+	if value >= 9.95 then
+		return `{math.floor(value + 0.5)}%`
+	elseif value >= 0.995 then
+		return `{string.format("%.1f", value)}%`
+	elseif value >= 0.005 then
+		return `{string.format("%.2f", value)}%`
+	end
+	return "<0.01%"
+end
+
+local function times(multiplier: number): string
+	return if multiplier == 1 then "" else ` x{multiplier}`
+end
+
+-- "Sun" for the Sun Sheep: what the rows' buttons say when another family is picked.
+local function shortName(family: string): string
+	return (string.gsub(Economy.Tier(family).FamilyName, " Sheep$", ""))
+end
+
+local function oddsRow(parent: Instance, name: string, order: number, color: Color3)
+	local row = UIKit.Frame(parent, name, UDim2.new(1, 0, 0, ODDS_ROW))
+	row.LayoutOrder = order
+	local dot = UIKit.Frame(row, "Dot", UDim2.fromOffset(12, 12), color)
+	dot.AnchorPoint = Vector2.new(0, 0.5)
+	dot.Position = UDim2.new(0, 3, 0.5, 0)
+	UIKit.Corner(dot, 6)
+	local edge = Instance.new("UIStroke")
+	edge.Color = Theme.Color.Line
+	edge.Thickness = 1.5
+	edge.Parent = dot
+	local label = UIKit.Text(row, "NameLabel", "", 15, Theme.Color.Snow, UDim2.new(1, -86, 1, 0), {
+		Stroke = Theme.Color.Line,
+		AlignX = Enum.TextXAlignment.Left,
+	})
+	label.Position = UDim2.fromOffset(22, 0)
+	local chance = UIKit.Text(row, "ChanceLabel", "", 15, Theme.Color.Snow, UDim2.new(0, 64, 1, 0), {
+		Stroke = Theme.Color.Line,
+		AlignX = Enum.TextXAlignment.Right,
+	})
+	chance.AnchorPoint = Vector2.new(1, 0)
+	chance.Position = UDim2.new(1, -2, 0, 0)
+end
+
+local function heading(parent: Instance, name: string, text: string, order: number): TextLabel
+	return UIKit.Text(parent, name, text, 15, GOLD_TEXT, UDim2.new(1, 0, 0, 20), {
+		Stroke = Theme.Color.Line,
+		AlignX = Enum.TextXAlignment.Left,
+		Order = order,
+	})
+end
+
+-- The lab's odds panel: dark glass with a gold edge, each size and fleece with its chance.
+local function buildOdds(root: Instance)
+	local odds = UIKit.Frame(root, "Odds", UDim2.fromOffset(ODDS_WIDTH, 0), GLASS)
+	odds.BackgroundTransparency = 0.18
+	odds.AutomaticSize = Enum.AutomaticSize.Y
+	odds.Position = UDim2.fromOffset(EDGE, ODDS_TOP)
+	UIKit.Corner(odds, 16)
+	local edge = Instance.new("UIStroke")
+	edge.Color = GOLD_TEXT
+	edge.Transparency = 0.45
+	edge.Thickness = 2
+	edge.Parent = odds
+	UIKit.Padding(odds, 10, 10, 9, 9)
+	UIKit.List(odds, false, 3)
+	local head = UIKit.Frame(odds, "SizeHead", UDim2.new(1, 0, 0, 20))
+	head.LayoutOrder = 1
+	heading(head, "TitleLabel", "SIZE", 0)
+	local luck = UIKit.Text(head, "LuckLabel", "", 13, Theme.Color.Snow, UDim2.new(0, 110, 1, 0), {
+		Font = Theme.Font.TextHeavy,
+		Stroke = Theme.Color.Line,
+		AlignX = Enum.TextXAlignment.Right,
+	})
+	luck.AnchorPoint = Vector2.new(1, 0)
+	luck.Position = UDim2.new(1, 0, 0, 0)
+	for index in Economy.Sizes do
+		oddsRow(odds, `Size{index}`, 1 + index, SIZE_DOTS[index] or SIZE_DOTS[1])
+	end
+	heading(odds, "FleeceHead", "FLEECE", 10)
+	for index, rarity in Economy.Rarities do
+		oddsRow(odds, `Fleece{index}`, 10 + index, rarity.Color)
+	end
+	UIKit.Text(odds, "HintLabel", "Bigger sheep in, more luck", 13, Theme.Fleece.Muted, UDim2.new(1, 0, 0, 18), {
+		Font = Theme.Font.TextHeavy,
+		Order = 20,
+	})
+end
 
 function Merge.Build(playerGui: Instance): ScreenGui
 	local gui, window = UIKit.MenuGui("Merge", "Day", "Merge Shrine", nil, false, nil, {
-		Accent = "Lab",
-		Badge = Theme.Icons.Helix,
+		Accent = "Gold",
+		Badge = Theme.Icons.Sparkle,
 		Size = "Large",
-		Width = 780,
+		Width = PANEL_WIDTH,
 	})
-	local page = MenuParts.Pages(window)
-	MenuParts.CardGrid(page)
-	local detail = MenuParts.Detail(page, MenuParts.GridWidth)
-	local buttons = detail:FindFirstChild("Buttons") :: Frame
-	local button = UIKit.Button(buttons, "MergeButton", "Buy", 160, Theme.ButtonHeight.Standard, "Merge")
-	UIKit.Grow(button)
-	UIKit.Text(page, "EmptyLabel", "", 18, Theme.Fleece.Muted, UDim2.new(0, MenuParts.GridWidth - 20, 0, 80), {
+	-- The shrine is the scene: no backdrop over it.
+	local backdrop = gui:FindFirstChild("Backdrop")
+	if backdrop and backdrop:IsA("GuiObject") then
+		backdrop.Visible = false
+	end
+	window.AnchorPoint = Vector2.new(1, 0.5)
+	window.Position = UDim2.new(1, -EDGE, 0.5, 0)
+	local page = window:FindFirstChild("Pages") :: Frame
+	local top = UIKit.Frame(page, "TopRow", UDim2.new(1, 0, 0, 26))
+	UIKit.Text(top, "PickLabel", "Pick 3 of one kind", 15, Theme.Fleece.Muted, UDim2.new(1, -70, 1, 0), {
+		Font = Theme.Font.TextHeavy,
+		AlignX = Enum.TextXAlignment.Left,
+	}).Position =
+		UDim2.fromOffset(6, 0)
+	local count = UIKit.Text(top, "CountLabel", "0/3", 18, Theme.Color.Snow, UDim2.new(0, 64, 1, 0), {
+		Stroke = Theme.Color.Line,
+		AlignX = Enum.TextXAlignment.Right,
+	})
+	count.AnchorPoint = Vector2.new(1, 0)
+	count.Position = UDim2.new(1, -6, 0, 0)
+	local list = UIKit.Scroller(page, "List", UDim2.new(1, 0, 1, -30), 8)
+	list.Position = UDim2.fromOffset(0, 30)
+	UIKit.Text(page, "EmptyLabel", "", 18, Theme.Fleece.Muted, UDim2.new(1, -20, 0, 80), {
 		Font = Theme.Font.TextHeavy,
 		Wrap = true,
 	}).Position =
 		UDim2.new(0, 10, 0.35, 0)
+
+	local root = gui:FindFirstChild("Root") :: Frame
+	buildOdds(root)
+	local button = UIKit.Button(root, "MergeButton", "Buy", 280, Theme.ButtonHeight.Hero, "Merge")
+	button.AnchorPoint = Vector2.new(0.5, 1)
+	button.Position = UDim2.new(0.5, -(PANEL_WIDTH + EDGE) / 2, 1, -EDGE)
 	UIKit.LightText(window)
 	gui.Parent = playerGui
 	return gui
 end
 
--- Groups of three or more unlocked adults that can merge, with the three each would use.
-local function groupsOf(flock: { View }): { Group }
-	local byKey: { [string]: { View } } = {}
-	for _, sheep in flock do
-		if sheep.Adult and not sheep.Locked and sheep.Rank < Economy.MaxRank then
-			local key = `{sheep.Family}|{sheep.Rarity}|{sheep.Rank}`
-			byKey[key] = byKey[key] or {}
-			table.insert(byKey[key], sheep)
-		end
-	end
-	local groups: { Group } = {}
-	for key, members in byKey do
-		if #members >= 3 then
-			local sorted = table.clone(members)
-			-- The biggest goes in (the result takes its size); then whichever two earn least, stored ones first.
-			table.sort(sorted, function(a: View, b: View)
-				if a.Size ~= b.Size then
-					return a.Size > b.Size
-				end
-				return (a.Slot > 0 and 1 or 0) < (b.Slot > 0 and 1 or 0)
-			end)
-			local picked = { sorted[1] }
-			local rest = { table.unpack(sorted, 2) }
-			table.sort(rest, function(a: View, b: View)
-				local aOn, bOn = a.Slot > 0, b.Slot > 0
-				if aOn ~= bOn then
-					return not aOn
-				end
-				return a.Income < b.Income
-			end)
-			table.insert(picked, rest[1])
-			table.insert(picked, rest[2])
-			table.insert(groups, { Key = key, Members = members, Picked = picked })
-		end
-	end
-	table.sort(groups, function(a: Group, b: Group)
-		return a.Picked[1].Income > b.Picked[1].Income
-	end)
-	return groups
+local function newRow(list: Instance): Row
+	local tile = UIKit.Tile(list, "Row", UDim2.new(1, -8, 0, ROW_HEIGHT))
+	-- The row's pieces in their own frame, so the ring over the tile isn't laid out with them.
+	local content = UIKit.Frame(tile, "Content", UDim2.fromScale(1, 1))
+	UIKit.Padding(content, 10, 10, 0, 0)
+	local layout = UIKit.List(content, true, 10)
+	layout.VerticalAlignment = Enum.VerticalAlignment.Center
+	local token = UIKit.Token(content, TOKEN, "Token")
+	token.LayoutOrder = 1
+	local words = UIKit.Frame(content, "Words", UDim2.new(1, -(TOKEN + 140), 0, 44))
+	words.LayoutOrder = 2
+	UIKit.Grow(words)
+	UIKit.List(words, false, 0)
+	local name = UIKit.Text(words, "NameLabel", "", 18, Theme.Color.Snow, UDim2.new(1, 0, 0, 24), {
+		Stroke = Theme.Color.Line,
+		AlignX = Enum.TextXAlignment.Left,
+		Fit = true,
+		Order = 1,
+	})
+	local detail = UIKit.Text(words, "DetailLabel", "", 14, Theme.Fleece.Muted, UDim2.new(1, 0, 0, 20), {
+		Font = Theme.Font.TextHeavy,
+		AlignX = Enum.TextXAlignment.Left,
+		Fit = true,
+		Order = 2,
+	})
+	local pick = UIKit.Button(content, "PickButton", "Action", 100, Theme.ButtonHeight.Row, "Add")
+	pick.LayoutOrder = 3
+	-- Which pedestal it stands on: a gold number on the token's corner.
+	local number = UIKit.Text(token, "NumberLabel", "", 14, Theme.Color.Snow, UDim2.fromOffset(22, 22), {
+		Stroke = Theme.Color.Line,
+	})
+	number.BackgroundTransparency = 0
+	number.BackgroundColor3 = Color3.fromRGB(255, 184, 28)
+	number.Position = UDim2.fromOffset(-6, -6)
+	number.ZIndex = 20
+	UIKit.Corner(number, 11)
+	local ring = UIKit.SelectionRing(tile)
+	ring.Visible = false
+	return {
+		Tile = tile,
+		Token = token,
+		Name = name,
+		Detail = detail,
+		Number = number,
+		Ring = ring,
+		Button = pick,
+	}
 end
 
 function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local trove = Trove.new()
 	local panel = Panel.Bind(gui, trove)
 	local window = panel.Window
+	local root = gui:FindFirstChild("Root") :: Frame
 	local list = window:FindFirstChild("List", true) :: ScrollingFrame
-	local detail = window:FindFirstChild("Detail", true) :: Frame
 	local emptyLabel = window:FindFirstChild("EmptyLabel", true) :: TextLabel
-	local view = detail:FindFirstChild("View", true) :: ViewportFrame
-	local nameLabel = detail:FindFirstChild("NameLabel", true) :: TextLabel
-	local rarityChip = detail:FindFirstChild("RarityChip", true) :: Frame
-	local rankChip = detail:FindFirstChild("RankChip", true) :: Frame
-	local rateLabel = detail:FindFirstChild("RateLabel", true) :: TextLabel
-	local stage = detail:FindFirstChild("Stage", true) :: Frame
-	local lines = {
-		detail:FindFirstChild("Line1", true) :: TextLabel,
-		detail:FindFirstChild("Line2", true) :: TextLabel,
-		detail:FindFirstChild("Line3", true) :: TextLabel,
-	}
-	local mergeButton = detail:FindFirstChild("MergeButton", true) :: TextButton
+	local countLabel = window:FindFirstChild("CountLabel", true) :: TextLabel
+	local odds = root:FindFirstChild("Odds") :: Frame
+	local luckLabel = odds:FindFirstChild("LuckLabel", true) :: TextLabel
+	local mergeButton = root:FindFirstChild("MergeButton") :: TextButton
 	local stateController = context.Controllers.StateController
+	local shrineController = context.Controllers.ShrineController
 	local sound = context.Controllers.SoundController
-	local pickedKey: string? = nil
-	local groups: { Group } = {}
+	local player = Players.LocalPlayer
+	local rows: { [string]: Row } = {}
+	local picks: { string } = {}
+	local byId: { [string]: View } = {}
 	local busy = false
+	local isOpen = false
+	local merged = false
 
-	local function current(): Group?
-		for _, group in groups do
-			if group.Key == pickedKey then
-				return group
-			end
-		end
-		return nil
+	local function coins(): number
+		local value = player:GetAttribute("Coins")
+		return if type(value) == "number" then value else 0
 	end
 
-	local function showDetail()
-		local group = current()
-		detail.Visible = group ~= nil
-		if not group then
-			return
-		end
-		local inputs = group.Picked
-		local first = inputs[1]
-		local result = Economy.MergeResult(inputs :: any)
-		local resultIncome = Economy.AdultIncome(result)
-		nameLabel.Text = Economy.Name(result)
-		Style.PaintRarity(rarityChip, SheepIcon.RarityLook(first.Rarity))
-		local rarityLabel = rarityChip:FindFirstChild("Label")
-		if rarityLabel and rarityLabel:IsA("TextLabel") then
-			rarityLabel.Text = string.upper(Economy.Rarities[first.Rarity].Name)
-		end
-		rankChip.Visible = true
-		Style.PaintRarity(rankChip, if result.Rank >= 2 then "Mythic" else "Epic")
-		local rankLabel = rankChip:FindFirstChild("Label")
-		if rankLabel and rankLabel:IsA("TextLabel") then
-			rankLabel.Text = `{string.upper(Economy.RankNames[result.Rank])} x{3 ^ result.Rank}`
-		end
-		Style.PaintStage(stage, SheepIcon.RarityLook(first.Rarity))
-		rateLabel.Text = `+{Format.Rate(resultIncome)}/s`
-		MenuParts.ShowSheep(view, first.Family, Economy.Sizes[result.Size].Scale)
-		local sizes: { string } = {}
-		local together = 0
-		local equippedIncome = 0
-		local anyEquipped = false
-		for _, sheep in inputs do
-			table.insert(sizes, Economy.Sizes[sheep.Size].Name)
-			together += sheep.Income
-			if sheep.Slot > 0 then
-				anyEquipped = true
-				equippedIncome += sheep.Income
+	local function picked(): { View }
+		local chosen: { View } = {}
+		for _, id in picks do
+			local sheep = byId[id]
+			if sheep then
+				table.insert(chosen, sheep)
 			end
 		end
-		local data = stateController:Get()
-		local flockNow = if type(data.Income) == "number" then data.Income else 0
-		local flockAfter = flockNow - equippedIncome + (if anyEquipped then resultIncome else 0)
-		lines[1].Text = `Uses 3: {table.concat(sizes, ", ")}`
-		lines[2].Text = `+{Format.Rate(together)}/s together -> +{Format.Rate(resultIncome)}/s`
-		lines[3].Text = `Flock: +{Format.Rate(flockNow)}/s -> +{Format.Rate(flockAfter)}/s`
-		Buttons.Set(mergeButton, "Buy", "Merge")
+		return chosen
 	end
 
-	local function refresh()
-		local data = stateController:Get()
-		for _, child in list:GetChildren() do
-			if child:IsA("TextButton") and child.Name ~= "CardTemplate" then
-				child:Destroy()
+	local function pickedFamily(): string?
+		local first = picks[1] and byId[picks[1]]
+		return if first then first.Family else nil
+	end
+
+	local function setOdds(chosen: { View })
+		local luck = if #chosen > 0 then Economy.ShrineLuck(chosen :: any) else Economy.ShrineBaseLuck
+		local fleece = Economy.ShrineFleeceOdds(chosen :: any)
+		local sizes = Economy.LuckySizeOdds(luck)
+		luckLabel.Text = `LUCK {math.floor(luck * 100 + 0.5)}%`
+		local function line(name: string, words: string, chance: number)
+			local row = odds:FindFirstChild(name)
+			local nameLabel = row and row:FindFirstChild("NameLabel")
+			local chanceLabel = row and row:FindFirstChild("ChanceLabel")
+			if nameLabel and nameLabel:IsA("TextLabel") and chanceLabel and chanceLabel:IsA("TextLabel") then
+				nameLabel.Text = words
+				chanceLabel.Text = percent(chance)
 			end
 		end
-		if data.MergeReady ~= true then
-			groups = {}
-			emptyLabel.Text = "The shrine opens after your third delivery"
-			emptyLabel.Visible = true
-			detail.Visible = false
+		for index, size in Economy.Sizes do
+			line(`Size{index}`, `{size.Name}{times(size.Multiplier)}`, sizes[index] or 0)
+		end
+		for index, rarity in Economy.Rarities do
+			line(`Fleece{index}`, `{rarity.Name}{times(rarity.Multiplier)}`, fleece[index] or 0)
+		end
+	end
+
+	local function setButton(ready: boolean)
+		local family = pickedFamily()
+		local price = if family then Economy.ShrinePrice(family) else nil
+		if not ready then
+			Buttons.Set(mergeButton, "Disabled", "After 3 deliveries")
+			Buttons.SetValue(mergeButton, nil)
+		elseif #picks < PICKS then
+			Buttons.Set(mergeButton, "Disabled", `Pick {PICKS - #picks} more`)
+			Buttons.SetValue(mergeButton, nil)
+		else
+			local cost = price or 0
+			Buttons.Set(mergeButton, if coins() >= cost then "Buy" else "CantAfford", "Merge")
+			Buttons.SetValue(mergeButton, Format.Short(cost), Theme.Icons.HudCash)
+		end
+	end
+
+	local function preview()
+		local stand: { { Family: string, Scale: number } } = {}
+		for _, sheep in picked() do
+			local size = Economy.Sizes[sheep.Size] or Economy.Sizes[1]
+			table.insert(stand, { Family = sheep.Family, Scale = GameConfig.SheepSize * size.Scale })
+		end
+		shrineController:Preview(stand)
+	end
+
+	local function paintRow(row: Row, sheep: View)
+		SheepIcon.Paint(row.Token, sheep.Family, sheep.Rarity)
+		local size = Economy.Sizes[sheep.Size] or Economy.Sizes[1]
+		row.Name.Text = Economy.Tier(sheep.Family).FamilyName
+		local fleece = if sheep.Rarity > 1 then ` {Economy.Rarities[sheep.Rarity].Name}` else ""
+		row.Detail.Text = `{size.Name}{fleece} · +{Format.Rate(sheep.Income)}/s`
+		local at = table.find(picks, sheep.Id)
+		row.Number.Text = if at then tostring(at) else ""
+		row.Number.Visible = at ~= nil
+		row.Ring.Visible = at ~= nil
+		local family = pickedFamily()
+		if at then
+			Buttons.Set(row.Button, "Soft", "Remove")
+		elseif sheep.Locked then
+			Buttons.Set(row.Button, "Locked", "Locked")
+		elseif #picks >= PICKS then
+			Buttons.Set(row.Button, "Disabled", "Full")
+		elseif family and family ~= sheep.Family then
+			Buttons.Set(row.Button, "Disabled", `Not {shortName(family)}`)
+		else
+			Buttons.Set(row.Button, "Action", "Add")
+		end
+	end
+
+	local refresh: () -> ()
+
+	local function toggle(id: string, button: TextButton)
+		if busy then
 			return
 		end
-		groups = groupsOf(stateController:Flock() :: any)
-		emptyLabel.Text = "Bring three grown sheep of the same family, fleece and rank"
-		emptyLabel.Visible = #groups == 0
-		if not current() then
-			pickedKey = if groups[1] then groups[1].Key else nil
+		local at = table.find(picks, id)
+		if at then
+			table.remove(picks, at)
+		else
+			local kind = Buttons.Kind(button)
+			if kind ~= "Action" then
+				Buttons.Shake(button)
+				sound:Play("Denied")
+				return
+			end
+			table.insert(picks, id)
 		end
-		for order, group in groups do
-			local first = group.Picked[1]
-			local card = MenuParts.NewCard(list, `Group{order}`, order)
-			local face = card:FindFirstChild("Face") :: Frame
-			Style.PaintCard(card, SheepIcon.RarityLook(first.Rarity))
-			SheepIcon.Paint(face:FindFirstChild("Token") :: Frame, first.Family, first.Rarity)
-			local cardName = face:FindFirstChild("NameLabel") :: TextLabel
-			cardName.Text = (string.gsub(first.Name, " Sheep$", ""))
-			local price = face:FindFirstChild("PriceLabel", true) :: TextLabel
-			price.Text = `+{Format.Rate(first.Income)}/s`
-			local count = face:FindFirstChild("CountLabel") :: TextLabel
-			count.Text = `x{#group.Members}`
-			count.Visible = true
-			trove:Connect(card.Activated, function()
-				pickedKey = group.Key
-				MenuParts.Select(list, card)
-				showDetail()
-			end)
-			if group.Key == pickedKey then
-				MenuParts.Select(list, card)
+		sound:Play("Click")
+		refresh()
+		preview()
+	end
+
+	refresh = function()
+		local data = stateController:Get()
+		local ready = data.MergeReady == true
+		table.clear(byId)
+		local eligible: { View } = {}
+		for _, sheep in stateController:Flock() :: { any } do
+			if sheep.Adult and not sheep.AtShrine and not sheep.Robux then
+				byId[sheep.Id] = sheep
+				table.insert(eligible, sheep)
 			end
 		end
-		showDetail()
+		-- Picks that are gone (sold, merged, locked meanwhile) drop out.
+		for index = #picks, 1, -1 do
+			local sheep = byId[picks[index]]
+			if not sheep or sheep.Locked then
+				table.remove(picks, index)
+			end
+		end
+		table.sort(eligible, function(a: View, b: View)
+			local tierA, tierB = Economy.Tier(a.Family).Tier, Economy.Tier(b.Family).Tier
+			if tierA ~= tierB then
+				return tierA > tierB
+			end
+			if a.Size ~= b.Size then
+				return a.Size > b.Size
+			end
+			return a.Income > b.Income
+		end)
+		local wanted: { [string]: boolean } = {}
+		for order, sheep in eligible do
+			wanted[sheep.Id] = true
+			local row = rows[sheep.Id]
+			if not row then
+				local made = newRow(list)
+				rows[sheep.Id] = made
+				local id = sheep.Id
+				trove:Connect(made.Button.Activated, function()
+					toggle(id, made.Button)
+				end)
+				row = made
+			end
+			local shown = row :: Row
+			shown.Tile.LayoutOrder = order
+			paintRow(shown, sheep)
+		end
+		for id, row in rows do
+			if not wanted[id] then
+				row.Tile:Destroy()
+				rows[id] = nil
+			end
+		end
+		list.Visible = ready and #eligible > 0
+		emptyLabel.Visible = not list.Visible
+		emptyLabel.Text = if not ready
+			then "The shrine opens after your third delivery"
+			else "Grow three sheep of one kind to merge them"
+		countLabel.Text = `{#picks}/{PICKS}`
+		setOdds(picked())
+		setButton(ready)
 	end
 
 	trove:Connect(mergeButton.Activated, function()
-		local group = current()
-		if not group or busy then
+		if busy then
+			return
+		end
+		local kind = Buttons.Kind(mergeButton)
+		if kind ~= "Buy" then
+			Buttons.Shake(mergeButton)
+			sound:Play("Denied")
 			return
 		end
 		busy = true
 		Buttons.Loading(mergeButton, true)
-		sound:Play("LabCharge")
-		task.wait(MERGE_SECONDS)
-		local ids = { group.Picked[1].Id, group.Picked[2].Id, group.Picked[3].Id }
-		local callOk, success, message = Remotes.Merge:Invoke(ids)
+		local ids = table.clone(picks)
+		local callOk, ok, message = Remotes.Merge:Invoke(ids)
 		Buttons.Loading(mergeButton, false)
 		busy = false
 		if not callOk then
 			return
 		end
-		if success then
-			sound:Play("SpinWin")
-			context.Controllers.UIController:Celebrate("MERGED!", message or "")
+		if ok then
+			-- The shrine takes it from here: the picks on the pedestals turn into the merge.
+			merged = true
+			table.clear(picks)
+			sound:Play("LabCharge")
+			context.Close("Merge")
+			task.delay(2, function()
+				if not shrineController:IsShowing() then
+					shrineController:Frame(false)
+				end
+			end)
 		else
 			sound:Play("Denied")
 			panel.Status(message or "Can't merge those", "Bad")
+			refresh()
 		end
-		refresh()
 	end)
 	if panel.CloseButton then
 		trove:Connect(panel.CloseButton.Activated, function()
@@ -258,20 +487,57 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end)
 	end
 	trove:Add(stateController.Changed:Connect(function()
-		if gui.Enabled and not busy then
+		if isOpen and not busy then
 			refresh()
 		end
 	end))
+	trove:Connect(player:GetAttributeChangedSignal("Coins"), function()
+		if isOpen then
+			setButton(stateController:Get().MergeReady == true)
+		end
+	end)
+	-- Walking away from the shrine closes it.
+	local since = 0
+	trove:Connect(RunService.Heartbeat, function(dt: number)
+		if not isOpen then
+			return
+		end
+		since += dt
+		if since < CHECK_SECONDS then
+			return
+		end
+		since = 0
+		local character = player.Character
+		local here = character and character:GetPivot().Position
+		if not here or (here - GameConfig.Shrine.At.Position).Magnitude > GameConfig.Shrine.MenuDistance then
+			context.Close("Merge")
+		end
+	end)
 
 	return {
 		Modal = true,
 		StartsOpen = false,
 		Open = function(_self: Types.Screen)
+			isOpen = true
+			merged = false
+			table.clear(picks)
 			refresh()
 			panel.Show()
+			shrineController:Frame(true)
+			preview()
 		end,
 		Close = function(_self: Types.Screen)
+			local wasOpen = isOpen
+			isOpen = false
 			panel.Hide(function() end)
+			if not wasOpen then
+				return
+			end
+			if not merged then
+				table.clear(picks)
+				shrineController:Preview({})
+				shrineController:Frame(false)
+			end
 		end,
 		Destroy = function(_self: Types.Screen)
 			trove:Clean()
