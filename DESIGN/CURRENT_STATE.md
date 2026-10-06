@@ -145,8 +145,7 @@ lamb.
 
 - **The onboarding trail on a real phone**: seen in a Studio playtest with Studio's phone emulation, walked by script
   (pen to meadow, the trail home, the walker); a player's own first run, a real phone's frame rate with the trail's
-  pathfinding (a route each 1.5 s) and other plots than Plot1 weren't tried. Removing the carried lamb's card and
-  Return came after that playtest (Studio was busy): `check.ps1` only.
+  pathfinding (a route each 1.5 s) and other plots than Plot1 weren't tried.
 - **Studs on every sheep on a phone and in a live server**: seen in a Studio playtest and in Edit on all 183 families,
   not on a real device; their cost on a low-end phone wasn't measured (no extra parts, only materials).
 - **The live game itself**: version 8 was checked only in a Studio playtest of the cloud place before its publish

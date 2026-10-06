@@ -26,7 +26,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     handles the hints after the onboarding).
   - *Then the user*: "remove the thing that says wild lamb return. That is never necessary". The carried lamb's card at
     the bottom (picture, name, Return) is gone, and so is `Remotes.ReturnSheep` with WildService's "The lamb ran back"
-    notice: nothing gives up a run now (a catch, a fall, a reset or leaving still ends one).
+    notice: nothing gives up a run now (a catch, a fall, a reset or leaving still ends one). Checked in a second
+    playtest of the cloud place (the four changed scripts swapped in, then main's put back): a debug steal carried the
+    lamb with no card or Return on screen, the chase banner as before, 84 tests, a clean console.
   - *Checked*: `check.ps1`. A playtest of the cloud place, with the two scripts swapped in from a rojo-built model and
     put back after: a blank save (`DebugBlankProfile`) on Plot1, with Studio's phone emulation on. Both bootstraps were
     ready and 84 tests passed, with nothing from our code in the console. The player was walked by script along a
