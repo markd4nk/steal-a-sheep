@@ -4,6 +4,11 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, daily gifts**: no place changes (the menu, the HUD's DAILY and the Pegasus Sheep are made at
+  runtime; `SheepService` adds the Pegasus to `ReplicatedStorage.SheepLooks` with the other families). Its six
+  pictures are uploaded images (`Theme.Icons.DailyCash1/3/5`, `DailyClimb1/3`, `Pegasus`). Tried in this session's own
+  copy of the place (`build/DailyPlaytest.rbxl`); the main Studio wasn't touched.
+
 - **2026-10-05, published to Roblox** (private): the place now lives on Roblox as place 114389615931493 (universe
   10769564664, "Steal a Sheep", getajobgle's). Its first version is `scripts/build-place.ps1`'s output at main 3c5ee43:
   scripts checked one by one against `rojo build tools/sync.project.json`, the Studio-side content fingerprinted

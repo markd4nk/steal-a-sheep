@@ -127,6 +127,18 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 	local state = states[player]
 	local income = Roster.Income(data.Sheep, data.PenSlots)
 	local giftCoins, giftClimb = Economy.GiftReward(data.WalkerLevel, income)
+	-- The daily gifts' week as the menu shows it: each day's cash or Climbing for this player now, and whose lamb Day 4
+	-- gives.
+	local amounts: { number } = {}
+	for day in Economy.DailyWeek do
+		amounts[day] = Economy.DailyAmount(day, income, data.WalkerLevel)
+	end
+	local daily = {
+		Day = data.DailyDay,
+		ReadyAt = if data.DailyAt > 0 then data.DailyAt + Economy.DailyCooldown else 0,
+		Amounts = amounts,
+		LambFamily = Olympus.Tiers[Economy.HighestStolen(data.Deliveries)].Family,
+	}
 	return {
 		Sheep = flock,
 		Count = Roster.Count(data.Sheep),
@@ -147,6 +159,7 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		FreeGift = data.FreeGift,
 		GiftCoins = giftCoins,
 		GiftClimb = giftClimb,
+		Daily = daily,
 	}
 end
 
@@ -637,6 +650,39 @@ end
 -- its fleece, weight and adult size rolled with the three's luck (Economy.ShrineRoll), saved as one change. The lamb
 -- waits on the shrine's altar (Shrine) until its owner carries it home or it goes there by itself
 -- (FlockService.ShrineArrive), and stays out of the pen meanwhile.
+-- A gift sheep (the daily gifts' lambs) joins the flock straight away: it hops into the pen on a free spot if there's
+-- room, else it's stored. `tier` is the tier a special family's sheep earns as. Nil when the flock is full.
+function FlockService.Grant(_self: any, player: Player, wild: Wild, tier: number?): Sheep?
+	local data = dataOf(player)
+	if not data or Roster.Count(data.Sheep) >= GameConfig.Theft.InventoryLimit then
+		return nil
+	end
+	local id = tostring(data.NextId)
+	data.NextId += 1
+	local slot = Roster.FreeSlot(data.Sheep, data.PenSlots)
+	local sheep: Sheep = {
+		Id = id,
+		Family = wild.Family,
+		Rarity = wild.Rarity,
+		Weight = wild.Weight,
+		Size = wild.Size,
+		Grown = 0,
+		Rank = 0,
+		Locked = false,
+		Slot = slot or 0,
+		Pinned = false,
+		Tier = tier,
+	}
+	data.Sheep[id] = sheep
+	local state = states[player]
+	if slot and state then
+		state.Arrivals[id] = {}
+	end
+	refreshPen(player)
+	push(player)
+	return sheep
+end
+
 function FlockService.ShrineMerge(
 	_self: any,
 	player: Player,

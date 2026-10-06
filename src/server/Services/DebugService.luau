@@ -95,6 +95,25 @@ local commands: { [string]: Command } = {
 		registry.FlockService:Push(player)
 		return true, nil
 	end,
+	-- Today's daily gift waits now, as if the timer had run out.
+	DailyReady = function(player)
+		local data = registry.DataService:GetData(player)
+		data.DailyAt = 0
+		registry.FlockService:Push(player)
+		return true, nil
+	end,
+	-- value: the daily gifts' day to claim next (1 to 7), waiting now.
+	DailyDay = function(player, value)
+		local data = registry.DataService:GetData(player)
+		local day = math.floor(value or 1)
+		if day < 1 or day > #Economy.DailyWeek then
+			return false, `Day 1 to {#Economy.DailyWeek}`
+		end
+		data.DailyDay = day
+		data.DailyAt = 0
+		registry.FlockService:Push(player)
+		return true, nil
+	end,
 	-- value: the stair walker level to show (1 is the free machine).
 	SetWalker = function(player, value)
 		local data = registry.DataService:GetData(player)

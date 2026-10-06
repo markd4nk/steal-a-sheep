@@ -6,10 +6,48 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Daily gifts, with the Pegasus Sheep on Day 7 (2026-10-05)**. The user: a daily gift to check in for every day,
+  better and better prizes, "day seven could be some like super rare sheep", then keep it standard; mock-ups first.
+  - *Mock-ups* (`DESIGN/ui/mockups/daily-gifts.html`, the Sell Stall's kit): A (seven in a row) and B (Days 1-6 in a
+    grid, Day 7 big beside Claim), the week in B, three looks for the sheep, the HUD button on a real screenshot. The
+    sheep was rendered in Blender from Shear a Sheep's fluffy sheep with feathered wings (`DESIGN/ui/art/pegasus.py`,
+    reading `C:\Users\markf\breed_render`); the cash and sandal pictures are the Robux store mock-up's.
+  - *The user's calls*: B; the third look (gold-tipped wings and a halo); a missed day waits; "just this week for
+    now" (the week repeats).
+  - *Server*: `DailyService` (`Remotes.ClaimDaily`, 2 in 2 s): saved `DailyDay` (1-7) and `DailyAt` (os.time of the
+    last claim); ready 20 h after a claim (`Economy.DailyCooldown`); cash and Climbing from `Economy.DailyWeek`
+    (seconds of the pen's income or the walker's rate, each with a floor); Day 4 a Rare lamb of
+    `Economy.HighestStolen`'s family and Day 7 a Pegasus lamb (`Economy.PegasusLuck` 1) through the new
+    `FlockService.Grant` (into the pen, hopping in, else stored; refused when the flock is full). The Pegasus is a
+    special family (`Economy.Specials`): a sheep's optional saved `Tier` sets what it earns and how long it grows
+    (`Economy.SheepTier`), `Economy.FamilyName`/`FamilyOrder` name and sort it (the Robux sheep too), `CanShrine`
+    refuses it. Its look: `GameConfig.Breeds.Pegasus` (white, Sparkles) and `Extras` "Pegasus": two wings of stretched
+    spheres (an arch, then primaries tipped gold, secondaries, coverts), a ring of 26 neon gold beads, gold hoof bands.
+    The snapshot's `Daily` carries the day, when the next opens and each day's amount for this player. Debug:
+    `DailyReady`, `DailyDay`.
+  - *Client*: `Screens/Daily` (laid out at the compact panel height, 600 x 318, so it's the same on a phone): day
+    cards from `UIKit.SheepCard` (blue ahead, gold and lifted with a ring today, dark with a tick claimed), Day 7 a
+    sky stage with the rendered Pegasus, SUPER RARE in a rainbow chip, Claim or "Next in 19:59:58"; a Day 7 card
+    ("Day 7!", Awesome!). The HUD's DAILY under GIFT; the left column now has a height and wraps
+    (`UIListLayout.Wraps`). Six pictures uploaded through the Studio MCP (`Theme.Icons.DailyCash1/3/5`,
+    `DailyClimb1/3`, `Pegasus`).
+  - *Checked*: `check.ps1` passes; 72 tests pass (new: the week's amounts and floors, the 20 hours, the Pegasus's
+    tier, income, name and shrine refusal, the saved fields). Played in this session's own Studio
+    (`build/DailyPlaytest.rbxl`, Studio's phone emulator): both bootstraps ready; the free gift's menu opened at 30 s
+    and, once closed, the daily menu at 45 s by itself; Claim on Day 1 gave its cash, ticked the card and counted down
+    from 19:59:57 (the HUD's DAILY too); a second claim was refused; Day 4 put a Rare lamb of the highest god in the
+    pen; Day 7 showed the Pegasus card and put a Pegasus Lamb in the pen (1,526/s for a tier-8 player, 3K-7.6K grown);
+    after it every day showed its tick and Day 1 came next. The Pegasus model, screenshotted in the sky, has the
+    render's wings, halo, hooves and sparkles. Fixed on the way: the 340-point panel ran off the phone's bottom (now
+    318), and the extra button pushed the left column off the screen (now it wraps). Replayed after merging main's
+    Robux store: the menu opened by itself at 44 s, Day 1 and Day 7 claims worked, 72 tests pass, console clean.
+  - *Merged into main* on the user's word: the prize amounts are good and the phone layout (the wrapping column) is
+    fine.
+
 - **First publish: a private test experience (2026-10-05)**. The user: "save everything that's currently there and
   then publish it to a real Roblox experience ... keep it private for now, just to test it out". Published main at
   3c5ee43 (everything merged by then) as "Steal a Sheep": universe 10769564664, place 114389615931493, owned by
-  getajobgle, audience Private.
+  getajobgle, audience Private. The daily gifts, merged into main just after, aren't in it.
   - *The place*: the main Studio held scripts from before the store, the Merge Shrine gamble and friend boost (31
     changed, 10 missing). Main's scripts went in from `rojo build tools/sync.project.json` (GetObjects swap); all 115
     then matched main and the old ones were deleted. Its Studio-side content matched a fresh `assemble.luau` build
@@ -26,7 +64,6 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     `privacyType` Private, Creator Hub shows Access and Audience Reach Private, and a Studio playtest of the cloud place
     had both bootstraps ready, 66 tests, ProfileStore "data will be saved" and no warnings. Not joined in a real
     server yet.
-
 - **The Robux store (2026-10-05)**. The user: a shop "just to buy stuff for Robux", reusing Shear a Sheep's store:
   pay-to-win sheep, 2x Growth and 2x Money passes, 2x Speed (3 Robux in Steal an Egg), the treadmill's upgrade for
   Robux beside its cash price, six Climbing ("speed") packs and five cash packs (24K for 45 up to 8M for 720); mock-ups

@@ -20,6 +20,8 @@ history: one line per item, details in the files below. Keep it under 300 lines 
   (`https://www.roblox.com/games/114389615931493`), owned by getajobgle (who owns Shear a Sheep's assets). Audience
   Private: only the owner and people with edit permission can play. Main @ 3c5ee43, its first version. Max 5 players,
   Team Create on, Studio access to API services on; no products or passes yet.
+- **Not live yet**: the daily gifts (merged into main just after the publish, a71cab4). The next publish needs the
+  user's OK.
 - The main Studio is now that cloud place (Team Create: edits there last without a Save and ship with the next
   publish). `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is
   the local copy sessions build their own Studios from; the main checkout's was rebuilt from 3c5ee43.
@@ -59,11 +61,15 @@ lamb.
   `art/store/make_store_art.py`. No products or passes exist on Roblox yet: Studio grants them with no dialog.
 - **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
   `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
+- **Daily gifts** (2026-10-05, merged into main): a week of gifts, the Pegasus Sheep on Day 7
+  (`DailyService`, `Economy.DailyWeek`/`Specials`, `Screens/Daily`, the HUD's DAILY; the Pegasus's wings, halo and
+  hooves are `SheepService/Extras` "Pegasus"). GAME_DESIGN.md, *Daily gifts*. The HUD's left column wraps into a
+  second column on short screens.
 
 - **Server**: `DataService`, `PurchaseService` (grants by Config/Store key), `StoreService`, `SheepService`, `PlotService`, `FlockService`,
   `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
-  `GiftService`, `ShrineService`, `DebugService` (Studio only).
-- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Store,
+  `GiftService`, `DailyService`, `ShrineService`, `DebugService` (Studio only).
+- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Daily, Store,
   Popup, Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`,
   `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
@@ -93,12 +99,19 @@ lamb.
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
   lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
+- Nothing from the daily gifts session (merged into main 2026-10-05 on the user's word). The published place (the
+  main Studio, Team Create) still holds main's scripts from before it until main is synced there and published.
 
 ## Not verified
 
 - **The live game itself**: nobody has joined the published place yet. Checked only in Studio on the cloud place
   (both bootstraps ready, 66 tests, ProfileStore "data will be saved", no warnings). Not yet seen in a real server:
   Shear a Sheep's meshes, faces and sounds loading, the debug panel staying hidden, the store's "Not on sale yet".
+
+- **Daily gifts over real days**: the 20-hour wait and the claims were tried with the debug day commands, not by
+  waiting; keeping the day across a real rejoin is untested (the mock store). The HUD's wrapped column was seen on
+  Studio's small phone (three columns of two), not on a tablet or a 390-point phone; the menu wasn't tried on PC
+  after the compact layout, nor with a gamepad.
 - **Real Robux purchases**: no product or pass exists yet, so nothing went through Roblox's dialog or ProcessReceipt;
   the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and
   the one-dialog-at-a-time rule with a real dialog are untested. Store on a phone: Galaxy A06 sideways only.
