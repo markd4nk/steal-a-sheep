@@ -44,6 +44,11 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     back and verified): both bootstraps ready, 88 tests (the new `Format.spec` with them), a clean console; level 1
     popped "+1" at 2.0 a second, level 30 "+2.5T" at 9.7 a second; the level tag hid while climbing and came back on
     stepping off. The Studio save was left a new player's, as found.
+  - *Merged with the onboarding trail* (the user: "Yes"): only the docs clashed (both sides kept). The pair, 23
+    scripts staged over main in the cloud place, then put back and verified: both bootstraps ready, 88 tests, a clean
+    console; no TrainMeter, Objective, GuideArrow or CarryCard in the HUD; the floor trail up for a new save; on the
+    walker the Climbing pill read +2/s and "+1" pops rose over the head. Main fast-forwarded to it; not published (the
+    live version is still 20).
   - *Checked*: `check.ps1` passes. A playtest of the cloud place with the branch's 17 scripts staged in
     (`scripts/stage_branch.py --base 3667692`, then put back and verified): both bootstraps ready, 84 tests, a clean
     console. Snapped onto the walker: `TrainRate` 2, the steps measured on the client at 1.67 steps a second; at level
