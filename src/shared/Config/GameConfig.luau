@@ -416,6 +416,40 @@ local GameConfig = {
 		PutDownReach = 12, -- the Put down prompt's reach (it sits on the lamb over the thief's head)
 	},
 
+	-- How a chase feels to the thief (ChaseController, Utils/ChaseFeel; the sounds are Config/Sounds'). Everything
+	-- follows one level, 0 (the god far off) to 1 (right behind): the heartbeat, the red edges, the drums.
+	Chase = {
+		NearStuds = 8, -- the god this close is as scary as it gets
+		FarStuds = 90, -- and from this far, as calm as a chase gets
+		HeadStartLevel = 0.3, -- while the god points, before it runs
+		Smoothing = 4, -- how fast the level follows the god, per second
+		HeartbeatBpm = { 80, 160 }, -- at level 0 and 1
+		HeartbeatSpeedUp = 0.35, -- playback speed added at level 1, so each beat is shorter
+		HeartbeatQuiet = 0.35, -- the heartbeat's volume at level 0, as a share of level 1's
+		DrumsFrom = 0.42, -- the chase music's drums start fading in at this level
+		DrumsFull = 0.75,
+		UnderscoreDuck = 0.6, -- the drumless mix drops by this share once the drums are in
+		Edges = { 0.25, 0.75 }, -- the red edges' opacity at level 0 and 1
+		Throb = { 0.12, 0.42 }, -- added on each heartbeat, at level 0 and 1
+		ThrobSeconds = 0.16,
+		Drain = 0.35, -- colour taken out of the world at level 1
+		Tint = 0.12, -- green and blue taken out at level 1, a red cast
+		StealFlash = 0.45, -- the red flash on the steal
+		StealZoom = 6, -- degrees the view narrows on the steal, springing back
+		ZoomSeconds = 0.35,
+		ShakeFrom = 0.72, -- the god's footsteps shake the view from this level
+		StepShake = 0.5, -- degrees, per footstep
+		RoarShake = 1, -- the god's roar
+		PunchShake = 2.5, -- caught
+		PunchFlash = 0.75, -- white, caught
+		SafeFlash = 0.25, -- warm, across the safety line
+		FadeSeconds = 1.2, -- the red, the grade and the heartbeat winding down after getting away
+		SnarlStuds = 16, -- a god this close to the thief it's chasing snarls instead of yelling
+		Yell = { 2.5, 4.5 }, -- seconds between a running god's yells
+		Snarl = { 1.6, 2.6 },
+		StepSeconds = 0.34, -- between footfalls when the run clip plays at 1x
+	},
+
 	-- The Merge Shrine in the hub (ShrineService builds it; the Merge menu and ShrineController show it).
 	Shrine = {
 		At = CFrame.new(287, 59.46, 245) * CFrame.Angles(0, math.rad(90), 0), -- the dais's centre on the ground

@@ -16,6 +16,7 @@ local registry: { Lifecycle.System } = {
 	require(Controllers.WalkerController),
 	require(Controllers.AnimController),
 	require(Controllers.GodController),
+	require(Controllers.ChaseController),
 	require(Controllers.ShrineController),
 	require(Controllers.PromptController),
 	require(Controllers.ComponentController),

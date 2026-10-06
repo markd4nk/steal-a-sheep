@@ -41,6 +41,18 @@ its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labe
 `Root.Size` (1/scale) and each `UITextSizeConstraint` from its `MaxPoints`/`MinPoints` attributes times the scale, as
 `UIController/Scale` does in play. Delete the `TEMP_` guis after.
 
+## The chase's sounds and red screen (2026-10-06)
+
+- Own place copy `build/ChasePlaytest.rbxl` (rojo build, then `tools/assemble.luau`, opened in its own Studio); code
+  swapped in from `content/sas/chase-sync.rbxm`.
+- A chase that lasts: `Debug Steal` (tier), then a Client `RenderStepped` loop that pivots the character a set
+  distance downhill of its god (`god.PrimaryPart.Position.X - D`, `Mountain.Floor` + 3): D shrinking walks the level
+  up; held at 18 studs it stays near the top. Past `Olympus.SafeLineX` = an escape. Return the carried lamb
+  (`Remotes.ReturnSheep:Fire()`) before the next steal, or it's refused ("You're already carrying one").
+- What to watch: `PlayerGui.ChaseScreen.Top.BackgroundTransparency` (edges), `Lighting.ChaseGrade.Saturation`,
+  `SoundService.GameSounds.RunForYourLife`/`RunForYourLifeDrums` Volume and IsPlaying, the `Heartbeat1`/`2` pool, and
+  `Sound.Played` on the god's descendants (its sounds are made on first use, so watch `DescendantAdded` too).
+
 ## Daily gifts (2026-10-05)
 
 - Own place copy `build/DailyPlaytest.rbxl` (code swapped in from `content/sas/daily-sync.rbxm`). After `GiveSheep` (the

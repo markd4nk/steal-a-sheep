@@ -285,6 +285,12 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   History row, and **Publish to Roblox** publishes that autosaved version, so Version History and Server management
   show the autosave's time, not the publish's. Check that every edit came before that time." Seen 2026-10-06 in Steal
   a Sheep: version 8 was autosaved at 08:42 and published at 08:51.
+- **S48** (`BRAIN/GOTCHAS.md`, Assets): "APM's alternate mixes of one track (the plain title, '(80%)', '(40%)', 'B')
+  are separate assets that start together: 'Run For Your Life' full and '(80%)' (no drums) line up to about 10 ms.
+  Play two as layers and crossfade them for intensity (drums in as danger grows). Their lengths differ by a second, so
+  don't use `Looped`: jump both `TimePosition`s from a loop end back to a loop start you've measured (a bar multiple
+  where the audio matches), and resync the second to the first when they drift. Find them by searching the track's
+  name." Seen 2026-10-06 in Steal a Sheep's chase music (cross-correlated offline, playing in sync in a playtest).
 
 ## Done
 
