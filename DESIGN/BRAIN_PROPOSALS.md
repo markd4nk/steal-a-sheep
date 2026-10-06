@@ -321,6 +321,18 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   fires `Activated`. Remake the cards only when the list itself changes (a key of the ids in order and the fields the
   cards are made from) and update the numbers in place; redraw a ViewportFrame only when what it shows changes." Seen
   2026-10-06 in Steal a Sheep: with a lamb growing, the Flock menu's cards couldn't be picked until it kept them.
+- **S54** (`BRAIN/PATTERNS/trailers.md`): "A Studio playtest wears the signed-in account's own avatar, which may be a
+  licensed character (a cartoon cat, a film hero) that a game page, thumbnail or ad can't show. Before filming, give
+  the character a plain look from the server: a `HumanoidDescription` with body colours (the classic noob: yellow
+  head and arms, blue torso, green legs) and a dynamic head, through `ApplyDescriptionAsync`; reapply on
+  `CharacterAdded`. Set its expression each frame after the Animator on the head's `FaceControls` (`JawDrop`,
+  `LipStretcher`, brow and lid raisers for shock; `LipCornerPuller`, `CheekRaiser` for a grin)." Seen 2026-10-06 in
+  Steal a Sheep's gameplay thumbnails: the test account's avatar was a Tom and Jerry cat.
+- **S55** (`BRAIN/PATTERNS/testing-studio.md`): "For a still, freeze or stage it on the client, not the server:
+  `RunService:Pause()` from a Server `execute_luau` stops the server's NPCs, but the client keeps simulating its own
+  character (it moved 11 studs on after the pause), and a server pause blocks the next remote. Pin the character and
+  NPCs with a client RenderStep (`PivotTo` each frame) and pose them over the Animator; the server's copies can stay
+  where they are." Seen 2026-10-06 in Steal a Sheep while framing thumbnails mid-chase.
 
 ## Done
 

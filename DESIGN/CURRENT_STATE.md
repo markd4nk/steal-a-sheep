@@ -153,7 +153,8 @@ lamb.
 
 - **Game page art and a trailer, first cuts** (overnight 2026-10-05, nothing uploaded): icon and thumbnail mock-ups
   (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and
-  thumbnails for now (2026-10-06). The 9:16 cut still carries the game's APM music, which can't go to TikTok or Shorts
+  thumbnails for now (2026-10-06). Five thumbnails from real gameplay frames (2026-10-06, `gamepage_play_*` in T3
+  Code's attachments, `art/gamepage/gameplay_thumbs.py`) wait for the user's pick; nothing uploaded. The 9:16 cut still carries the game's APM music, which can't go to TikTok or Shorts
   (BRAIN trailers.md): it needs a licensed track first.
 
 - Nothing from the free gift session (merged into main 2026-10-05).

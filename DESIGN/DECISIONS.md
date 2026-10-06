@@ -274,6 +274,14 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
 
 ## To review
 
+Calls in the gameplay thumbnails (2026-10-06, `art/gamepage/gameplay_thumbs.py`, nothing uploaded):
+
+- **The thief is a classic noob with Roblox's "Shocked" head**, not a player's avatar (the test account's is a licensed
+  cartoon character, which a game page can't show).
+- **Every thumbnail carries only the "STEAL A SHEEP!" title**, no captions; clean copies exist without it.
+- **Staged moments, real models**: the gods and thief were placed beside each other for the frame and the god posed
+  with the game's own lunge and glide clips at a chosen instant; the pen's 16 sheep were stood facing the camera.
+
 Calls in the god lunge, belly glide and surf (2026-10-06, `Utils/BodyClips`, `GodController`, `SlideController`):
 
 - **The lunge takes 0.84 s and the dive is 1.6x faster from 0.22 to 0.56 s in** (about 3 studs gained at tier 1), as

@@ -6,6 +6,17 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Five game page thumbnails from gameplay (2026-10-06, branch `t3code/04bf2e2b`, nothing uploaded)**. The user:
+  "create a couple thumbnails based off just clips from the actual game ... a player running with a sheep, a lamb ...
+  five thumbnails". Shot in a Studio playtest of a place copy built from main 7270d54 (the lunge, belly glide and surf
+  included): 1 Pan diving face first at the thief in the meadow, 2 Zeus diving with his bolt on High Olympus, 3 Pan
+  glaring behind a grinning thief, 4 Tyche belly-gliding after the surfing thief with the snow and lava stages behind,
+  5 a full pen of 16 grown sheep in front of the mountain. Each has the "STEAL A SHEEP!" title (`compose.py`) and a
+  clean copy. How every frame was staged is in `art/gamepage/README.md`.
+  - *Checked*: `check.ps1`; every frame is the game's own render (models, faces, the game's clips), the thief a noob
+    instead of the test account's licensed-character avatar. The overnight trailer takes were looked at first: too
+    wide for thumbnails.
+
 - **Gods lunge and belly-glide, players surf down (2026-10-06, branch `t3code/god-chase-animation-mockups`, merged
   into main on the user's word, not published)**. The user: the gods used Roblox's idle, walk and run, the planned lunge and belly chase weren't built, and
   the slide was Roblox's sit; "show me some mock-ups ... a video perhaps". A 29 s mock-up video (Now; the god's chase;
