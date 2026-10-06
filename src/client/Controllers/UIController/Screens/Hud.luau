@@ -152,6 +152,10 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	alertOn(dex, "").Visible = false
 	local friends = UIKit.PictureButton(tiles, "FriendButton", Theme.Icons.HudInvite, PICTURE_SIZE, "INVITE")
 	friends.LayoutOrder = 4
+	-- The Robux store on the right edge, where the left column has no room left (as the reference game's store buttons).
+	local storeButton = UIKit.PictureButton(root, "StoreButton", Theme.Icons.HudRobux, PICTURE_SIZE, "STORE")
+	storeButton.AnchorPoint = Vector2.new(1, 0.5)
+	storeButton.Position = UDim2.new(1, -8, 0.5, 0)
 
 	local banner = UIKit.Banner(root, "Banner")
 	banner.AnchorPoint = Vector2.new(0.5, 0)
@@ -229,6 +233,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local objectiveSub = objective:FindFirstChild("SubLabel") :: TextLabel
 	local objectiveBar = objective:FindFirstChild("Bar") :: Frame
 	local tiles = root:FindFirstChild("Tiles") :: Frame
+	local storeButton = root:FindFirstChild("StoreButton") :: TextButton
 	local banner = root:FindFirstChild("Banner") :: TextLabel
 	local arrow = root:FindFirstChild("GuideArrow") :: Frame
 	local arrowLabel = arrow:FindFirstChild("Label") :: TextLabel
@@ -466,6 +471,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local function refreshTiles()
 		local data = stateController:Get()
 		tiles.Visible = (data.Tutorial or 0) >= 1
+		storeButton.Visible = tiles.Visible
 		local unclaimed = data.FreeGift == false
 		giftButton.Visible = unclaimed
 		Motion.SetGlow(Motion.FindGlow(giftButton), unclaimed and tiles.Visible)
@@ -493,7 +499,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		local tier = player:GetAttribute("CarryTier")
 		if type(family) == "string" and type(tier) == "number" then
 			SheepIcon.Paint(carryToken, family, 1)
-			carryName.Text = string.gsub(Olympus.Tiers[tier].FamilyName, "Sheep$", "Lamb")
+			carryName.Text = string.gsub(Economy.FamilyName(family), "Sheep$", "Lamb")
 		end
 	end
 	trove:Connect(returnButton.Activated, function()
@@ -559,6 +565,9 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end)
 	trove:Connect((tiles:FindFirstChild("ShopButton") :: TextButton).Activated, function()
 		context.Open("Shop")
+	end)
+	trove:Connect(storeButton.Activated, function()
+		context.Open("Store")
 	end)
 	trove:Connect((tiles:FindFirstChild("SheepdexButton") :: TextButton).Activated, function()
 		context.Open("Sheepdex")

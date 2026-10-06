@@ -75,12 +75,6 @@ function StairClimb.StepSeconds(level: number): number
 	return config.StepSeconds + config.StepRange * config.StepDecay ^ (math.max(level, 1) - 1)
 end
 
--- The Robux offer for the level after `level` (saved WalkerLevel, 0-based): its price and developer product id.
-function StairClimb.RobuxOffer(level: number): { Price: number, ProductId: number }
-	local offers = GameConfig.StairWalker.Robux
-	return offers[math.clamp(level + 1, 1, #offers)]
-end
-
 -- Where step `index` (1 to Steps) is, in steps above the lower foot, `cycle` steps into the run.
 function StairClimb.StepAt(index: number, cycle: number): number
 	return (index - 1 - cycle % 1 - StairClimb.Lowest) % StairClimb.Steps + StairClimb.Lowest

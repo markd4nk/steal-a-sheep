@@ -48,14 +48,20 @@ lamb.
 - **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
   Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
   `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
+- **Robux store** (2026-10-05, merged into main): the HUD's STORE (right edge) opens one
+  scrolling page with its section tabs outside the window: two Robux-only sheep, 2x Money / 2x Growth passes, 2x Speed
+  (re-buyable, tripling), the walker's next level, Climbing and Cash packs. `Config/Store` (catalog, prices, ladders),
+  `StoreService` (dialogs, passes), `PurchaseService/Products` (grants by key), `Screens/Store`; art from
+  `art/store/make_store_art.py`. No products or passes exist on Roblox yet: Studio grants them with no dialog.
 - **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
   `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
 
-- **Server**: `DataService`, `PurchaseService` (pack; the walker's Robux levels, no products made yet), `SheepService`, `PlotService`, `FlockService`,
+- **Server**: `DataService`, `PurchaseService` (grants by Config/Store key), `StoreService`, `SheepService`, `PlotService`, `FlockService`,
   `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
   `GiftService`, `ShrineService`, `DebugService` (Studio only).
-- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Popup,
-  Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`, `PromptController`.
+- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Store,
+  Popup, Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`,
+  `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
   `Utils/Economy` (every formula), `Utils/Mountain` (ramp height, tiers by position, floor checks).
 - **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
@@ -72,18 +78,28 @@ lamb.
 
 ## In progress
 
+- **The Robux store can't sell yet** (merged 2026-10-05; the user: Creator Hub later): once the game is published,
+  make the 2 passes and 49 developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) at
+  Config/Store's prices and put their ids in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`). `StealASheep.rbxl` wasn't
+  rebuilt with the store: run `scripts/build-place.ps1` (or swap main's scripts into the open Studio).
+
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
   lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
-- **Six sheep a tier and the new Sheepdex, built on t3code/sheep-deck-mockup (2026-10-05), not merged**: each god's
-  six families (`Config/Herds`), rolled for every wild lamb; fleeces Plain / Shiny / Royal; Sheepdex rewards claimed in
-  the new Sheepdex (`SheepdexService`, save schema 3) with a herd gift for all six. HISTORY.md has the details; the
-  gods' new order (t3code/order-olympian-gods) still has to merge for tiers to match the lineup the user OK'd.
+- **Six sheep a tier and the new Sheepdex** (merged 2026-10-05): each god's six families (`Config/Herds`), rolled for
+  every wild lamb; fleeces Plain / Shiny / Royal; Sheepdex rewards claimed in the new Sheepdex (`SheepdexService`,
+  save schema 3) with a herd gift for all six. HISTORY.md has the details. Zeus's Legendary is the Golden Ram (the
+  store's Robux sheep is the Golden Fleece). The gods' new order (t3code/order-olympian-gods) still has to merge for
+  tiers to match the lineup the user OK'd.
 
 ## Not verified
+
+- **Real Robux purchases**: no product or pass exists yet, so nothing went through Roblox's dialog or ProcessReceipt;
+  the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and
+  the one-dialog-at-a-time rule with a real dialog are untested. Store on a phone: Galaxy A06 sideways only.
 
 - **Merge Shrine with two players** (another player mustn't see your picks, merge or lamb), **leaving with a lamb on
   the altar** (should go to the pen), **touch and gamepad** in its menu, and **a Titan's grow-up** (none rolled yet).

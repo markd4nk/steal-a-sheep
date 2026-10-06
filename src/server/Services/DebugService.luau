@@ -10,6 +10,7 @@ local Economy = require(ReplicatedStorage.Utils.Economy)
 local Herds = require(ReplicatedStorage.Config.Herds)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
+local Store = require(ReplicatedStorage.Config.Store)
 
 -- Studio-only test tools behind the debug panel (client `UIController/Screens/DebugPanel`) and the Studio MCP:
 -- `require(ReplicatedStorage.Remotes).Debug:Invoke("AddCash", 500)` from a Client `execute_luau`. Every command is
@@ -128,12 +129,14 @@ local commands: { [string]: Command } = {
 		end
 		return false, "data not loaded"
 	end,
-	-- value: the developer product's id. Its grant runs as a purchase's would, with no dialog or receipt.
+	-- value: the developer product's id. Its grant runs as a purchase's would, with no dialog or receipt. (The store
+	-- grants products without an id straight away in Studio.)
 	GrantProduct = function(player, value)
-		if not value then
-			return false, "which product id?"
+		local key = if value then Store.KeyOfProduct(value) else nil
+		if not key then
+			return false, "no store product has that id"
 		end
-		return registry.PurchaseService:Grant(player, value)
+		return registry.PurchaseService:Grant(player, key)
 	end,
 	-- value: the pass's id. It counts as bought in this session.
 	GrantPass = function(player, value)

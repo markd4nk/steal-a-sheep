@@ -34,6 +34,7 @@ export type SheepView = {
 	High: number,
 	Sell: number,
 	Name: string,
+	Robux: boolean?, -- bought in the store: can't be sold or merged
 	AtShrine: boolean, -- a merged lamb still on the Merge Shrine's altar
 }
 
@@ -82,9 +83,12 @@ local ORDERS: { [string]: (a: SheepView, b: SheepView) -> boolean? } = {
 		return if a.Income ~= b.Income then a.Income > b.Income else nil
 	end,
 	Family = function(a, b)
+		-- The store's sheep have no tier: they sort after Zeus's.
 		local tierA, tierB = Olympus.ByFamily[a.Family], Olympus.ByFamily[b.Family]
-		if tierA and tierB and tierA.Tier ~= tierB.Tier then
-			return tierA.Tier < tierB.Tier
+		local numberA = if tierA then tierA.Tier else Olympus.Count + 1
+		local numberB = if tierB then tierB.Tier else Olympus.Count + 1
+		if numberA ~= numberB then
+			return numberA < numberB
 		end
 		return nil
 	end,

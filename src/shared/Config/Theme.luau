@@ -579,7 +579,26 @@ local Theme = {
 		-- Prize Fleece (2026-10-03): the pack's shoe (the Upgrades menu's Walk speed), warning sign (Pen Full), dog (the
 		-- kennel), paw (the wolf den), house (the land a rebirth keeps), tick and padlock (a requirement met or still to
 		-- do); and the shears drawn to the packs' rules for Shear size (art/menu/make_shears_icon.py).
-		HudShoe = "rbxassetid://115583544742451",
+		-- Hermes' winged sandal (the user, 2026-10-05: the climbing shoe looks like Hermes'), art/store/make_store_art.py.
+		HudShoe = "rbxassetid://123930258499636",
+		-- The Robux store's pictures (art/store, drawn 2026-10-05): each Climbing and Cash pack's, growing with its size,
+		-- 2x Speed's gold-winged sandal, the passes', the stair walker's, and the HUD's store button.
+		StoreClimb1 = "rbxassetid://92648617688814",
+		StoreClimb2 = "rbxassetid://89797659786440",
+		StoreClimb3 = "rbxassetid://137353699797704",
+		StoreClimb4 = "rbxassetid://119205893472699",
+		StoreClimb5 = "rbxassetid://76293814628298",
+		StoreClimb6 = "rbxassetid://122743274015042",
+		StoreCash1 = "rbxassetid://117932920602228",
+		StoreCash2 = "rbxassetid://139803548988276",
+		StoreCash3 = "rbxassetid://105193632516792",
+		StoreCash4 = "rbxassetid://105614424944752",
+		StoreCash5 = "rbxassetid://94605086224793",
+		StoreSpeed = "rbxassetid://131569026987393",
+		StoreMoney = "rbxassetid://85191990593929",
+		StoreGrowth = "rbxassetid://93291322088839",
+		StoreWalker = "rbxassetid://138905170230021",
+		HudRobux = "rbxassetid://112293379714602",
 		HudWarning = "rbxassetid://79323446999830",
 		HudDog = "rbxassetid://130996484032696",
 		HudPaw = "rbxassetid://119373941015314",
@@ -675,7 +694,6 @@ local Theme = {
 		HudDaily = { [64] = "rbxassetid://100492887401375", [128] = "rbxassetid://100330758183713" },
 		HudCrown = { [64] = "rbxassetid://70881977478097", [128] = "rbxassetid://100103917334139" },
 		HudUpgrade = { [64] = "rbxassetid://129079502301626", [128] = "rbxassetid://80362475823286" },
-		HudShoe = { [64] = "rbxassetid://86142016100021", [128] = "rbxassetid://138884847358739" },
 		HudWarning = { [64] = "rbxassetid://133818832916616", [128] = "rbxassetid://132431273945364" },
 		HudDog = { [64] = "rbxassetid://124860465665342", [128] = "rbxassetid://87451805635726" },
 		HudPaw = { [64] = "rbxassetid://87357528265338", [128] = "rbxassetid://120537429573505" },

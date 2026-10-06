@@ -5,6 +5,7 @@ local ProximityPromptService = game:GetService("ProximityPromptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
@@ -117,12 +118,12 @@ local function refreshPutDown()
 		return
 	end
 	dropPutDown()
-	local tier = player:GetAttribute("CarryTier")
+	local family = player:GetAttribute("CarriedFamily")
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "PutDownPrompt"
 	prompt.ActionText = "Put down"
-	prompt.ObjectText = if type(tier) == "number" and Olympus.Tiers[tier]
-		then (string.gsub(Olympus.Tiers[tier].FamilyName, "Sheep$", "Lamb"))
+	prompt.ObjectText = if type(family) == "string" and Olympus.ByFamily[family]
+		then (string.gsub(Economy.FamilyName(family), "Sheep$", "Lamb"))
 		else ""
 	prompt.HoldDuration = 0
 	prompt.KeyboardKeyCode = Enum.KeyCode.E

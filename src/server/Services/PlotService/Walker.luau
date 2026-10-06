@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
 local StairClimb = require(ReplicatedStorage.Utils.StairClimb)
+local Store = require(ReplicatedStorage.Config.Store)
 
 -- The stair walker machine outside a pen and the upgrade sign beside it. Built in machine space (Utils/StairClimb):
 -- the model's pivot is the machine's frame, -Z up the stairs. Each level has a look (the last one carries on above
@@ -570,8 +571,7 @@ function Walker.Paint(pieces: Pieces, level: number?, ownerId: number?)
 	if level and not cost then
 		next = "MAX LEVEL"
 	elseif level and cost then
-		local offer = StairClimb.RobuxOffer(level)
-		next, cash, robux = `LV {shown + 1}`, `{Format.Short(cost)} cash`, `R$ {offer.Price}`
+		next, cash, robux = `LV {shown + 1}`, `{Format.Short(cost)} cash`, `R$ {Store.WalkerPrice(level)}`
 		pieces.CoinPrompt.ObjectText = cash
 		pieces.RobuxPrompt.ObjectText = robux
 	end

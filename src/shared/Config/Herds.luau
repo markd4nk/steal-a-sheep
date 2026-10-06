@@ -49,7 +49,7 @@ Herds.ByGod = table.freeze({
 	Hestia = { "Hearth", "Cozy", "Cinnamon", "Loaf", "Hearthkeeper", "EternalFlame" },
 	Poseidon = { "Tide", "Wave", "Coral", "Trident", "Kraken", "SeaKing" },
 	Hera = { "Crown", "Lady", "Peacock", "Empress", "SilverQueen", "PeacockRoyal" },
-	Zeus = { "Thunder", "Thundercloud", "Eagle", "Lightning", "GoldenFleece", "KingOfOlympus" },
+	Zeus = { "Thunder", "Thundercloud", "Eagle", "Lightning", "GoldenRam", "KingOfOlympus" },
 }) :: { [string]: { string } }
 
 -- Each family's rarity (an index into Rarities) and its god.
@@ -1200,8 +1200,9 @@ Herds.Looks = table.freeze({
 		Face = "Sly",
 		Extras = { extra("Bolt", rgb(120, 200, 255)) },
 	},
-	GoldenFleece = {
-		Name = "Golden Fleece Sheep",
+	-- Not "Golden Fleece": that's the Robux store's sheep (GameConfig, Economy.RobuxSheep).
+	GoldenRam = {
+		Name = "Golden Ram Sheep",
 		WoolStyle = "Ringlets",
 		WoolColor = rgb(255, 205, 60),
 		WoolMaterial = Material.Foil,

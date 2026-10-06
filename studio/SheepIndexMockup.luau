@@ -102,7 +102,7 @@ local SECTIONS: { Section } = {
 				Claimed = true,
 			},
 			{
-				Name = "Golden Fleece",
+				Name = "Golden Ram",
 				Look = {
 					WoolStyle = "Ringlets",
 					WoolSize = 1.25,

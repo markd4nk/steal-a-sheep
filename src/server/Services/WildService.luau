@@ -205,7 +205,7 @@ local function fill(spawn: Spawn)
 	place(spawn)
 end
 
--- A Royal fleece, or a Legendary or Mythic family: "A Mythic Golden Fleece Lamb appeared in Zeus's pasture!"
+-- A Royal fleece, or a Legendary or Mythic family: "A Mythic King of Olympus Lamb appeared in Zeus's pasture!"
 local function announce(spawn: Spawn)
 	local tier = Olympus.Tiers[spawn.Tier]
 	local rolled = spawn.Roll

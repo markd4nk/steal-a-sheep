@@ -1,6 +1,5 @@
 --!strict
 
-local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -9,15 +8,15 @@ local Format = require(ReplicatedStorage.Utils.Format)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Remotes = require(ReplicatedStorage.Remotes)
-local StairClimb = require(ReplicatedStorage.Utils.StairClimb)
+local Store = require(ReplicatedStorage.Config.Store)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- Coin purchases (the next stair walker level, the next pen slot, trails in order) and the hub's three stations: the
 -- map's two stalls become the Shop and the Sell Stall, and the Merge Shrine's prompt (ShrineService builds the shrine)
 -- stands on its front steps. A station's prompt
 -- carries an Opens attribute; the client opens that screen (PromptController). Trails train faster and show on the
--- player as a coloured trail. Each stair walker's sign upgrades it straight away, for cash or Robux (a developer
--- product per price, PurchaseService/Products).
+-- player as a coloured trail. Each stair walker's sign upgrades it straight away, for cash or Robux (the Robux store's
+-- walker products, through StoreService).
 local ShopService = { Name = "ShopService" }
 
 local SHRINE_PROMPT = CFrame.new(0, 4, -12) -- from the shrine's centre: on the front of its dais
@@ -235,22 +234,18 @@ function ShopService.Start(_self: any)
 			if plot.Owner ~= player or not data or not Economy.WalkerCost(data.WalkerLevel) then
 				return
 			end
-			local offer = StairClimb.RobuxOffer(data.WalkerLevel)
-			if offer.ProductId > 0 then
-				MarketplaceService:PromptProductPurchase(player, offer.ProductId)
-			else
-				Remotes.Notify:Fire(player, "Robux upgrades aren't on sale yet", "Bad", "Denied")
+			-- The store's own walker products (Config/Store), so one dialog at a time and the price ladder are kept.
+			local ok, message = registry.StoreService:Request(player, "Walker")
+			if message then
+				Remotes.Notify:Fire(player, message, if ok then "Good" else "Bad", if ok then "Upgrade" else "Denied")
 			end
 		end)
 	end
-	trove:Add(registry.PurchaseService.Granted:Connect(function(player: Player, productId: number)
-		for _, offer in GameConfig.StairWalker.Robux do
-			if offer.ProductId == productId then
-				local data = registry.DataService:GetData(player)
-				local level = if data then data.WalkerLevel + 1 else 0
-				Remotes.Notify:Fire(player, `Stair walker level {level}!`, "Good", "Upgrade")
-				return
-			end
+	trove:Add(registry.PurchaseService.Granted:Connect(function(player: Player, key: string)
+		if Store.Split(key) == "Walker" then
+			local data = registry.DataService:GetData(player)
+			local level = if data then data.WalkerLevel + 1 else 0
+			Remotes.Notify:Fire(player, `Stair walker level {level}!`, "Good", "Upgrade")
 		end
 	end))
 	local function watch(player: Player)

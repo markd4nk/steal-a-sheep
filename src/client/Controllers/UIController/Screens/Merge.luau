@@ -81,7 +81,7 @@ end
 
 -- "Sun" for the Sun Sheep: what the rows' buttons say when another family is picked.
 local function shortName(family: string): string
-	return (string.gsub(Economy.Tier(family).FamilyName, " Sheep$", ""))
+	return (string.gsub(Economy.FamilyName(family), " Sheep$", ""))
 end
 
 local function oddsRow(parent: Instance, name: string, order: number, color: Color3)
@@ -390,7 +390,7 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		table.clear(byId)
 		local eligible: { View } = {}
 		for _, sheep in stateController:Flock() :: { any } do
-			if sheep.Adult and not sheep.AtShrine then
+			if sheep.Adult and not sheep.AtShrine and not sheep.Robux then
 				byId[sheep.Id] = sheep
 				table.insert(eligible, sheep)
 			end

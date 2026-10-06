@@ -19,6 +19,7 @@ local registry: { Lifecycle.System } = {
 	require(Services.MountainService),
 	require(Services.TrainingService),
 	require(Services.ShopService),
+	require(Services.StoreService),
 	require(Services.GiftService),
 	require(Services.SheepdexService),
 	require(Services.LeaderboardService),
