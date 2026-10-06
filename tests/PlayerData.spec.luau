@@ -49,6 +49,12 @@ return function(t: Run.Suite)
 		t.Expect((PlayerData.Validate({ Sheep = { ["2"] = sheep("1") } }))).ToBe(false)
 	end)
 
+	t.Test("the free gift is a flag", function()
+		t.Expect(PlayerData.Template.FreeGift).ToBe(false)
+		t.Expect((PlayerData.Validate({ FreeGift = true }))).ToBe(true)
+		t.Expect((PlayerData.Validate({ FreeGift = 1 }))).ToBe(false)
+	end)
+
 	t.Test("accepts a sheep's home spot, and rejects one that isn't a number", function()
 		local placed = sheep("1")
 		placed.HomeX = -12.5

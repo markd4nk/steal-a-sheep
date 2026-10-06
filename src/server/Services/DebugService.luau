@@ -53,6 +53,14 @@ local commands: { [string]: Command } = {
 		player:SetAttribute("DebugSpeed", if boost == 1 then nil else boost)
 		return true, nil
 	end,
+	-- value: how many friends the player counts as having in the server, for the friend boost; a negative value goes
+	-- back to their real friends.
+	SetFriends = function(player, value)
+		local friends = math.floor(value or 0)
+		player:SetAttribute("DebugFriends", if friends >= 0 then friends else nil)
+		registry.FriendService:Refresh(player)
+		return true, nil
+	end,
 	-- value: a tier. An ordinary lamb of that tier's family goes straight into the flock, as if delivered.
 	GiveSheep = function(player, value)
 		local tier = Olympus.Tiers[math.clamp(math.floor(value or 1), 1, Olympus.Count)]
@@ -76,6 +84,21 @@ local commands: { [string]: Command } = {
 			local key = tostring(tier)
 			data.Deliveries[key] = math.max(data.Deliveries[key] or 0, 1)
 		end
+		registry.DataService:Replicate(player)
+		registry.FlockService:Push(player)
+		return true, nil
+	end,
+	-- The free gift can be claimed again.
+	ResetGift = function(player)
+		local data = registry.DataService:GetData(player)
+		data.FreeGift = false
+		registry.FlockService:Push(player)
+		return true, nil
+	end,
+	-- value: the stair walker level to show (1 is the free machine).
+	SetWalker = function(player, value)
+		local data = registry.DataService:GetData(player)
+		data.WalkerLevel = math.clamp(math.floor(value or 1) - 1, 0, Economy.MaxWalker)
 		registry.DataService:Replicate(player)
 		registry.FlockService:Push(player)
 		return true, nil

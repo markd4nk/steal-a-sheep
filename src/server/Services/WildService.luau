@@ -259,8 +259,8 @@ function WildService.Fail(_self: any, player: Player, reason: string)
 	place(spawn, drop)
 	spawn.ReturnAt = if drop then os.clock() + GameConfig.Theft.DropSeconds else 0
 	if reason == "Caught" then
-		notify(player, `{tier.God} caught you! You dropped the lamb`, "Bad", "Denied")
-		registry.PlotService:SendHome(player)
+		notify(player, `{tier.God} punched you! You dropped the lamb`, "Bad", "Denied")
+		registry.MountainService:Punch(player)
 	elseif reason == "Returned" then
 		notify(player, `The lamb ran back to {tier.God}`, "Bad", "Notice")
 	elseif reason == "Blocked" then

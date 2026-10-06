@@ -8,12 +8,14 @@ local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Remotes = require(ReplicatedStorage.Remotes)
+local Store = require(ReplicatedStorage.Config.Store)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- Coin purchases (the next stair walker level, the next pen slot, trails in order) and the hub's three stations: the
 -- map's two stalls become the Shop and the Sell Stall, and the Merge Shrine stands between them. A station's prompt
 -- carries an Opens attribute; the client opens that screen (PromptController). Trails train faster and show on the
--- player as a coloured trail.
+-- player as a coloured trail. Each stair walker's sign upgrades it straight away, for cash or Robux (the Robux store's
+-- walker products, through StoreService).
 local ShopService = { Name = "ShopService" }
 
 local SHRINE_AT = CFrame.new(287, 59.5, 245) * CFrame.Angles(0, math.rad(90), 0)
@@ -240,6 +242,34 @@ function ShopService.Start(_self: any)
 	Remotes.Buy:Handle(function(player: Player, item: string, which: string?)
 		return buy(player, item, which)
 	end)
+	for _, plot in registry.PlotService:Plots() do
+		local walker = plot.Pieces.Walker
+		trove:Connect(walker.CoinPrompt.Triggered, function(player: Player)
+			if plot.Owner ~= player then
+				return
+			end
+			local ok, message = buy(player, "Walker")
+			Remotes.Notify:Fire(player, message or "", if ok then "Good" else "Bad", if ok then "Upgrade" else "Denied")
+		end)
+		trove:Connect(walker.RobuxPrompt.Triggered, function(player: Player)
+			local data = registry.DataService:GetData(player)
+			if plot.Owner ~= player or not data or not Economy.WalkerCost(data.WalkerLevel) then
+				return
+			end
+			-- The store's own walker products (Config/Store), so one dialog at a time and the price ladder are kept.
+			local ok, message = registry.StoreService:Request(player, "Walker")
+			if message then
+				Remotes.Notify:Fire(player, message, if ok then "Good" else "Bad", if ok then "Upgrade" else "Denied")
+			end
+		end)
+	end
+	trove:Add(registry.PurchaseService.Granted:Connect(function(player: Player, key: string)
+		if Store.Split(key) == "Walker" then
+			local data = registry.DataService:GetData(player)
+			local level = if data then data.WalkerLevel + 1 else 0
+			Remotes.Notify:Fire(player, `Stair walker level {level}!`, "Good", "Upgrade")
+		end
+	end))
 	local function watch(player: Player)
 		trove:Connect(player.CharacterAdded, function(character: Model)
 			character:WaitForChild("HumanoidRootPart", 10)

@@ -3,10 +3,11 @@
 -- The one module allowed to create instances at require time. Define every remote here with
 -- Net.ToServer / Net.ToClient / Net.Request before the server bootstrap calls Net.Publish().
 -- See BRAIN/PATTERNS/networking.md.
+local GameConfig = require(script.Parent.Config.GameConfig)
 local Net = require(script.Parent.Net)
 local Guard = Net.Guard
 
-local FLOCK_ACTIONS = { "Equip", "Unequip", "Lock", "Unlock", "Sell", "EquipBest" }
+local FLOCK_ACTIONS = { "Equip", "Unequip", "Lock", "Unlock", "EquipBest" }
 local BUY_ITEMS = { "Walker", "PenSlot", "Trail" }
 local SHEEP_ID = Guard.String(16)
 
@@ -35,8 +36,10 @@ local Remotes = {
 	-- A slider knocked this player back, down the slope (the direction), or this player's slide hit someone.
 	Knockback = Net.ToClient("Knockback") :: Net.ToClient<Vector3>,
 	SlideHit = Net.ToClient("SlideHit") :: Net.ToClient<number>,
+	-- A god caught this player and punched them down the mountain: where they land, and how long the flight takes.
+	Punch = Net.ToClient("Punch") :: Net.ToClient<(Vector3, number)>,
 
-	-- The player's own flock: equip, unequip, lock, unlock or sell one sheep, or Equip Best (no id).
+	-- The player's own flock: equip, unequip, lock or unlock one sheep, or Equip Best (no id).
 	FlockAction = Net.Request(
 		"FlockAction",
 		{ Guard.OneOf(FLOCK_ACTIONS), Guard.Optional(SHEEP_ID) },
@@ -44,14 +47,20 @@ local Remotes = {
 	) :: Net.Request<(string, string?), (boolean, string?)>,
 	-- Three sheep into one at the Merge Shrine: (ok, message, the new sheep's id).
 	Merge = Net.Request("Merge", { Guard.Array(SHEEP_ID, 3) }, { Count = 4, Window = 1 }) :: Net.Request<({ string }), (boolean, string?, string?)>,
+	-- The Sell Stall: these stored sheep sold together (ok, message).
+	Sell = Net.Request("Sell", { Guard.Array(SHEEP_ID, GameConfig.Theft.InventoryLimit) }, { Count = 4, Window = 1 }) :: Net.Request<({ string }), (boolean, string?)>,
 	-- The shop: the next stair walker, room for one more sheep in the pen, or a trail by id (bought, or equipped if
 	-- owned).
 	Buy = Net.Request("Buy", { Guard.OneOf(BUY_ITEMS), Guard.Optional(Guard.String(16)) }, { Count = 8, Window = 1 }) :: Net.Request<(string, string?), (boolean, string?)>,
 	-- The Robux store: an item by its Config/Store key ("Cash.1", "Sheep.Kronos", "DoubleMoney"), or "Speed" or
 	-- "Walker" for that ladder's next step. The server opens Roblox's dialog: (ok, a message to show).
 	RequestPurchase = Net.Request("RequestPurchase", { Guard.String(32) }, { Count = 4, Window = 2 }) :: Net.Request<(string), (boolean, string?)>,
+	-- The free gift, once per player: (ok, message, coins given, Climbing given).
+	ClaimGift = Net.Request("ClaimGift", {}, { Count = 2, Window = 2 }) :: Net.Request<(), (boolean, string?, number?, number?)>,
 	-- Give up a run: the carried sheep goes back to its pasture.
 	ReturnSheep = Net.ToServer("ReturnSheep", {}, { Count = 2, Window = 1 }) :: Net.ToServer<()>,
+	-- Off the stair walker (the player jumped while on it).
+	LeaveWalker = Net.ToServer("LeaveWalker", {}, { Count = 4, Window = 1 }) :: Net.ToServer<()>,
 	-- Put the carried lamb down here, in the player's own pen: that delivers it (the server checks where they stand).
 	PutDown = Net.ToServer("PutDown", {}, { Count = 4, Window = 1 }) :: Net.ToServer<()>,
 	-- The client's slide state (MovementController): the server checks hits only for sliders it has heard from.

@@ -1,0 +1,48 @@
+--!strict
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local StairClimb = require(ReplicatedStorage.Utils.StairClimb)
+local Run = require(script.Parent.Run)
+
+local function near(a: number, b: number): boolean
+	return math.abs(a - b) < 1e-6
+end
+
+return function(t: Run.Suite)
+	t.Test("steps run faster at every level", function()
+		t.Expect(near(StairClimb.StepSeconds(1), 0.6)).ToBe(true)
+		t.Expect(near(StairClimb.StepSeconds(5), 0.25 + 0.35 * 0.9 ^ 4)).ToBe(true)
+		for level = 2, 30 do
+			t.Expect(StairClimb.StepSeconds(level) < StairClimb.StepSeconds(level - 1)).ToBe(true)
+		end
+		t.Expect(StairClimb.StepSeconds(30) > 0.25).ToBe(true)
+	end)
+
+	t.Test("a step comes down one rise and back one run each cycle", function()
+		local a, b = StairClimb.Tread(1), StairClimb.Tread(0)
+		t.Expect(near(a.Y - b.Y, StairClimb.Rise)).ToBe(true)
+		t.Expect(near(b.Z - a.Z, StairClimb.Run)).ToBe(true)
+		for index = 1, StairClimb.Steps do
+			for _, cycle in { 0, 0.25, 0.5, 3.75, 120.1 } do
+				local u = StairClimb.StepAt(index, cycle)
+				t.Expect(u >= StairClimb.Lowest and u < StairClimb.Lowest + StairClimb.Steps).ToBe(true)
+			end
+			-- A quarter of a cycle later, every step is a quarter step lower (or has wrapped round inside).
+			local now, later = StairClimb.StepAt(index, 0.5), StairClimb.StepAt(index, 0.75)
+			t.Expect(near(now - later, 0.25) or near(now - later + StairClimb.Steps, 0.25)).ToBe(true)
+		end
+	end)
+
+	t.Test("about five steps show at any moment", function()
+		for _, cycle in { 0, 0.3, 0.6, 0.9 } do
+			local shown = 0
+			for index = 1, StairClimb.Steps do
+				if StairClimb.Shown(StairClimb.StepAt(index, cycle)) then
+					shown += 1
+				end
+			end
+			t.Expect(shown >= 5 and shown <= 6).ToBe(true)
+		end
+	end)
+end

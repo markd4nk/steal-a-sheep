@@ -15,9 +15,29 @@ The DEBUG button on the left edge, or `require(ReplicatedStorage.Remotes).Debug:
 | `GiveSheep` | tier | An ordinary lamb of that tier straight into the flock, as if delivered |
 | `GrowAll` | - | Every lamb grows up on the next tick (with its reveal) |
 | `UnlockAll` | - | Zeus's Heavy target in Climbing and one delivery from every tier |
+| `SetWalker` | level (1-30) | The stair walker at that level (its look, step speed and sign) |
+| `ResetGift` | - | The free gift can be claimed again (its HUD button comes back) |
 | `WipeSave` | - | A new player's save |
 
 Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session playtest (pack feature).
+
+The free gift in a playtest: `GiveSheep` 1 counts as the first delivery, and the menu opens by itself 30 s later at the
+plot. Claim skips Roblox's favorite prompt while the place is unpublished (PlaceId 0).
+
+UI mock-ups without playing: in Edit, `require` a screen module from `StarterPlayerScripts.UIController.Screens`, call
+its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labels, and set `Root.Scale.Scale` (1.25),
+`Root.Size` (1/scale) and each `UITextSizeConstraint` from its `MaxPoints`/`MinPoints` attributes times the scale, as
+`UIController/Scale` does in play. Delete the `TEMP_` guis after.
+
+## Sell Stall (2026-10-05)
+
+- Own place copy `build/SellPlaytest.rbxl` (as the pens session's below), code swapped in from
+  `content/sas/sell-sync.rbxm`. Flock for a test: `Debug UnlockAll`, `GiveSheep` a dozen times (the first 8 fill the
+  pen, the rest are stored lambs), `GrowAll`, then `FlockAction Unequip` an adult or two to store them.
+- Open it like a player: pivot the character 6 studs in front of `Workspace.Stations.SellStation`'s `StationPrompt`
+  and press E (`user_keyboard_input`); cards are `SellStall.Root.Window.Pages.GridWell.List.Sheep<id>`, the buttons
+  `...Pages.SellTile.SelectButton` / `SellButton`, the confirm's `...Root.Confirm.Dialog.Body.Buttons.ConfirmButton`.
+- `Remotes.Sell` allows 4 calls a second: space out several refused-sale checks or the fifth is dropped.
 
 ## Pens in this session's own Studio (2026-10-05)
 
@@ -71,6 +91,17 @@ Set `ServerStorage`'s `DebugBlankProfile` attribute in Edit for a first-session 
   along the floor is 37 across it at 52 degrees; 0 of 74 samples in the air with the ramp hold, 29% without.
 - `require` of a game module from `execute_luau` gets a fresh copy, not the running one (SheepService:Build returned
   nil): to look at families or gods side by side, clone the running game's own wild lambs and gods instead.
+
+## Stair walker climbing test (2026-10-05)
+
+- **Avatars measured**: the user's (a skinned R15 cat with the Avatar Joint Upgrade: AnimationConstraints, arms rest
+  in a T-pose) has thigh 0.64, shin 0.56 (hip-to-ankle reach 1.2), foot 1.29 long, hip height 1.57. A default blocky
+  R15 rig (`CreateHumanoidModelFromDescription` on the server) has reach 1.93 and a 1.0 foot. With 0.6 x 1.0 steps
+  both reach the upper step comfortably.
+- **Showing motion without the desktop tools**: drive the animation from a phase variable, set it from Client
+  `execute_luau` (0, 0.25 ... 1.75), `screen_capture` from a fixed camera after each, and join the frames into a GIF
+  with Pillow (140 ms a frame is real speed for a 0.55 s step).
+- A side view hides the far leg; a camera a little in front of the side shows both.
 
 ## Playtesting through the Studio MCP from a script (2026-10-05)
 

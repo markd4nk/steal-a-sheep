@@ -144,4 +144,10 @@ function StoreService.Destroy(_self: any)
 	trove:Clean()
 end
 
+-- What the store's buttons ask for (a Config/Store key, "Speed" or "Walker"), for server-side prompts such as the
+-- stair walker's sign: (ok, a message to show).
+function StoreService.Request(_self: any, player: Player, key: string): (boolean, string?)
+	return request(player, key)
+end
+
 return StoreService

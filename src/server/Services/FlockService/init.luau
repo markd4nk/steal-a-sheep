@@ -124,6 +124,8 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		flock[id] = view(sheep, data.PenSlots, best, money)
 	end
 	local state = states[player]
+	local income = Roster.Income(data.Sheep, data.PenSlots)
+	local giftCoins, giftClimb = Economy.GiftReward(data.WalkerLevel, income)
 	return {
 		Sheep = flock,
 		Count = Roster.Count(data.Sheep),
@@ -138,9 +140,12 @@ function FlockService.Snapshot(_self: any, player: Player): { [string]: any }
 		Tutorial = data.Tutorial,
 		ClimbTier = Economy.ClimbTier(data.ClimbPower),
 		MergeReady = Economy.TotalDeliveries(data.Deliveries) >= Economy.MergeAfterDeliveries,
-		Income = Roster.Income(data.Sheep, data.PenSlots) * money,
+		Income = income * money,
 		SpeedBuys = data.SpeedBuys,
 		Offline = if state then state.Offline else nil,
+		FreeGift = data.FreeGift,
+		GiftCoins = giftCoins,
+		GiftClimb = giftClimb,
 	}
 end
 
@@ -395,7 +400,7 @@ local function tick(dt: number)
 			end
 		end
 		if income > 0 then
-			registry.DataService:AdjustCoins(player, income * dt)
+			registry.DataService:AdjustCoins(player, income * registry.FriendService:Boost(player) * dt)
 		end
 		data.LastSeen = os.time()
 		for _, sheep in grewUp do
@@ -471,6 +476,9 @@ function FlockService.Start(_self: any)
 	end)
 	Remotes.Merge:Handle(function(player: Player, ids: { string })
 		return FlockService:Merge(player, ids)
+	end)
+	Remotes.Sell:Handle(function(player: Player, ids: { string })
+		return FlockService:Sell(player, ids)
 	end)
 end
 
@@ -584,20 +592,6 @@ local function act(player: Player, data: any, action: string, id: string?): (boo
 	elseif action == "Lock" or action == "Unlock" then
 		sheep.Locked = action == "Lock"
 		return true, nil
-	elseif action == "Sell" then
-		if Economy.IsRobuxSheep(sheep.Family) then
-			return false, "Robux sheep stay with you"
-		end
-		if sheep.Locked then
-			return false, "Unlock it first"
-		end
-		if Roster.Count(data.Sheep) <= 1 then
-			return false, "You can't sell your last sheep"
-		end
-		local value = Economy.SellValue(sheep, Economy.BestIncome(data.Sheep))
-		data.Sheep[sheep.Id] = nil
-		registry.DataService:AdjustCoins(player, value)
-		return true, `Sold for {Format.Short(value)} cash`
 	end
 	return false, "Unknown action"
 end
@@ -607,15 +601,35 @@ function FlockService.Act(_self: any, player: Player, action: string, id: string
 	if not data then
 		return false, "Still loading"
 	end
-	if action == "Sell" and player:GetAttribute("Carrying") == true then
-		return false, "Deliver your sheep first"
-	end
 	local ok, message = act(player, data, action, id)
 	if ok then
 		refreshPen(player, true)
 		push(player)
 	end
 	return ok, message
+end
+
+-- The Sell Stall: stored, unlocked sheep sold together for Economy.SellValue each, as one change.
+function FlockService.Sell(_self: any, player: Player, ids: { string }): (boolean, string?)
+	local data = dataOf(player)
+	if not data then
+		return false, "Still loading"
+	end
+	if player:GetAttribute("Carrying") == true then
+		return false, "Deliver your sheep first"
+	end
+	local ok, why = Roster.CanSell(data.Sheep, ids, data.PenSlots)
+	if not ok then
+		return false, why
+	end
+	local total = 0
+	for _, id in ids do
+		total += Economy.SellValue(data.Sheep[id])
+		data.Sheep[id] = nil
+	end
+	registry.DataService:AdjustCoins(player, total)
+	push(player)
+	return true, `Sold {#ids} for {Format.Short(total)} cash`
 end
 
 -- The Merge Shrine: three unlocked adults of one family, fleece and rank into one of the next rank, saved as one

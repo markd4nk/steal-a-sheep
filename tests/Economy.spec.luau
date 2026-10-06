@@ -38,6 +38,14 @@ end
 
 -- These pin the current tuning: when the numbers are changed on purpose, change the expectations with them.
 return function(t: Run.Suite)
+	t.Test("each friend in the server adds 20% income, up to 4 friends", function()
+		t.Expect(near(Economy.FriendBoost(0), 1)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(1), 1.2)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(4), 1.8)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(9), 1.8)).ToBe(true)
+		t.Expect(near(Economy.FriendBoost(-2), 1)).ToBe(true)
+	end)
+
 	t.Test("base income follows round(2 x 2.5^(tier - 1))", function()
 		local expected = { 2, 5, 13, 31, 78, 195, 488, 1221, 3052, 7629, 19073, 47684 }
 		for tier, income in expected do
@@ -133,11 +141,11 @@ return function(t: Run.Suite)
 	end)
 
 	t.Test("stair walker, pen slot and trail prices", function()
-		t.Expect(Economy.WalkerCost(0)).ToBe(120)
-		t.Expect(Economy.WalkerCost(1)).ToBe(300)
-		t.Expect(Economy.WalkerCost(2)).ToBe(750)
-		t.Expect(Economy.WalkerCost(3)).ToBe(1875)
-		t.Expect(Economy.WalkerCost(11)).ToBe(2861023)
+		t.Expect(Economy.WalkerCost(0)).ToBe(1200)
+		t.Expect(Economy.WalkerCost(1)).ToBe(3000)
+		t.Expect(Economy.WalkerCost(2)).ToBe(7500)
+		t.Expect(Economy.WalkerCost(3)).ToBe(18750)
+		t.Expect(Economy.WalkerCost(11)).ToBe(28610229)
 		t.Expect(Economy.WalkerCost(29)).ToBe(nil)
 		t.Expect(Economy.WalkerRate(1)).ToBe(12)
 		t.Expect(Economy.PenCost(8)).ToBe(nil)
@@ -208,9 +216,9 @@ return function(t: Run.Suite)
 		t.Expect((Economy.CanMerge(top))).ToBe(false)
 	end)
 
-	t.Test("selling pays 15 seconds of current income", function()
-		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(45)
-		t.Expect(Economy.SellValue(sheep({}))).ToBe(15)
+	t.Test("selling pays two minutes of current income", function()
+		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(360)
+		t.Expect(Economy.SellValue(sheep({}))).ToBe(120)
 	end)
 
 	t.Test("offline: a quarter of at most two hours, lamb rate until grown", function()
@@ -239,5 +247,14 @@ return function(t: Run.Suite)
 			t.Expect(weight >= 1 and weight <= 1.5).ToBe(true)
 			t.Expect(size >= 1 and size <= 3).ToBe(true)
 		end
+	end)
+
+	t.Test("the free gift: three minutes of walker and income, at least 500 of each", function()
+		local coins, climb = Economy.GiftReward(0, 0)
+		t.Expect(coins).ToBe(500)
+		t.Expect(climb).ToBe(500)
+		local laterCoins, laterClimb = Economy.GiftReward(2, 13.5)
+		t.Expect(laterCoins).ToBe(2430)
+		t.Expect(laterClimb).ToBe(7200)
 	end)
 end
