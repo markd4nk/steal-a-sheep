@@ -616,7 +616,6 @@ local GameConfig = {
 	Ui = {
 		NoticeSeconds = 2.5,
 		NoticeQueue = 4,
-		BannerSeconds = 4,
 	},
 	Gift = {
 		FavoriteTimeout = 60, -- seconds to wait for Roblox's favorite prompt to answer

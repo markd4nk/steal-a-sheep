@@ -108,9 +108,9 @@ lamb.
   (GAME_DESIGN.md, *Merge Shrine*).
 - **The gods** (version 8): thirty in mythological rank, Pan tier 1 to Zeus 30, each a catalog-dressed Roblox avatar
   (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load.
-- **What the HUD says** (version 8): one message per moment, hints only when needed (`Screens/Hud`, `goal()`); every
-  ProximityPrompt drawn as the menus' button for the device, press or tap (`PromptController/Look`). HISTORY.md, the
-  overnight entry.
+- **What the HUD says** (version 8): one message per moment (`Screens/Hud`); every ProximityPrompt drawn as the menus'
+  button for the device, press or tap (`PromptController/Look`). HISTORY.md, the overnight entry. On the onboarding
+  branch below the HUD gives no hints in words at all.
 - **Settings menu** (version 8; `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound
   effects in four steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in
   the save, `SoundController` volumes).
@@ -119,17 +119,22 @@ lamb.
   `studio/SheepStuds.luau` (in the cloud place since 2026-10-06); without them the wool stays plain and the server warns
   once.
 
+- **Onboarding trail** (merged 2026-10-06, not published): Shear a Sheep's floor chevrons (`UIController/GuidePath`)
+  guide only the first lamb, to Pan's meadow, home from the mountain's foot, then to the stair walker; no words, no
+  floating arrow. Also gone from the HUD: Train to climb, Put your sheep to work, the walker's training meter, the
+  carried lamb's card with its Return button (no giving up a run now), and the chase banner (its music stays).
+  GAME_DESIGN.md, *Onboarding*.
+- **Mystery lambs** (merged 2026-10-06, not published): every lamb is a bare white lamb with one spot per step of its
+  family's rarity in its grown sheep's colour (mock-up D), bigger and rounder the heavier, nothing over it and nothing
+  naming it; it earns nothing, shows a clock and time left in the pen, and at 100% its fleece pops on at its real size
+  with a "Your lamb grew up: ..." notice (the Sheepdex finds it then). `Utils/LambLook`, `SheepService/Lambs`,
+  `SheepService.BuildLamb`/`LambLook`. GAME_DESIGN.md, *Mystery lambs*.
+
 ## In progress
 
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
-- **Mystery lambs (built 2026-10-06 on `t3code/mystery-lamb-mockup`, not merged: waiting for the user's word)**: every
-  lamb is a bare white lamb with one spot per step of its family's rarity in its grown sheep's colour (mock-up D),
-  bigger and rounder the heavier, nothing over it and nothing naming it; it earns nothing, shows a clock and time left
-  in the pen, and at 100% its fleece pops on at its real size with a "Your lamb grew up: ..." notice (the Sheepdex finds
-  it then). `Utils/LambLook`, `SheepService/Lambs`, `SheepService.BuildLamb`/`LambLook`. Playtested in the cloud
-  Studio (HISTORY.md). GAME_DESIGN.md, *Mystery lambs*; calls in DECISIONS.md.
 
 - **Game page art and a trailer, first cuts** (overnight 2026-10-05, nothing uploaded): icon and thumbnail mock-ups
   (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and
@@ -153,6 +158,9 @@ lamb.
 - **Mystery lambs, not yet seen**: the fleece popping on at grow-up (the notice and the grown model were seen, not the
   pop itself), the merged lamb on the Merge Shrine's altar and carried home, a Titan's grow-up, the Day 4 and Pegasus
   gift lambs, selling a lamb for real (its price is unit-tested), two players, a real phone or gamepad.
+- **The onboarding trail on a real phone**: seen in a Studio playtest with Studio's phone emulation, walked by script
+  (pen to meadow, the trail home, the walker); a player's own first run, a real phone's frame rate with the trail's
+  pathfinding (a route each 1.5 s) and other plots than Plot1 weren't tried.
 - **Studs on every sheep on a phone and in a live server**: seen in a Studio playtest and in Edit on all 183 families,
   not on a real device; their cost on a low-end phone wasn't measured (no extra parts, only materials).
 - **The live game itself**: version 8 was checked only in a Studio playtest of the cloud place before its publish

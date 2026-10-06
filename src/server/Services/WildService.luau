@@ -181,18 +181,9 @@ local function floorAt(x: number, z: number): CFrame
 	return CFrame.new(x, y, z) * CFrame.Angles(0, math.rad(90 + random:NextNumber(-35, 35)), 0)
 end
 
--- The carried lamb's marks for its thief's carry card (the colour and count of its spots), not its family.
-local function setCarriedLook(player: Player, family: string)
-	local look = registry.SheepService:LambLook(family)
-	player:SetAttribute("CarriedColor", look.Color)
-	player:SetAttribute("CarriedSpots", look.Spots)
-end
-
 local function clearAttributes(player: Player)
 	player:SetAttribute("Carrying", false)
 	player:SetAttribute("InPen", nil)
-	player:SetAttribute("CarriedColor", nil)
-	player:SetAttribute("CarriedSpots", nil)
 	player:SetAttribute("CarriedScale", nil)
 	player:SetAttribute("CarryTier", nil)
 	player:SetAttribute("CarryWeight", nil)
@@ -250,8 +241,6 @@ function WildService.Fail(_self: any, player: Player, reason: string)
 	if reason == "Caught" then
 		notify(player, `{tier.God} punched you! You dropped the lamb`, "Bad", "Denied")
 		registry.MountainService:Punch(player)
-	elseif reason == "Returned" then
-		notify(player, `The lamb ran back to {tier.God}`, "Bad", "Notice")
 	elseif reason == "Blocked" then
 		notify(player, "The lamb slipped away", "Bad", "Denied")
 	end
@@ -334,7 +323,6 @@ tryPickUp = function(player: Player, spawn: Spawn)
 	model.Parent = carriedFolder
 	carries[player] = { Spawn = spawn, Started = os.clock() }
 	local rolled = spawn.Roll
-	setCarriedLook(player, rolled.Family)
 	player:SetAttribute("CarriedScale", model:GetScale())
 	player:SetAttribute("CarryTier", spawn.Tier)
 	player:SetAttribute("CarryWeight", rolled.Weight)
@@ -531,9 +519,6 @@ function WildService.Start(_self: any)
 		dropTutorialLamb(player)
 		wrongPlot[player] = nil
 	end)
-	trove:Add(Remotes.ReturnSheep:Connect(function(player: Player)
-		WildService:Fail(player, "Returned")
-	end))
 	trove:Add(Remotes.PutDown:Connect(putDown))
 
 	local sinceCheck = 0
@@ -595,7 +580,6 @@ function WildService.CarryLamb(
 	end
 	model.Parent = carriedFolder
 	carries[player] = { Lamb = { Id = id, Model = model }, Started = os.clock() }
-	setCarriedLook(player, family)
 	player:SetAttribute("CarriedScale", model:GetScale())
 	player:SetAttribute("CarryTier", tier.Tier)
 	player:SetAttribute("CarryWeight", weight)

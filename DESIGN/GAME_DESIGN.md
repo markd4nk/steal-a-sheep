@@ -16,6 +16,19 @@ Train on the stair walker -> climb to a god's pasture -> steal a lamb -> slide h
 carry it into your pen and put it down wherever you like -> it grows up there, roaming and grazing, and only then shows
 what it is and starts earning -> upgrade.
 
+## Onboarding (the user, 2026-10-06: "it should be very simple, but the player should understand exactly what it is, and I don't want to hand-hold them the entire time")
+- Only the first lamb is guided, by Shear a Sheep's trail of white chevrons running along the ground, and no words. The
+  trail leads to a place, not to a sheep: from the pen, out of the gate, to the front of Pan's meadow (the tutorial
+  lamb waits just short of it, the meadow's wild lambs past it). In the meadow it stops; the lambs' Steal buttons and
+  the chase's music say the rest. No words come up during a chase either (no "Pan wants their sheep back!", the user,
+  2026-10-06).
+- With the lamb, nothing on the slope (the slide takes the player down); from the mountain's foot the trail leads
+  into the player's own pen, where it stops and the Put down button takes over.
+- After that first delivery the menus appear and one short trail leads out of the gate to the stair walker. Stepping
+  on ends the onboarding for good (saved `Tutorial` 2). From then on nothing tells the player what to do.
+- As in Steal an Egg (two first plays watched, 2026-10-06): a trail to the first egg and home, then nothing. Steal an
+  Egg also shows a short line per step ("Steal an Egg!", "RUN!!", "Go to your Pen!"); this game leaves the words out.
+
 ## The pen (the user, 2026-10-05: "just like Steal an Egg ... bring them into the pen and then place them down", and
 the sheep walking around on their own "just like in Shear a Sheep", lambs "mostly eating off the floor")
 - The whole fenced plot is the pen. There's no delivery pad and no pads to stand sheep on or unlock: a thief carries
@@ -202,12 +215,13 @@ clues to what it will grow into, and what it is shows when it grows up.
   lamb"), its horns, if it'll have any, as buds, with **one spot for each step of its family's rarity**, Common one to
   Mythic six, in the main colour of the sheep it will be (taken from that sheep's own look). Heavier lambs are bigger
   and rounder (*Lamb weight*). Shiny and Royal fleeces show only their blue or gold sparkle.
-- **Nothing names it**: nothing over a wild lamb (no card), "Lamb" on the carry card, in the Flock menu and at the Sell
-  Stall, with its token and 3D look in its marks.
+- **Nothing names it**: nothing over a wild lamb (no card), nothing on screen while it's carried, and "Lamb" in the
+  Flock menu, at the Sell Stall and in the notices, with its token and 3D look in its marks, even when its family is
+  known (a merged lamb, the gift lambs).
 - **Growing up**: in the pen a lamb earns nothing; its label is a clock and the time left (45 s on Pan up to 8 minutes
   on Zeus, half with 2x Growth; stored lambs don't grow). It grows bigger as it goes, and at 100% its wool pops on and
-  it takes its real size, Titan included, with a notice ("Your lamb grew up: Epic Toadstool Sheep, GIANT!", louder the
-  rarer or bigger). The Sheepdex finds its family then.
+  it takes its real size, Titan included, with a notice for every one ("Your lamb grew up: Epic Toadstool Sheep,
+  GIANT!", louder the rarer or bigger). The Sheepdex finds its family then.
 - **Selling a lamb** (Sell Stall): two minutes of what it will really earn grown, its price shown as "?" until it's sold.
 - **Equip Best** ranks a lamb by what it's likely worth from what shows (its god, fleece, weight and rank), the same
   for every family of its herd, so a growing lamb keeps its place in the pen without giving its family away.

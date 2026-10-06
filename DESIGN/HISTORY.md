@@ -6,7 +6,8 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
-- **Mystery lambs (2026-10-06, branch `t3code/mystery-lamb-mockup`, not merged)**.
+- **Mystery lambs (2026-10-06, branch `t3code/mystery-lamb-mockup`, merged into main on the user's word with the
+  onboarding trail)**.
   The user: lambs should be a mystery "so that the player doesn't actually know what they're getting", like Steal an
   Egg's eggs, with only a little indication (which is bigger, heavier, more basic), a default lamb look ("no wool, ...
   a very slim body where you can tell that it's just a lamb") and a bit of the colour of what it'll be. Mock-ups in Pan's
@@ -22,8 +23,8 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   (`LambLook.MainColor`: by area, not white or cream, skipping the shorn body). `SheepService.BuildLamb` clones the
   plain lamb and `LambLook.Dress`es it (body as wide as its weight, `Economy.FamilyRarity` spots on an ellipsoid fit
   to the body); `SheepService.LambLook` is what a lamb shows (colour, spots, horns). Wild lambs, carried ones, pen
-  lambs and the shrine's merged lamb all use it, with no family on the model or its thief (the carry card reads
-  `CarriedColor`/`CarriedSpots`; `CarriedFamily` is gone). `Economy.Income` is 0 for a lamb; `Economy.LambSize` grows
+  lambs and the shrine's merged lamb all use it, with no family on the model or its thief (`CarriedFamily` is gone;
+  carrying poses every lamb as `GameConfig.LambBreed`). `Economy.Income` is 0 for a lamb; `Economy.LambSize` grows
   it 60% from `LambScale` (now 0.55-0.88, spread at the light end); `SellValue` is two minutes of `AdultIncome` for
   everything; `Worth` (Equip Best) ranks a lamb by its likely worth; `Name` of a lamb is "Lamb" (fleece first), so the
   announcements say "A Mythic Lamb". The flock snapshot sends a lamb without its family or price, with `Look` and
@@ -39,6 +40,12 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   with `GrowAll` ("Your lamb grew up: Legendary Blossom Sheep!", +16/s, Sheepdex badge 1); a tier 1 lamb grown while
   away; the Flock menu's lamb card and detail; the Sell Stall's "?" and "900 + ?". The test save was wiped back to new.
   Not seen: the fleece pop itself, the shrine's lamb, a Titan, the gift lambs, a lamb sold, two players, a phone.
+  *Then the user*: keep a notice for every grow-up, unnamed known lambs are fine, and remove "Slide home!", "Pan wants
+  their sheep back!", the "Lamb / Return" card and the floating arrow with its distance ("the blue thing"). All but the
+  chase banner were already gone on the onboarding branch (session 7bbf5a87, done but not merged); the user chose to
+  merge it with this one. The chase banner went here (`Screens/Hud`: the chase plays its music and scare sound, no
+  words; `GameConfig.Ui.BannerSeconds` gone), and with the carry card gone, so did WildService's `CarriedColor` and
+  `CarriedSpots`.
 
 - **Momentum slides, the god boosted too, quick bump recovery, a dead stop at the safety line (2026-10-06, branch
   `t3code/speed-up-downhill-sliding`, merged into main on the user's word)**.
@@ -79,6 +86,38 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     bootstraps ready, 86 tests, 30 gods, "data will be saved", a clean console); File > Save to Roblox, then Publish
     to Roblox at 17:34 UTC: "Place published. Editors can now play this place in Roblox", v20. Audience still Private;
     no schema or remote changes, so no servers to restart.
+- **The onboarding trail (2026-10-06, branch `t3code/simplify-onboarding-guidance`, merged into main with the mystery
+  lambs on the user's word in that thread)**. The user: too much said "steal this
+  person's sheep" and pointed at the sheep; instead chevrons on the floor "just like in Shear a Sheep" to "the place
+  where the player has to actually go", only for the first lamb, "very simple ... I don't want to hand-hold them the
+  entire time", and look at how Steal an Egg does it.
+  - *Steal an Egg* (frames of two fresh-account first plays, KreekCraft and Bloxtian PH, saved as `sae-*.jpg` in T3
+    Code's attachments): a short line per step ("Steal an Egg!", "RUN!!", "Go to your Pen!", "Hatch the Egg!") and a
+    red chevron trail to one egg just past the safe zone, flipping to point home on the grab, into the pen; on the
+    second steal nothing at all. The treadmill gets one line much later, when it's bought at $1K.
+  - *Built*: `UIController/GuidePath`, Shear a Sheep's `Guide/Path` (its solid white chevrons with a black edge, 17
+    at most, 3.4 studs apart at 13 studs/s, Reduce motion keeps them still) with two changes for this map. The way
+    always comes from PathfindingService, because the plots' fences, the hay and the leaderboards can't be seen by
+    rays (`CanQuery` off) and Shear a Sheep only asked for a way round when a ray hit something. The ground is found
+    near `Mountain.RampY`, not the goal's height, since the trail climbs the ramp. `Screens/Hud`'s `goal()` gives the
+    trail its target: the front of Pan's meadow until the player is in it, their pen from the mountain's foot while
+    carrying the first lamb (none on the slope), then the walker's `Zone` until `Tutorial` 2. The hint line, the
+    floating guide arrow with its distance, Train to climb and Put your sheep to work (with the FLOCK glow) are
+    removed, and so is the walker's training meter (Mark, via the less-hand-holding session t3code-b39d69ab, which
+    handles the hints after the onboarding).
+  - *Then the user*: "remove the thing that says wild lamb return. That is never necessary". The carried lamb's card at
+    the bottom (picture, name, Return) is gone, and so is `Remotes.ReturnSheep` with WildService's "The lamb ran back"
+    notice: nothing gives up a run now (a catch, a fall, a reset or leaving still ends one). Checked in a second
+    playtest of the cloud place (the four changed scripts swapped in, then main's put back): a debug steal carried the
+    lamb with no card or Return on screen, the chase banner as before, 84 tests, a clean console.
+  - *Checked*: `check.ps1`. A playtest of the cloud place, with the two scripts swapped in from a rojo-built model and
+    put back after: a blank save (`DebugBlankProfile`) on Plot1, with Studio's phone emulation on. Both bootstraps were
+    ready and 84 tests passed, with nothing from our code in the console. The player was walked by script along a
+    path. The trail went out through the gate and round the stalls; it ended by the tutorial lamb and showed no words
+    or arrow. A steal followed by standing still was punched by Pan, as before. A debug steal then slid to the foot,
+    where the trail turned to the pen and disappeared inside the fence. Put down gave `Tutorial` 1, the menus showed,
+    and a trail led to the walker. Stepping on gave `Tutorial` 2 and the trail was gone. Pictures are
+    `onboarding-*.jpg` in T3 Code's attachments.
 
 - **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
   it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game
