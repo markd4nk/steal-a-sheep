@@ -4,11 +4,13 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
-- **2026-10-05, studs on the sheep (mock-ups)**: no place changes. Made in a local copy (`HerdsPlaytest.rbxl`) as
-  `workspace.TEMP_StudSheep` and `MaterialService.TEMP_SheepStuds`, then deleted. Built for real, mock-up A needs only
-  the map's `MaterialService.Studs`; B and C need half-size copies of it in MaterialService: Plastic, Metal, Fabric,
-  Foil and a glowing Plastic one (HISTORY.md, *Studs on the sheep*). Their BaseMaterial and maps are Studio-only
-  properties, so they'd be made Studio-side (`tools/assemble.luau`, and a `studio/` script for the cloud place).
+- **2026-10-05, the map's studs on every sheep** (branch `t3code/sheep-stud-style-mockups`): the code expects five
+  MaterialVariants in `MaterialService`, copies of the map's `Studs` at 0.5 studs a tile: `SheepStuds` (Plastic),
+  `SheepStudsMetal`, `SheepStudsFabric`, `SheepStudsFoil` and `SheepStudsGlow` (Plastic, its colour map as its
+  emissive mask, strength 1.6). `studio/SheepStuds.luau` makes them (rerunnable, in Edit); `tools/assemble.luau` runs it
+  on every built place. **The cloud place doesn't have them yet**: run the script there before publishing this code
+  (without them the wool stays plain and the server warns once). `HerdsPlaytest.rbxl` (the borrowed local copy in
+  t3code-002720c0's `build/`) holds them and this branch's scripts, unsaved. The mock-ups' `TEMP_` models were deleted.
 
 - **2026-10-05, daily gifts**: no place changes (the menu, the HUD's DAILY and the Pegasus Sheep are made at
   runtime; `SheepService` adds the Pegasus to `ReplicatedStorage.SheepLooks` with the other families). Its six

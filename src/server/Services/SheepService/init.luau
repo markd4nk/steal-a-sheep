@@ -12,8 +12,8 @@ local Looks = require(script.Looks)
 
 -- Makes sheep models: Shear a Sheep's rig (ServerStorage.Assets.SheepRig, its meshes and add-ons in
 -- ServerStorage.Assets.SheepAddons) dressed as a family's breed by Looks, with the family's primitive extra, its fleece
--- rarity's paint and sparkle, at a size. Also lifts them onto a carrier's head and puts them down. Every sheep is
--- tagged "Sheep" for the clients' idle animation and never collides with anything.
+-- rarity's paint and sparkle and the map's studs on its wool, at a size. Also lifts them onto a carrier's head and
+-- puts them down. Every sheep is tagged "Sheep" for the clients' idle animation and never collides with anything.
 local SheepService = { Name = "SheepService" }
 
 local SHEEP_TAG = "Sheep"
@@ -120,6 +120,7 @@ function SheepService.Build(_self: any, family: string, rarity: number, scale: n
 	elseif rarity >= 3 then
 		sparkle(model, Color3.fromRGB(255, 214, 90), 8)
 	end
+	Looks.Studs(model)
 	settle(model)
 	if math.abs(scale - 1) > 1e-3 then
 		model:ScaleTo(scale)

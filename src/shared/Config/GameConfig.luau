@@ -58,6 +58,14 @@ export type Mutation = {
 	SparkleColor: Color3?,
 }
 
+-- How one wool material wears the map's studs (Sheep.Studs): the material the part becomes, since a MaterialVariant
+-- only shows on its own base material, the variant's name, and for see-through studs the least Transparency.
+export type StudLook = {
+	Material: Enum.Material,
+	Variant: string,
+	Transparency: number?,
+}
+
 local rgb = Color3.fromRGB
 
 local function deepFreeze<T>(value: T): T
@@ -467,6 +475,19 @@ local GameConfig = {
 		-- The faces a grazing sheep chews with, in turn (names in Faces).
 		ChewFaces = { "MunchA", "MunchB" } :: { string },
 		WoolSpread = 0.5,
+		-- The map's studs over every sheep's wool, at half the map's size (the user, 2026-10-05: mock-up B on every
+		-- sheep), keyed by the wool's material. The variants are copies of the map's MaterialService.Studs that
+		-- studio/SheepStuds.luau makes in the place. Glass and Neon draw no variant, so glass wool becomes see-through
+		-- studded plastic and glowing wool takes studs that glow by themselves. Other materials keep their look.
+		Studs = {
+			[Enum.Material.Plastic] = { Material = Enum.Material.Plastic, Variant = "SheepStuds" },
+			[Enum.Material.SmoothPlastic] = { Material = Enum.Material.Plastic, Variant = "SheepStuds" },
+			[Enum.Material.Metal] = { Material = Enum.Material.Metal, Variant = "SheepStudsMetal" },
+			[Enum.Material.Fabric] = { Material = Enum.Material.Fabric, Variant = "SheepStudsFabric" },
+			[Enum.Material.Foil] = { Material = Enum.Material.Foil, Variant = "SheepStudsFoil" },
+			[Enum.Material.Glass] = { Material = Enum.Material.Plastic, Variant = "SheepStuds", Transparency = 0.25 },
+			[Enum.Material.Neon] = { Material = Enum.Material.Plastic, Variant = "SheepStudsGlow" },
+		} :: { [Enum.Material]: StudLook },
 	},
 
 	-- How penned sheep live (the server picks where they walk; each device animates them) and how each device brings

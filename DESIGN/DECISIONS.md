@@ -13,6 +13,8 @@ confirmed or reversed it.
   the docs.
 - The first build reused Shear a Sheep's UI and assets and kept new things primitive (the user, 2026-10-05). That was
   how the MVP was made, not a limit on later changes.
+- **The map's studs on every sheep (2026-10-05)**: the user picked mock-up B, the map's stud material at half its
+  size over the wool (face, ears and legs smooth), "build it on every sheep", and glowing studs for glowing wool.
 - **Thirty gods, Zeus on top (2026-10-05)**: the user's list of thirty, a map part for each above the old summit
   (High Olympus), each god's section grouped, the new parts indistinguishable from the commissioned map (its own
   pieces, studs and textures).
@@ -135,6 +137,18 @@ confirmed or reversed it.
   highest god stolen from, Day 5 Climbing 3 minutes (450), Day 6 cash 30 minutes (2,500), Day 7 the Pegasus Sheep.
 
 ## To review
+
+Calls in the studs on every sheep (2026-10-05, branch t3code/sheep-stud-style-mockups, not merged):
+
+- **What counts as wool**: the puffs (and anything hanging off them), the tail, and add-on pieces tinted as wool.
+  Horns, hats, halos, wings and other extras stay smooth, as do the face, ears, legs and body.
+- **Stud size**: half a stud a tile on every sheep, so bigger sheep (Giant, Titan) carry more studs, like bigger
+  blocks on the map; lambs carry fewer.
+- **Glass wool** (4 families) becomes see-through studded plastic at 25% transparency: Roblox draws no studs on glass,
+  and the glassy shine goes. **Glowing wool** (10 families) glows at strength 1.6: a little less bright than Neon.
+- **Royal (gold) fleeces and silver paints** take metal studs; on glowing or glass families the Royal gold replaces the
+  glow or the see-through look, as the gold paint already did.
+- Any other wool material keeps its look without studs (none uses one today).
 
 Calls in Zeus's Blender model (2026-10-05, a mock-up waiting for the user's OK):
 

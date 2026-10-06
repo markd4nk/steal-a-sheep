@@ -6,30 +6,32 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
-- **Studs on the sheep: three mock-ups (2026-10-05)**. Not built yet. The user asked to see the map's stud style
-  layered over the sheep, as mock-ups.
+- **The map's studs on every sheep (2026-10-05)**. On branch `t3code/sheep-stud-style-mockups`, not merged. The user
+  asked for mock-ups of the map's stud style layered over the sheep, picked B, then: "build it on every sheep, and then
+  you can use the glowing studs".
   - *The map's studs*: `MaterialService.Studs`, a Plastic MaterialVariant (colour and normal maps, one stud a tile) on
     about 26,000 of the map's parts: a grid of square insets with a bevel. The other Texture on 14,700 faces
     (`6905003203`, 9 studs a tile, 90% transparent) is a soft shading gradient, not studs.
-  - *How the mock-ups work* (`studio/StudSheepMockup.luau`): sheep from `SheepService.Build`, then the fleece (the Wool
-    folder, the tail, add-ons tinted Wool or Spot) set to Plastic with a variant. On the sheep's meshes the tiles follow
-    each mesh's UVs but keep their size in studs, so a bigger sheep carries more of them; at the map's size they come out
-    uneven where UV islands meet. A: the map's variant (1 stud). B: a copy at half size. C: B on every Plastic part,
-    face, ears, legs, horns and extras too (the face picture stays on top). Glowing, glass and metal wool keeps its
-    material in the mock-ups, since the variant is Plastic.
-  - *Tried and dropped*: the variant on the face block at the map's size (a cross through the face); the studs' colour
-    map as a projected `Texture` (an even grid, but flat L-shaped marks without the bump map, and it washes the colour
-    out when see-through).
-  - *Checked*: rendered in a local copy of the place (HerdsPlaytest.rbxl) by the first plot: Laurel, Grape, Rose and
-    War in each look, and close-ups of one Laurel and one Rose in all four looks; shown to the user. The TEMP_ model and
-    the half-size variant were deleted after.
-  - *B on every sheep* (the user asked how much work): every sheep model comes from `SheepService.Build` (wild, pens,
-    carried, the shrine's lamb, `SheepLooks` for the menus), so one change there covers them all. Wool that isn't
-    plastic, tried on a Laurel and a block each: a copy of the variant with BaseMaterial Metal, Fabric or Foil shows the
-    studs (gold Royal fleeces, silver, the metal families). Glass and Neon draw no variant at all; stand-ins that work:
-    the half-size Plastic studs at Transparency 0.25 for glass, and a Plastic copy with the studs' own colour map as
-    its `EmissiveMaskContent` (EmissiveStrength 1.6) for glowing wool. A variant's BaseMaterial and maps can only be set
-    in Studio, so the copies would be made Studio-side.
+  - *Mock-ups* (`studio/StudSheepMockup.luau`, rendered in HerdsPlaytest.rbxl by the first plot): A the map's variant
+    (1 stud) on the wool, B a half-size copy on the wool, C B all over (face, ears, legs, extras). On the sheep's meshes
+    the tiles follow each mesh's UVs but keep their size in studs; at the map's size they came out uneven where UV
+    islands meet, and C's faces looked quilted. Dropped: the studs' colour map as a projected `Texture` (an even grid,
+    but flat L-shaped marks without the bump map).
+  - *How it works*: `GameConfig.Sheep.Studs` gives each wool material the material it becomes and its variant
+    (Plastic and SmoothPlastic `SheepStuds`, Metal, Fabric and Foil their own copies, Glass `SheepStuds` at
+    Transparency 0.25 or more, Neon `SheepStudsGlow`). `Looks.Studs`, called by `SheepService.Build` after the paint,
+    extras and sparkle, puts them on the fleece: the Wool folder, the tail and add-ons tinted Wool or Spot. A variant
+    missing from the place leaves the part as it was (warned once). Every sheep model comes from `Build` (wild, pens,
+    carried, the shrine's lamb, `SheepLooks` for the menus), so nothing else changed. The five variants are copies of
+    the map's Studs at 0.5 studs a tile, made by `studio/SheepStuds.luau`: their BaseMaterial, maps and glow mask (the
+    studs' own colour map) can only be set in Studio or Lune. `tools/assemble.luau` runs that same file on every place it
+    builds, through `@lune/luau` with `game` set to the place.
+  - *Checked*: `check.ps1`; a Lune build holds the five variants as made; in HerdsPlaytest.rbxl with the branch's code
+    synced (`content/sas/studs-sync.rbxm`) and the studio script run: both bootstraps ready, 78 tests (2 new in
+    `SheepStuds.spec`), console clean. The client had the five variants; 121 wild lambs and a pen of eight special
+    wools (glowing, glass, fabric, metal, foil, silver) came out right; the Flock menu's 3D sheep shows the studs. All 183
+    families, plus Royal and Shiny fleeces, rendered in Edit: nothing broken (the Scarecrow's denim and checker
+    pictures still show). Not run on the cloud place or on a phone.
 
 - **Gods in mythological rank (2026-10-05)**. The user asked whether the thirty gods were in Mount Olympus's order.
   They weren't: the Olympians had been placed to fit the commissioned map's stage themes and the minor gods sat above
