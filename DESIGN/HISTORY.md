@@ -116,6 +116,19 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     the swoop into the full pen), the wide slide shot (occluded), a store or Sheepdex moment (optional).
   - *Checked*: contact sheets of every take and of both cuts, every caption against the frame, loudness (-17 LUFS),
     no silent gaps. Studio's layout was put back after (panels, view selector, ribbon, Device Simulator on).
+  - *Then, on the combined build* (this branch with the studs, the Settings menu and the gods' tools,
+    `t3code/overnight-rc`), with the copy acting as the published place (`SetPlaceId`, TESTING.md): 84 unit tests;
+    a two-player Server & Clients test (slide hit and knockback, "That's not your plot!" once, the walker sign's
+    buttons hidden from another player, the shrine's show private to its player); saving across three sessions of
+    a test player (sheep, tutorial, cash, settings, receipts), the welcome-back card with offline cash, the daily
+    gifts opening by themselves in a second session; Roblox's test purchase dialog with real products (+24K cash,
+    2x Speed step 1), and the same cheap step bought again outside the store not doubling; every menu on the phone
+    and the HUD on a computer.
+  - *Fixed from those tests*: the counters stand left of Roblox's player list on a computer; the daily gifts wait for
+    the welcome-back card (they had opened under it); the guide arrow never covers the hint; on a phone the Flock's
+    buttons stay inside its window, the free gift's step is a row, the Merge button moves under the shrine's list so
+    every odd shows at a readable size, and the HUD's STORE hides while a menu is open; an old Speed step pays at the
+    smallest Climbing pack's rate.
 
 - **The thirty gods as Roblox avatars (2026-10-05)**. The user wanted real god models. Roblox's mesh generator kept
   missing (third arms, bare chests; moderation removed two limb meshes), and a Blender pipeline (`art/gods/`, Zeus and
