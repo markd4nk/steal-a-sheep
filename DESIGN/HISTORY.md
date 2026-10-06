@@ -31,7 +31,8 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     `SheepStuds.spec`), console clean. The client had the five variants; 121 wild lambs and a pen of eight special
     wools (glowing, glass, fabric, metal, foil, silver) came out right; the Flock menu's 3D sheep shows the studs. All 183
     families, plus Royal and Shiny fleeces, rendered in Edit: nothing broken (the Scarecrow's denim and checker
-    pictures still show). Not run on the cloud place or on a phone.
+    pictures still show). Rechecked after merging main's avatar gods (78 tests, 121 of 121 wild lambs studded, console
+    clean). Not run on the cloud place or on a phone.
 
 - **The thirty gods as Roblox avatars (2026-10-05)**. The user wanted real god models. Roblox's mesh generator kept
   missing (third arms, bare chests; moderation removed two limb meshes), and a Blender pipeline (`art/gods/`, Zeus and
