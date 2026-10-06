@@ -267,6 +267,13 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   screenshot, and trigger them with `InputHoldBegin`/`InputHoldEnd` as their button does. Prompts sharing a part need
   laying out side by side (`SizeOffset`); Roblox's own UI stacked them, a custom one overlaps them." Seen 2026-10-05
   in Steal a Sheep.
+- **S45** (`BRAIN/PATTERNS/desktop.md`, Other sessions): "`window` close goes by `query`, not `hwnd` (`hwnd` alone
+  fails with 'no window matching None'), and closes the first window whose title contains it. After Don't Save a
+  Studio stays open on its Start page, titled just 'Roblox Studio', which every Studio window's title contains: closing
+  it with that query shut the user's cloud place Studio instead. List the windows first and give a query only one
+  title holds. A Team Create place closed by mistake loses nothing (its edits are on Roblox's server), but its MCP
+  connection goes until it's reopened: `RobloxStudioBeta.exe -task EditPlace -placeId <id> -universeId <id>`." Seen
+  2026-10-06 in Steal a Sheep, closing an overnight test copy.
 
 ## Done
 
