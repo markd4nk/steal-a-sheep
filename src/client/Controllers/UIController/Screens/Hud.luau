@@ -473,7 +473,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end)
 	end)
 
-	-- The chase banner and its music.
+	-- The chase banner (its sounds and red screen are ChaseController's).
 	local bannerToken = 0
 	trove:Add(Remotes.Chase:Connect(function(god: string?)
 		bannerToken += 1
@@ -481,8 +481,6 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			banner.Text = `{god} wants their sheep back!`
 			banner.Visible = true
 			Motion.NoticeIn(banner, banner.Position)
-			sound:SetDanger(true)
-			sound:Play("WolfScare")
 			local token = bannerToken
 			task.delay(GameConfig.Ui.BannerSeconds, function()
 				if bannerToken == token then
@@ -491,7 +489,6 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			end)
 		else
 			banner.Visible = false
-			sound:SetDanger(false)
 		end
 	end))
 	trove:Add(Remotes.Notify:Connect(function(message: string, kind: string, cue: string?)

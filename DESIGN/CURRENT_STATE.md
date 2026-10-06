@@ -86,7 +86,7 @@ lamb.
 - **Server**: `DataService`, `PurchaseService` (grants by Config/Store key), `StoreService`, `SheepService`, `PlotService`, `FlockService`,
   `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
   `GiftService`, `DailyService`, `ShrineService`, `DebugService` (Studio only).
-- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Daily, Store,
+- **Client**: `StateController`, `SoundController`, `ChaseController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Daily, Store,
   Popup, Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`,
   `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
@@ -132,6 +132,13 @@ lamb.
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
+- **Planned, later** (the user, 2026-10-06): a catch sound of each god's own (Zeus's thunder and so on).
+- **A scarier steal and chase (merged into main 2026-10-06, not published yet)**: an alarm, the god's
+  roar, footsteps, yells, snarl, punch and laugh from the god (`GodController`; goddesses `Olympus.Goddess`), the
+  thief's heartbeat, red edges, drained colour, shake and drums that build as it closes (`ChaseController`,
+  `Utils/ChaseFeel`, `GameConfig.Chase`), "safe" on getting away; `Remotes.Chase` says how a chase ended. The user OK'd
+  the mock-up's sounds and picked alarm C; every voice one person in one take, goddesses deeper (their words, in
+  DECISIONS.md); every voice-board take but M1, said at random without repeats (`Config/Sounds` Voices, `art/chase/`).
 
 - **Game page art and a trailer, first cuts** (overnight 2026-10-05, nothing uploaded): icon and thumbnail mock-ups
   (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and
@@ -199,7 +206,8 @@ lamb.
   (touch); a real phone, a tablet and a gamepad are untested. The slide uses Roblox's own input.
 - **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
   teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
-- **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to.
+- **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to. The chase's were heard by the user in the
+  mock-up (not yet in a playtest); its alarm and the goddess voices only on the sound boards, if at all.
 - **The free gift's favorite prompt**: `PromptSetFavorite` in the live game (version 8), its answer and the claim after
   it are untested.
 - **Momentum slides in play**: a tier 20 chase (the god 43 -> 69 studs/s with its thief, caught on tier 16) and tier 3

@@ -7,6 +7,13 @@ confirmed or reversed it.
 
 ## Confirmed rules
 
+- **The chase's sounds (2026-10-06)**: Steal an Egg's terror with human sounds, since the guardians are gods. The
+  alarm is option C, APM "Electronic Alarms (D)" (over A, the buzzier Red Alert, and the mock-up's "heavy metal"
+  one). Every voice is one person in one take, never two sounds layered ("it feels like it's layered rather than just
+  one person"), and a laugh is one continuous laugh. The goddesses' voices are slowed deeper ("they're still huge
+  beings"). Kept from the mock-up: the roar, the chase, "right behind you" and the god's laugh. From the voice board
+  every take but M1 is in, said at random for "a little bit more variety every time, different voice lines": roars
+  M2-M4 and F1-F3, laughs ML1-ML3 and FL1-FL3. A catch sound of each god's own comes later.
 - **The base design doc is the starting point; the user refines from here (2026-10-05).** The first build followed
   `DESIGN/BASE_DESIGN_DOC.md`; the user will rework a lot of it as they go. A request that changes what was built is
   the new rule: don't object that it goes against the base doc, the first build or the calls below; make it and update
@@ -248,6 +255,26 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
 - Any other wool material keeps its look without studs (none uses one today).
 
 ## To review
+
+Calls in the scarier steal and chase (2026-10-06; the user's own calls are under *Confirmed rules*; `art/chase/`,
+GameConfig.Chase, Config/Sounds):
+
+- **No repeats**: a god never says the take it said last, nor its previous take for the same moment (three laughs: never
+  one laugh twice running), while there's another to choose. Each god keeps its own memory, on each player's device.
+  The "got away" yells (one for gods, one for goddesses) and the snarl have one take each.
+- **Alarm length**: 4 s from its first pulse, on every steal, the tutorial's too.
+- **Scariness follows distance**: the god 90 studs or more away is the calmest a chase gets, 8 or closer the scariest;
+  the head start sits at 0.3 of the way. Heartbeat 80 to 160 a minute; drums from 0.42, all in at 0.75.
+- **Red edges**: 25% to 75% opaque, a throb on every heartbeat; colour drained 35% and a red cast at the scariest. Under
+  the HUD (the banner and buttons stay clear).
+- **Shake and zoom**: a 6-degree zoom jolt and a small shake on the steal; the god's footsteps shake the view from 0.72;
+  a big shake on the catch. None of it with Reduce Motion on (flashes stay).
+- **The god's voice**: yells every 2.5-4.5 s while running, a snarl every 1.6-2.6 s within 16 studs of its thief; an
+  angry yell when a thief gets away. The goddesses at 0.77 speed (the goddess board's "deeper"; "deepest" is 0.68).
+- **Getting away**: the chase music stops within 0.3 s at the safety line, the Notice hit plays, the red fades over
+  1.2 s with the heartbeat slowing. No special sound for each god's catch yet (Zeus's thunder was only in the mock-up).
+- **Gone**: the horror sting on every steal (APM "FEAR HIT 12"), the cartoon boink on picking up a stolen lamb, the
+  punch's comic clangs ("Scuffle", kept for slide hits). The chase music is now APM "Run For Your Life" (was "Evasion").
 
 Calls in the momentum slide (2026-10-06, `Mountain.Momentum`, `GodService` pace):
 
