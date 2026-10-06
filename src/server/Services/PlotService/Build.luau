@@ -146,18 +146,20 @@ function Build.Plot(index: number, model: Model, parent: Instance): (Pieces, CFr
 	signAnchor.Transparency = 1
 	signAnchor.CanCollide = false
 	signAnchor.CanQuery = false
+	-- Sized in studs, like a real sign: a fixed pixel size made the five signs pile up across the screen from afar.
 	local sign = Instance.new("BillboardGui")
-	sign.Size = UDim2.fromOffset(320, 90)
+	sign.Size = UDim2.fromScale(24, 6.8)
 	sign.MaxDistance = 300
 	sign.LightInfluence = 0
 	sign.Parent = signAnchor
 	local signList = Instance.new("UIListLayout")
 	signList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	signList.Parent = sign
-	local function signLine(text: string, height: number, color: Color3): TextLabel
+	-- `share`: the line's part of the sign's height.
+	local function signLine(text: string, share: number, color: Color3): TextLabel
 		local line = Instance.new("TextLabel")
 		line.BackgroundTransparency = 1
-		line.Size = UDim2.new(1, 0, 0, height)
+		line.Size = UDim2.fromScale(1, share)
 		line.FontFace = Font.fromEnum(Enum.Font.FredokaOne)
 		line.TextScaled = true
 		line.TextColor3 = color
@@ -168,8 +170,8 @@ function Build.Plot(index: number, model: Model, parent: Instance): (Pieces, CFr
 		line.Parent = sign
 		return line
 	end
-	local signName = signLine("Empty plot", 50, Color3.new(1, 1, 1))
-	local signIncome = signLine("", 36, Color3.fromRGB(190, 255, 90))
+	local signName = signLine("Empty plot", 0.56, Color3.new(1, 1, 1))
+	local signIncome = signLine("", 0.4, Color3.fromRGB(190, 255, 90))
 
 	folder.Parent = parent
 	local spawn = origin * CFrame.new(SPAWN_AT.X, 4, SPAWN_AT.Y) * CFrame.Angles(0, math.rad(-90), 0)

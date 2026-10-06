@@ -181,6 +181,8 @@ local function refreshPutDown()
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "PutDownPrompt"
 	prompt.Style = Enum.ProximityPromptStyle.Custom
+	local scale = player:GetAttribute("CarriedScale")
+	prompt:SetAttribute("PromptLift", 1 + 2 * (if type(scale) == "number" then scale else 1))
 	prompt.ActionText = "Put down"
 	prompt.ObjectText = ""
 	prompt.HoldDuration = 0

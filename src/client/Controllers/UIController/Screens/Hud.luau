@@ -4,6 +4,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SocialService = game:GetService("SocialService")
+local UserInputService = game:GetService("UserInputService")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
@@ -31,6 +32,7 @@ local PICTURE_SIZE = 66
 local TILES_BOTTOM = 70 -- the menu pictures stop this far above the bottom, clear of a phone's thumbstick
 local WORK_HINT_SECONDS = 12 -- "Put your sheep to work" shows this long after room opens up in the pen
 local CRAWL_SHARE = 0.5 -- climbing slower than this share of normal speed: "Train to climb"
+local MIDDLE_HALF_WIDTH = 160 -- half the widest hint or notice, in points: what must clear the menu pictures
 local Color = Theme.Color
 local TextSize = Theme.TextSize
 
@@ -242,16 +244,45 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local stateController = context.Controllers.StateController
 	local sound = context.Controllers.SoundController
 
-	Scale.TopBar(gui, root, topBar, trove, function(below: number)
-		objective.Position = UDim2.new(0.5, 0, 0, below)
-		noticeLabel.Position = UDim2.new(0.5, 0, 0, below + 64)
-		banner.Position = UDim2.new(0.5, 0, 0, below + 110)
+	-- The hint, notices and chase banner stand in the middle of the screen, or, where the menu pictures wrap into a wide
+	-- block (a phone held sideways), in the middle of the room right of them, so nothing covers a picture.
+	local below = 60
+	local tilesRight = 0 -- points from the left: where the menu pictures end
+	local noticeHome = noticeLabel.Position -- where a notice rests, from placeMiddle
+	local function placeMiddle()
+		local scale = Scale.Of(root)
+		local width = root.AbsoluteSize.X / scale
+		local left = 0
+		if tiles.Visible then
+			for _, child in tiles:GetChildren() do
+				if child:IsA("GuiObject") and child.Visible then
+					local right = child.AbsolutePosition.X + child.AbsoluteSize.X - root.AbsolutePosition.X
+					left = math.max(left, right / scale)
+				end
+			end
+		end
+		tilesRight = left
+		local middle = width / 2
+		if left > middle - MIDDLE_HALF_WIDTH then
+			middle = (left + width) / 2
+		end
+		objective.Position = UDim2.new(0, middle, 0, below)
+		noticeHome = UDim2.new(0, middle, 0, below + 64)
+		if not noticeLabel.Visible then
+			noticeLabel.Position = noticeHome
+		end
+		banner.Position = UDim2.new(0, middle, 0, below + 110)
+	end
+	Scale.TopBar(gui, root, topBar, trove, function(top: number)
+		below = top
 		tiles.Position = UDim2.fromOffset(8, below + 8)
 		tiles.Size = UDim2.new(0, PICTURE_SIZE + 12, 1, -(below + 8 + TILES_BOTTOM))
+		placeMiddle()
 	end)
+	trove:Connect(tiles:GetPropertyChangedSignal("Visible"), placeMiddle)
 
 	-- Notices: one at a time, the rest queued (Shear a Sheep's HUD notices). A notice's sound plays when its words show.
-	local noticeRest = noticeLabel.Position
+	local noticeRest = noticeHome
 	local queue: { { Text: string, Kind: string, Cue: string? } } = {}
 	local showing = false
 	noticeLabel.Visible = false
@@ -268,7 +299,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		end
 		local kind: Style.NoticeKind = Style.NoticeKindOf(nextNotice.Kind)
 		Style.PaintNotice(noticeLabel, kind)
-		noticeRest = noticeLabel.Position
+		noticeRest = noticeHome
 		Motion.NoticeIn(noticeLabel, noticeRest)
 		if Style.IsProblem(kind) then
 			task.delay(Theme.Motion.NoticeIn.Time, function()
@@ -483,6 +514,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		dexAlert.Visible = waiting > 0
 		dexAlert.Text = if waiting > 9 then "9+" else tostring(waiting)
 		refreshDaily()
+		task.defer(placeMiddle)
 	end
 
 	-- The carry card.
@@ -653,6 +685,12 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			(middle.Y - SCREEN_MARGIN) / math.max(math.abs(unit.Y), 1e-3)
 		)
 		local at = middle + unit * reach
+		-- Clear of the menu pictures, and on a touch screen of the thumbstick and jump button along the bottom; the
+		-- pointer still turns to the target.
+		local right = viewport.X - SCREEN_MARGIN
+		local left = math.min(inset.X + (tilesRight + 40) * scale, right)
+		local bottom = if UserInputService.TouchEnabled then viewport.Y * 0.6 else viewport.Y - SCREEN_MARGIN
+		at = Vector2.new(math.clamp(at.X, left, right), math.clamp(at.Y, SCREEN_MARGIN, bottom))
 		arrow.Position = UDim2.fromOffset((at.X - inset.X) / scale, (at.Y - inset.Y) / scale)
 		pointer.Rotation = math.deg(math.atan2(unit.Y, unit.X)) - 90
 	end)

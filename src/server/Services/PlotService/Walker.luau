@@ -491,7 +491,7 @@ function Walker.Build(parent: Instance, frame: CFrame, signAt: CFrame): Pieces
 	tagAnchor.Name = "TagAnchor"
 	tagAnchor.Transparency = 1
 	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.fromOffset(150, 56)
+	billboard.Size = UDim2.fromScale(6.3, 2.35) -- studs, so the row of walkers' tags doesn't pile up from afar
 	billboard.MaxDistance = 160
 	billboard.LightInfluence = 0
 	billboard.Parent = tagAnchor

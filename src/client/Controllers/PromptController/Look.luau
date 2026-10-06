@@ -99,6 +99,11 @@ function Look.Show(
 		(math.max(rowWidth, textWidth(object, OBJECT_SIZE) + 12)) * scale,
 		(objectHeight + hitHeight) * scale
 	)
+	-- PromptLift (studs) raises it off its part: the Put down prompt sits over the lamb on the player's head, not on it.
+	local lift = prompt:GetAttribute("PromptLift")
+	if type(lift) == "number" then
+		billboard.StudsOffsetWorldSpace = Vector3.new(0, lift, 0)
+	end
 	local adornee = prompt.Parent
 	billboard.Adornee = if adornee
 			and (adornee:IsA("BasePart") or adornee:IsA("Attachment") or adornee:IsA("Model"))

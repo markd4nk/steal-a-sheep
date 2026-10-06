@@ -62,8 +62,9 @@ local function station(
 	prompt.GamepadKeyCode = Enum.KeyCode.ButtonX
 	prompt:SetAttribute("Opens", opens)
 	prompt.Parent = anchor
+	-- Sized in studs (it shrinks with distance), so the stalls' names don't pile up over the hub from afar.
 	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.fromOffset(260, 60)
+	billboard.Size = UDim2.fromScale(15, 3.5)
 	billboard.StudsOffsetWorldSpace = Vector3.new(0, 14, 0)
 	billboard.MaxDistance = 220
 	billboard.LightInfluence = 0
