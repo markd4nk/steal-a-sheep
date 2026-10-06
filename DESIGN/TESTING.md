@@ -147,13 +147,24 @@ its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labe
 
 - **Preview the map**: `lune run tools/preview-upper-mountain.luau "<Studio version folder>/content"`, then in Edit:
   `local m = game:GetObjects("rbxasset://sas/upper.rbxm")[1]; m.Parent = game.ServerStorage;
-  require(m).Build({ Instance = Instance, CFrame = CFrame, Vector3 = Vector3, Color3 = Color3, Enum = Enum }, workspace);
-  m:Destroy()`. It replaces `Stages.HighOlympus` each run.
+  require(m).Build({ Instance = Instance, CFrame = CFrame, Vector3 = Vector3, Color3 = Color3, Enum = Enum,
+  NumberRange = NumberRange, NumberSequence = NumberSequence, NumberSequenceKeypoint = NumberSequenceKeypoint,
+  ColorSequence = ColorSequence }, workspace); m:Destroy()`. It replaces `Stages.HighOlympus` each run.
+- **A slide bot along the path (2026-10-06)**: in one Client `execute_luau` (standing still between calls, the god
+  catches you): `Debug UnlockAll`, `Debug Steal 30`, then a RenderStep at `Input + 1` that calls `Humanoid:Move`
+  towards the first `Path` tile 30 studs further down (tiles under `Stages.HighOlympus`, sorted by x), logging
+  horizontal speed drops (a bump: under 0.6 of the last frame's) and jumps in x over 60 (a punch). `Move(-X)` instead
+  slides straight. Measured: 51.7 s along the path, 54.0 s straight (10 bumps), Zeus's top to x 3060.
 - **Branch code without Rojo**: `rojo build tools/sync.project.json` (a Folder-rooted copy of the project:
   ReplicatedStorage, ServerScriptService, StarterPlayerScripts, Tests) into `content/sas/sync.rbxm`, then in Edit
   `GetObjects` it and swap each container's children.
+- **Filming High Olympus in play (2026-10-06)**: a Scriptable camera held over a stretch while the character stands at
+  the plots draws only the sky there (seen on Hypnos's stretch, main's version too); pivot the character (anchored)
+  near the shot first. With the character there and the normal camera it draws properly. `windows-computer-use`
+  `record` on a background Studio window gave identical frames; foreground it (no input needed) for motion clips.
 - **Lane check**: every collidable part under a stretch's `Decor` in its frame (x across, y up from the floor) must have
-  |x| >= 56 or sit 16+ studs up. `lune run tools/check-lanes.luau` checks the built `StealASheep.rbxl` without Studio
+  |x| >= 56 or sit 16+ studs up; under its `Lane`, collidable parts lower than 16 must leave 28+ studs across the
+  lane everywhere, keep off the `Path` tiles and 6 studs from the lamb and god spots. `lune run tools/check-lanes.luau` checks the built `StealASheep.rbxl` without Studio
   (exits 1 and lists the parts if any are in the lane); rerun it after changing a theme or the stretches' layout.
 - **A mesh's cost**: in Edit, `AssetService:CreateEditableMeshAsync(part.MeshContent)` then `#mesh:GetFaces()` gives its
   triangles, and `AssetService:CreateEditableImageAsync(part.TextureContent).Size` its texture size (destroy both

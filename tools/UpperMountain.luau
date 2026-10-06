@@ -25,11 +25,30 @@ local DECOR_SCALE = SURFACE_LENGTH / 210
 -- A stretch longer than one unit takes its ends from the neighbouring copies, laid along its floor like the first.
 local TERRACE_REPEAT = 251.16
 local SLAB_WIDTH = 190
--- The walkable lane in a stretch's own frame (x across: +x is world -z). Decor stays out of it so slides run clear.
+-- The walkable lane in a stretch's own frame (x across: +x is world -z). Decor stays out of it so slides run clear;
+-- the lane's own obstacles (Lane, below) go in it.
 local LANE_HALF = 56
 local FOLDER_NAME = "HighOlympus"
+-- What the game keeps clear on each stretch, from Config/Olympus and Utils/Mountain (PastureSpots, GodHome): keep in
+-- step. The lane's z range in the world, where on a tier its pasture starts and stops, and the god's spot.
+local LANE_Z = { 140, 244 }
+local PASTURE_FROM = 0.45
+local PASTURE_TOP = 18
+local SPAWNS_PER_TIER = 4
+local GOD_BACK = 22
+local GOD_Z = 217
 
-type Env = { Instance: any, CFrame: any, Vector3: any, Color3: any, Enum: any }
+type Env = {
+	Instance: any,
+	CFrame: any,
+	Vector3: any,
+	Color3: any,
+	Enum: any,
+	NumberRange: any,
+	NumberSequence: any,
+	NumberSequenceKeypoint: any,
+	ColorSequence: any,
+}
 
 export type Section = {
 	Tier: number,
@@ -85,6 +104,38 @@ function UpperMountain.Layout(): { Section }
 		x, y = x2, y2
 	end
 	return sections
+end
+
+-- The lane's obstacles and terrain (defined below the shared props).
+local Lane = {}
+
+-- Scenery the client sets moving (src/client/Controllers/SceneryController): a tag and its numbers as attributes.
+local Motion = {}
+
+-- Bobs up and down `height` studs every `period` seconds.
+function Motion.Bob(instance: any, height: number, period: number)
+	if not instance then
+		return
+	end
+	instance:AddTag("OlympusBob")
+	instance:SetAttribute("BobHeight", height)
+	instance:SetAttribute("BobPeriod", period)
+end
+
+-- Turns round `axis` through `center` at `speed` degrees a second.
+function Motion.Spin(instance: any, center: any, axis: any, speed: number)
+	instance:AddTag("OlympusSpin")
+	instance:SetAttribute("SpinCenter", center)
+	instance:SetAttribute("SpinAxis", axis)
+	instance:SetAttribute("SpinSpeed", speed)
+end
+
+-- Its birds circle `center` (a level circle `radius` across) at `speed` degrees a second, flapping.
+function Motion.Flock(instance: any, center: any, radius: number, speed: number)
+	instance:AddTag("OlympusFlock")
+	instance:SetAttribute("FlockCenter", center)
+	instance:SetAttribute("FlockRadius", radius)
+	instance:SetAttribute("FlockSpeed", speed)
 end
 
 -- A small seeded random (Park-Miller), the same in Lune and Studio.
@@ -266,6 +317,18 @@ local SPRITES: { [string]: { string } } = {
 		"..Z.",
 		".Z..",
 		"ZZZZ",
+	},
+	Eagle = {
+		"BB.........BB",
+		"BBB...W...BBB",
+		".BBB.WWW.BBB.",
+		".BBBBWKWBBBB.",
+		"..BBBWYWBBB..",
+		"...BBBYBBB...",
+		"....BBBBB....",
+		".....BBB.....",
+		"....BB.BB....",
+		"....T...T....",
 	},
 }
 
@@ -572,7 +635,9 @@ function UpperMountain.Build(env: Env, workspace: any)
 			return frame * Vector3.new(x, y, z)
 		end
 
-		-- Places a template upright (or tilted with the slope), turned `yaw` degrees, recoloured part by part.
+		-- Places a template tilted with the slope like the old stages' pieces (upright ones look as if they're toppling
+		-- downhill on the steep stretches), or `Upright` for things floating off the mountain, turned `yaw` degrees,
+		-- recoloured part by part.
 		local function place(name: string, x: number, z: number, options: { [string]: any }?): any
 			local template = templates[name]
 			if not template then
@@ -582,10 +647,10 @@ function UpperMountain.Build(env: Env, workspace: any)
 			local scale = opts.Scale or 1
 			local y = if opts.Y then opts.Y else ground(x, z) - (opts.Sink or 0.3)
 			local base
-			if opts.Tilted then
-				base = frame * CFrame.new(x, y, z) * CFrame.fromEulerAnglesYXZ(0, -math.pi / 2, 0)
-			else
+			if opts.Upright then
 				base = CFrame.new(at(x, y, z))
+			else
+				base = frame * CFrame.new(x, y, z) * CFrame.fromEulerAnglesYXZ(0, -math.pi / 2, 0)
 			end
 			base = base * CFrame.Angles(0, math.rad(opts.Yaw or random.Number(0, 360)), 0)
 			if opts.Roll then
@@ -640,17 +705,20 @@ function UpperMountain.Build(env: Env, workspace: any)
 			return holder
 		end
 
-		-- A block in the stretch's upright frame at (x, y, z), turned `yaw` degrees.
+		-- A block at (x, y, z) in the stretch's frame, tilted with the slope (or `Upright`), turned `yaw` degrees.
 		local function block(x: number, y: number, z: number, size: any, color: any, props: { [string]: any }?): any
 			local yaw = props and props.Yaw or 0
-			local cf = CFrame.new(at(x, y, z)) * upright * CFrame.Angles(0, math.rad(yaw), 0)
+			local cf = if props and props.Upright
+				then CFrame.new(at(x, y, z)) * upright
+				else frame * CFrame.new(x, y, z)
+			cf = cf * CFrame.Angles(0, math.rad(yaw), 0)
 			if props and props.Turn then
 				cf = cf * props.Turn
 			end
 			local extra: { [string]: any } = {}
 			if props then
 				for name, value in props do
-					if name ~= "Yaw" and name ~= "Turn" and name ~= "Parent" then
+					if name ~= "Yaw" and name ~= "Turn" and name ~= "Parent" and name ~= "Upright" then
 						extra[name] = value
 					end
 				end
@@ -658,7 +726,8 @@ function UpperMountain.Build(env: Env, workspace: any)
 			return newPart(props and props.Parent or decor, cf, size, color, extra)
 		end
 
-		-- A pixel sprite standing upright at (x, z) on the ground, facing the lane, `cell` studs a pixel.
+		-- A pixel sprite standing at (x, z) on the ground, facing the lane, `cell` studs a pixel; tilted with the slope
+		-- unless `Upright`.
 		local function sprite(
 			name: string,
 			x: number,
@@ -676,7 +745,9 @@ function UpperMountain.Build(env: Env, workspace: any)
 			local y0 = (if opts.Y then opts.Y else ground(x, z)) + lift
 			local face = if x > 0 then 90 else -90
 			local yaw = opts.Yaw or face
-			local base = CFrame.new(at(x, y0, z)) * upright * CFrame.Angles(0, math.rad(yaw), 0)
+			-- `Frame`: stand it in this frame instead (the top of a post).
+			local stood = if opts.Upright then CFrame.new(at(x, y0, z)) * upright else frame * CFrame.new(x, y0, z)
+			local base = (opts.Frame or stood) * CFrame.Angles(0, math.rad(yaw), 0)
 			if opts.Tip then
 				base = base * CFrame.Angles(0, 0, math.rad(opts.Tip))
 			end
@@ -723,6 +794,74 @@ function UpperMountain.Build(env: Env, workspace: any)
 			return x, z
 		end
 
+		-- A block lying in the floor's frame (tilted with the slope like the terraces), `y` up from the floor, turned
+		-- `Yaw` degrees about the floor's normal.
+		local function tilted(x: number, y: number, z: number, size: any, color: any, props: { [string]: any }?): any
+			local cf = frame * CFrame.new(x, y, z) * CFrame.Angles(0, math.rad(props and props.Yaw or 0), 0)
+			if props and props.Turn then
+				cf = cf * props.Turn
+			end
+			local extra: { [string]: any } = {}
+			if props then
+				for name, value in props do
+					if name ~= "Yaw" and name ~= "Turn" and name ~= "Parent" then
+						extra[name] = value
+					end
+				end
+			end
+			return newPart(props and props.Parent or decor, cf, size, color, extra)
+		end
+
+		-- A frame standing on the floor at (x, z), or on a surface `lift` studs above it (a knoll's top), tilted with the
+		-- slope like the old stages' pieces (upright ones look as if they're toppling downhill on the steep stretches):
+		-- x across, y out of the floor, z uphill.
+		local function stand(x: number, z: number, lift: number?): any
+			return frame * CFrame.new(x, lift or 0, z)
+		end
+
+		-- A particle emitter on an invisible part. `spec`: Texture, Color (Color3 or two), Size and Transparency
+		-- ({ { time, value } }), Lifetime, Speed (numbers or { min, max }), Rate and any other emitter property.
+		local function emitter(parent: any, cf: any, size: any, spec: { [string]: any }): any
+			local holder = newPart(parent, cf, size, rgb(255, 255, 255), {
+				Transparency = 1,
+				CanCollide = false,
+				CanQuery = false,
+				CanTouch = false,
+				CastShadow = false,
+			})
+			holder.Name = spec.Name or "Emitter"
+			local function range(value: any): any
+				return if type(value) == "table"
+					then env.NumberRange.new(value[1], value[2])
+					else env.NumberRange.new(value)
+			end
+			local function sequence(points: { { number } }): any
+				local keypoints = {}
+				for _, point in points do
+					table.insert(keypoints, env.NumberSequenceKeypoint.new(point[1], point[2]))
+				end
+				return env.NumberSequence.new(keypoints)
+			end
+			local particles = Instance.new("ParticleEmitter")
+			for name, value in spec do
+				if name == "Name" then
+					continue
+				elseif name == "Color" then
+					particles.Color = if type(value) == "table"
+						then env.ColorSequence.new(value[1], value[2])
+						else env.ColorSequence.new(value)
+				elseif name == "Size" or name == "Transparency" then
+					particles[name] = sequence(value)
+				elseif name == "Lifetime" or name == "Speed" or name == "Rotation" or name == "RotSpeed" then
+					particles[name] = range(value)
+				else
+					particles[name] = value
+				end
+			end
+			particles.Parent = holder
+			return holder
+		end
+
 		local ctx = {
 			Random = random,
 			Half = half,
@@ -747,6 +886,13 @@ function UpperMountain.Build(env: Env, workspace: any)
 			Rgb = rgb,
 			Index = index,
 			Count = count,
+			Section = section,
+			Tilted = tilted,
+			Stand = stand,
+			Emitter = emitter,
+			LaneRandom = newRandom(section.Tier * 101 + 57),
+			-- Filled by Lane.Build: the outcrops and knoll as { X1, X2, Z1, Z2 }, for the edge props to keep off.
+			Walls = {},
 		}
 
 		-- Plants on the terraces and the floor's edges.
@@ -763,7 +909,7 @@ function UpperMountain.Build(env: Env, workspace: any)
 				random.Pick({ "Stone1", "Stone2", "Stone3" }),
 				x,
 				z,
-				{ Solid = theme.Stone, Scale = random.Number(1.2, 2.2), Tilted = true }
+				{ Solid = theme.Stone, Scale = random.Number(1.2, 2.2) }
 			)
 		end
 		-- Floating islands and clouds off to the sides.
@@ -771,8 +917,9 @@ function UpperMountain.Build(env: Env, workspace: any)
 			local side = if i % 2 == 0 then 1 else -1
 			local x = side * random.Number(135, 210)
 			local z = random.Number(-half, half)
-			place("Island", x, z, {
+			local island = place("Island", x, z, {
 				Y = random.Number(-10, 45),
+				Upright = true,
 				Scale = random.Number(0.8, 1.4),
 				Color = function(_part: any, source: any, _i: number, value: number): any
 					local h = select(1, source:ToHSV())
@@ -782,15 +929,24 @@ function UpperMountain.Build(env: Env, workspace: any)
 					return shade(theme.SideB, value, 1)
 				end,
 			})
+			-- Motion's numbers come from the index, not `random`, so the decor after them keeps its places.
+			Motion.Bob(island, 3 + (i % 3), 6 + (i % 4))
 		end
 		for i = 1, count(theme.Clouds or 2) do
 			local side = if i % 2 == 0 then -1 else 1
-			place("Cloud", side * random.Number(170, 320), random.Number(-half, half), {
+			local cloud = place("Cloud", side * random.Number(170, 320), random.Number(-half, half), {
 				Y = random.Number(40, 120),
+				Upright = true,
 				Solid = theme.Cloud or rgb(214, 214, 214),
 				Ghost = true,
 				Scale = random.Number(0.5, 0.8),
 			})
+			Motion.Bob(cloud, 3, 14 + (i % 3) * 3)
+		end
+		-- The lane's outcrops, knoll, obstacles, floor patches and particles, on their own random stream so the decor
+		-- above keeps its places. Built before the props so edge props can keep off the outcrops.
+		if theme.Obstacles then
+			Lane.Build(ctx, theme)
 		end
 		if theme.Props then
 			theme.Props(ctx, theme)
@@ -916,22 +1072,34 @@ function Props.Crater(c: any, x: number, z: number, rim: any, inside: any, radiu
 	end
 end
 
--- A wheel on a post at a terrace's edge, its face towards the lane.
+-- A wheel on a post at a terrace's edge, its face towards the lane, turning.
 function Props.Wheel(c: any, x: number, z: number, colors: { any }, hub: any)
 	local y = c.Ground(x, z)
 	local V = c.Vector3
 	local center = y + 20
 	c.Block(x, y + 9, z, V.new(3, 18, 3), hub)
+	local wheel = c.Instance.new("Model")
+	wheel.Name = "Wheel"
 	for i = 0, 15 do
 		local a = (i + 0.5) * math.pi * 2 / 16
 		c.Block(x, center + math.sin(a) * 13, z + math.cos(a) * 13, V.new(2, 4, 5.4), colors[i % #colors + 1], {
 			Turn = c.CFrame.Angles(-a, 0, 0),
+			Parent = wheel,
 		})
 	end
 	for i = 0, 3 do
-		c.Block(x, center, z, V.new(1.4, 24, 1.4), hub, { Turn = c.CFrame.Angles(math.rad(i * 45), 0, 0) })
+		c.Block(
+			x,
+			center,
+			z,
+			V.new(1.4, 24, 1.4),
+			hub,
+			{ Turn = c.CFrame.Angles(math.rad(i * 45), 0, 0), Parent = wheel }
+		)
 	end
-	c.Block(x, center, z, V.new(2.6, 4, 4), hub)
+	c.Block(x, center, z, V.new(2.6, 4, 4), hub, { Parent = wheel })
+	wheel.Parent = c.Decor
+	Motion.Spin(wheel, c.At(x, center, z), c.Frame.RightVector, 12)
 end
 
 -- A fan of ribs standing at (x, z) from a hinge at height y, facing the path: a shell, a peacock's tail.
@@ -957,14 +1125,597 @@ function Props.Scatter(c: any, count: number, make: (number, number) -> (), minX
 	end
 end
 
--- Along both lane edges, alternating sides every `step / 2` studs: torches, columns, banners.
+-- Along both lane edges, alternating sides every `step / 2` studs: torches, columns, banners. Not where an outcrop
+-- reaches into the lane.
 function Props.Edges(c: any, step: number, make: (number, number) -> ())
 	local z = -c.Half + step / 2
 	local side = 1
 	while z < c.Half - 6 do
-		make(side * (c.Lane + 5), z)
+		local x = side * (c.Lane + 5)
+		local walled = false
+		for _, wall in c.Walls do
+			if x * wall[1] > 0 and z > wall[3] - 6 and z < wall[4] + 6 then
+				walled = true
+			end
+		end
+		if not walled then
+			make(x, z)
+		end
 		side = -side
 		z += step / 2
+	end
+end
+
+-- The lane (2026-10-06). The old stages have trees, snowmen, arches and lamps in their lanes; these stretches get the
+-- same: rock outcrops of the terraces' stacked blocks reaching in from the sides, a knoll splitting the path round
+-- the god's landmark, the god's obstacles at about the old stages' density (more each tier), flat patches on the floor
+-- and the god's particles. A slider always has a gap of MIN_GAP studs somewhere across, and the pasture's lamb spots,
+-- the god's spot and the gate at the foot stay clear.
+
+-- Room a slider needs between obstacles at every point down a stretch, in studs across.
+local MIN_GAP = 30
+-- Walking room between two obstacles.
+local SPACING = 6
+-- Kept clear: the foot of each stretch (its gate and sign) and its top.
+local FOOT_CLEAR = 30
+local TOP_CLEAR = 14
+-- Where the terraces' first blocks stand: the outcrops grow from there.
+local WALL_X = 63
+-- Studs kept clear round a lamb spot and the god's spot.
+local SPOT_CLEAR = 10
+-- The path up the lane, a line nothing solid stands on (the user, 2026-10-06): its centre swings PATH_SWING studs
+-- either side, a full bend every 2 pi PATH_BEND studs along, gentle enough to follow at a slide's top speed (100);
+-- obstacles keep PATH_CLEAR studs from its centre line, and it's drawn PATH_WIDTH wide.
+local PATH_SWING = 18
+local PATH_BEND = 52
+local PATH_CLEAR = 11
+local PATH_WIDTH = 12
+
+-- The narrowest open run across the lane at `z`, given the shapes (circles { X, Z, R }, boxes { X1, X2, Z1, Z2 }).
+local function gapAt(shapes: { any }, z: number): number
+	local cells: { [number]: boolean } = {}
+	local count = LANE_HALF -- two-stud cells across the lane
+	for _, shape in shapes do
+		local lo, hi
+		if shape.R then
+			local dz = math.abs(z - shape.Z)
+			if dz < shape.R then
+				local w = math.sqrt(shape.R * shape.R - dz * dz)
+				lo, hi = shape.X - w, shape.X + w
+			end
+		elseif z >= shape.Z1 and z <= shape.Z2 then
+			lo, hi = shape.X1, shape.X2
+		end
+		if lo then
+			local from = math.max(1, math.floor((lo + LANE_HALF) / 2) + 1)
+			for i = from, math.min(count, math.ceil((hi + LANE_HALF) / 2)) do
+				cells[i] = true
+			end
+		end
+	end
+	local best, run = 0, 0
+	for i = 1, count do
+		if cells[i] then
+			run = 0
+		else
+			run += 1
+			best = math.max(best, run)
+		end
+	end
+	return best * 2
+end
+
+-- The spots the game keeps clear on a stretch, in its frame: the four lamb spots and the god's.
+local function keepClear(c: any): { { number } }
+	local section = c.Section
+	local midX = (section.XStart + section.XEnd) / 2
+	local cosine = math.cos(c.Grade)
+	local middleZ = MIDDLE_Z
+	local spots = {}
+	local from = section.XStart + (section.XEnd - section.XStart) * PASTURE_FROM
+	local to = section.XEnd - PASTURE_TOP
+	for index = 1, SPAWNS_PER_TIER do
+		local share = (index - 0.5) / SPAWNS_PER_TIER
+		local worldX = from + (to - from) * (if index % 2 == 0 then 0.35 else 0.75)
+		local worldZ = LANE_Z[1] + 14 + (LANE_Z[2] - LANE_Z[1] - 28) * share
+		table.insert(spots, { middleZ - worldZ, (worldX - midX) / cosine })
+	end
+	table.insert(spots, { middleZ - GOD_Z, (section.XEnd - GOD_BACK - midX) / cosine })
+	return spots
+end
+
+-- Whether `shape` fits: clear of the kept spots and the other shapes, leaving the gap everywhere along it.
+local function fits(c: any, shapes: { any }, shape: any, spots: { { number } }): boolean
+	local z1 = if shape.R then shape.Z - shape.R else shape.Z1
+	local z2 = if shape.R then shape.Z + shape.R else shape.Z2
+	if z1 < -c.Half + FOOT_CLEAR or z2 > c.Half - TOP_CLEAR then
+		return false
+	end
+	for _, spot in spots do
+		local distance
+		if shape.R then
+			distance = math.sqrt((spot[1] - shape.X) ^ 2 + (spot[2] - shape.Z) ^ 2) - shape.R
+		else
+			local dx = math.max(shape.X1 - spot[1], spot[1] - shape.X2, 0)
+			local dz = math.max(shape.Z1 - spot[2], spot[2] - shape.Z2, 0)
+			distance = math.sqrt(dx * dx + dz * dz)
+		end
+		if distance < SPOT_CLEAR then
+			return false
+		end
+	end
+	-- Off the path: its centre line, sampled every 2 studs along, stays PATH_CLEAR from the shape.
+	local pathX = c.PathX
+	if pathX then
+		local reach = if shape.R then shape.R else 0
+		local z = z1 - PATH_CLEAR - reach
+		while z <= z2 + PATH_CLEAR + reach do
+			local px = pathX(z)
+			local distance
+			if shape.R then
+				distance = math.sqrt((px - shape.X) ^ 2 + (z - shape.Z) ^ 2) - shape.R
+			else
+				local dx = math.max(shape.X1 - px, px - shape.X2, 0)
+				local dz = math.max(shape.Z1 - z, z - shape.Z2, 0)
+				distance = math.sqrt(dx * dx + dz * dz)
+			end
+			if distance < PATH_CLEAR then
+				return false
+			end
+			z += 2
+		end
+	end
+	if shape.R then
+		for _, other in shapes do
+			if other.R then
+				local d = math.sqrt((other.X - shape.X) ^ 2 + (other.Z - shape.Z) ^ 2)
+				if d < other.R + shape.R + SPACING then
+					return false
+				end
+			else
+				local dx = math.max(other.X1 - shape.X, shape.X - other.X2, 0)
+				local dz = math.max(other.Z1 - shape.Z, shape.Z - other.Z2, 0)
+				if math.sqrt(dx * dx + dz * dz) < shape.R + SPACING then
+					return false
+				end
+			end
+		end
+	end
+	table.insert(shapes, shape)
+	local z = z1
+	while z <= z2 do
+		if gapAt(shapes, z) < MIN_GAP then
+			table.remove(shapes)
+			return false
+		end
+		z += 2
+	end
+	return true
+end
+
+-- Stacked blocks like the terraces': each layer narrower than the one below, its top capped. Grows from `outer`
+-- towards `inner` (x, either sign) over z1..z2.
+function Lane.Stack(
+	c: any,
+	theme: any,
+	parent: any,
+	inner: number,
+	outer: number,
+	z1: number,
+	z2: number,
+	layers: number
+)
+	local random = c.LaneRandom
+	local V = c.Vector3
+	local side = if outer > inner then 1 else -1
+	local y = 0
+	local edge = math.abs(inner)
+	local from, to = z1, z2
+	for layer = 1, layers do
+		local h = random.Number(4, 6)
+		local width = math.abs(outer) - edge
+		if width < 4 or to - from < 6 then
+			break
+		end
+		local x = side * (edge + width / 2)
+		local z = (from + to) / 2
+		local color = if layer % 2 == 0 then theme.SideB else theme.SideA
+		c.Tilted(x, y + h / 2, z, V.new(width, h, to - from), color, { Parent = parent })
+		local cap = if theme.CapAt then theme.CapAt(V.new(x, 0, z), random) else theme.Cap
+		c.Tilted(x - side * 0.4, y + h + 0.5, z, V.new(width + 0.8, 1, to - from + 0.8), cap, { Parent = parent })
+		-- A loose block on the step's edge now and then, as on the map's terraces.
+		if random.Number(0, 1) < 0.6 then
+			local s = random.Number(2.5, 4)
+			local bz = random.Number(from + s, to - s)
+			c.Tilted(side * (edge + s / 2 + 1), y + h + 1 + s / 2, bz, V.new(s, s, s * 1.4), color, { Parent = parent })
+		end
+		y += h + 1
+		edge += random.Number(4, 8)
+		from += random.Number(2, 6)
+		to -= random.Number(2, 6)
+	end
+	return y
+end
+
+function Lane.Build(c: any, theme: any)
+	local random = c.LaneRandom
+	local Instance = c.Instance
+	local lane = Instance.new("Model")
+	lane.Name = "Lane"
+	lane.Parent = c.Model
+	local function folder(name: string): any
+		local model = Instance.new("Model")
+		model.Name = name
+		model.Parent = lane
+		return model
+	end
+	local outcrops, obstacles, patches, life =
+		folder("Outcrops"), folder("Obstacles"), folder("Patches"), folder("Life")
+	local spots = keepClear(c)
+	local shapes = {}
+	local usable = c.Half * 2 - FOOT_CLEAR - TOP_CLEAR
+	-- The path first: everything else keeps off it.
+	local phase = random.Number(0, math.pi * 2)
+	local function pathX(z: number): number
+		return math.sin(z / PATH_BEND + phase) * PATH_SWING
+	end
+	c.PathX = pathX
+
+	-- The knoll first, the stretch's landmark: a stepped mound in the lane with the god's landmark on top, beside the
+	-- path.
+	for _ = 1, 200 do
+		local w, l = random.Number(24, 30), random.Number(36, 46)
+		local x = random.Number(-LANE_HALF + w / 2 + 6, LANE_HALF - w / 2 - 6)
+		local z = random.Number(-c.Half + FOOT_CLEAR + l / 2, c.Half - TOP_CLEAR - l / 2)
+		local box = { X1 = x - w / 2, X2 = x + w / 2, Z1 = z - l / 2, Z2 = z + l / 2 }
+		if fits(c, shapes, box, spots) then
+			local model = Instance.new("Model")
+			model.Name = "Knoll"
+			model.Parent = outcrops
+			local V = c.Vector3
+			local y = 0
+			local ww, ll = w, l
+			for layer = 1, 3 do
+				local h = random.Number(3, 4.5)
+				local color = if layer % 2 == 0 then theme.SideB else theme.SideA
+				c.Tilted(x, y + h / 2, z, V.new(ww, h, ll), color, { Parent = model })
+				c.Tilted(x, y + h + 0.5, z, V.new(ww + 0.8, 1, ll + 0.8), theme.Cap, { Parent = model })
+				y += h + 1
+				ww -= random.Number(5, 8)
+				ll -= random.Number(6, 10)
+			end
+			table.insert(c.Walls, { 0, 0, box.Z1, box.Z2 })
+			if theme.Knoll then
+				theme.Knoll(c, x, y, z, model)
+			end
+			break
+		end
+	end
+
+	-- Outcrops, alternating sides along the stretch.
+	local outcropCount = theme.Outcrops or (if c.Index <= 6 then 3 else 4)
+	local side = random.Side()
+	for i = 1, outcropCount do
+		for _ = 1, 12 do
+			local reach = random.Number(22, 30)
+			local length = random.Number(36, 54)
+			local z = -c.Half + FOOT_CLEAR + usable * (i - 0.5) / outcropCount + random.Number(-18, 18)
+			local inner = WALL_X - reach
+			local box = if side > 0
+				then { X1 = inner, X2 = LANE_HALF, Z1 = z - length / 2, Z2 = z + length / 2 }
+				else { X1 = -LANE_HALF, X2 = -inner, Z1 = z - length / 2, Z2 = z + length / 2 }
+			if fits(c, shapes, box, spots) then
+				local model = Instance.new("Model")
+				model.Name = "Outcrop"
+				model.Parent = outcrops
+				Lane.Stack(c, theme, model, side * inner, side * (WALL_X + 8), box.Z1, box.Z2, random.Int(3, 4))
+				table.insert(c.Walls, { side, 0, box.Z1, box.Z2 })
+				break
+			end
+		end
+		side = -side
+	end
+
+	-- Obstacles, one to each slice of the stretch so they spread like the old stages', more each tier.
+	-- 20% fewer than the first mock-up's 12 rising to 18 (the user, 2026-10-06).
+	local count = theme.ObstacleCount or math.floor((12 + (c.Index - 1) * 0.35) * 0.8 + 0.5)
+	local total = 0
+	for _, entry in theme.Obstacles do
+		total += entry[1]
+	end
+	local slice = usable / count
+	for i = 1, count do
+		for _ = 1, 80 do
+			local pick = random.Number(0, total)
+			local entry = theme.Obstacles[#theme.Obstacles]
+			for _, candidate in theme.Obstacles do
+				pick -= candidate[1]
+				if pick <= 0 then
+					entry = candidate
+					break
+				end
+			end
+			local r = entry[2]
+			local x = random.Number(-LANE_HALF + r + 2, LANE_HALF - r - 2)
+			local z = -c.Half + FOOT_CLEAR + slice * (i - 1) + random.Number(r, math.max(r, slice - r))
+			if fits(c, shapes, { X = x, Z = z, R = r }, spots) then
+				local model = Instance.new("Model")
+				model.Name = entry.Name or "Obstacle"
+				model.Parent = obstacles
+				entry[3](c, x, z, model)
+				break
+			end
+		end
+	end
+
+	-- Flat patches on the floor: a winding path up the lane and the god's own ground, under everything.
+	local flat = { CanCollide = false, CanQuery = false, CanTouch = false, CastShadow = false, Parent = patches }
+	if theme.Path then
+		local z = -c.Half + 3
+		while z < c.Half - 3 do
+			local x1, x2 = pathX(z), pathX(z + 6)
+			local props = table.clone(flat)
+			props.Yaw = math.deg(math.atan2(x2 - x1, 6))
+			local tile = c.Tilted((x1 + x2) / 2, 0.08, z + 3, c.Vector3.new(PATH_WIDTH, 0.2, 7.5), theme.Path, props)
+			tile.Name = "Path"
+			z += 6
+		end
+	end
+	if theme.Patch then
+		for _ = 1, theme.Patches or 6 do
+			local x, z = random.Number(-48, 48), random.Number(-c.Half + 10, c.Half - 10)
+			for _ = 1, random.Int(2, 4) do
+				local s = random.Number(6, 12)
+				local props = table.clone(flat)
+				props.Yaw = random.Number(0, 90)
+				c.Tilted(
+					x + random.Number(-5, 5),
+					0.06,
+					z + random.Number(-5, 5),
+					c.Vector3.new(s, 0.15, s),
+					theme.Patch,
+					props
+				)
+			end
+		end
+	end
+	if theme.Life then
+		theme.Life(c, life)
+	end
+	if theme.Birds then
+		Lane.Birds(c, life, theme.Birds)
+	end
+end
+
+-- A few small flocks of block birds circling over the stretch (Motion.Flock flies them).
+function Lane.Birds(c: any, parent: any, colors: { any })
+	local random = c.LaneRandom
+	local V, CF = c.Vector3, c.CFrame
+	local soft = { CanCollide = false, CanQuery = false, CanTouch = false, CastShadow = false }
+	for _ = 1, random.Int(2, 3) do
+		local center = c.At(random.Number(-50, 50), random.Number(30, 55), random.Number(-c.Half + 40, c.Half - 40))
+		local radius = random.Number(25, 45)
+		local speed = random.Number(10, 18) * random.Side()
+		local flock = c.Instance.new("Model")
+		flock.Name = "Flock"
+		-- Laid out where the flock's circle starts, facing the way it flies.
+		local start = CF.new(center) * CF.new(radius, 0, 0) * CF.Angles(0, if speed > 0 then math.pi else 0, 0)
+		for _ = 1, random.Int(3, 5) do
+			local bird = c.Instance.new("Model")
+			bird.Name = "Bird"
+			local cf = start
+				* CF.new(random.Number(-8, 8), random.Number(-3, 3), random.Number(-8, 8))
+				* CF.Angles(0, math.rad(random.Number(-10, 10)), 0)
+			local body, wing = colors[1], colors[2] or colors[1]
+			local function piece(name: string, offset: any, size: any, color: any, turn: any?)
+				local part = c.NewPart(bird, cf * CF.new(offset) * (turn or CF.new()), size, color, table.clone(soft))
+				part.Name = name
+			end
+			piece("Body", V.new(0, 0, 0), V.new(1.2, 1, 3), body)
+			piece("Head", V.new(0, 0.3, 1.9), V.new(1, 1, 1), body)
+			piece("Beak", V.new(0, 0.2, 2.7), V.new(0.4, 0.4, 0.7), colors[3] or c.Rgb(240, 190, 70))
+			piece("Tail", V.new(0, 0.1, -1.9), V.new(1.2, 0.3, 1.2), wing)
+			local flap = math.rad(random.Number(-10, 25))
+			for _, side in { -1, 1 } do
+				-- Swept back, so a still bird doesn't read as a little plane.
+				piece(
+					if side < 0 then "WingL" else "WingR",
+					V.new(side * 2.3, 0.2 + math.sin(flap) * 1.8, -0.3),
+					V.new(4.2, 0.3, 1.4),
+					wing,
+					CF.Angles(0, side * math.rad(22), side * flap)
+				)
+			end
+			bird.Parent = flock
+		end
+		Motion.Flock(flock, center, radius, speed)
+		flock.Parent = parent
+	end
+end
+
+-- A rock of two or three blocks lying on the floor, `size` studs across, with an optional glowing seam.
+function Lane.Rock(c: any, x: number, z: number, model: any, color: any, size: number, seam: any?)
+	local random = c.LaneRandom
+	local V = c.Vector3
+	local yaw = random.Number(0, 90)
+	c.Tilted(x, size * 0.35, z, V.new(size * 1.5, size * 0.7, size * 1.2), color, { Yaw = yaw, Parent = model })
+	c.Tilted(
+		x + random.Number(-1, 1),
+		size * 0.95,
+		z + random.Number(-1, 1),
+		V.new(size, size * 0.55, size * 0.85),
+		color,
+		{ Yaw = yaw + random.Number(15, 40), Parent = model }
+	)
+	if random.Number(0, 1) < 0.6 then
+		local s = size * 0.5
+		c.Tilted(x + size * 0.7, s / 2, z - size * 0.4, V.new(s, s, s), color, { Yaw = yaw + 30, Parent = model })
+	end
+	if seam then
+		c.Tilted(x, size * 0.72, z, V.new(size * 1.3, 0.3, size * 1.0), seam, {
+			Yaw = yaw,
+			Material = c.Enum.Material.Neon,
+			CanCollide = false,
+			Parent = model,
+		})
+	end
+end
+
+-- A glowing crack zig-zagging over the floor, starting at (x, z).
+function Lane.Crack(c: any, x: number, z: number, segments: number, color: any, parent: any)
+	local random = c.LaneRandom
+	local angle = random.Number(0, 360)
+	for _ = 1, segments do
+		local length = random.Number(4, 8)
+		local a = math.rad(angle)
+		local mx, mz = x + math.sin(a) * length / 2, z + math.cos(a) * length / 2
+		c.Tilted(mx, 0.1, mz, c.Vector3.new(0.7, 0.2, length + 0.6), color, {
+			Yaw = angle,
+			Material = c.Enum.Material.Neon,
+			CanCollide = false,
+			CanQuery = false,
+			CastShadow = false,
+			Parent = parent,
+		})
+		x, z = x + math.sin(a) * length, z + math.cos(a) * length
+		angle += random.Number(-60, 60)
+	end
+end
+
+-- A marble column standing on the floor, broken off at `height`, its plinth and a ring of trim.
+function Lane.Column(c: any, x: number, z: number, model: any, stone: any, trim: any, height: number, lift: number?)
+	local V, CF = c.Vector3, c.CFrame
+	-- The plinth lies on the slope (or the knoll's top, `lift` up); the shaft stands out of it.
+	c.Tilted(x, (lift or 0) + 1.2, z, V.new(7, 2.4, 7), stone, { Parent = model })
+	local base = c.Stand(x, z, lift)
+	c.NewPart(model, base * CF.new(0, height / 2, 0), V.new(5, height, 5), stone)
+	c.NewPart(model, base * CF.new(0, height * 0.55, 0), V.new(5.6, 0.8, 5.6), trim)
+	-- The break: two stubs of the shaft, one taller.
+	c.NewPart(model, base * CF.new(-1.2, height + 0.8, 0.6), V.new(2.4, 1.6, 3.4), stone)
+	c.NewPart(model, base * CF.new(1.1, height + 0.4, -1), V.new(2.6, 0.8, 2.4), stone)
+end
+
+-- An invisible box of drifting particles over the lane at (x, y, z).
+function Lane.Motes(c: any, parent: any, x: number, y: number, z: number, size: any, spec: { [string]: any })
+	local full = table.clone(spec)
+	full.Shape = c.Enum.ParticleEmitterShape.Box
+	full.ShapeStyle = c.Enum.ParticleEmitterShapeStyle.Volume
+	c.Emitter(parent, c.CFrame.new(c.At(x, y, z)) * c.Upright, size, full)
+end
+
+-- One of the map's trees in the lane, recoloured. It's named Tree... so ground checks look through it
+-- (Mountain.IsPlant), as they do through the old stages' trees. `opts`: Leaves, Wood, Scale, Lift (a knoll's top).
+function Lane.Tree(c: any, x: number, z: number, model: any, template: string, opts: { [string]: any })
+	c.Place(template, x, z, {
+		Name = "Tree" .. template,
+		Y = (opts.Lift or 0) - 1,
+		Yaw = c.LaneRandom.Number(0, 360),
+		Scale = opts.Scale or c.LaneRandom.Number(0.85, 1.1),
+		Leaves = opts.Leaves,
+		Wood = opts.Wood,
+		Parent = model,
+	})
+end
+
+-- A barrel on the floor at (x, z), `y` up (a stack's second row), lying across the slope or standing.
+function Lane.Barrel(c: any, x: number, y: number, z: number, model: any, wood: any, hoop: any, standing: boolean?)
+	local V, CF = c.Vector3, c.CFrame
+	local cylinder = { Shape = c.Enum.PartType.Cylinder }
+	-- A cylinder's axis is its X: standing ones turn it up.
+	local base = c.Stand(x, z) * CF.new(0, y + (if standing then 2.5 else 2.2), 0)
+	if standing then
+		base = base * CF.Angles(0, 0, math.pi / 2)
+	end
+	c.NewPart(model, base, V.new(5, 4.4, 4.4), wood, cylinder)
+	for _, d in { -1.6, 1.6 } do
+		c.NewPart(model, base * CF.new(d, 0, 0), V.new(0.5, 4.7, 4.7), hoop, cylinder)
+	end
+end
+
+-- A big clay jar (an amphora), `k` times its usual 9 studs tall.
+function Lane.Jar(c: any, x: number, z: number, model: any, clay: any, rim: any, k: number?)
+	local V, CF = c.Vector3, c.CFrame
+	local s = k or 1
+	local base = c.Stand(x, z)
+	c.NewPart(model, base * CF.new(0, 0.6 * s, 0), V.new(3, 1.2, 3) * s, clay)
+	c.NewPart(model, base * CF.new(0, 3.4 * s, 0), V.new(5.4, 5.4, 5.4) * s, clay, { Shape = c.Enum.PartType.Ball })
+	c.NewPart(model, base * CF.new(0, 6.9 * s, 0), V.new(2.2, 2.4, 2.2) * s, clay)
+	c.NewPart(model, base * CF.new(0, 8.3 * s, 0), V.new(3, 0.6, 3) * s, rim)
+	for _, side in { -1, 1 } do
+		c.NewPart(model, base * CF.new(side * 1.9 * s, 6.6 * s, 0), V.new(0.6, 2.6, 0.6) * s, clay)
+	end
+end
+
+-- A pedestal `height` tall and `width` across, trimmed on top; returns the frame on its top.
+function Lane.Pedestal(
+	c: any,
+	x: number,
+	z: number,
+	model: any,
+	stone: any,
+	trim: any,
+	height: number,
+	width: number,
+	lift: number?
+): any
+	local V, CF = c.Vector3, c.CFrame
+	local base = c.Stand(x, z, lift)
+	c.NewPart(model, base * CF.new(0, height / 2, 0), V.new(width, height, width), stone)
+	c.NewPart(model, base * CF.new(0, height + 0.4, 0), V.new(width + 1, 0.8, width + 1), trim)
+	return base * CF.new(0, height + 0.8, 0)
+end
+
+-- A log lying on the floor, `length` long, turned up to 60 degrees off straight across: low enough to jump.
+function Lane.Log(c: any, x: number, z: number, model: any, bark: any, inner: any, length: number)
+	local V, CF = c.Vector3, c.CFrame
+	local cylinder = { Shape = c.Enum.PartType.Cylinder }
+	local base = c.Stand(x, z) * CF.new(0, 1.6, 0) * CF.Angles(0, math.rad(c.LaneRandom.Number(-60, 60)), 0)
+	c.NewPart(model, base, V.new(length, 3.2, 3.2), bark, cylinder)
+	for _, side in { -1, 1 } do
+		c.NewPart(model, base * CF.new(side * (length / 2 + 0.05), 0, 0), V.new(0.2, 2.6, 2.6), inner, cylinder)
+	end
+	c.NewPart(model, base * CF.new(length * 0.2, 1.8, 0) * CF.Angles(0, 0, math.rad(40)), V.new(0.6, 2.4, 0.6), bark)
+end
+
+-- A fan of `ribs` ribs from `frame`'s origin, in its x-y plane (facing down the mountain): a peacock's tail, a shell.
+function Lane.Fan(c: any, frame: any, model: any, ribs: number, length: number, colors: { any }, tip: any?)
+	local V, CF = c.Vector3, c.CFrame
+	for i = 0, ribs - 1 do
+		local turn = frame * CF.Angles(0, 0, math.rad(75 - i * 150 / (ribs - 1)))
+		c.NewPart(model, turn * CF.new(0, length / 2, 0), V.new(2.6, length, 0.8), colors[i % #colors + 1])
+		if tip then
+			c.NewPart(model, turn * CF.new(0, length, 0), V.new(2.4, 2.4, 2.4), tip, { Shape = c.Enum.PartType.Ball })
+		end
+	end
+end
+
+-- Flames: two neon blocks and a fire emitter at `frame`, `k` times a torch's.
+function Lane.Flame(c: any, frame: any, model: any, k: number)
+	local V, CF = c.Vector3, c.CFrame
+	local neon = { Material = c.Enum.Material.Neon, CanCollide = false }
+	c.NewPart(model, frame * CF.new(0, 1.7 * k, 0), V.new(3, 3.4, 3) * k, c.Rgb(255, 140, 50), neon)
+	c.NewPart(model, frame * CF.new(0, 2.7 * k, 0), V.new(1.7, 3, 1.7) * k, c.Rgb(255, 214, 90), neon)
+	c.Emitter(model, frame * CF.new(0, 3 * k, 0), V.new(2, 1, 2) * k, {
+		Name = "Fire",
+		Texture = "rbxasset://textures/particles/fire_main.dds",
+		Color = { c.Rgb(255, 214, 90), c.Rgb(255, 110, 40) },
+		LightEmission = 1,
+		Size = { { 0, 1.6 * k }, { 1, 0.2 } },
+		Transparency = { { 0, 0.2 }, { 1, 1 } },
+		Lifetime = { 0.5, 1 },
+		Speed = { 3, 6 },
+		Rate = 14,
+	})
+end
+
+-- A ring of `count` blocks round (x, z) on the floor, `radius` out: a hearth, a rock pool, a crater's rim.
+function Lane.Ring(c: any, x: number, z: number, model: any, color: any, radius: number, count: number, size: any)
+	for i = 1, count do
+		local a = i / count * math.pi * 2
+		c.Tilted(x + math.cos(a) * radius, size.Y / 2, z + math.sin(a) * radius, size, color, {
+			Yaw = -math.deg(a),
+			Parent = model,
+		})
 	end
 end
 
@@ -972,7 +1723,57 @@ end
 -- brightens them a lot), plants as { template, count, nearest x, farthest x }, and props.
 function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]: any }
 	local themes: { [string]: any } = {}
+	local SPARKLE = "rbxasset://textures/particles/sparkles_main.dds"
+	local FIRE = "rbxasset://textures/particles/fire_main.dds"
+	local SMOKE = "rbxasset://textures/particles/smoke_main.dds"
 
+	-- Hypnos's lane: giant poppies, stacks of pillows, dream trees and moon lamps; a big dream tree on the knoll.
+	local poppyRed, poppyMiddle, stem = rgb(232, 92, 62), rgb(52, 42, 62), rgb(96, 150, 84)
+	local function giantPoppy(c: any, x: number, z: number, model: any, height: number?, lift: number?)
+		local V, CF = c.Vector3, c.CFrame
+		local random = c.LaneRandom
+		local h = height or random.Number(11, 16)
+		local base = c.Stand(x, z, lift)
+		c.NewPart(model, base * CF.new(0, h / 2, 0), V.new(1.6, h, 1.6), stem)
+		c.NewPart(model, base * CF.new(1.4, h * 0.35, 0) * CF.Angles(0, 0, math.rad(-35)), V.new(3.6, 0.6, 1.8), stem)
+		c.NewPart(model, base * CF.new(-1.4, h * 0.55, 0) * CF.Angles(0, 0, math.rad(35)), V.new(3.6, 0.6, 1.8), stem)
+		local head = base * CF.new(0, h, 0) * CF.Angles(0, math.rad(random.Number(0, 90)), 0)
+		for i = 0, 3 do
+			c.NewPart(
+				model,
+				head * CF.Angles(0, i * math.pi / 2, 0) * CF.new(0, 0.8, 2.4) * CF.Angles(math.rad(-28), 0, 0),
+				V.new(5, 0.8, 4.6),
+				poppyRed
+			)
+		end
+		c.NewPart(model, head * CF.new(0, 1.1, 0), V.new(2.6, 1.6, 2.6), poppyMiddle)
+	end
+	local function poppies(c: any, x: number, z: number, model: any)
+		local random = c.LaneRandom
+		local count = random.Int(2, 3)
+		for i = 1, count do
+			local a = (i / count) * math.pi * 2 + random.Number(0, 1)
+			local d = if i == 1 then 0 else random.Number(3, 4.5)
+			giantPoppy(c, x + math.cos(a) * d, z + math.sin(a) * d, model, random.Number(12, 22))
+		end
+	end
+	local function pillows(c: any, x: number, z: number, model: any)
+		local random = c.LaneRandom
+		local colors = { rgb(246, 242, 255), rgb(206, 186, 240), rgb(240, 196, 226) }
+		local yaw = random.Number(0, 180)
+		local y = 0
+		for i = 1, random.Int(3, 4) do
+			c.Tilted(
+				x + random.Number(-0.8, 0.8),
+				y + 1.6,
+				z + random.Number(-0.8, 0.8),
+				c.Vector3.new(14 - i * 1.5, 3.2, 10 - i),
+				random.Pick(colors),
+				{ Yaw = yaw + random.Number(-25, 25), Parent = model }
+			)
+			y += 3.2
+		end
+	end
 	themes.Hypnos = {
 		Floor = rgb(174, 154, 214),
 		Cap = rgb(194, 174, 228),
@@ -984,6 +1785,94 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		Cloud = rgb(206, 196, 236),
 		Clouds = 4,
 		Plants = { { "RoundTree", 4 } },
+		Path = rgb(190, 172, 226),
+		Birds = { rgb(250, 248, 255), rgb(226, 214, 250) },
+		Obstacles = {
+			{ 3, 6, poppies, Name = "GiantPoppies" },
+			{ 2, 7, pillows, Name = "Pillows" },
+			{
+				1,
+				9,
+				function(c: any, x: number, z: number, model: any)
+					c.Place("Cloud", x, z, {
+						Y = -2,
+						Yaw = c.LaneRandom.Number(0, 360),
+						Scale = 0.2,
+						Solid = rgb(232, 226, 250),
+						Parent = model,
+					})
+				end,
+				Name = "RestingCloud",
+			},
+			{
+				2,
+				6,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Tree(c, x, z, model, "RoundTree", {
+						Leaves = rgb(186, 150, 226),
+						Scale = c.LaneRandom.Number(0.9, 1.15),
+					})
+				end,
+				Name = "DreamTree",
+			},
+			{
+				2,
+				5,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Rock(c, x, z, model, rgb(182, 172, 212), c.LaneRandom.Number(5, 7))
+				end,
+				Name = "Rock",
+			},
+			{
+				1,
+				3,
+				function(c: any, x: number, z: number, model: any)
+					local V, CF = c.Vector3, c.CFrame
+					local base = c.Stand(x, z)
+					c.Tilted(x, 0.6, z, V.new(4, 1.2, 4), rgb(142, 122, 182), { Parent = model })
+					c.NewPart(model, base * CF.new(0, 9, 0), V.new(1.6, 18, 1.6), rgb(120, 102, 142))
+					c.Sprite("Moon", x, z, 1.2, { M = rgb(255, 244, 200) }, {
+						Frame = base * CF.new(0, 17.4, 0),
+						Yaw = c.LaneRandom.Number(-30, 30),
+						Neon = true,
+						Parent = model,
+					})
+				end,
+				Name = "MoonLamp",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			Lane.Tree(c, x, z, model, "RoundTree", { Leaves = rgb(196, 160, 236), Scale = 1.35, Lift = y })
+			for i = 0, 3 do
+				local a = i * math.pi / 2 + 0.6
+				giantPoppy(c, x + math.cos(a) * 5, z + math.sin(a) * 8, model, c.LaneRandom.Number(7, 10), y)
+			end
+			c.Sprite(
+				"Zzz",
+				x + 4,
+				z,
+				2.4,
+				{ Z = rgb(246, 244, 255) },
+				{ Y = y + 34, Yaw = 0, Upright = true, Neon = true, Ghost = true, Parent = model }
+			)
+		end,
+		Life = function(c: any, life: any)
+			-- Sleepy sparkles drifting up over the poppies.
+			for i = 1, 5 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 5
+				Lane.Motes(c, life, c.LaneRandom.Number(-30, 30), 6, z, c.Vector3.new(80, 6, 40), {
+					Texture = SPARKLE,
+					Color = rgb(236, 220, 255),
+					LightEmission = 1,
+					Size = { { 0, 0 }, { 0.3, 0.8 }, { 1, 0 } },
+					Transparency = { { 0, 0.1 }, { 1, 0.6 } },
+					Lifetime = { 4, 7 },
+					Speed = { 0.4, 1.2 },
+					Acceleration = c.Vector3.new(0, 0.5, 0),
+					Rate = 5,
+				})
+			end
+		end,
 		Props = function(c: any)
 			local poppy, middle = rgb(232, 92, 62), rgb(52, 42, 62)
 			Props.Scatter(c, 50, function(x: number, z: number)
@@ -992,20 +1881,148 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 			-- Sleepy clouds low over the terraces.
 			for i = 1, 3 do
 				local side = if i % 2 == 0 then 1 else -1
-				c.Place("Cloud", side * c.Random.Number(110, 150), c.Random.Number(-80, 80), {
+				local cloud = c.Place("Cloud", side * c.Random.Number(110, 150), c.Random.Number(-80, 80), {
 					Y = c.Random.Number(18, 34),
+					Upright = true,
 					Solid = rgb(214, 204, 240),
 					Ghost = true,
 					Scale = 0.35,
 				})
+				Motion.Bob(cloud, 1.5, 12)
 			end
 			Props.Scatter(c, 3, function(x: number, z: number)
-				c.Sprite("Zzz", x, z, 2.2, { Z = rgb(246, 244, 255) }, { Lift = 16, Neon = true, Ghost = true })
+				local zzz = c.Sprite(
+					"Zzz",
+					x,
+					z,
+					2.2,
+					{ Z = rgb(246, 244, 255) },
+					{ Lift = 16, Upright = true, Neon = true, Ghost = true }
+				)
+				Motion.Bob(zzz, 1.5, 5)
 			end, 70, 100)
 		end,
 	}
 
+	-- Morpheus's lane: dream steps whose top steps float, pastel crystals, blossom trees and pastel rocks; a blossom
+	-- tree on the knoll with dream shapes circling it.
+	local dreamColors = { rgb(255, 150, 210), rgb(130, 230, 255), rgb(255, 236, 130), rgb(160, 255, 200) }
+	local function dreamSteps(c: any, x: number, z: number, model: any)
+		local random = c.LaneRandom
+		local yaw = random.Number(0, 360)
+		local a = math.rad(yaw)
+		for i = 0, 3 do
+			local d = (i - 1.5) * 3.2
+			local s = 4.4 - i * 0.4
+			local step = c.Tilted(
+				x + math.sin(a) * d,
+				s / 2 + i * 2.6,
+				z + math.cos(a) * d,
+				c.Vector3.new(s, s, s),
+				dreamColors[i + 1],
+				{ Yaw = yaw + i * 12, Parent = model }
+			)
+			-- The top two float, bobbing.
+			if i >= 2 then
+				step.CanCollide = false
+				Motion.Bob(step, 0.8, 3 + i)
+			end
+		end
+	end
+	local function dreamCrystal(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local random = c.LaneRandom
+		local color = random.Pick(dreamColors)
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(random.Number(0, 90)), 0)
+		local h = random.Number(10, 16)
+		c.NewPart(model, base * CF.new(0, h / 2, 0), V.new(3.4, h, 3.4), color)
+		c.NewPart(
+			model,
+			base * CF.new(2.4, h * 0.25, 0.8) * CF.Angles(0, 0, math.rad(-22)),
+			V.new(2.2, h * 0.55, 2.2),
+			color
+		)
+		c.NewPart(
+			model,
+			base * CF.new(-2.1, h * 0.2, -1.2) * CF.Angles(0, 0, math.rad(20)),
+			V.new(2, h * 0.45, 2),
+			color
+		)
+		c.NewPart(model, base * CF.new(0, h + 0.8, 0), V.new(1.6, 1.6, 1.6), color, {
+			Material = c.Enum.Material.Neon,
+			CanCollide = false,
+		})
+	end
 	themes.Morpheus = {
+		Path = rgb(232, 236, 252),
+		Birds = { rgb(255, 250, 255), rgb(200, 220, 255) },
+		Obstacles = {
+			{ 3, 7, dreamSteps, Name = "DreamSteps" },
+			{ 3, 5, dreamCrystal, Name = "DreamCrystal" },
+			{
+				2,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Tree(
+						c,
+						x,
+						z,
+						model,
+						"BlossomTree",
+						{ Leaves = rgb(250, 190, 226), Scale = c.LaneRandom.Number(0.5, 0.65) }
+					)
+				end,
+				Name = "Blossom",
+			},
+			{
+				2,
+				6,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Rock(c, x, z, model, rgb(220, 226, 246), c.LaneRandom.Number(5, 6.5))
+				end,
+				Name = "Rock",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			Lane.Tree(c, x, z, model, "BlossomTree", { Leaves = rgb(255, 176, 220), Scale = 0.8, Lift = y })
+			-- A ring of dream shapes circling above the tree.
+			local ring = c.Instance.new("Model")
+			ring.Name = "DreamRing"
+			ring.Parent = model
+			local center = c.At(x, y + 30, z)
+			for i = 1, 8 do
+				local a = i / 8 * math.pi * 2
+				local s = if i % 2 == 0 then 3 else 2.2
+				c.NewPart(
+					ring,
+					c.CFrame.new(center + c.Vector3.new(math.cos(a) * 16, 0, math.sin(a) * 16))
+						* c.CFrame.Angles(a, a * 2, 0),
+					c.Vector3.new(s, s, s),
+					dreamColors[i % #dreamColors + 1],
+					{
+						Material = c.Enum.Material.Neon,
+						CanCollide = false,
+						Shape = if i % 3 == 0 then c.Enum.PartType.Ball else c.Enum.PartType.Block,
+					}
+				)
+			end
+			Motion.Spin(ring, center, c.Vector3.new(0, 1, 0), 18)
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 5 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 5
+				Lane.Motes(c, life, c.LaneRandom.Number(-30, 30), 8, z, c.Vector3.new(80, 8, 40), {
+					Texture = SPARKLE,
+					Color = { rgb(255, 190, 230), rgb(170, 230, 255) },
+					LightEmission = 1,
+					Size = { { 0, 0 }, { 0.3, 0.9 }, { 1, 0 } },
+					Lifetime = { 4, 7 },
+					Speed = { 0.4, 1.2 },
+					Acceleration = c.Vector3.new(0, 0.6, 0),
+					Rate = 5,
+				})
+			end
+		end,
 		Floor = rgb(150, 192, 236),
 		Cap = rgb(240, 172, 212),
 		SideA = rgb(196, 216, 244),
@@ -1023,12 +2040,15 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 				local z = c.Random.Number(-c.Half, c.Half)
 				local s = c.Random.Number(3, 9)
 				local ball = c.Random.Number(0, 1) < 0.35
-				c.Block(x, c.Ground(x, z) + c.Random.Number(14, 55), z, V.new(s, s, s), c.Random.Pick(dream), {
-					Material = c.Enum.Material.Neon,
-					CanCollide = false,
-					Shape = if ball then c.Enum.PartType.Ball else c.Enum.PartType.Block,
-					Turn = c.CFrame.Angles(c.Random.Number(0, 6), c.Random.Number(0, 6), c.Random.Number(0, 6)),
-				})
+				local shape =
+					c.Block(x, c.Ground(x, z) + c.Random.Number(14, 55), z, V.new(s, s, s), c.Random.Pick(dream), {
+						Upright = true,
+						Material = c.Enum.Material.Neon,
+						CanCollide = false,
+						Shape = if ball then c.Enum.PartType.Ball else c.Enum.PartType.Block,
+						Turn = c.CFrame.Angles(c.Random.Number(0, 6), c.Random.Number(0, 6), c.Random.Number(0, 6)),
+					})
+				Motion.Bob(shape, 1.5 + s * 0.3, 5 + s * 0.4)
 			end
 			Props.Scatter(c, 6, function(x: number, z: number)
 				c.Sprite(
@@ -1037,21 +2057,124 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 					z,
 					1.6,
 					{ S = rgb(255, 236, 130) },
-					{ Lift = c.Random.Number(10, 30), Neon = true, Ghost = true }
+					{ Lift = c.Random.Number(10, 30), Upright = true, Neon = true, Ghost = true }
 				)
 			end, c.Lane + 10, 110)
 			for _ = 1, c.Count(3) do
 				local x = c.Random.Number(130, 190) * c.Random.Side()
-				c.Place("Island", x, c.Random.Number(-c.Half, c.Half), {
+				local island = c.Place("Island", x, c.Random.Number(-c.Half, c.Half), {
 					Y = c.Random.Number(30, 70),
+					Upright = true,
 					Roll = { 180, 0 },
 					Solid = rgb(240, 172, 212),
 				})
+				Motion.Bob(island, 4, 8)
 			end
 		end,
 	}
 
+	-- Deimos's lane: dread rocks with red seams, dark spires, totems with glowing eyes and craters; on the knoll a
+	-- monolith with one red eye, rocks hanging in the air round it.
+	local dreadDark, dreadRed = rgb(70, 44, 40), rgb(255, 60, 40)
+	local function dreadTotem(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-20, 20)), 0)
+		c.NewPart(model, base * CF.new(0, 2, 0), V.new(6, 4, 6), dreadDark)
+		c.NewPart(model, base * CF.new(0, 6.5, 0), V.new(4.6, 5, 4.6), rgb(96, 58, 50))
+		c.NewPart(model, base * CF.new(0, 10.5, 0), V.new(5.4, 3, 5.4), dreadDark)
+		c.NewPart(model, base * CF.new(0, 12.6, 0), V.new(3, 1.2, 3), rgb(96, 58, 50))
+		-- Eyes on the downhill face, glowing at the climbers.
+		for _, side in { -1, 1 } do
+			c.NewPart(model, base * CF.new(side * 1.1, 7.4, -2.35), V.new(1, 0.8, 0.2), dreadRed, {
+				Material = c.Enum.Material.Neon,
+				CanCollide = false,
+			})
+		end
+	end
+	local function dreadCrater(c: any, x: number, z: number, model: any)
+		local radius = c.LaneRandom.Number(4.5, 6)
+		c.Tilted(x, 0.1, z, c.Vector3.new(radius * 1.7, 0.2, radius * 1.7), rgb(60, 36, 32), {
+			Yaw = 45,
+			CanCollide = false,
+			Parent = model,
+		})
+		Lane.Ring(c, x, z, model, rgb(174, 118, 98), radius, 10, c.Vector3.new(3.5, 2, 4))
+	end
 	themes.Deimos = {
+		Path = rgb(122, 80, 68),
+		Birds = { rgb(44, 32, 32), rgb(64, 44, 42), rgb(200, 60, 40) },
+		Obstacles = {
+			{
+				3,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Rock(c, x, z, model, rgb(112, 68, 58), c.LaneRandom.Number(5.5, 7), dreadRed)
+				end,
+				Name = "DreadRock",
+			},
+			{
+				2,
+				6,
+				function(c: any, x: number, z: number, model: any)
+					c.Place(c.LaneRandom.Pick({ "Spire", "SmallSpire" }), x, z, {
+						Y = -1,
+						Yaw = c.LaneRandom.Number(0, 360),
+						Scale = c.LaneRandom.Number(0.55, 0.7),
+						Solid = rgb(110, 56, 48),
+						Parent = model,
+					})
+				end,
+				Name = "DreadSpire",
+			},
+			{ 2, 4, dreadTotem, Name = "DreadTotem" },
+			{ 1, 7, dreadCrater, Name = "Crater" },
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			local base = c.Stand(x, z, y)
+			c.NewPart(model, base * CF.new(0, 9, 0), V.new(7, 18, 5), rgb(60, 38, 36))
+			c.NewPart(model, base * CF.new(0, 18.6, 0), V.new(8, 1.2, 6), rgb(112, 68, 58))
+			c.NewPart(model, base * CF.new(0, 12, -2.55), V.new(3.6, 2.2, 0.2), dreadRed, {
+				Material = c.Enum.Material.Neon,
+				CanCollide = false,
+			})
+			c.NewPart(model, base * CF.new(0, 12, -2.7), V.new(1.2, 1.4, 0.2), rgb(30, 10, 10), { CanCollide = false })
+			-- Rocks hanging in the air round it, bobbing.
+			for i = 1, 5 do
+				local a = i / 5 * math.pi * 2
+				local s = c.LaneRandom.Number(2.5, 4.5)
+				local rock = c.Instance.new("Model")
+				rock.Name = "FloatingRock"
+				rock.Parent = model
+				c.Tilted(
+					x + math.cos(a) * 11,
+					y + 16 + c.LaneRandom.Number(-3, 3),
+					z + math.sin(a) * 15,
+					V.new(s, s * 0.8, s),
+					rgb(112, 68, 58),
+					{ Yaw = c.LaneRandom.Number(0, 90), CanCollide = false, Parent = rock }
+				)
+				Motion.Bob(rock, 1.5, 4 + i * 0.7)
+			end
+		end,
+		Life = function(c: any, life: any)
+			for _ = 1, 6 do
+				local x, z = c.LaneRandom.Number(-50, 50), c.LaneRandom.Number(-c.Half + 12, c.Half - 12)
+				Lane.Crack(c, x, z, c.LaneRandom.Int(3, 5), dreadRed, life)
+			end
+			for i = 1, 4 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 4
+				Lane.Motes(c, life, 0, 4, z, c.Vector3.new(100, 6, 50), {
+					Texture = SMOKE,
+					Color = rgb(150, 80, 64),
+					Size = { { 0, 1.5 }, { 1, 4 } },
+					Transparency = { { 0, 0.75 }, { 1, 1 } },
+					Lifetime = { 4, 6 },
+					Speed = { 0.5, 1.5 },
+					Rate = 3,
+				})
+			end
+		end,
 		Floor = rgb(154, 104, 88),
 		Cap = rgb(174, 118, 98),
 		SideA = rgb(114, 78, 68),
@@ -1071,6 +2194,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 			end, c.Lane + 8, 100)
 			-- Mars, which Deimos goes round.
 			c.Block(520, 150, 0, c.Vector3.new(200, 200, 200), rgb(170, 100, 82), {
+				Upright = true,
 				Shape = c.Enum.PartType.Ball,
 				CanCollide = false,
 				CastShadow = false,
@@ -1080,13 +2204,112 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 					"Pyramid",
 					side * 160,
 					c.Random.Number(-40, 40),
-					{ Solid = rgb(128, 88, 76), Y = -30, Scale = 0.6 }
+					{ Solid = rgb(128, 88, 76), Y = -30, Scale = 0.6, Upright = true }
 				)
 			end
 		end,
 	}
 
+	-- Thanatos's lane: gravestones, stone tombs, bare grey trees and funeral urns; a crypt on the knoll, its doorway
+	-- glowing, ghosts floating over it.
+	local graveStone, graveDark = rgb(150, 152, 160), rgb(104, 106, 116)
+	local ghostLegend = { W = rgb(236, 244, 255), B = rgb(30, 30, 40) }
+	local function gravestone(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-15, 15)), 0)
+		c.NewPart(model, base * CF.new(0, 0.5, 0), V.new(7, 1, 4), graveDark)
+		c.NewPart(model, base * CF.new(0, 4.5, 0), V.new(5.4, 7, 1.6), graveStone)
+		c.NewPart(model, base * CF.new(0, 8, 0) * CF.Angles(0, math.pi / 2, 0), V.new(1.6, 5.4, 5.4), graveStone, {
+			Shape = c.Enum.PartType.Cylinder,
+		})
+	end
+	local function tomb(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-40, 40)), 0)
+		c.NewPart(model, base * CF.new(0, 1.5, 0), V.new(10, 3, 5), graveDark)
+		c.NewPart(model, base * CF.new(0, 3.3, 0), V.new(10.8, 0.6, 5.8), graveStone)
+		c.NewPart(model, base * CF.new(0, 3.9, 0), V.new(8, 0.6, 3.4), graveStone)
+	end
 	themes.Thanatos = {
+		Path = rgb(112, 114, 124),
+		Birds = { rgb(30, 30, 36), rgb(44, 44, 52), rgb(90, 90, 96) },
+		Obstacles = {
+			{ 3, 4, gravestone, Name = "Gravestone" },
+			{ 2, 6, tomb, Name = "Tomb" },
+			{
+				2,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Tree(
+						c,
+						x,
+						z,
+						model,
+						"Bush",
+						{ Leaves = rgb(100, 104, 114), Wood = rgb(40, 40, 44), Scale = 0.65 }
+					)
+				end,
+				Name = "Dead",
+			},
+			{
+				1,
+				4,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Jar(c, x, z, model, rgb(80, 82, 92), rgb(176, 232, 255), 0.9)
+				end,
+				Name = "Urn",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			local base = c.Stand(x, z, y)
+			c.NewPart(model, base * CF.new(0, 5, 2), V.new(12, 10, 8), graveDark)
+			c.NewPart(model, base * CF.new(0, 10.6, 2), V.new(14, 1.2, 10), graveStone)
+			c.NewPart(model, base * CF.new(0, 12, 2), V.new(10, 1.6, 7), graveStone)
+			for _, side in { -1, 1 } do
+				c.NewPart(model, base * CF.new(side * 5, 5, -2.6), V.new(1.8, 10, 1.8), graveStone)
+			end
+			c.NewPart(model, base * CF.new(0, 4, -2.05), V.new(4, 7, 0.2), rgb(170, 230, 255), {
+				Material = c.Enum.Material.Neon,
+				CanCollide = false,
+			})
+			for _, side in { -1, 1 } do
+				local ghost = c.Sprite("Ghost", x, z, 1.4, ghostLegend, {
+					Frame = base * CF.new(side * 7, 16, 0),
+					Yaw = 0,
+					Ghost = true,
+					Parent = model,
+				})
+				Motion.Bob(ghost, 1.5, 4 + side)
+			end
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 4 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 4
+				Lane.Motes(c, life, 0, 5, z, c.Vector3.new(100, 8, 50), {
+					Texture = SPARKLE,
+					Color = rgb(190, 236, 255),
+					LightEmission = 1,
+					Size = { { 0, 0 }, { 0.3, 0.7 }, { 1, 0 } },
+					Lifetime = { 4, 7 },
+					Speed = { 0.3, 1 },
+					Acceleration = c.Vector3.new(0, 0.5, 0),
+					Rate = 4,
+				})
+			end
+			-- Ghosts drifting over the lane, high enough to pass under.
+			for _ = 1, 2 do
+				local ghost = c.Sprite(
+					"Ghost",
+					c.LaneRandom.Number(-40, 40),
+					c.LaneRandom.Number(-c.Half + 30, c.Half - 30),
+					1.4,
+					ghostLegend,
+					{ Lift = 20, Yaw = 0, Ghost = true, Parent = life }
+				)
+				Motion.Bob(ghost, 2, 5)
+			end
+		end,
 		Floor = rgb(54, 56, 64),
 		Cap = rgb(74, 76, 86),
 		SideA = rgb(40, 42, 48),
@@ -1116,7 +2339,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 					z,
 					1.4,
 					{ W = rgb(236, 244, 255), B = rgb(30, 30, 40) },
-					{ Lift = c.Random.Number(8, 20), Ghost = true }
+					{ Lift = c.Random.Number(8, 20), Upright = true, Ghost = true }
 				)
 			end, c.Lane + 8, 100)
 			for _ = 1, c.Count(10) do
@@ -1132,7 +2355,96 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Nemesis's lane: giant swords driven into the ground, scales of judgement, silver-seamed stones and pines; a great
+	-- sword in the knoll.
+	local swordLegend = { S = rgb(204, 210, 220), G = rgb(216, 182, 82), H = rgb(72, 52, 42) }
+	local function scales(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local silver, gold = rgb(174, 184, 194), rgb(216, 182, 82)
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-30, 30)), 0)
+		c.NewPart(model, base * CF.new(0, 0.5, 0), V.new(5, 1, 5), silver)
+		c.NewPart(model, base * CF.new(0, 7, 0), V.new(1.2, 13, 1.2), gold)
+		local tilt = math.rad(c.LaneRandom.Number(-12, 12))
+		c.NewPart(model, base * CF.new(0, 13.4, 0) * CF.Angles(0, 0, tilt), V.new(13, 0.8, 0.8), gold)
+		c.NewPart(model, base * CF.new(0, 14.4, 0), V.new(1.8, 1.8, 1.8), gold, { Shape = c.Enum.PartType.Ball })
+		for _, side in { -1, 1 } do
+			-- Each pan hangs straight under its end of the beam.
+			local hang = base * CF.new(side * 6 * math.cos(tilt), 13.4 + side * 6 * math.sin(tilt), 0)
+			c.NewPart(model, hang * CF.new(0, -2.5, 0), V.new(0.2, 5, 0.2), silver, { CanCollide = false })
+			c.NewPart(model, hang * CF.new(0, -5.2, 0) * CF.Angles(0, 0, math.pi / 2), V.new(0.5, 4.4, 4.4), silver, {
+				Shape = c.Enum.PartType.Cylinder,
+			})
+		end
+	end
 	themes.Nemesis = {
+		Path = rgb(140, 162, 168),
+		Birds = { rgb(222, 228, 234), rgb(170, 180, 190) },
+		Obstacles = {
+			{
+				3,
+				6,
+				function(c: any, x: number, z: number, model: any)
+					c.Sprite("Sword", x, z, 2.2, swordLegend, {
+						Lift = -4,
+						Yaw = c.LaneRandom.Number(-30, 30),
+						Tip = c.LaneRandom.Number(-10, 10),
+						Parent = model,
+					})
+				end,
+				Name = "Sword",
+			},
+			{ 2, 7, scales, Name = "Scales" },
+			{
+				2,
+				6,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Rock(c, x, z, model, rgb(140, 150, 160), c.LaneRandom.Number(5, 6.5), rgb(220, 240, 255))
+				end,
+				Name = "JudgementStone",
+			},
+			{
+				2,
+				6,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Tree(
+						c,
+						x,
+						z,
+						model,
+						"Pine3",
+						{ Leaves = rgb(62, 122, 112), Scale = c.LaneRandom.Number(0.6, 0.75) }
+					)
+				end,
+				Name = "Pine",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			c.Sprite("Sword", x, z, 3.2, swordLegend, { Frame = c.Stand(x, z, y - 6), Yaw = 0, Parent = model })
+			c.Emitter(model, c.Stand(x, z, y + 26), c.Vector3.new(8, 4, 2), {
+				Name = "Gleam",
+				Texture = SPARKLE,
+				Color = rgb(240, 248, 255),
+				LightEmission = 1,
+				Size = { { 0, 0 }, { 0.3, 1.4 }, { 1, 0 } },
+				Lifetime = { 1, 2 },
+				Speed = { 0.5, 1.5 },
+				Rate = 6,
+			})
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 4 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 4
+				Lane.Motes(c, life, 0, 6, z, c.Vector3.new(100, 8, 50), {
+					Texture = SPARKLE,
+					Color = rgb(226, 236, 246),
+					LightEmission = 1,
+					Size = { { 0, 0 }, { 0.3, 0.6 }, { 1, 0 } },
+					Lifetime = { 3, 5 },
+					Speed = { 0.3, 1 },
+					Rate = 4,
+				})
+			end
+		end,
 		Floor = rgb(62, 112, 118),
 		Cap = rgb(174, 184, 194),
 		SideA = rgb(48, 88, 94),
@@ -1156,7 +2468,95 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Dionysus's lane: stacked wine barrels, short rows of vines heavy with grapes, wine jars and vine trees; a great
+	-- vat on the knoll with grapes on top.
+	local vineWood, vineLeaf, vineGrape = rgb(122, 88, 62), rgb(92, 156, 72), rgb(122, 62, 154)
+	local function barrels(c: any, x: number, z: number, model: any)
+		local wood, hoop = rgb(150, 104, 66), rgb(70, 60, 56)
+		Lane.Barrel(c, x, 0, z - 2.3, model, wood, hoop)
+		Lane.Barrel(c, x, 0, z + 2.3, model, wood, hoop)
+		if c.LaneRandom.Number(0, 1) < 0.7 then
+			Lane.Barrel(c, x, 3.8, z, model, wood, hoop)
+		end
+	end
+	local function vineRow(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-20, 20)), 0)
+		for _, dz in { -5.5, 5.5 } do
+			c.NewPart(model, base * CF.new(0, 4, dz), V.new(1.2, 8, 1.2), vineWood)
+		end
+		c.NewPart(model, base * CF.new(0, 8.4, 0), V.new(1, 0.8, 12), vineWood)
+		c.NewPart(model, base * CF.new(0, 6.4, 0), V.new(3, 3.4, 12), vineLeaf)
+		for i = -2, 2 do
+			c.NewPart(model, base * CF.new(c.LaneRandom.Pick({ -1.4, 1.4 }), 4.2, i * 2.4), V.new(2, 2, 2), vineGrape, {
+				Shape = c.Enum.PartType.Ball,
+			})
+		end
+	end
 	themes.Dionysus = {
+		Path = rgb(112, 86, 62),
+		Birds = { rgb(120, 92, 62), rgb(96, 150, 72), rgb(230, 190, 80) },
+		Obstacles = {
+			{ 3, 5, barrels, Name = "Barrels" },
+			{ 3, 7, vineRow, Name = "VineRow" },
+			{
+				1,
+				5,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Jar(c, x - 1.8, z, model, rgb(170, 84, 62), rgb(60, 40, 36))
+					Lane.Jar(c, x + 2.2, z + 1.2, model, rgb(150, 76, 58), rgb(60, 40, 36), 0.8)
+				end,
+				Name = "WineJars",
+			},
+			{
+				2,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Tree(
+						c,
+						x,
+						z,
+						model,
+						"RoundTree",
+						{ Leaves = vineLeaf, Scale = c.LaneRandom.Number(0.6, 0.75) }
+					)
+				end,
+				Name = "Vine",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			local cylinder = { Shape = c.Enum.PartType.Cylinder }
+			local base = c.Stand(x, z, y)
+			local up = base * CF.Angles(0, 0, math.pi / 2)
+			c.NewPart(model, up * CF.new(5, 0, 0), V.new(10, 13, 13), rgb(150, 104, 66), cylinder)
+			for _, h in { 1.2, 5, 8.8 } do
+				c.NewPart(model, up * CF.new(h, 0, 0), V.new(0.7, 13.5, 13.5), rgb(70, 60, 56), cylinder)
+			end
+			c.NewPart(model, up * CF.new(10.2, 0, 0), V.new(0.4, 12, 12), rgb(110, 40, 90), {
+				Shape = c.Enum.PartType.Cylinder,
+				Material = c.Enum.Material.Neon,
+			})
+			c.Sprite("Grapes", x, z, 1.8, { P = vineGrape, L = vineLeaf }, {
+				Frame = base * CF.new(0, 10.4, 0),
+				Yaw = 0,
+				Parent = model,
+			})
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 4 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 4
+				Lane.Motes(c, life, 0, 6, z, c.Vector3.new(100, 8, 50), {
+					Texture = SPARKLE,
+					Color = { rgb(200, 120, 255), rgb(255, 210, 110) },
+					LightEmission = 1,
+					Size = { { 0, 0 }, { 0.3, 0.7 }, { 1, 0 } },
+					Lifetime = { 3, 6 },
+					Speed = { 0.3, 1 },
+					Rate = 4,
+				})
+			end
+		end,
 		Floor = rgb(150, 128, 96),
 		Cap = rgb(112, 152, 72),
 		SideA = rgb(122, 96, 72),
@@ -1202,7 +2602,146 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Hermes's lane: herms (the travellers' waymarkers), stacks of parcels, signposts and piles of coins with a coin
+	-- spinning over each; a great caduceus turning on the knoll.
+	local hermesStone, hermesGold, hermesWhite = rgb(214, 210, 200), rgb(228, 190, 82), rgb(250, 250, 255)
+	local function herm(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z)
+		c.NewPart(model, base * CF.new(0, 0.6, 0), V.new(5, 1.2, 5), hermesStone)
+		c.NewPart(model, base * CF.new(0, 7, 0), V.new(3.6, 12, 3.6), hermesStone)
+		c.NewPart(model, base * CF.new(0, 14.6, 0), V.new(3.2, 3.2, 3.2), hermesStone)
+		c.NewPart(model, base * CF.new(0, 16.6, 0), V.new(4.6, 0.8, 4.6), hermesGold)
+		for _, side in { -1, 1 } do
+			c.Sprite("Wing", x, z, 0.5, { W = hermesWhite }, {
+				Frame = base * CF.new(side * 2.3, 16.2, 0) * CF.Angles(0, math.pi / 2, 0),
+				Yaw = if side > 0 then 180 else 0,
+				Ghost = true,
+				Parent = model,
+			})
+		end
+	end
+	local function parcels(c: any, x: number, z: number, model: any)
+		local random = c.LaneRandom
+		local colors = { rgb(176, 132, 88), rgb(196, 152, 104), rgb(150, 110, 74) }
+		local y = 0
+		for i = 1, random.Int(2, 3) do
+			local s = 5 - i * 0.6
+			c.Tilted(
+				x + random.Number(-1, 1),
+				y + s / 2,
+				z + random.Number(-1, 1),
+				c.Vector3.new(s * 1.2, s, s),
+				random.Pick(colors),
+				{
+					Yaw = random.Number(0, 90),
+					Parent = model,
+				}
+			)
+			y += s
+		end
+		-- A strap of twine round the bottom one.
+		c.Tilted(x, 2.4, z, c.Vector3.new(6.2, 0.4, 0.6), rgb(230, 214, 170), { Parent = model, CanCollide = false })
+	end
+	local function signpost(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z)
+		local wood = rgb(140, 104, 70)
+		c.NewPart(model, base * CF.new(0, 6, 0), V.new(1.2, 12, 1.2), wood)
+		for i, yaw in { 20, 150, 260 } do
+			local arm = base * CF.new(0, 7 + i * 1.4, 0) * CF.Angles(0, math.rad(yaw + c.LaneRandom.Number(-15, 15)), 0)
+			c.NewPart(model, arm * CF.new(3, 0, 0), V.new(6, 1.1, 0.4), rgb(214, 196, 150))
+			c.NewPart(
+				model,
+				arm * CF.new(6.3, 0, 0) * CF.Angles(0, 0, math.rad(45)),
+				V.new(0.8, 0.8, 0.4),
+				rgb(214, 196, 150)
+			)
+		end
+	end
+	local function coinPile(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local random = c.LaneRandom
+		local coin = { Shape = c.Enum.PartType.Cylinder, Turn = CF.Angles(0, 0, math.pi / 2) }
+		for _ = 1, 3 do
+			local cx, cz = x + random.Number(-2, 2), z + random.Number(-2, 2)
+			for i = 1, random.Int(3, 6) do
+				local props = table.clone(coin)
+				props.Parent = model
+				c.Tilted(cx + random.Number(-0.3, 0.3), (i - 0.5) * 1.1, cz, V.new(1, 6, 6), hermesGold, props)
+			end
+		end
+		-- One big coin spinning over the pile.
+		local spin = c.Instance.new("Model")
+		spin.Name = "SpinningCoin"
+		spin.Parent = model
+		local at = c.Stand(x, z) * CF.new(0, 11, 0)
+		c.NewPart(spin, at, V.new(0.8, 5, 5), hermesGold, { Shape = c.Enum.PartType.Cylinder, CanCollide = false })
+		Motion.Spin(spin, at.Position, at.UpVector, 90)
+		Motion.Bob(spin, 0.8, 3)
+	end
 	themes.Hermes = {
+		Path = rgb(186, 176, 154),
+		Birds = { rgb(250, 250, 255), rgb(230, 236, 250), rgb(240, 170, 90) },
+		Obstacles = {
+			{ 3, 3.5, herm, Name = "Herm" },
+			{ 2, 5, parcels, Name = "Parcels" },
+			{ 2, 7, signpost, Name = "Signpost" },
+			{ 2, 5, coinPile, Name = "Coins" },
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			local staff = c.Instance.new("Model")
+			staff.Name = "Caduceus"
+			staff.Parent = model
+			local base = c.Stand(x, z, y)
+			c.NewPart(model, base * CF.new(0, 1, 0), V.new(7, 2, 7), hermesStone)
+			c.NewPart(staff, base * CF.new(0, 18, 0), V.new(2.2, 32, 2.2), hermesGold)
+			for i = 0, 18 do
+				for _, phase in { 0, math.pi } do
+					local a = i * 0.9 + phase
+					c.NewPart(
+						staff,
+						base * CF.new(math.cos(a) * 2.6, 6 + i * 1.3, math.sin(a) * 2.6),
+						V.new(1.6, 1.6, 1.6),
+						rgb(84, 150, 92),
+						{ CanCollide = false }
+					)
+				end
+			end
+			c.NewPart(
+				staff,
+				base * CF.new(0, 35, 0),
+				V.new(3.6, 3.6, 3.6),
+				hermesGold,
+				{ Shape = c.Enum.PartType.Ball }
+			)
+			for _, side in { -1, 1 } do
+				c.Sprite("Wing", x, z, 1.1, { W = hermesWhite }, {
+					Frame = base * CF.new(side * 1.4, 29, 0) * CF.Angles(0, math.pi / 2, 0),
+					Yaw = if side > 0 then 180 else 0,
+					Ghost = true,
+					Parent = staff,
+				})
+			end
+			Motion.Spin(staff, base.Position, base.UpVector, 20)
+		end,
+		Life = function(c: any, life: any)
+			-- Gusts blowing down the road.
+			for i = 1, 4 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 4
+				Lane.Motes(c, life, 0, 6, z, c.Vector3.new(100, 8, 50), {
+					Texture = SMOKE,
+					Color = rgb(255, 255, 255),
+					Size = { { 0, 0.6 }, { 1, 2.4 } },
+					Transparency = { { 0, 0.7 }, { 1, 1 } },
+					Lifetime = { 1.5, 2.5 },
+					Speed = { 0.5, 1 },
+					Acceleration = c.Frame.LookVector * 14,
+					Rate = 5,
+				})
+			end
+		end,
 		Floor = rgb(214, 204, 178),
 		Cap = rgb(132, 192, 226),
 		SideA = rgb(170, 160, 140),
@@ -1271,6 +2810,116 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Hephaestus's lane: anvils on stumps, slag with glowing seams, ore carts, half-buried cogs and girders; a forge on
+	-- the knoll, lava cracks in the floor and embers rising.
+	local iron, rust, molten, ember = rgb(62, 60, 66), rgb(132, 82, 58), rgb(255, 120, 40), rgb(255, 170, 70)
+	local function embers(c: any, parent: any, x: number, y: number, z: number, size: any, rate: number)
+		Lane.Motes(c, parent, x, y, z, size, {
+			Texture = FIRE,
+			Color = { ember, molten },
+			LightEmission = 1,
+			Size = { { 0, 0.35 }, { 1, 0 } },
+			Lifetime = { 1.5, 3 },
+			Speed = { 3, 6 },
+			EmissionDirection = c.Enum.NormalId.Top,
+			Acceleration = c.Vector3.new(0, 2, 0),
+			Rate = rate,
+		})
+	end
+	local function anvil(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local k = 1.3
+		local base = c.Stand(x, z)
+		local function piece(px: number, py: number, pz: number, size: any, color: any, turn: any?)
+			c.NewPart(model, base * CF.new(px * k, py * k, pz * k) * (turn or CF.new()), size * k, color)
+		end
+		piece(0, 2.5, 0, V.new(5, 5, 5), rgb(110, 82, 60))
+		piece(0, 5.6, 0, V.new(4.4, 1.6, 5), iron)
+		piece(0, 7, 0, V.new(2.6, 1.6, 3.4), iron)
+		piece(0, 8.6, 0.6, V.new(4.6, 1.8, 8.4), iron)
+		piece(0, 8.9, 5.4, V.new(2.4, 1.2, 2.4), iron)
+		-- The hammer left on it.
+		piece(1, 10, -1, V.new(0.8, 0.8, 6), rgb(110, 82, 60), CF.Angles(0, math.rad(30), 0))
+		piece(1.9, 10.2, -3.6, V.new(2.6, 1.6, 1.6), iron, CF.Angles(0, math.rad(30), 0))
+	end
+	local function pillar(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local random = c.LaneRandom
+		local h = random.Number(16, 26)
+		local base = c.Stand(x, z)
+		c.NewPart(model, base * CF.new(0, h / 2, 0), V.new(7, h, 7), rgb(110, 70, 58))
+		c.NewPart(model, base * CF.new(0, h + 0.4, 0), V.new(8, 0.8, 8), iron)
+		c.NewPart(model, base * CF.new(0, h * 0.45, -3.55), V.new(2, h * 0.3, 0.2), molten, {
+			Material = c.Enum.Material.Neon,
+			CanCollide = false,
+		})
+		c.Emitter(model, base * CF.new(0, h + 1, 0), V.new(5, 1, 5), {
+			Name = "Smoke",
+			Texture = SMOKE,
+			Color = rgb(70, 66, 70),
+			Size = { { 0, 2 }, { 1, 7 } },
+			Transparency = { { 0, 0.5 }, { 1, 1 } },
+			Lifetime = { 3, 5 },
+			Speed = { 3, 5 },
+			Rate = 3,
+		})
+	end
+	local function cart(c: any, x: number, z: number, model: any)
+		local V = c.Vector3
+		local random = c.LaneRandom
+		local yaw = random.Number(-25, 25)
+		for _, dx in { -2.6, 2.6 } do
+			c.Tilted(x + dx, 0.2, z, V.new(0.6, 0.4, 14), iron, { Yaw = yaw, CanCollide = false, Parent = model })
+		end
+		c.Tilted(x, 3.4, z, V.new(6.4, 4, 8), rust, { Yaw = yaw, Parent = model })
+		c.Tilted(x, 5.8, z, V.new(5, 1.4, 6.4), molten, { Yaw = yaw, Material = c.Enum.Material.Neon, Parent = model })
+		c.Tilted(
+			x,
+			6.8,
+			z + 0.6,
+			V.new(3, 1.2, 3.4),
+			molten,
+			{ Yaw = yaw + 20, Material = c.Enum.Material.Neon, Parent = model }
+		)
+		for _, dx in { -3.4, 3.4 } do
+			for _, dz in { -2.6, 2.6 } do
+				c.Tilted(x + dx, 1.6, z + dz, V.new(1, 2.6, 2.6), iron, {
+					Yaw = yaw,
+					Shape = c.Enum.PartType.Cylinder,
+					Parent = model,
+				})
+			end
+		end
+	end
+	-- A cog of radius `r` round `center`'s look axis, turning at `speed` degrees a second.
+	local function gear(c: any, center: any, r: number, model: any, speed: number)
+		local V, CF = c.Vector3, c.CFrame
+		c.NewPart(model, center * CF.Angles(0, math.pi / 2, 0), V.new(2, r * 2, r * 2), rust, {
+			Shape = c.Enum.PartType.Cylinder,
+		})
+		local teeth = math.max(10, math.floor(r * 1.5))
+		for i = 0, teeth - 1 do
+			c.NewPart(
+				model,
+				center * CF.Angles(0, 0, i * math.pi * 2 / teeth) * CF.new(0, r + 0.7, 0),
+				V.new(2, 1.6, 2.2),
+				rust
+			)
+		end
+		c.NewPart(model, center * CF.Angles(0, math.pi / 2, 0), V.new(2.6, r * 0.3, r * 0.3), iron, {
+			Shape = c.Enum.PartType.Cylinder,
+		})
+		Motion.Spin(model, center.Position, center.LookVector, speed)
+	end
+	local function cog(c: any, x: number, z: number, model: any)
+		local random = c.LaneRandom
+		local r = random.Number(7, 9)
+		-- Half buried, standing on edge, its face across the slope.
+		local center = c.Stand(x, z)
+			* c.CFrame.new(0, r * 0.3, 0)
+			* c.CFrame.Angles(0, math.rad(random.Number(-30, 30)), 0)
+		gear(c, center, r, model, random.Number(15, 30) * random.Side())
+	end
 	themes.Hephaestus = {
 		Floor = rgb(78, 70, 70),
 		Cap = rgb(92, 80, 76),
@@ -1283,6 +2932,82 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		Stones = 10,
 		Islands = 2,
 		Plants = {},
+		Path = rgb(58, 54, 60),
+		Birds = { rgb(44, 42, 48), rgb(60, 56, 64), rgb(200, 150, 60) },
+		Obstacles = {
+			{ 2, 8.5, anvil, Name = "Anvil" },
+			{
+				2,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Rock(c, x, z, model, rgb(52, 46, 48), c.LaneRandom.Number(5.5, 7.5), molten)
+				end,
+				Name = "Slag",
+			},
+			{ 1, 6, cart, Name = "OreCart" },
+			{ 3, 9, cog, Name = "Cog" },
+			{ 2, 5, pillar, Name = "ChimneyPillar" },
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			local brick = rgb(110, 70, 58)
+			local base = c.Stand(x, z, y)
+			c.NewPart(model, base * CF.new(0, 7, 0), V.new(14, 14, 14), brick)
+			c.NewPart(model, base * CF.new(0, 14.6, 0), V.new(15, 1.2, 15), iron)
+			-- The furnace's mouth glows down the mountain, towards the climbers.
+			c.NewPart(model, base * CF.new(0, 5, -7.1), V.new(7, 6, 0.4), molten, {
+				Material = c.Enum.Material.Neon,
+				CanCollide = false,
+			})
+			c.NewPart(model, base * CF.new(3, 25, 3), V.new(5, 20, 5), brick)
+			c.NewPart(model, base * CF.new(3, 35.4, 3), V.new(6.4, 0.8, 6.4), iron)
+			c.Emitter(model, base * CF.new(3, 36, 3), V.new(4, 1, 4), {
+				Name = "Smoke",
+				Texture = SMOKE,
+				Color = rgb(70, 66, 70),
+				Size = { { 0, 3 }, { 1, 9 } },
+				Transparency = { { 0, 0.4 }, { 1, 1 } },
+				Lifetime = { 4, 6 },
+				Speed = { 4, 6 },
+				Rate = 6,
+				Acceleration = V.new(0, 1, 0),
+			})
+			c.Emitter(model, base * CF.new(0, 5, -8), V.new(6, 4, 1), {
+				Name = "Sparks",
+				Texture = FIRE,
+				Color = { ember, molten },
+				LightEmission = 1,
+				Size = { { 0, 0.5 }, { 1, 0 } },
+				Lifetime = { 0.6, 1.2 },
+				Speed = { 6, 12 },
+				Rate = 18,
+				EmissionDirection = c.Enum.NormalId.Front,
+				Acceleration = V.new(0, -20, 0),
+			})
+		end,
+		Life = function(c: any, life: any)
+			for _ = 1, 7 do
+				local x, z = c.LaneRandom.Number(-50, 50), c.LaneRandom.Number(-c.Half + 12, c.Half - 12)
+				Lane.Crack(c, x, z, c.LaneRandom.Int(3, 5), molten, life)
+				embers(c, life, x, 1, z, c.Vector3.new(8, 1, 8), 3)
+			end
+			for _, obstacle in c.Model:FindFirstChild("Lane"):FindFirstChild("Obstacles"):GetChildren() do
+				if obstacle.Name == "Slag" or obstacle.Name == "OreCart" then
+					local pivot = obstacle:GetChildren()[1].CFrame
+					c.Emitter(life, c.CFrame.new(pivot.Position), c.Vector3.new(4, 1, 4), {
+						Name = "Embers",
+						Texture = FIRE,
+						Color = { ember, molten },
+						LightEmission = 1,
+						Size = { { 0, 0.35 }, { 1, 0 } },
+						Lifetime = { 1.5, 3 },
+						Speed = { 3, 6 },
+						Acceleration = c.Vector3.new(0, 2, 0),
+						Rate = 4,
+					})
+				end
+			end
+		end,
 		Props = function(c: any)
 			local V = c.Vector3
 			local iron, brick, glow = rgb(62, 60, 66), rgb(110, 70, 58), rgb(255, 120, 40)
@@ -1317,10 +3042,136 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 					Yaw = 45,
 				})
 			end, c.Lane + 10, 90)
+			-- Two great cogs set in the cliffs either side, turning slowly, faces to the lane.
+			for _, side in { -1, 1 } do
+				local x, z = side * 76, c.Random.Number(-60, 60)
+				local wheel = c.Instance.new("Model")
+				wheel.Name = "WallCog"
+				wheel.Parent = c.Decor
+				local r = 14
+				local center = c.Frame
+					* c.CFrame.new(x, c.Ground(x, z) + r * 0.55, z)
+					* c.CFrame.Angles(0, math.pi / 2, 0)
+				gear(c, center, r, wheel, 8 * side)
+			end
 		end,
 	}
 
+	-- Ares's lane: weapon racks, spiked barricades, shields on stands, campfires and war drums; a bronze helmet on the
+	-- knoll between two banners.
+	local aresBronze, aresRed, aresWood = rgb(196, 146, 72), rgb(184, 44, 40), rgb(110, 82, 60)
+	local function weaponRack(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-30, 30)), 0)
+		for _, dx in { -4, 4 } do
+			c.NewPart(model, base * CF.new(dx, 4, 0), V.new(1, 8, 1), aresWood)
+		end
+		c.NewPart(model, base * CF.new(0, 7.6, 0), V.new(9.6, 0.8, 0.8), aresWood)
+		for i = -3, 3, 2 do
+			c.NewPart(model, base * CF.new(i, 6.5, 0.6) * CF.Angles(math.rad(-10), 0, 0), V.new(0.4, 13, 0.4), aresWood)
+			c.NewPart(
+				model,
+				base * CF.new(i, 13.2, 1.7) * CF.Angles(math.rad(-10), 0, 0),
+				V.new(0.8, 1.6, 0.4),
+				rgb(200, 204, 210)
+			)
+		end
+		c.NewPart(model, base * CF.new(0, 3.6, -0.9) * CF.Angles(0, math.pi / 2, 0), V.new(0.6, 5.4, 5.4), aresBronze, {
+			Shape = c.Enum.PartType.Cylinder,
+		})
+	end
+	local function barricade(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.new(0, 2.2, 0) * CF.Angles(0, math.rad(c.LaneRandom.Number(-50, 50)), 0)
+		c.NewPart(model, base, V.new(12, 1.6, 1.6), aresWood, { Shape = c.Enum.PartType.Cylinder })
+		for i = -2, 2 do
+			for _, lean in { -40, 40 } do
+				c.NewPart(
+					model,
+					base * CF.new(i * 2.5, 0, 0) * CF.Angles(math.rad(lean), 0, 0),
+					V.new(0.6, 6, 0.6),
+					rgb(150, 112, 74)
+				)
+			end
+		end
+	end
+	local function shieldStand(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-25, 25)), 0)
+		c.NewPart(model, base * CF.new(0, 3.5, 0), V.new(0.8, 7, 0.8), aresWood)
+		local face = base * CF.new(0, 5, -0.7) * CF.Angles(0, math.pi / 2, 0)
+		c.NewPart(model, face, V.new(0.8, 7, 7), aresBronze, { Shape = c.Enum.PartType.Cylinder })
+		c.NewPart(model, face * CF.new(0.5, 0, 0), V.new(0.4, 2.4, 2.4), aresRed, { Shape = c.Enum.PartType.Cylinder })
+		c.NewPart(model, base * CF.new(2, 7, 0.8) * CF.Angles(0, 0, math.rad(-12)), V.new(0.5, 14, 0.5), aresWood)
+	end
+	local function campfire(c: any, x: number, z: number, model: any)
+		Lane.Ring(c, x, z, model, rgb(110, 100, 96), 3.2, 8, c.Vector3.new(1.8, 1.2, 1.8))
+		for _, yaw in { 0, 60, 120 } do
+			c.Tilted(x, 0.6, z, c.Vector3.new(5, 0.9, 0.9), aresWood, { Yaw = yaw, Parent = model })
+		end
+		Lane.Flame(c, c.Stand(x, z) * c.CFrame.new(0, 0.6, 0), model, 0.8)
+		c.Emitter(model, c.Stand(x, z) * c.CFrame.new(0, 4, 0), c.Vector3.new(1, 1, 1), {
+			Name = "Smoke",
+			Texture = SMOKE,
+			Color = rgb(90, 86, 84),
+			Size = { { 0, 1.5 }, { 1, 6 } },
+			Transparency = { { 0, 0.5 }, { 1, 1 } },
+			Lifetime = { 3, 5 },
+			Speed = { 3, 5 },
+			Rate = 3,
+		})
+	end
 	themes.Ares = {
+		Path = rgb(124, 82, 66),
+		Birds = { rgb(70, 52, 42), rgb(54, 40, 34), rgb(220, 190, 140) },
+		Obstacles = {
+			{ 2, 6, weaponRack, Name = "WeaponRack" },
+			{ 3, 7, barricade, Name = "Barricade" },
+			{ 2, 4.5, shieldStand, Name = "ShieldStand" },
+			{ 2, 4.5, campfire, Name = "Campfire" },
+			{
+				1,
+				3.5,
+				function(c: any, x: number, z: number, model: any)
+					local base = c.Stand(x, z) * c.CFrame.new(0, 2.5, 0) * c.CFrame.Angles(0, 0, math.pi / 2)
+					local cylinder = { Shape = c.Enum.PartType.Cylinder }
+					c.NewPart(model, base, c.Vector3.new(5, 6, 6), aresRed, cylinder)
+					for _, d in { -2.4, 2.4 } do
+						c.NewPart(
+							model,
+							base * c.CFrame.new(d, 0, 0),
+							c.Vector3.new(0.4, 6.4, 6.4),
+							aresBronze,
+							cylinder
+						)
+					end
+				end,
+				Name = "WarDrum",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local top = Lane.Pedestal(c, x, z, model, rgb(126, 86, 72), aresBronze, 4, 12, y)
+			c.Sprite("Helmet", x, z, 1.8, { R = aresRed, B = aresBronze }, { Frame = top, Yaw = 0, Parent = model })
+			for _, side in { -1, 1 } do
+				local pole = c.Stand(x + side * 9, z + 4, y)
+				c.NewPart(model, pole * c.CFrame.new(0, 12, 0), c.Vector3.new(1, 24, 1), aresWood)
+				c.NewPart(model, pole * c.CFrame.new(side * 3.2, 19, 0), c.Vector3.new(6, 9, 0.4), aresRed)
+			end
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 4 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 4
+				Lane.Motes(c, life, 0, 3, z, c.Vector3.new(100, 4, 50), {
+					Texture = SMOKE,
+					Color = rgb(170, 130, 100),
+					Size = { { 0, 1 }, { 1, 3.5 } },
+					Transparency = { { 0, 0.8 }, { 1, 1 } },
+					Lifetime = { 3, 5 },
+					Speed = { 0.5, 1.5 },
+					Rate = 3,
+				})
+			end
+		end,
 		Floor = rgb(150, 96, 78),
 		Cap = rgb(160, 58, 50),
 		SideA = rgb(112, 76, 64),
@@ -1368,7 +3219,111 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Aphrodite's lane: rose hedges, heart topiaries, little fountains and blossom trees; a heart on the knoll, bobbing,
+	-- and petals falling all along.
+	local roseRed, rosePink, hedge = rgb(214, 44, 72), rgb(240, 120, 160), rgb(80, 146, 86)
+	local function roseHedge(c: any, x: number, z: number, model: any)
+		local random = c.LaneRandom
+		local yaw = random.Number(0, 90)
+		c.Tilted(x, 2, z, c.Vector3.new(8, 4, 6), hedge, { Yaw = yaw, Parent = model })
+		c.Tilted(x, 4.6, z, c.Vector3.new(6, 2, 4.4), hedge, { Yaw = yaw + 10, Parent = model })
+		for _ = 1, 9 do
+			c.Tilted(
+				x + random.Number(-3.4, 3.4),
+				random.Number(2, 5.6),
+				z + random.Number(-2.6, 2.6),
+				c.Vector3.new(1.3, 1.3, 1.3),
+				random.Pick({ roseRed, rosePink }),
+				{ Yaw = random.Number(0, 90), Parent = model, CanCollide = false }
+			)
+		end
+	end
+	local function heartTopiary(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z)
+		c.NewPart(model, base * CF.new(0, 1.5, 0), V.new(4, 3, 4), rgb(232, 196, 186))
+		c.NewPart(model, base * CF.new(0, 5, 0), V.new(0.8, 4, 0.8), rgb(120, 90, 70))
+		c.Sprite("Heart", x, z, 0.9, { R = roseRed, W = rgb(255, 224, 232) }, {
+			Frame = base * CF.new(0, 6.8, 0),
+			Yaw = c.LaneRandom.Number(-25, 25),
+			Parent = model,
+		})
+	end
+	local function fountain(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, 0, math.pi / 2)
+		local marble = rgb(248, 236, 236)
+		local cylinder = { Shape = c.Enum.PartType.Cylinder }
+		c.NewPart(model, base * CF.new(1.2, 0, 0), V.new(2.4, 9, 9), marble, cylinder)
+		c.NewPart(model, base * CF.new(2.45, 0, 0), V.new(0.2, 7.6, 7.6), rgb(150, 210, 240), {
+			Shape = c.Enum.PartType.Cylinder,
+			Material = c.Enum.Material.Neon,
+			Transparency = 0.2,
+			CanCollide = false,
+		})
+		c.NewPart(model, base * CF.new(4, 0, 0), V.new(5, 1.4, 1.4), marble, cylinder)
+		c.NewPart(model, base * CF.new(6.6, 0, 0), V.new(0.8, 3.4, 3.4), marble, cylinder)
+		c.Emitter(model, c.Stand(x, z) * CF.new(0, 7, 0), V.new(0.6, 0.6, 0.6), {
+			Name = "Spray",
+			Texture = SPARKLE,
+			Color = rgb(210, 240, 255),
+			LightEmission = 0.6,
+			Size = { { 0, 0.5 }, { 1, 0.2 } },
+			Lifetime = { 0.8, 1.1 },
+			Speed = { 7, 9 },
+			Acceleration = V.new(0, -18, 0),
+			Rate = 30,
+		})
+	end
 	themes.Aphrodite = {
+		Path = rgb(248, 226, 230),
+		Birds = { rgb(255, 250, 252), rgb(250, 210, 226), rgb(240, 150, 170) },
+		Obstacles = {
+			{ 3, 5.5, roseHedge, Name = "RoseHedge" },
+			{ 2, 4.5, heartTopiary, Name = "HeartTopiary" },
+			{ 1, 5, fountain, Name = "Fountain" },
+			{
+				2,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Tree(
+						c,
+						x,
+						z,
+						model,
+						"BlossomTree",
+						{ Leaves = rgb(240, 156, 186), Scale = c.LaneRandom.Number(0.5, 0.6) }
+					)
+				end,
+				Name = "Blossom",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local top = Lane.Pedestal(c, x, z, model, rgb(248, 236, 236), rgb(222, 118, 142), 3, 10, y)
+			local heart = c.Sprite("Heart", x, z, 2.2, { R = roseRed, W = rgb(255, 224, 232) }, {
+				Frame = top * c.CFrame.new(0, 2, 0),
+				Yaw = 0,
+				Parent = model,
+			})
+			Motion.Bob(heart, 1.2, 3)
+		end,
+		Life = function(c: any, life: any)
+			-- Petals falling over the whole stretch.
+			for i = 1, 3 do
+				local z = -c.Half + (i - 0.5) * c.Half * 2 / 3
+				Lane.Motes(c, life, 0, 34, z, c.Vector3.new(120, 2, 90), {
+					Texture = SPARKLE,
+					Color = { rgb(255, 150, 180), rgb(255, 210, 225) },
+					Size = { { 0, 0.6 }, { 1, 0.5 } },
+					Lifetime = { 6, 9 },
+					Speed = { 0.5, 1.5 },
+					Acceleration = c.Vector3.new(0, -4, 0),
+					Rotation = { 0, 360 },
+					RotSpeed = { -90, 90 },
+					Rate = 8,
+				})
+			end
+		end,
 		Floor = rgb(236, 196, 204),
 		Cap = rgb(222, 118, 142),
 		SideA = rgb(240, 214, 220),
@@ -1401,7 +3356,110 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Artemis's lane: pines, archery targets, fallen logs and silver stags; her crescent moon on the knoll, and
+	-- fireflies between the trees.
+	local function target(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local wood = rgb(120, 92, 66)
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-25, 25)), 0)
+		for _, dx in { -3, 3 } do
+			c.NewPart(model, base * CF.new(dx, 4, 0.8), V.new(0.8, 8, 0.8), wood)
+		end
+		local rings = { rgb(240, 240, 236), rgb(40, 40, 44), rgb(70, 130, 210), rgb(214, 60, 52), rgb(240, 204, 70) }
+		for i, color in rings do
+			local d = 10 - (i - 1) * 1.9
+			c.NewPart(
+				model,
+				base * CF.new(0, 7.5, -(i - 1) * 0.12) * CF.Angles(0, math.pi / 2, 0),
+				V.new(0.6, d, d),
+				color,
+				{
+					Shape = c.Enum.PartType.Cylinder,
+				}
+			)
+		end
+		c.NewPart(model, base * CF.new(0.6, 7.8, -1.4), V.new(0.3, 0.3, 3), wood)
+	end
+	local function stag(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local silver = rgb(214, 220, 232)
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(0, 360)), 0)
+		c.NewPart(model, base * CF.new(0, 1, 0), V.new(4, 2, 8), rgb(150, 160, 176))
+		c.NewPart(model, base * CF.new(0, 6.5, 0), V.new(2.6, 2.8, 6.4), silver)
+		for _, dx in { -0.9, 0.9 } do
+			for _, dz in { -2.4, 2.4 } do
+				c.NewPart(model, base * CF.new(dx, 3.5, dz), V.new(0.8, 3.4, 0.8), silver)
+			end
+		end
+		c.NewPart(model, base * CF.new(0, 8.8, 2.9) * CF.Angles(math.rad(-30), 0, 0), V.new(1.4, 3.6, 1.4), silver)
+		c.NewPart(model, base * CF.new(0, 10.4, 4), V.new(1.4, 1.4, 2.6), silver)
+		for _, side in { -1, 1 } do
+			c.NewPart(
+				model,
+				base * CF.new(side * 0.8, 12.2, 3.6) * CF.Angles(0, 0, math.rad(side * -25)),
+				V.new(0.4, 3, 0.4),
+				silver
+			)
+			c.NewPart(
+				model,
+				base * CF.new(side * 1.6, 13.2, 3.6) * CF.Angles(0, 0, math.rad(side * -60)),
+				V.new(0.4, 1.6, 0.4),
+				silver
+			)
+		end
+	end
 	themes.Artemis = {
+		Path = rgb(150, 160, 176),
+		Birds = { rgb(150, 130, 110), rgb(120, 100, 84), rgb(240, 200, 80) },
+		Obstacles = {
+			{
+				3,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Tree(c, x, z, model, c.LaneRandom.Pick({ "SnowPine", "Pine", "Pine3" }), {
+						Leaves = rgb(52, 104, 86),
+						Scale = c.LaneRandom.Number(0.65, 0.8),
+					})
+				end,
+				Name = "Pine",
+			},
+			{ 2, 5.5, target, Name = "Target" },
+			{
+				2,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Log(c, x, z, model, rgb(80, 66, 60), rgb(180, 150, 110), 12)
+				end,
+				Name = "FallenLog",
+			},
+			{ 1, 4.5, stag, Name = "SilverStag" },
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local base = c.Stand(x, z, y)
+			c.NewPart(model, base * c.CFrame.new(0, 7, 0), c.Vector3.new(1.4, 14, 1.4), rgb(200, 206, 218))
+			local moon = c.Sprite("Moon", x, z, 2.2, { M = rgb(236, 240, 255) }, {
+				Frame = base * c.CFrame.new(0, 14, 0),
+				Yaw = 0,
+				Neon = true,
+				Ghost = true,
+				Parent = model,
+			})
+			Motion.Bob(moon, 1.2, 4)
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 5 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 5
+				Lane.Motes(c, life, 0, 6, z, c.Vector3.new(100, 8, 40), {
+					Texture = SPARKLE,
+					Color = { rgb(220, 255, 200), rgb(200, 230, 255) },
+					LightEmission = 1,
+					Size = { { 0, 0 }, { 0.5, 0.6 }, { 1, 0 } },
+					Lifetime = { 2, 4 },
+					Speed = { 0.5, 1.5 },
+					Rate = 6,
+				})
+			end
+		end,
 		Floor = rgb(94, 102, 112),
 		Cap = rgb(226, 232, 240),
 		SideA = rgb(58, 70, 92),
@@ -1414,7 +3472,14 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		Props = function(c: any)
 			local V = c.Vector3
 			local wood = rgb(120, 92, 66)
-			c.Sprite("Moon", -150, 30, 7, { M = rgb(236, 240, 255) }, { Y = 70, Yaw = -90, Neon = true, Ghost = true })
+			c.Sprite(
+				"Moon",
+				-150,
+				30,
+				7,
+				{ M = rgb(236, 240, 255) },
+				{ Y = 70, Yaw = -90, Upright = true, Neon = true, Ghost = true }
+			)
 			-- Archery targets facing the path, an arrow in each.
 			local rings =
 				{ rgb(240, 240, 236), rgb(40, 40, 44), rgb(70, 130, 210), rgb(214, 60, 52), rgb(240, 204, 70) }
@@ -1443,7 +3508,135 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Apollo's lane: golden tripods with fire, lyres on stands, laurel trees, sun discs turning and white columns; a
+	-- golden sun turning on the knoll.
+	local apolloGold, apolloMarble = rgb(236, 186, 62), rgb(244, 238, 226)
+	local function tripod(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z)
+		for i = 0, 2 do
+			local a = i * math.pi * 2 / 3
+			c.NewPart(
+				model,
+				base * CF.new(math.cos(a) * 1.6, 3.5, math.sin(a) * 1.6) * CF.Angles(0, -a, math.rad(-12)),
+				V.new(0.6, 7.4, 0.6),
+				apolloGold
+			)
+		end
+		c.NewPart(model, base * CF.new(0, 7.4, 0), V.new(5, 1.4, 5), apolloGold)
+		Lane.Flame(c, base * CF.new(0, 7.6, 0), model, 0.9)
+	end
+	local function sunDisc(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local top = Lane.Pedestal(c, x, z, model, apolloMarble, apolloGold, 5, 4)
+		local disc = c.Instance.new("Model")
+		disc.Name = "Disc"
+		disc.Parent = model
+		local center = top * CF.new(0, 4.5, 0)
+		c.NewPart(
+			disc,
+			center * CF.Angles(0, math.pi / 2, 0),
+			V.new(0.8, 7, 7),
+			apolloGold,
+			{ Shape = c.Enum.PartType.Cylinder }
+		)
+		for i = 0, 7 do
+			c.NewPart(
+				disc,
+				center * CF.Angles(0, 0, i * math.pi / 4) * CF.new(0, 4.6, 0),
+				V.new(1, 2.2, 0.6),
+				rgb(255, 170, 60),
+				{
+					Material = c.Enum.Material.Neon,
+					CanCollide = false,
+				}
+			)
+		end
+		Motion.Spin(disc, center.Position, center.LookVector, 30)
+	end
 	themes.Apollo = {
+		Path = rgb(232, 206, 140),
+		Birds = { rgb(255, 255, 255), rgb(246, 240, 226), rgb(240, 160, 60) },
+		Obstacles = {
+			{ 2, 3.5, tripod, Name = "Tripod" },
+			{
+				2,
+				4,
+				function(c: any, x: number, z: number, model: any)
+					local top = Lane.Pedestal(c, x, z, model, apolloMarble, apolloGold, 3, 4)
+					c.Sprite("Lyre", x, z, 0.7, { G = apolloGold, S = rgb(250, 246, 236) }, {
+						Frame = top,
+						Yaw = c.LaneRandom.Number(-25, 25),
+						Parent = model,
+					})
+				end,
+				Name = "Lyre",
+			},
+			{
+				2,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Tree(
+						c,
+						x,
+						z,
+						model,
+						"RoundTree",
+						{ Leaves = rgb(96, 158, 82), Scale = c.LaneRandom.Number(0.6, 0.75) }
+					)
+				end,
+				Name = "Laurel",
+			},
+			{ 1, 4, sunDisc, Name = "SunDisc" },
+			{
+				2,
+				5,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Column(c, x, z, model, apolloMarble, apolloGold, c.LaneRandom.Number(12, 24))
+				end,
+				Name = "Column",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			local top = Lane.Pedestal(c, x, z, model, apolloMarble, apolloGold, 6, 6, y)
+			local sun = c.Instance.new("Model")
+			sun.Name = "Sun"
+			sun.Parent = model
+			local center = top * CF.new(0, 9, 0)
+			c.NewPart(sun, center, V.new(10, 10, 10), rgb(255, 214, 90), {
+				Shape = c.Enum.PartType.Ball,
+				Material = c.Enum.Material.Neon,
+				CanCollide = false,
+			})
+			for i = 0, 11 do
+				c.NewPart(
+					sun,
+					center * CF.Angles(0, 0, i * math.pi / 6) * CF.new(0, 8, 0),
+					V.new(1.6, 4, 1.2),
+					rgb(255, 170, 60),
+					{
+						Material = c.Enum.Material.Neon,
+						CanCollide = false,
+					}
+				)
+			end
+			Motion.Spin(sun, center.Position, center.LookVector, 25)
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 4 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 4
+				Lane.Motes(c, life, 0, 8, z, c.Vector3.new(100, 10, 50), {
+					Texture = SPARKLE,
+					Color = { rgb(255, 236, 150), rgb(255, 200, 90) },
+					LightEmission = 1,
+					Size = { { 0, 0 }, { 0.3, 0.8 }, { 1, 0 } },
+					Lifetime = { 3, 5 },
+					Speed = { 0.3, 1 },
+					Rate = 5,
+				})
+			end
+		end,
 		Floor = rgb(240, 222, 170),
 		Cap = rgb(236, 176, 64),
 		SideA = rgb(240, 232, 214),
@@ -1459,6 +3652,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 			-- The sun low over one side, its rays round it.
 			local sx, sy, sz = 170 * c.Random.Side(), 80, c.Random.Number(-40, 40)
 			c.Block(sx, sy, sz, V.new(36, 36, 36), rgb(255, 214, 90), {
+				Upright = true,
 				Shape = c.Enum.PartType.Ball,
 				Material = light.Material,
 				CanCollide = false,
@@ -1467,6 +3661,7 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 			for i = 0, 11 do
 				local a = i * math.pi / 6
 				c.Block(sx, sy + math.cos(a) * 27, sz + math.sin(a) * 27, V.new(2, 12, 4), rgb(255, 170, 60), {
+					Upright = true,
 					Turn = c.CFrame.Angles(a, 0, 0),
 					Material = light.Material,
 					CanCollide = false,
@@ -1484,7 +3679,106 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Athena's lane: olive trees, broken marble columns, oil jars, owls on plinths and shields propped on spears; her
+	-- owl on the knoll.
+	local athenaMarble, athenaBlue = rgb(240, 238, 232), rgb(70, 104, 170)
+	local owlLegend = {
+		B = rgb(150, 120, 92),
+		L = rgb(206, 184, 150),
+		W = rgb(244, 236, 214),
+		K = rgb(30, 28, 30),
+		Y = rgb(236, 186, 62),
+	}
+	local function athenaShield(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-25, 25)), 0)
+		c.NewPart(
+			model,
+			base * CF.new(1.6, 7, 0.6) * CF.Angles(0, 0, math.rad(-8)),
+			V.new(0.5, 14, 0.5),
+			rgb(128, 108, 88)
+		)
+		local face = base * CF.new(0, 3.8, -0.4) * CF.Angles(math.rad(-12), math.pi / 2, 0)
+		c.NewPart(model, face, V.new(0.8, 7.4, 7.4), athenaBlue, { Shape = c.Enum.PartType.Cylinder })
+		c.NewPart(
+			model,
+			face * CF.new(-0.45, 0, 0),
+			V.new(0.2, 3, 3),
+			rgb(236, 186, 62),
+			{ Shape = c.Enum.PartType.Cylinder }
+		)
+	end
 	themes.Athena = {
+		Path = rgb(206, 200, 188),
+		Birds = { rgb(150, 120, 92), rgb(206, 184, 150), rgb(236, 186, 62) },
+		Obstacles = {
+			{
+				3,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Tree(c, x, z, model, "RoundTree", {
+						Leaves = rgb(132, 152, 104),
+						Wood = rgb(128, 108, 88),
+						Scale = c.LaneRandom.Number(0.6, 0.75),
+					})
+				end,
+				Name = "Olive",
+			},
+			{
+				2,
+				5,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Column(c, x, z, model, athenaMarble, athenaBlue, c.LaneRandom.Number(10, 24))
+				end,
+				Name = "Column",
+			},
+			{
+				2,
+				5,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Jar(c, x - 1.8, z, model, rgb(200, 120, 72), rgb(40, 34, 32))
+					Lane.Jar(c, x + 2.2, z - 1, model, rgb(184, 108, 64), rgb(40, 34, 32), 0.75)
+				end,
+				Name = "OilJars",
+			},
+			{
+				1,
+				4,
+				function(c: any, x: number, z: number, model: any)
+					local top = Lane.Pedestal(c, x, z, model, athenaMarble, athenaBlue, 4, 5)
+					c.Sprite(
+						"Owl",
+						x,
+						z,
+						0.8,
+						owlLegend,
+						{ Frame = top, Yaw = c.LaneRandom.Number(-20, 20), Parent = model }
+					)
+				end,
+				Name = "Owl",
+			},
+			{ 1, 4.5, athenaShield, Name = "Shield" },
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local top = Lane.Pedestal(c, x, z, model, athenaMarble, athenaBlue, 4, 10, y)
+			c.Sprite("Owl", x, z, 1.8, owlLegend, { Frame = top, Yaw = 0, Parent = model })
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 3 do
+				local z = -c.Half + (i - 0.5) * c.Half * 2 / 3
+				Lane.Motes(c, life, 0, 26, z, c.Vector3.new(110, 2, 90), {
+					Texture = SPARKLE,
+					Color = { rgb(150, 170, 110), rgb(120, 140, 90) },
+					Size = { { 0, 0.5 }, { 1, 0.4 } },
+					Lifetime = { 6, 9 },
+					Speed = { 0.5, 1.5 },
+					Acceleration = c.Vector3.new(0, -3, 0),
+					Rotation = { 0, 360 },
+					RotSpeed = { -60, 60 },
+					Rate = 5,
+				})
+			end
+		end,
 		Floor = rgb(226, 222, 212),
 		Cap = rgb(138, 156, 96),
 		SideA = rgb(206, 200, 188),
@@ -1524,7 +3818,135 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Demeter's lane: hay bales, wheat sheaves, a harvest cart, scarecrows and pumpkins; a windmill on the knoll, its
+	-- sails turning.
+	local harvestHay, harvestWood, harvestWheat = rgb(222, 190, 96), rgb(122, 92, 62), rgb(236, 196, 92)
+	local function bales(c: any, x: number, z: number, model: any)
+		local random = c.LaneRandom
+		if random.Number(0, 1) < 0.5 then
+			-- A round bale lying across the slope.
+			local base = c.Stand(x, z) * c.CFrame.new(0, 3, 0) * c.CFrame.Angles(0, math.rad(random.Number(-40, 40)), 0)
+			c.NewPart(model, base, c.Vector3.new(5, 6, 6), harvestHay, { Shape = c.Enum.PartType.Cylinder })
+			c.NewPart(model, base * c.CFrame.new(2.55, 0, 0), c.Vector3.new(0.2, 4, 4), rgb(196, 160, 70), {
+				Shape = c.Enum.PartType.Cylinder,
+			})
+		else
+			local yaw = random.Number(0, 90)
+			c.Tilted(x, 1.5, z - 2, c.Vector3.new(4, 3, 7), harvestHay, { Yaw = yaw, Parent = model })
+			c.Tilted(x + 1, 1.5, z + 3, c.Vector3.new(4, 3, 5), harvestHay, { Yaw = yaw + 30, Parent = model })
+			c.Tilted(x, 4.5, z, c.Vector3.new(4, 3, 6), harvestHay, { Yaw = yaw + 8, Parent = model })
+		end
+	end
+	local function sheaves(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local random = c.LaneRandom
+		for i = 1, 3 do
+			local a = i / 3 * math.pi * 2
+			local base = c.Stand(x + math.cos(a) * 2.2, z + math.sin(a) * 2.2)
+				* CF.Angles(math.rad(random.Number(-8, 8)), 0, math.rad(random.Number(-8, 8)))
+			c.NewPart(model, base * CF.new(0, 3, 0), V.new(2.2, 6, 2.2), rgb(196, 170, 84))
+			c.NewPart(model, base * CF.new(0, 3.4, 0), V.new(2.5, 0.6, 2.5), harvestWood)
+			c.NewPart(model, base * CF.new(0, 6.6, 0), V.new(2.8, 1.6, 2.8), harvestWheat)
+		end
+	end
+	local function cart(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local random = c.LaneRandom
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(random.Number(-40, 40)), 0)
+		c.NewPart(model, base * CF.new(0, 3.4, 0), V.new(6, 0.6, 8), harvestWood)
+		for _, side in { -1, 1 } do
+			c.NewPart(model, base * CF.new(side * 2.8, 4.6, 0), V.new(0.4, 2, 8), harvestWood)
+			c.NewPart(model, base * CF.new(side * 3.4, 2.4, -1), V.new(0.6, 4.8, 4.8), rgb(90, 70, 52), {
+				Shape = c.Enum.PartType.Cylinder,
+			})
+		end
+		c.NewPart(model, base * CF.new(0, 3, 5), V.new(0.5, 0.5, 3), harvestWood)
+		for _ = 1, 5 do
+			c.NewPart(
+				model,
+				base * CF.new(random.Number(-1.6, 1.6), 5, random.Number(-2.6, 2.6)),
+				V.new(2.4, 2.2, 2.4),
+				rgb(232, 128, 44),
+				{ Shape = c.Enum.PartType.Ball }
+			)
+		end
+	end
+	local function scarecrow(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-30, 30)), 0)
+		c.NewPart(model, base * CF.new(0, 6, 0), V.new(1, 12, 1), harvestWood)
+		c.NewPart(model, base * CF.new(0, 9, 0), V.new(10, 1, 1), harvestWood)
+		c.NewPart(model, base * CF.new(0, 8, 0), V.new(4, 4, 2.6), rgb(176, 70, 56))
+		c.NewPart(model, base * CF.new(0, 11.6, 0), V.new(2.6, 2.6, 2.6), rgb(214, 190, 140))
+		c.NewPart(model, base * CF.new(0, 13.1, 0), V.new(5, 0.4, 5), rgb(150, 116, 62))
+		c.NewPart(model, base * CF.new(0, 14, 0), V.new(2.6, 1.6, 2.6), rgb(150, 116, 62))
+	end
 	themes.Demeter = {
+		Path = rgb(150, 116, 72),
+		Birds = { rgb(36, 34, 40), rgb(52, 50, 58), rgb(220, 180, 70) },
+		Obstacles = {
+			{ 3, 5, bales, Name = "HayBales" },
+			{ 2, 4.5, sheaves, Name = "Sheaves" },
+			{ 1, 7, cart, Name = "HarvestCart" },
+			{ 2, 5.5, scarecrow, Name = "Scarecrow" },
+			{
+				1,
+				4,
+				function(c: any, x: number, z: number, model: any)
+					for i = 1, 3 do
+						local a = i / 3 * math.pi * 2 + c.LaneRandom.Number(0, 1)
+						local s = c.LaneRandom.Number(2.6, 3.6)
+						local px, pz = x + math.cos(a) * 2.2, z + math.sin(a) * 2.2
+						c.Tilted(px, s / 2, pz, c.Vector3.new(s * 1.2, s, s * 1.2), rgb(232, 128, 44), {
+							Shape = c.Enum.PartType.Ball,
+							Parent = model,
+						})
+						c.Tilted(px, s + 0.4, pz, c.Vector3.new(0.4, 1, 0.4), rgb(96, 120, 60), { Parent = model })
+					end
+				end,
+				Name = "Pumpkins",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			local base = c.Stand(x, z, y)
+			c.NewPart(model, base * CF.new(0, 5, 0), V.new(9, 10, 9), rgb(236, 226, 200))
+			c.NewPart(model, base * CF.new(0, 13, 0), V.new(7, 6, 7), rgb(236, 226, 200))
+			c.NewPart(model, base * CF.new(0, 17, 0), V.new(8, 2, 8), rgb(176, 70, 56))
+			c.NewPart(model, base * CF.new(0, 19, 0), V.new(5, 2, 5), rgb(176, 70, 56))
+			c.NewPart(model, base * CF.new(0, 3, -4.55), V.new(3, 5, 0.2), harvestWood, { CanCollide = false })
+			local sails = c.Instance.new("Model")
+			sails.Name = "Sails"
+			sails.Parent = model
+			local hub = base * CF.new(0, 14, -4.2)
+			c.NewPart(sails, hub, V.new(1.6, 1.6, 1.6), harvestWood, { CanCollide = false })
+			for i = 0, 3 do
+				local arm = hub * CF.Angles(0, 0, i * math.pi / 2)
+				c.NewPart(sails, arm * CF.new(0, 6.5, 0), V.new(0.6, 13, 0.6), harvestWood, { CanCollide = false })
+				c.NewPart(
+					sails,
+					arm * CF.new(1.4, 7.5, -0.1),
+					V.new(2.4, 9, 0.2),
+					rgb(244, 236, 220),
+					{ CanCollide = false }
+				)
+			end
+			Motion.Spin(sails, hub.Position, hub.LookVector, 30)
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 4 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 4
+				Lane.Motes(c, life, 0, 5, z, c.Vector3.new(100, 8, 50), {
+					Texture = SPARKLE,
+					Color = rgb(255, 226, 140),
+					Size = { { 0, 0 }, { 0.3, 0.5 }, { 1, 0 } },
+					Lifetime = { 3, 5 },
+					Speed = { 0.5, 1.5 },
+					Acceleration = c.Frame.LookVector * 2,
+					Rate = 6,
+				})
+			end
+		end,
 		Floor = rgb(196, 176, 104),
 		Cap = rgb(222, 186, 82),
 		SideA = rgb(150, 122, 82),
@@ -1568,7 +3990,92 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Hestia's lane: braziers, hearth rings, stacks of firewood, bread ovens and clay pots; the eternal flame on the
+	-- knoll, embers rising everywhere.
+	local hearthStone, hearthClay = rgb(150, 100, 80), rgb(182, 112, 72)
+	local function brazier(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z)
+		c.NewPart(model, base * CF.new(0, 3, 0), V.new(2.6, 6, 2.6), hearthStone)
+		c.NewPart(model, base * CF.new(0, 6.6, 0), V.new(5, 1.6, 5), rgb(182, 122, 62))
+		Lane.Flame(c, base * CF.new(0, 7, 0), model, 1)
+	end
+	local function hearthRing(c: any, x: number, z: number, model: any)
+		Lane.Ring(c, x, z, model, hearthStone, 3.6, 9, c.Vector3.new(2.4, 1.8, 2.4))
+		for _, yaw in { 20, 80, 140 } do
+			c.Tilted(x, 0.7, z, c.Vector3.new(5.4, 1, 1), rgb(100, 70, 52), { Yaw = yaw, Parent = model })
+		end
+		Lane.Flame(c, c.Stand(x, z) * c.CFrame.new(0, 0.8, 0), model, 1.1)
+	end
+	local function firewood(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(c.LaneRandom.Number(-40, 40)), 0)
+		local cylinder = { Shape = c.Enum.PartType.Cylinder }
+		local rows = { { -2.4, 0, 2.4 }, { -1.2, 1.2 }, { 0 } }
+		for level, row in rows do
+			for _, dz in row do
+				c.NewPart(
+					model,
+					base * CF.new(0, 1.1 + (level - 1) * 2, dz),
+					V.new(8, 2.2, 2.2),
+					rgb(120, 84, 60),
+					cylinder
+				)
+			end
+		end
+	end
+	local function oven(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z)
+		c.NewPart(model, base * CF.new(0, 1, 0), V.new(9, 2, 9), hearthStone)
+		c.NewPart(model, base * CF.new(0, 2, 0), V.new(8, 8, 8), hearthClay, { Shape = c.Enum.PartType.Ball })
+		c.NewPart(model, base * CF.new(0, 3, -3.6), V.new(3, 2.6, 1), rgb(255, 140, 50), {
+			Material = c.Enum.Material.Neon,
+			CanCollide = false,
+		})
+		c.NewPart(model, base * CF.new(1.6, 6.6, 1.6), V.new(1.6, 3, 1.6), hearthStone)
+	end
 	themes.Hestia = {
+		Path = rgb(172, 98, 76),
+		Birds = { rgb(150, 90, 60), rgb(200, 120, 70), rgb(250, 200, 90) },
+		Obstacles = {
+			{ 3, 3, brazier, Name = "Brazier" },
+			{ 2, 5, hearthRing, Name = "HearthRing" },
+			{ 2, 5, firewood, Name = "Firewood" },
+			{ 1, 5, oven, Name = "Oven" },
+			{
+				1,
+				4.5,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Jar(c, x - 1.6, z, model, hearthClay, rgb(90, 60, 48), 0.7)
+					Lane.Jar(c, x + 1.8, z + 1.2, model, rgb(196, 124, 80), rgb(90, 60, 48), 0.6)
+				end,
+				Name = "Pots",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			local base = c.Stand(x, z, y)
+			c.NewPart(model, base * CF.new(0, 2.5, 0), V.new(5, 5, 5), hearthStone)
+			c.NewPart(model, base * CF.new(0, 5.6, 0), V.new(11, 1.4, 11), rgb(182, 122, 62))
+			c.NewPart(model, base * CF.new(0, 6.8, 0), V.new(12, 1, 12), rgb(182, 122, 62))
+			Lane.Flame(c, base * CF.new(0, 7, 0), model, 2.4)
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 5 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 5
+				Lane.Motes(c, life, 0, 2, z, c.Vector3.new(100, 2, 40), {
+					Texture = FIRE,
+					Color = { rgb(255, 200, 90), rgb(255, 110, 40) },
+					LightEmission = 1,
+					Size = { { 0, 0.3 }, { 1, 0 } },
+					Lifetime = { 2, 4 },
+					Speed = { 2, 4 },
+					EmissionDirection = c.Enum.NormalId.Top,
+					Rate = 5,
+				})
+			end
+		end,
 		Floor = rgb(194, 114, 84),
 		Cap = rgb(214, 144, 94),
 		SideA = rgb(152, 88, 68),
@@ -1600,7 +4107,149 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Poseidon's lane: coral, rock pools, tridents driven into the sand, anchors and kelp; a fountain on the knoll with
+	-- his trident in it, and bubbles rising. The path is a stream.
+	local seaGold, seaWater, seaFoam = rgb(232, 192, 76), rgb(52, 150, 210), rgb(220, 244, 250)
+	local function coral(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local random = c.LaneRandom
+		local color = random.Pick({ rgb(236, 112, 102), rgb(244, 160, 120), rgb(214, 92, 150) })
+		local base = c.Stand(x, z) * CF.Angles(0, math.rad(random.Number(0, 90)), 0)
+		c.NewPart(model, base * CF.new(0, 3, 0), V.new(1.8, 6, 1.8), color)
+		for i = 1, 5 do
+			local a = i / 5 * math.pi * 2
+			local h = random.Number(3, 6)
+			c.NewPart(
+				model,
+				base
+					* CF.new(math.cos(a) * 1.8, 4 + h / 2, math.sin(a) * 1.8)
+					* CF.Angles(math.sin(a) * 0.5, 0, -math.cos(a) * 0.5),
+				V.new(1.2, h, 1.2),
+				color
+			)
+			c.NewPart(
+				model,
+				base * CF.new(math.cos(a) * (2 + h * 0.45), 4 + h, math.sin(a) * (2 + h * 0.45)),
+				V.new(1.6, 1.6, 1.6),
+				color,
+				{ Shape = c.Enum.PartType.Ball, CanCollide = false }
+			)
+		end
+	end
+	local function rockPool(c: any, x: number, z: number, model: any)
+		Lane.Ring(c, x, z, model, rgb(150, 170, 172), 5, 12, c.Vector3.new(3, 2, 3.4))
+		c.Tilted(x, 1.3, z, c.Vector3.new(8.6, 0.4, 8.6), seaWater, {
+			Yaw = 45,
+			Material = c.Enum.Material.Neon,
+			Transparency = 0.2,
+			CanCollide = false,
+			Parent = model,
+		})
+	end
+	local function anchor(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local iron = rgb(70, 80, 92)
+		local base = c.Stand(x, z)
+			* CF.Angles(0, math.rad(c.LaneRandom.Number(-30, 30)), math.rad(c.LaneRandom.Number(-15, 15)))
+		c.NewPart(model, base * CF.new(0, 6, 0), V.new(1.4, 12, 1.4), iron)
+		c.NewPart(model, base * CF.new(0, 10, 0), V.new(7, 1.2, 1.2), iron)
+		c.NewPart(model, base * CF.new(0, 13, 0) * CF.Angles(0, math.pi / 2, 0), V.new(0.6, 3, 3), iron, {
+			Shape = c.Enum.PartType.Cylinder,
+		})
+		for _, side in { -1, 1 } do
+			c.NewPart(
+				model,
+				base * CF.new(side * 2.4, 1.6, 0) * CF.Angles(0, 0, math.rad(side * 50)),
+				V.new(1.2, 5, 1.2),
+				iron
+			)
+			c.NewPart(model, base * CF.new(side * 4.2, 3.4, 0), V.new(1.6, 1.6, 1.6), iron)
+		end
+	end
+	local function kelp(c: any, x: number, z: number, model: any)
+		local V, CF = c.Vector3, c.CFrame
+		local random = c.LaneRandom
+		for i = 1, 3 do
+			local px, pz = x + random.Number(-2, 2), z + random.Number(-2, 2)
+			local base = c.Stand(px, pz)
+			local h = 0
+			for j = 1, random.Int(4, 6) do
+				local s = 2.2
+				c.NewPart(
+					model,
+					base * CF.new(math.sin(j * 1.3 + i) * 0.8, h + s / 2, 0),
+					V.new(1.2, s, 1.6),
+					rgb(72, 150, 96)
+				)
+				h += s
+			end
+		end
+	end
 	themes.Poseidon = {
+		Path = rgb(120, 196, 214),
+		Birds = { rgb(250, 250, 250), rgb(190, 196, 204), rgb(240, 190, 70) },
+		Obstacles = {
+			{ 3, 5, coral, Name = "Coral" },
+			{ 2, 7, rockPool, Name = "RockPool" },
+			{
+				2,
+				6,
+				function(c: any, x: number, z: number, model: any)
+					c.Sprite("Trident", x, z, 1.2, { G = seaGold }, {
+						Lift = -3,
+						Yaw = c.LaneRandom.Number(-30, 30),
+						Tip = c.LaneRandom.Number(-10, 10),
+						Parent = model,
+					})
+				end,
+				Name = "Trident",
+			},
+			{ 1, 6, anchor, Name = "Anchor" },
+			{ 2, 4, kelp, Name = "Kelp" },
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			local base = c.Stand(x, z, y)
+			local up = base * CF.Angles(0, 0, math.pi / 2)
+			local cylinder = { Shape = c.Enum.PartType.Cylinder }
+			c.NewPart(model, up * CF.new(1.2, 0, 0), V.new(2.4, 14, 14), rgb(236, 236, 228), cylinder)
+			c.NewPart(model, up * CF.new(2.45, 0, 0), V.new(0.2, 12.4, 12.4), seaWater, {
+				Shape = c.Enum.PartType.Cylinder,
+				Material = c.Enum.Material.Neon,
+				Transparency = 0.15,
+				CanCollide = false,
+			})
+			c.Sprite("Trident", x, z, 2, { G = seaGold }, { Frame = base * CF.new(0, 1, 0), Yaw = 0, Parent = model })
+			for _, side in { -1, 1 } do
+				c.Emitter(model, base * CF.new(side * 4, 2.6, 0), V.new(0.6, 0.6, 0.6), {
+					Name = "Spray",
+					Texture = SPARKLE,
+					Color = seaFoam,
+					LightEmission = 0.6,
+					Size = { { 0, 0.7 }, { 1, 0.3 } },
+					Lifetime = { 1, 1.4 },
+					Speed = { 10, 13 },
+					Acceleration = V.new(0, -18, 0),
+					Rate = 30,
+				})
+			end
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 5 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 5
+				Lane.Motes(c, life, 0, 2, z, c.Vector3.new(100, 2, 40), {
+					Texture = SPARKLE,
+					Color = rgb(200, 240, 255),
+					LightEmission = 0.5,
+					Size = { { 0, 0.4 }, { 1, 0.8 } },
+					Transparency = { { 0, 0.3 }, { 1, 1 } },
+					Lifetime = { 3, 5 },
+					Speed = { 2, 3 },
+					EmissionDirection = c.Enum.NormalId.Top,
+					Rate = 5,
+				})
+			end
+		end,
 		Floor = rgb(206, 196, 160),
 		Cap = rgb(72, 168, 182),
 		SideA = rgb(150, 170, 172),
@@ -1619,14 +4268,15 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 			for _, side in { -1, 1 } do
 				local x, z = side * c.Random.Number(140, 170), c.Random.Number(-60, 60)
 				local top = c.Random.Number(40, 60)
-				c.Place("Island", x, z, { Y = top - 10, Scale = 1.2, Solid = rgb(150, 170, 172) })
+				c.Place("Island", x, z, { Y = top - 10, Upright = true, Scale = 1.2, Solid = rgb(150, 170, 172) })
 				c.Block(x, top - 70, z, V.new(6, 120, 14), water, {
+					Upright = true,
 					Material = neon,
 					Transparency = 0.3,
 					CanCollide = false,
 					CastShadow = false,
 				})
-				c.Block(x, top - 3, z, V.new(10, 2, 18), foam, { Material = neon, CanCollide = false })
+				c.Block(x, top - 3, z, V.new(10, 2, 18), foam, { Upright = true, Material = neon, CanCollide = false })
 			end
 			-- Rock pools, coral and his trident.
 			Props.Scatter(c, 4, function(x: number, z: number)
@@ -1647,7 +4297,130 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Hera's lane: golden urns of flowers, peacock statues, clipped hedges, marble benches and crowns on pedestals; a
+	-- great peacock on the knoll, her crown turning over it. The path is a royal carpet.
+	local heraGold, heraPurple, heraMarble = rgb(232, 192, 76), rgb(122, 72, 160), rgb(242, 238, 236)
+	local peacockTail = { rgb(52, 150, 132), rgb(62, 120, 190) }
+	local crownLegend = { G = heraGold, R = rgb(204, 52, 62), B = rgb(62, 92, 200) }
+	local function peacock(c: any, x: number, z: number, model: any, k: number, lift: number?)
+		local V, CF = c.Vector3, c.CFrame
+		local base = c.Stand(x, z, lift)
+		Lane.Fan(c, base * CF.new(0, 2 * k, 1 * k), model, 11, 9 * k, peacockTail, rgb(40, 60, 150))
+		c.NewPart(model, base * CF.new(0, 2.4 * k, 0), V.new(2.4, 3, 3) * k, rgb(52, 92, 180))
+		c.NewPart(model, base * CF.new(0, 4.8 * k, -0.8 * k), V.new(1, 3, 1) * k, rgb(52, 92, 180))
+		c.NewPart(model, base * CF.new(0, 6.6 * k, -1 * k), V.new(1.4, 1.2, 1.6) * k, rgb(52, 92, 180))
+		c.NewPart(model, base * CF.new(0, 0.4 * k, 0), V.new(1, 0.8, 1) * k, heraGold)
+	end
 	themes.Hera = {
+		Path = rgb(122, 72, 160),
+		Birds = { rgb(52, 92, 180), rgb(52, 150, 132), rgb(230, 190, 80) },
+		Obstacles = {
+			{
+				3,
+				4,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Jar(c, x, z, model, heraGold, heraPurple, 1)
+					for i = 1, 5 do
+						local a = i / 5 * math.pi * 2
+						c.NewPart(
+							model,
+							c.Stand(x, z) * c.CFrame.new(math.cos(a) * 1.2, 9.2, math.sin(a) * 1.2),
+							c.Vector3.new(1.4, 1.4, 1.4),
+							rgb(214, 120, 200),
+							{ Shape = c.Enum.PartType.Ball, CanCollide = false }
+						)
+					end
+				end,
+				Name = "Urn",
+			},
+			{
+				2,
+				7.5,
+				function(c: any, x: number, z: number, model: any)
+					peacock(c, x, z, model, 0.8)
+				end,
+				Name = "Peacock",
+			},
+			{
+				2,
+				4,
+				function(c: any, x: number, z: number, model: any)
+					local hedge = rgb(80, 150, 110)
+					c.Tilted(
+						x,
+						3,
+						z,
+						c.Vector3.new(6, 6, 6),
+						hedge,
+						{ Yaw = c.LaneRandom.Number(0, 90), Parent = model }
+					)
+					c.Tilted(x, 8, z, c.Vector3.new(4, 4, 4), hedge, { Shape = c.Enum.PartType.Ball, Parent = model })
+				end,
+				Name = "Topiary",
+			},
+			{
+				1,
+				5,
+				function(c: any, x: number, z: number, model: any)
+					local yaw = c.LaneRandom.Number(-30, 30)
+					c.Tilted(x, 2.8, z, c.Vector3.new(9, 0.8, 3), heraMarble, { Yaw = yaw, Parent = model })
+					for _, d in { -3.4, 3.4 } do
+						local a = math.rad(yaw)
+						c.Tilted(
+							x + math.cos(a) * d,
+							1.2,
+							z - math.sin(a) * d,
+							c.Vector3.new(1.4, 2.4, 2.6),
+							heraMarble,
+							{
+								Yaw = yaw,
+								Parent = model,
+							}
+						)
+					end
+				end,
+				Name = "Bench",
+			},
+			{
+				1,
+				4,
+				function(c: any, x: number, z: number, model: any)
+					local top = Lane.Pedestal(c, x, z, model, heraMarble, heraGold, 5, 5)
+					c.Sprite(
+						"Crown",
+						x,
+						z,
+						0.8,
+						crownLegend,
+						{ Frame = top, Yaw = c.LaneRandom.Number(-20, 20), Parent = model }
+					)
+				end,
+				Name = "CrownPedestal",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			peacock(c, x, z, model, 2, y)
+			local crown = c.Instance.new("Model")
+			crown.Name = "Crown"
+			crown.Parent = model
+			local at = c.Stand(x, z, y + 22)
+			c.Sprite("Crown", x, z, 1.2, crownLegend, { Frame = at, Yaw = 0, Ghost = true, Parent = crown })
+			Motion.Spin(crown, (at * c.CFrame.new(0, 3, 0)).Position, c.Vector3.new(0, 1, 0), 30)
+		end,
+		Life = function(c: any, life: any)
+			for i = 1, 4 do
+				local z = -c.Half + 30 + (i - 0.5) * (c.Half * 2 - 44) / 4
+				Lane.Motes(c, life, 0, 7, z, c.Vector3.new(100, 8, 50), {
+					Texture = SPARKLE,
+					Color = { rgb(255, 230, 140), rgb(220, 180, 255) },
+					LightEmission = 1,
+					Size = { { 0, 0 }, { 0.3, 0.8 }, { 1, 0 } },
+					Lifetime = { 3, 5 },
+					Speed = { 0.3, 1 },
+					Rate = 5,
+				})
+			end
+		end,
 		Floor = rgb(200, 186, 214),
 		Cap = rgb(226, 190, 86),
 		SideA = rgb(158, 128, 182),
@@ -1688,6 +4461,23 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		end,
 	}
 
+	-- Zeus's lane: broken and fallen marble columns, scorched rocks, bolts struck into the ground and golden braziers;
+	-- his eagle on the knoll, a marble path, glowing cracks where lightning hit and sparks crackling.
+	local marble, gold, bolt = rgb(236, 232, 224), rgb(224, 194, 94), rgb(255, 232, 92)
+	local function sparks(c: any, parent: any, cf: any, size: any, rate: number)
+		c.Emitter(parent, cf, size, {
+			Name = "Sparks",
+			Texture = SPARKLE,
+			Color = { rgb(255, 250, 200), bolt },
+			LightEmission = 1,
+			Size = { { 0, 0.9 }, { 1, 0 } },
+			Lifetime = { 0.3, 0.7 },
+			Speed = { 2, 5 },
+			Rate = rate,
+			Shape = c.Enum.ParticleEmitterShape.Box,
+			ShapeStyle = c.Enum.ParticleEmitterShapeStyle.Volume,
+		})
+	end
 	themes.Zeus = {
 		Floor = rgb(124, 134, 164),
 		Cap = rgb(224, 194, 94),
@@ -1700,6 +4490,111 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 		Glow = rgb(255, 232, 92),
 		Clouds = 4,
 		Plants = {},
+		Path = rgb(150, 158, 186),
+		Birds = { rgb(150, 112, 70), rgb(120, 88, 56), rgb(255, 214, 90) },
+		Obstacles = {
+			{
+				3,
+				5,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Column(c, x, z, model, marble, gold, c.LaneRandom.Number(12, 28))
+				end,
+				Name = "BrokenColumn",
+			},
+			{
+				2,
+				10,
+				function(c: any, x: number, z: number, model: any)
+					-- Fallen across the path in drums, low enough to jump.
+					local random = c.LaneRandom
+					local yaw = random.Number(40, 75) * random.Side()
+					local a = math.rad(yaw)
+					for i = -1, 1 do
+						local d = i * 6.4 + random.Number(-0.4, 0.4)
+						c.Tilted(x + math.sin(a) * d, 2.8, z + math.cos(a) * d, c.Vector3.new(5.6, 5.6, 6), marble, {
+							Yaw = yaw + random.Number(-6, 6),
+							Parent = model,
+						})
+					end
+					c.Tilted(
+						x + math.sin(a) * 10.2,
+						3.2,
+						z + math.cos(a) * 10.2,
+						c.Vector3.new(7.6, 6.4, 1.8),
+						marble,
+						{
+							Yaw = yaw,
+							Parent = model,
+						}
+					)
+				end,
+				Name = "FallenColumn",
+			},
+			{
+				2,
+				7,
+				function(c: any, x: number, z: number, model: any)
+					Lane.Rock(c, x, z, model, rgb(70, 74, 92), c.LaneRandom.Number(5.5, 7.5), bolt)
+				end,
+				Name = "ScorchedRock",
+			},
+			{
+				2,
+				4,
+				function(c: any, x: number, z: number, model: any)
+					local holder = c.Sprite("Bolt", x, z, 2.6, { Y = bolt }, {
+						Frame = c.Stand(x, z, -3),
+						Yaw = c.LaneRandom.Number(-25, 25),
+						Neon = true,
+						Tip = c.LaneRandom.Number(-18, 18),
+						Parent = model,
+					})
+					Lane.Crack(c, x, z, 3, bolt, model)
+					sparks(c, model, c.CFrame.new(c.At(x, 4, z)), c.Vector3.new(4, 8, 4), 8)
+					return holder
+				end,
+				Name = "StruckBolt",
+			},
+			{
+				1,
+				3,
+				function(c: any, x: number, z: number, model: any)
+					local V, CF = c.Vector3, c.CFrame
+					local base = c.Stand(x, z)
+					c.Tilted(x, 0.6, z, V.new(5, 1.2, 5), marble, { Parent = model })
+					c.NewPart(model, base * CF.new(0, 3.5, 0), V.new(3, 7, 3), marble)
+					c.NewPart(model, base * CF.new(0, 7.6, 0), V.new(5.6, 1.4, 5.6), gold)
+					c.NewPart(model, base * CF.new(0, 9.4, 0), V.new(3.4, 2.6, 3.4), rgb(255, 160, 60), {
+						Material = c.Enum.Material.Neon,
+						CanCollide = false,
+					})
+					c.NewPart(model, base * CF.new(0, 10.4, 0), V.new(2, 2.6, 2), bolt, {
+						Material = c.Enum.Material.Neon,
+						CanCollide = false,
+					})
+				end,
+				Name = "Brazier",
+			},
+		},
+		Knoll = function(c: any, x: number, y: number, z: number, model: any)
+			local V, CF = c.Vector3, c.CFrame
+			-- His eagle on a marble pedestal, wings spread, two columns behind.
+			local base = c.Stand(x, z, y)
+			c.NewPart(model, base * CF.new(0, 4, 0), V.new(8, 8, 8), marble)
+			c.NewPart(model, base * CF.new(0, 8.4, 0), V.new(9, 1, 9), gold)
+			local legend = { B = rgb(150, 112, 70), W = rgb(250, 250, 250), K = rgb(30, 28, 30), Y = bolt, T = gold }
+			c.Sprite("Eagle", x, z, 1.5, legend, { Frame = base * CF.new(0, 8.9, 0), Yaw = 0, Parent = model })
+			for _, dx in { -6, 6 } do
+				Lane.Column(c, x + dx, z + 7, model, marble, gold, 20, y)
+			end
+			sparks(c, model, base * CF.new(0, 16, 0), V.new(16, 8, 4), 10)
+		end,
+		Life = function(c: any, life: any)
+			for _ = 1, 6 do
+				local x, z = c.LaneRandom.Number(-50, 50), c.LaneRandom.Number(-c.Half + 12, c.Half - 12)
+				Lane.Crack(c, x, z, c.LaneRandom.Int(3, 6), bolt, life)
+			end
+		end,
 		Props = function(c: any)
 			Props.Scatter(c, 6, function(x: number, z: number)
 				c.Sprite(
@@ -1716,12 +4611,14 @@ function UpperMountain.Themes(rgb: (number, number, number) -> any): { [string]:
 			end)
 			for i = 1, 3 do
 				local side = if i % 2 == 0 then 1 else -1
-				c.Place("Cloud", side * c.Random.Number(120, 170), c.Random.Number(-80, 80), {
+				local cloud = c.Place("Cloud", side * c.Random.Number(120, 170), c.Random.Number(-80, 80), {
 					Y = c.Random.Number(40, 70),
+					Upright = true,
 					Solid = rgb(84, 88, 104),
 					Ghost = true,
 					Scale = 0.45,
 				})
+				Motion.Bob(cloud, 2, 10)
 			end
 		end,
 	}

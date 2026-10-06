@@ -4,6 +4,16 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-06, High Olympus's lanes** (branch `t3code/olympus-obstacle-mockups`; only in local copies so far, not in
+  the cloud place). `tools/UpperMountain.luau` now adds to each `Tier.. God` model a `Lane` model (`Outcrops` with the
+  `Knoll`, `Obstacles`, `Patches` with the flat `Path` tiles, `Life` with particle holders and bird `Flock`s) and
+  tilts the old `Decor` with the slope. `SceneryController` expects the tags `OlympusBob` (`BobHeight`,
+  `BobPeriod`), `OlympusSpin` (`SpinCenter`, `SpinAxis`, `SpinSpeed`) and `OlympusFlock` (`FlockCenter`,
+  `FlockRadius`, `FlockSpeed`; birds' parts named `Body`, `WingL`, `WingR`); without them nothing moves. The builder
+  needs `NumberRange`, `NumberSequence`, `NumberSequenceKeypoint` and `ColorSequence` in its env now
+  (`tools/assemble.luau` passes them; a Studio run passes them too, TESTING.md). For the cloud place: run the builder
+  there in Edit (it replaces `Stages.HighOlympus`), with main's code holding `SceneryController`, when this ships.
+
 - **2026-10-06, version 20 published** (saved and published; Team Create): main d8fc2b3's five changed scripts set
   in the cloud place (MountainService, GodService, MovementController, Utils/Mountain, Config/GameConfig) and
   `Tests/Mountain.spec` added; first checked that the place held exactly main b87e808's scripts (115 the same, only

@@ -32,6 +32,10 @@ UpperMountain.Build({
 	Vector3 = roblox.Vector3,
 	Color3 = roblox.Color3,
 	Enum = roblox.Enum,
+	NumberRange = roblox.NumberRange,
+	NumberSequence = roblox.NumberSequence,
+	NumberSequenceKeypoint = roblox.NumberSequenceKeypoint,
+	ColorSequence = roblox.ColorSequence,
 }, place:GetService("Workspace"))
 
 -- Code: every child of the containers Rojo owns, over whatever the map had there.

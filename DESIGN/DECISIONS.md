@@ -73,8 +73,11 @@ confirmed or reversed it.
   shorter than they climb.
 - **No shortcut up**: the climb stays on foot, however long (the user turned down a lift to the highest open gate,
   2026-10-05).
-- **Obstacles on the higher levels come later, from the user** (2026-10-05: High Olympus is "very barren" now). Until
-  then don't thin or fill the slide lanes, old stages included.
+- **High Olympus has obstacles, terrain and moving scenery (the user, 2026-10-06)**: "feel like it's still alive and
+  not just an empty path that needs to go up"; built from the existing structures in their style, each god's own
+  things. The first mock-up's density less 20%; everything standing on the mountain tilted with the slope; scenery
+  moving ("cogs turning, islands bopping ... much more immersive"); a winding path up each stretch that obstacles keep
+  off.
 - **The stair walker is a real StairMaster the player climbs (the user, 2026-10-05)**: level 1 looks like a plain gym
   machine and each upgrade looks better, ending in the Olympus look (marble and gold); the player snaps onto it like a
   treadmill and climbs the moving steps; the steps get faster with each machine level.
@@ -273,6 +276,23 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
   removals); the chase's music and its scare sound stay.
 
 ## To review
+
+Calls in High Olympus's lanes (2026-10-06; the user's own calls are under Confirmed rules):
+
+- **Always a 30-stud gap** across the lane at every point down a stretch, and nothing solid within 10 studs of a wild
+  lamb's spot or the god's, nor in the first 30 studs of a stretch (its gate and sign) or its last 14.
+- **The path**: swings 18 studs either side, one bend every 330 studs or so (gentle enough to follow at 100 studs/s,
+  main's top slide speed); obstacles keep 11 studs from its centre line; 12 studs wide. Poseidon's is a stream and
+  Hera's a royal carpet, the others a shade of the floor.
+- **How many**: obstacles 10 at tier 13 rising to 14 at Zeus (12 to 18 less the user's 20%; a crowded stretch can
+  come out one or two short); three rock outcrops a stretch up to tier 18, four above; one knoll each, with the god's
+  landmark.
+- **Which obstacles**: each god's own (HISTORY.md lists them), mostly ones to steer round; a few low enough to jump
+  (fallen logs and columns, tombs, benches, barricades).
+- **Gods glide through obstacles** as on the old stages (no pathfinding); obstacles and knolls block a god's line of
+  sight, so they give a thief cover.
+- **Moving scenery is the player's own**: each device moves what's within 600 studs of its camera; Reduce motion holds
+  it all still. Birds and bobbing things can't be touched.
 
 Calls in the god lunge, belly glide and surf (2026-10-06, `Utils/BodyClips`, `GodController`, `SlideController`):
 

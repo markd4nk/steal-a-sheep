@@ -6,6 +6,54 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **High Olympus's lanes: obstacles, terrain and moving scenery on tiers 13-30 (2026-10-06, branch
+  `t3code/olympus-obstacle-mockups`, not merged)**. The user: High Olympus is "just an empty path that needs to go
+  up"; add obstacles and terrain, reuse the existing structures and keep their style, make it "feel like it's still
+  alive", mock-ups first. Mock-up 1 (Hypnos, Hephaestus, Zeus, before/after shots): they asked for 20% fewer
+  obstacles, everything tilted with the slope, and moving scenery ("cogs turning, islands bopping ... much more
+  immersive"). Mock-up 2 with a motion clip: keep the winding path clear ("there should be a winding path"), then
+  build the other fifteen.
+  - *How it's built* (`tools/UpperMountain.luau`, `Lane`): each stretch gets a `Lane` model beside its `Decor`.
+    First a path up the lane (flat `Path` tiles, a sine 18 studs either side, one bend every 2 pi x 52 studs), then a
+    knoll (three stacked terrace layers, capped, the god's landmark on top), three or four outcrops (the terraces'
+    stacked blocks reaching 22-30 studs in from alternating sides), then the god's obstacles (`theme.Obstacles`:
+    weight, footprint radius, builder), one to each slice of the stretch, 10 at tier 13 rising to 14 at Zeus. Every
+    shape must keep 11 studs from the path's centre, 10 from the four lamb spots and the god's spot, out of the first
+    30 studs (the gate and sign) and the last 14, and leave a 30-stud gap across the lane all along it. Then flat
+    patches, particles (`theme.Life`) and flocks of block birds. Its own random stream, so the old decor kept its places.
+    Everything standing on the mountain (the old decor too) now tilts with the slope like the map's own stages; things
+    floating off it stay level (`Upright`). Lane trees are named `Tree...` so ground checks look through them
+    (`Mountain.IsPlant`).
+  - *Each god*: Hypnos giant poppies, pillows, dream trees, moon lamps; Morpheus dream steps (the top two float),
+    pastel crystals, blossom trees, a ring of dream shapes circling the knoll; Deimos red-seamed rocks, spires, totems
+    with glowing eyes, craters, a one-eyed monolith with rocks floating round it; Thanatos gravestones, tombs, dead
+    trees, urns, a crypt with a glowing door and ghosts; Nemesis giant swords, scales, judgement stones, pines, a great
+    sword in the knoll; Dionysus barrels, vine rows, wine jars, a vat with grapes; Hermes herms, parcels, signposts,
+    coin piles with spinning coins, a turning caduceus; Hephaestus anvils, slag, ore carts, cogs, chimney pillars, a
+    forge, two great cogs turning in the cliffs; Ares weapon racks, barricades, shields, campfires, war drums, a bronze
+    helmet between banners; Aphrodite rose hedges, heart topiaries, fountains, blossom trees, a bobbing heart, falling
+    petals; Artemis pines, archery targets, fallen logs, silver stags, a bobbing moon, fireflies; Apollo tripods,
+    lyres, laurels, turning sun discs, columns, a turning sun; Athena olives, columns, oil jars, owls, shields, a great
+    owl; Demeter hay bales, sheaves, a harvest cart, scarecrows, pumpkins, a windmill with turning sails; Hestia
+    braziers, hearth rings, firewood, bread ovens, pots, the eternal flame, embers; Poseidon coral, rock pools,
+    tridents, anchors, kelp, a fountain with spray, bubbles, the path a stream; Hera urns, peacocks, topiaries,
+    benches, crowns, a great peacock with a turning crown, the path a royal carpet; Zeus broken and fallen columns,
+    scorched rocks, struck bolts, braziers, his eagle.
+  - *Motion* (`SceneryController`, new): the builder tags what moves (`OlympusBob`, `OlympusSpin`, `OlympusFlock`,
+    numbers as attributes); each device moves what's within 600 studs of its camera in one `BulkMoveTo` a frame
+    (187 bobbing, 11 turning, 47 flocks); Reduce motion holds it still. The server's copies stay put; turning things
+    turn in place.
+  - *Numbers*: High Olympus 14,010 parts -> 19,383 (the workspace 26,663 -> 32,036), 110 particle emitters.
+  - *Checked*: `check.ps1`; `tools/check-lanes.luau` now also checks the lane on the built place (Lune): the
+    narrowest gap 32-44 studs per stretch, nothing solid on the path, nothing within 6 studs of a lamb or god spot,
+    0 problems. Own Studio copy (`build/OlympusMockup.rbxl`, the cloud place untouched), main's momentum slides synced
+    in: both bootstraps ready, 86 tests, a clean console. A scripted thief at full Climbing stole from Zeus and slid
+    home steering along the path: Zeus's top to High Olympus's foot in 51.7 s, no bumps, never slowed, not caught; the
+    same without steering, straight down: 54.0 s, 10 bumps and 5 near-stops, not caught. Motion filmed in play
+    (Hephaestus, Zeus, Morpheus). After main's version 27 (the lunge, belly glide and surf) was merged in: `check.ps1`,
+    the lane check, 101 tests, the path slide again 51.8 s with no bumps, a clean console. Not tried: a phone, two
+    players, a real player's slide.
+
 - **Gods lunge and belly-glide, players surf down (2026-10-06, branch `t3code/god-chase-animation-mockups`, merged
   into main on the user's word, not published)**. The user: the gods used Roblox's idle, walk and run, the planned lunge and belly chase weren't built, and
   the slide was Roblox's sit; "show me some mock-ups ... a video perhaps". A 29 s mock-up video (Now; the god's chase;

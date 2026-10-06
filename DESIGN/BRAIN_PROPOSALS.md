@@ -321,6 +321,16 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   fires `Activated`. Remake the cards only when the list itself changes (a key of the ids in order and the fields the
   cards are made from) and update the numbers in place; redraw a ViewportFrame only when what it shows changes." Seen
   2026-10-06 in Steal a Sheep: with a lamb growing, the Flock menu's cards couldn't be picked until it kept them.
+- **S54** (`BRAIN/PATTERNS/testing-studio.md`, Screenshots and the camera): "In a playtest, a Scriptable camera held
+  far from the character (about 3,000 studs away, the character still at the spawn) drew only the sky and the
+  BillboardGuis, even with StreamingEnabled off; changing a part near the shot on the client sometimes brought the
+  view back. Pivot the character (anchored) near the shot first: with it there and the normal camera the same spot
+  drew properly. An Edit-mode `screen_capture` of the spot was always fine." Seen 2026-10-06 filming Steal a Sheep's
+  High Olympus (main's version too, so not caused by that change).
+- **S55** (`BRAIN/PATTERNS/desktop.md`, Recording): "`record` of a window that isn't in front can return identical
+  frames ('frames look identical'): Studio stops drawing a covered window. Record with `foreground=true` (it needs no
+  input, so announce it as a short takeover); one background recording of the same window did move, so don't trust a
+  background one." Seen 2026-10-06 filming Steal a Sheep's moving scenery with other sessions' Studios open.
 
 ## Done
 
