@@ -55,7 +55,7 @@ lamb.
   `art/store/make_store_art.py`. No products or passes exist on Roblox yet: Studio grants them with no dialog.
 - **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
   `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
-- **Daily gifts** (2026-10-05, branch `t3code/daily-sheep-gifts`): a week of gifts, the Pegasus Sheep on Day 7
+- **Daily gifts** (2026-10-05, merged into main): a week of gifts, the Pegasus Sheep on Day 7
   (`DailyService`, `Economy.DailyWeek`/`Specials`, `Screens/Daily`, the HUD's DAILY; the Pegasus's wings, halo and
   hooves are `SheepService/Extras` "Pegasus"). GAME_DESIGN.md, *Daily gifts*. The HUD's left column wraps into a
   second column on short screens.
@@ -93,8 +93,8 @@ lamb.
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
   lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
-- **Daily gifts: built and playtested on `t3code/daily-sheep-gifts`, not merged** (waiting for the user's word). Main
-  merged in after the Robux store. DECISIONS.md's *To review* lists its calls.
+- Nothing from the daily gifts session (merged into main 2026-10-05 on the user's word). The published place (the
+  main Studio, Team Create) still holds main's scripts from before it until main is synced there and published.
 
 ## Not verified
 

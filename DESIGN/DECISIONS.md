@@ -112,16 +112,18 @@ confirmed or reversed it.
 - **Daily gifts (2026-10-05)**: a check-in every day, the prizes better each day, a super rare sheep on Day 7; the
   user picked layout B (Days 1-6 in a grid, Day 7 big beside Claim), the Pegasus Sheep with gold-tipped wings and a
   halo (the third look), and a missed day waits where it was (no reset). "Just this week for now": the same week
-  repeats after Day 7 until later weeks are designed.
+  repeats after Day 7 until later weeks are designed. Then, after playing it: the prize amounts are good, and so is the
+  phone layout (the HUD's left column wrapping into more columns on a short screen).
+- **The daily prizes** (the user's OK, 2026-10-05): Day 1 cash 3 minutes of the pen's income (at least 250), Day 2
+  Climbing 1 minute of the stair walker (at least 150), Day 3 cash 10 minutes (800), Day 4 a Rare lamb from the
+  highest god stolen from, Day 5 Climbing 3 minutes (450), Day 6 cash 30 minutes (2,500), Day 7 the Pegasus Sheep.
 
 ## To review
 
 Calls made building the daily gifts (2026-10-05):
 
-- **The prizes**: Day 1 cash 3 minutes of the pen's income (at least 250), Day 2 Climbing 1 minute of the stair walker
-  (at least 150), Day 3 cash 10 minutes (800), Day 4 a Rare lamb from the highest god stolen from, Day 5 Climbing 3
-  minutes (450), Day 6 cash 30 minutes (2,500), Day 7 the Pegasus Sheep. The walker's rate leaves trails out; the cash
-  leaves out the friend boost and 2x Money. Amounts are worked out when claimed (the cards show what they'd give now).
+- **The prizes' fine print**: the walker's rate leaves trails out; the cash leaves out the friend boost and 2x Money.
+  Amounts are worked out when claimed (the cards show what they'd give now).
 - **The wait**: the next gift opens 20 hours after a claim (not a calendar day), so playing at about the same time
   each day works.
 - **The Pegasus Sheep** earns as tier "highest stolen + 1" (a Royal of that god), saved on the sheep so it keeps its
@@ -133,9 +135,8 @@ Calls made building the daily gifts (2026-10-05):
   "Rare Laurel Lamb is in your pen!") and the button counting down; Day 7 shows its own card ("Day 7!", the Pegasus,
   "In your pen now", Awesome!). After Day 7 every card shows a tick until the next Day 1.
 - **The HUD**: DAILY sits under GIFT at the top of the left column, with a red "!" and a glow while a gift waits and
-  its countdown in place of its name once claimed. The column now stops 70 points above the bottom and wraps into a
-  second (or third) column on a short screen, instead of running off it (on Studio's small phone: three columns of
-  two).
+  its countdown in place of its name once claimed. The column stops 70 points above the bottom (the wrapping itself is
+  the user's OK).
 - **Pictures**: the store mock-up's cash (one stack, a pile, a chest) and Hermes' sandal (one, three) grow with the
   day; Day 4 shows the lamb's token; Day 7 the rendered Pegasus.
 

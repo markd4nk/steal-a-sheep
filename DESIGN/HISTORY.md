@@ -40,8 +40,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     after it every day showed its tick and Day 1 came next. The Pegasus model, screenshotted in the sky, has the
     render's wings, halo, hooves and sparkles. Fixed on the way: the 340-point panel ran off the phone's bottom (now
     318), and the extra button pushed the left column off the screen (now it wraps). Replayed after merging main's
-    Robux store: the menu opened by itself at 44 s, Day 1 and Day 7 claims worked, 72 tests pass, console clean. Not
-    merged.
+    Robux store: the menu opened by itself at 44 s, Day 1 and Day 7 claims worked, 72 tests pass, console clean.
+  - *Merged into main* on the user's word: the prize amounts are good and the phone layout (the wrapping column) is
+    fine.
 - **The Robux store (2026-10-05)**. The user: a shop "just to buy stuff for Robux", reusing Shear a Sheep's store:
   pay-to-win sheep, 2x Growth and 2x Money passes, 2x Speed (3 Robux in Steal an Egg), the treadmill's upgrade for
   Robux beside its cash price, six Climbing ("speed") packs and five cash packs (24K for 45 up to 8M for 720); mock-ups
