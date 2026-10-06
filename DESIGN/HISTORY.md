@@ -47,8 +47,11 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   - *Merged with the onboarding trail* (the user: "Yes"): only the docs clashed (both sides kept). The pair, 23
     scripts staged over main in the cloud place, then put back and verified: both bootstraps ready, 88 tests, a clean
     console; no TrainMeter, Objective, GuideArrow or CarryCard in the HUD; the floor trail up for a new save; on the
-    walker the Climbing pill read +2/s and "+1" pops rose over the head. Main fast-forwarded to it; not published (the
-    live version is still 20).
+    walker the Climbing pill read +2/s and "+1" pops rose over the head. Main had meanwhile taken the chase work
+    (`t3code/guardian-theft-horror`): merged in with no code conflicts (Hud, Remotes, WildService and GameConfig merged
+    on their own; the docs kept both sides; BRAIN proposals renumbered S48 chase, S49 screenshots, S50 CanQuery),
+    `check.ps1` passes. Not playtested with the chase in: the cloud Studio was in another session's use. Main
+    fast-forwarded to it; not published (the live version is still 20).
   - *Checked*: `check.ps1` passes. A playtest of the cloud place with the branch's 17 scripts staged in
     (`scripts/stage_branch.py --base 3667692`, then put back and verified): both bootstraps ready, 84 tests, a clean
     console. Snapped onto the walker: `TrainRate` 2, the steps measured on the client at 1.67 steps a second; at level
