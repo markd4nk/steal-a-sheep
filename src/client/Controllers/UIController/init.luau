@@ -19,6 +19,7 @@ local screenModules: { [string]: Types.ScreenModule } = {
 	Hud = require(script.Screens.Hud),
 	Flock = require(script.Screens.Flock),
 	Shop = require(script.Screens.Shop),
+	Store = require(script.Screens.Store),
 	Sheepdex = require(script.Screens.Sheepdex),
 	Merge = require(script.Screens.Merge),
 	Popup = require(script.Screens.Popup),

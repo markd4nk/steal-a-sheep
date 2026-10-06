@@ -83,6 +83,13 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   `AssetFetchStatus.Failure` until Roblox's review clears it (minutes), and a Studio that fetched it before then may go
   on reporting Failure from `PreloadAsync` after it's cleared: check in a freshly opened Studio. In game code, swap in a
   new picture only once it has arrived, or a Decal shows nothing meanwhile." Seen 2026-10-05.
+- **S19** (`BRAIN/PATTERNS/desktop.md` or `ui.md`, mock-ups): "Uploaded images can't be downloaded by asset id without a
+  login (the thumbnails API returns its placeholder for Image assets, assetdelivery returns 403). Every image any
+  Studio on the computer has shown is still on disk: `%LOCALAPPDATA%\Roblox\rbx-storage\<xx>\<file>`, each an `RBXH`
+  header followed by the PNG (cut from the `\x89PNG` signature). The files aren't named by asset id: extract them all,
+  make a numbered contact sheet and pick by eye. With a project's game art this way, a mock-up can be drawn as HTML
+  and rendered with headless Chrome (`chrome --headless=new --screenshot`) when every Studio is busy with other
+  sessions." Seen 2026-10-05 mocking up Steal a Sheep's Robux store while three sessions held the open Studios.
 
 ## Done
 

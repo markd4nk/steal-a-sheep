@@ -13,6 +13,7 @@ export type SpecialFX =
 	| "StormSparks"
 	| "Stars"
 	| "Sparkles"
+	| "GoldSparkles"
 	| "MoonGlow"
 	| "Spores"
 	| "Wisps"
@@ -91,7 +92,7 @@ local function look(id: string, name: string, overrides: { [string]: any }): Bre
 	return breed
 end
 
--- The thirty families' looks, keyed by family id (Config/Olympus). Most are Shear a Sheep breeds as they are, in its
+-- The thirty families' looks, keyed by family id (Config/Olympus), then the store's two. Most are Shear a Sheep breeds as they are, in its
 -- colours; the Grape, War, Laurel, Cupid, Justice, Victory and Hearth sheep are its plain breeds recoloured, with a
 -- primitive extra, and the Prism Sheep a plain one in rainbow puffs.
 local breeds: { [string]: Breed } = {
@@ -287,6 +288,24 @@ local breeds: { [string]: Breed } = {
 		LegColor = rgb(72, 76, 104),
 		EarInnerColor = rgb(200, 210, 250),
 		SpecialFX = "StormSparks",
+	}),
+	-- The Robux store's two sheep (Economy.RobuxSheep), in Shear a Sheep's colours for its Golden Fleece and Time Sheep.
+	GoldenFleece = look("GoldenFleece", "Golden Fleece", {
+		WoolColor = rgb(255, 196, 64),
+		FaceColor = rgb(246, 226, 206),
+		LegColor = rgb(246, 226, 206),
+		EarInnerColor = rgb(250, 176, 180),
+		HornStyle = "BigCurl",
+		HornColor = rgb(240, 228, 198),
+		Face = "Happy",
+		SpecialFX = "GoldSparkles",
+	}),
+	Kronos = look("Kronos", "Kronos Sheep", {
+		Build = "TimeSheep",
+		WoolColor = rgb(246, 232, 196),
+		WoolSpotColor = rgb(236, 214, 166),
+		FaceColor = rgb(250, 240, 220),
+		LegColor = rgb(150, 112, 70),
 	}),
 }
 

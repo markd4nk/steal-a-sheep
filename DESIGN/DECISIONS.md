@@ -55,7 +55,46 @@ confirmed or reversed it.
   Server (the richest here, by income), Top Income (the richest overall, each player's best ever), Most Steals and
   Climb Power (titled CLIMBING since Climbing replaced Climb Power on screen). Titles are words only, no icon; otherwise the boards' look (dark panel, medal rows, headshots) is OK'd.
 
+- **The Robux store (the user, 2026-10-05, over five mock-ups)**: Shear a Sheep's one scrolling store in its purple,
+  with square studs and big art filling every card, the art growing with the pack (one, a pair, a pile, a sack, a
+  chest, a gold chest). Each picture is one outlined icon: overlapping stickers "looked sloppy". The section tabs
+  (Sheep, Passes, Speed, Climb, Cash) stand outside the window on its right, tight together and close to it; no
+  scrollbar inside. The approved mock-up is `steal-a-sheep-store-mockup-e-pc.png` / `-e-full.png` in T3 Code's
+  attachments folder.
+- **Hermes' winged sandal is the climbing icon everywhere**, the HUD's too, with white wings; gold wings only on 2x
+  Speed (the user, 2026-10-05, from a picture of a talaria).
+- **Store prices**: Golden Fleece 799 (earns 10x your best sheep) and Kronos Sheep 349 (3x), Robux only; passes 2x Money
+  249 and 2x Growth 149; Climbing packs +150K / 1M / 10M / 100M / 1B / 10B at 49 / 99 / 199 / 399 / 799 / 1,499; Cash
+  packs 24K / 200K / 800K / 4M / 8M at 45 / 149 / 299 / 499 / 720 (the user set 24K, 8M and their prices and the first
+  four Climbing amounts; the rest were proposed and accepted).
+- **2x Speed doubles Climbing and can be bought again, each buy three times the last**: 3, 9, 27, 81, 243, 729, 2,187,
+  then sold out.
+- **The stair walker's next level for Robux, beside its cash price**: 19 for the first level, 20% more each level
+  (3,132 for the last).
+
 ## To review
+
+Calls made building the Robux store (2026-10-05):
+
+- **"Your best sheep"** is the highest income right now among the player's other sheep, stored ones included (a lamb
+  at its lamb rate), and at least a tier 1 adult's 2/s. 2x Money doubles the Robux sheep's income too.
+- **Robux sheep** arrive grown, Golden Fleece Giant-sized and Kronos Large (their income ignores size). They can't be
+  sold ("Robux sheep stay with you") or merged, aren't in the Sheepdex, and go into the pen if there's room, stored if
+  not; the flock limit never stops a purchase.
+- **Their looks**: Golden Fleece in Shear a Sheep's colours (gold wool, cream curled horns, happy face) with gold
+  sparkles (a new effect); Kronos Sheep is Shear a Sheep's Time Sheep.
+- **2x Speed at 0 Climbing** gives +25: each buy doubles, and gives at least +25.
+- **One Roblox dialog at a time** per player ("Finish your purchase first"), so a price step can't be bought twice at
+  its price. A receipt for a step already counted still doubles; a walker receipt that finds the walker maxed pays the
+  last level's cash price.
+- **Passes count offline too**: 2x Money on the offline cash, 2x Growth on growth while away. Every income shown (HUD,
+  flock cards, pen labels, the income boards) includes 2x Money.
+- **HUD**: a STORE button (the icon pack's golden Robux coin) under SHEEPDEX, hidden like the others until the first
+  delivery. The store window's corner picture is the basket, as in the mock-ups.
+- **Words**: "ROBUX ONLY" on the sheep, "CHEAP!" on 2x Speed with "Next: 9" under its price, "BEST VALUE" on +10B and
+  +8M, "Owned", "Sold out" and "MAX" when done; the walker card counts levels from 1, as the shop does.
+- **Before the products exist on Roblox**: in Studio a store button grants its product at once, with no dialog; a live
+  server says "Not on sale yet".
 
 Calls made building free placement and roaming sheep (2026-10-05):
 

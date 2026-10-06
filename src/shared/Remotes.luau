@@ -47,6 +47,9 @@ local Remotes = {
 	-- The shop: the next stair walker, room for one more sheep in the pen, or a trail by id (bought, or equipped if
 	-- owned).
 	Buy = Net.Request("Buy", { Guard.OneOf(BUY_ITEMS), Guard.Optional(Guard.String(16)) }, { Count = 8, Window = 1 }) :: Net.Request<(string, string?), (boolean, string?)>,
+	-- The Robux store: an item by its Config/Store key ("Cash.1", "Sheep.Kronos", "DoubleMoney"), or "Speed" or
+	-- "Walker" for that ladder's next step. The server opens Roblox's dialog: (ok, a message to show).
+	RequestPurchase = Net.Request("RequestPurchase", { Guard.String(32) }, { Count = 4, Window = 2 }) :: Net.Request<(string), (boolean, string?)>,
 	-- Give up a run: the carried sheep goes back to its pasture.
 	ReturnSheep = Net.ToServer("ReturnSheep", {}, { Count = 2, Window = 1 }) :: Net.ToServer<()>,
 	-- Put the carried lamb down here, in the player's own pen: that delivers it (the server checks where they stand).

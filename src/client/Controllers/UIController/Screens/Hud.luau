@@ -126,6 +126,8 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	shop.LayoutOrder = 2
 	local dex = UIKit.PictureButton(tiles, "SheepdexButton", Theme.Icons.MenuSheepdex, PICTURE_SIZE, "SHEEPDEX")
 	dex.LayoutOrder = 3
+	local store = UIKit.PictureButton(tiles, "StoreButton", Theme.Icons.HudRobux, PICTURE_SIZE, "STORE")
+	store.LayoutOrder = 4
 
 	local banner = UIKit.Banner(root, "Banner")
 	banner.AnchorPoint = Vector2.new(0.5, 0)
@@ -512,6 +514,9 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	end)
 	trove:Connect((tiles:FindFirstChild("ShopButton") :: TextButton).Activated, function()
 		context.Open("Shop")
+	end)
+	trove:Connect((tiles:FindFirstChild("StoreButton") :: TextButton).Activated, function()
+		context.Open("Store")
 	end)
 	trove:Connect((tiles:FindFirstChild("SheepdexButton") :: TextButton).Activated, function()
 		context.Open("Sheepdex")

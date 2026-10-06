@@ -43,6 +43,8 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
 - Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
 - Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climbing): `LeaderboardService`.
+- The Robux store: what it sells and its prices in `Config/Store`; prompts and passes `StoreService`; grants
+  `PurchaseService/Products`; the screen `Screens/Store`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
 ## The map
@@ -89,7 +91,17 @@ plaza. The climb is all on foot. High Olympus is sparse for now: the user will a
 
 ## Economy (as built)
 Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards and selling, and
-buys stair walker levels, pen space and trails. No Robux products.
+buys stair walker levels, pen space and trails.
+
+## The Robux store (the user, 2026-10-05)
+A STORE button on the HUD opens one page that scrolls, its section tabs outside the window on the right:
+- **Sheep**: Golden Fleece (799) and Kronos Sheep (349), sold for Robux only. Each earns 10x / 3x the player's best
+  other sheep, so it stays their top earner at every tier; they arrive grown and can't be sold or merged.
+- **Passes**: 2x Money (all sheep income, offline too) and 2x Growth (lambs grow twice as fast, away too).
+- **Speed**: 2x Speed doubles Climbing; it can be bought again, three times the price each time (3 to 2,187, seven
+  buys). The stair walker's next level, for Robux (19, then 20% more a level) or its cash price.
+- **Climbing** packs (+150K to +10B) and **Cash** packs (24K to 8M).
+Hermes' winged sandal is the climbing icon everywhere (gold wings on 2x Speed).
 
 ## Climbing (the user, 2026-10-05)
 Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain
@@ -115,5 +127,5 @@ Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (l
 bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look a little bigger as lambs.
 
 ## Not built
-Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.
+Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, gifting store items.
 These are just not built yet, not ruled out: build them if the user asks.

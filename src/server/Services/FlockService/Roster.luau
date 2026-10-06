@@ -22,12 +22,13 @@ function Roster.IsEquipped(sheep: Sheep, penSlots: number): boolean
 	return sheep.Slot >= 1 and sheep.Slot <= penSlots
 end
 
--- What the equipped sheep earn a second together.
+-- What the equipped sheep earn a second together (before the 2x Money pass).
 function Roster.Income(flock: Flock, penSlots: number): number
+	local best = Economy.BestIncome(flock)
 	local total = 0
 	for _, sheep in flock do
 		if Roster.IsEquipped(sheep, penSlots) then
-			total += Economy.Income(sheep)
+			total += Economy.Income(sheep, best)
 		end
 	end
 	return total
@@ -82,8 +83,9 @@ function Roster.EquipBest(flock: Flock, penSlots: number)
 			table.insert(candidates, sheep)
 		end
 	end
+	local best = Economy.BestIncome(flock)
 	table.sort(candidates, function(a: Sheep, b: Sheep)
-		local incomeA, incomeB = Economy.Income(a), Economy.Income(b)
+		local incomeA, incomeB = Economy.Income(a, best), Economy.Income(b, best)
 		if incomeA ~= incomeB then
 			return incomeA > incomeB
 		end

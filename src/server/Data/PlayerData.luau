@@ -21,6 +21,7 @@ export type Data = {
 	Dex: { [string]: boolean }, -- families delivered at least once
 	Tutorial: number, -- 0 until the first delivery, then 1; 2 once the stair walker was used
 	LastSeen: number, -- os.time() of the last settlement, for offline earnings; 0 for a new player
+	SpeedBuys: number, -- how many times 2x Speed was bought (Config/Store.SpeedPrices: the next one's price)
 }
 
 local PlayerData = {}
@@ -42,6 +43,7 @@ PlayerData.Template = {
 	Dex = {},
 	Tutorial = 0,
 	LastSeen = 0,
+	SpeedBuys = 0,
 } :: Data
 
 -- migrations[n] upgrades data from schema n to n + 1, in place.
@@ -123,7 +125,7 @@ function PlayerData.Validate(data: any): (boolean, string?)
 			return false, `{field} is not an amount >= 0`
 		end
 	end
-	for _, field in { "WalkerLevel", "PenSlots", "NextId", "Tutorial", "LastSeen" } do
+	for _, field in { "WalkerLevel", "PenSlots", "NextId", "Tutorial", "LastSeen", "SpeedBuys" } do
 		if data[field] ~= nil and not isNatural(data[field]) then
 			return false, `{field} is not a whole number >= 0`
 		end

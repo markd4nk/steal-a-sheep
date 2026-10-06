@@ -8,6 +8,7 @@ local RunService = game:GetService("RunService")
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Products = require(script.Products)
 local Signal = require(ReplicatedStorage.Packages.Signal)
+local Store = require(ReplicatedStorage.Config.Store)
 
 local MAX_RECEIPTS = 50
 local LOAD_WAIT = 60
@@ -16,9 +17,9 @@ local PurchaseService = {
 	Name = "PurchaseService",
 	-- Fires when a player buys a pass in this server, so systems can switch its perk on without a rejoin.
 	PassPurchased = Signal.new() :: Signal.Signal<Player, number>,
-	-- (player, product id, from a real receipt): the product's reward is in their data, so systems can show it. False
-	-- for the Studio debug grant, which analytics should ignore.
-	Granted = Signal.new() :: Signal.Signal<Player, number, boolean>,
+	-- (player, product key from Config/Store, from a real receipt): the product's reward is in their data, so systems
+	-- can show it. False for the Studio grant, which analytics should ignore.
+	Granted = Signal.new() :: Signal.Signal<Player, string, boolean>,
 }
 
 local isStudio = RunService:IsStudio()
@@ -67,8 +68,9 @@ local function processReceipt(receipt: { [string]: any }): Enum.ProductPurchaseD
 
 	local purchaseId = tostring(receipt.PurchaseId)
 	if data.Receipts[purchaseId] == nil then
-		local grant = Products[receipt.ProductId]
-		if not grant then
+		local key = Store.KeyOfProduct(receipt.ProductId)
+		local grant = if key then Products[key] else nil
+		if not key or not grant then
 			warn(`[PurchaseService] No grant for product {receipt.ProductId}`)
 			return Enum.ProductPurchaseDecision.NotProcessedYet
 		end
@@ -82,7 +84,7 @@ local function processReceipt(receipt: { [string]: any }): Enum.ProductPurchaseD
 		end
 		data.Receipts[purchaseId] = os.time()
 		prune(data.Receipts)
-		PurchaseService.Granted:Fire(player, receipt.ProductId, true)
+		PurchaseService.Granted:Fire(player, key, true)
 	end
 
 	-- Acknowledge only once a saved copy holds the receipt (and so the reward granted with it).
@@ -163,19 +165,20 @@ function PurchaseService.OwnsPass(_self: any, player: Player, passId: number): b
 	return owns
 end
 
--- Studio debug: gives a product's reward through its grant, as a purchase would, with no dialog or receipt.
-function PurchaseService.Grant(_self: any, player: Player, productId: number): (boolean, string?)
+-- Studio: gives a product's reward (by its Config/Store key) through its grant, as a purchase would, with no dialog
+-- or receipt. The store uses it for products that don't exist on Roblox yet.
+function PurchaseService.Grant(_self: any, player: Player, key: string): (boolean, string?)
 	if not isStudio then
 		return false, "Studio only"
 	end
-	local grant = Products[productId]
+	local grant = Products[key]
 	if not grant or not registry.DataService:GetData(player) then
 		return false, "no such product in Products, or data not loaded"
 	end
 	if not grant(player, registry) then
 		return false, "the grant refused"
 	end
-	PurchaseService.Granted:Fire(player, productId, false)
+	PurchaseService.Granted:Fire(player, key, false)
 	return true, nil
 end
 
