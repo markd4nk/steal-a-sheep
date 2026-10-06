@@ -9,6 +9,9 @@ here. Newest first.
   pictures are uploaded images (`Theme.Icons.DailyCash1/3/5`, `DailyClimb1/3`, `Pegasus`). Tried in this session's own
   copy of the place (`build/DailyPlaytest.rbxl`); the main Studio wasn't touched.
 
+- **2026-10-05, version 4 published**: main a71cab4's scripts (the daily gifts' 19 changed files) swapped into the
+  cloud place and checked (117 scripts, 0 differences); its Studio-side content still matched a fresh build exactly.
+  No place changes.
 - **2026-10-05, published to Roblox** (private): the place now lives on Roblox as place 114389615931493 (universe
   10769564664, "Steal a Sheep", getajobgle's). Its first version is `scripts/build-place.ps1`'s output at main 3c5ee43:
   scripts checked one by one against `rojo build tools/sync.project.json`, the Studio-side content fingerprinted

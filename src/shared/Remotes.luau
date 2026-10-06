@@ -62,6 +62,8 @@ local Remotes = {
 	RequestPurchase = Net.Request("RequestPurchase", { Guard.String(32) }, { Count = 4, Window = 2 }) :: Net.Request<(string), (boolean, string?)>,
 	-- The free gift, once per player: (ok, message, coins given, Climbing given).
 	ClaimGift = Net.Request("ClaimGift", {}, { Count = 2, Window = 2 }) :: Net.Request<(), (boolean, string?, number?, number?)>,
+	-- A Sheepdex entry's reward (SheepdexService), by family id.
+	ClaimDex = Net.Request("ClaimDex", { Guard.String(32) }, { Count = 6, Window = 1 }) :: Net.Request<(string), (boolean, string?)>,
 	-- Today's daily gift (DailyService): (ok, message, what was given: Day, Kind, Amount, or a sheep's Name and Family).
 	ClaimDaily = Net.Request("ClaimDaily", {}, { Count = 2, Window = 2 }) :: Net.Request<(), (boolean, string?, { [string]: any }?)>,
 	-- Give up a run: the carried sheep goes back to its pasture.

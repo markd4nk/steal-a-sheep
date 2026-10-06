@@ -283,7 +283,7 @@ function Daily.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		(face:FindFirstChild("Done") :: GuiObject).Visible = done
 		local amount = face:FindFirstChild("PriceLabel", true) :: TextLabel
 		local amounts = data.Amounts or {}
-		amount.Text = if kind == "Lamb" then "Rare lamb" else `+{Format.Short(amounts[day] or 0)}`
+		amount.Text = if kind == "Lamb" then "Shiny lamb" else `+{Format.Short(amounts[day] or 0)}`
 		for _, ring in { "Selected", "SelectedRing" } do
 			local stroke = face:FindFirstChild(ring)
 			if stroke and stroke:IsA("UIStroke") then

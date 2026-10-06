@@ -135,7 +135,16 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 - **S23** (`BRAIN/PATTERNS/testing-studio.md`): "`user_mouse_input`'s `instance_path` can't reach an instance whose name
   has a dot in it ('Instance not found'): the dot splits the path. Name UI elements without dots (or tap by x/y)."
   Seen 2026-10-05 clicking the store's `Sheep.GoldenFleece` card.
-- **S25** (`BRAIN/PATTERNS/publishing.md`, a new "A game's first publish" section): "A place opened from a local file
+- **S25** (`BRAIN/GOTCHAS.md`): "Neon brightens a part's colour towards white: a pale Neon colour (140, 255, 170) reads
+  as white, most of all in a ViewportFrame. Give Neon a saturated colour, (255, 90, 0) or (0, 220, 190), to keep its
+  hue." Seen 2026-10-05 rendering Steal a Sheep's sheep designs: four glowing Mythics came out white.
+- **S26** (`BRAIN/PATTERNS/testing-studio.md`): "To call the running game's client code from a playtest (open a menu,
+  press what the mouse would) without the mouse, add a TEMP_ LocalScript to StarterPlayerScripts in Edit that requires
+  the controller and acts when an attribute on the LocalPlayer changes, then set the attribute from a Client
+  `execute_luau`: the LocalScript shares the game's module copies, `execute_luau` doesn't (S7). Delete it after." Seen
+  2026-10-05 in Steal a Sheep: desktop clicks meant for my Studio landed in another session's, which had taken the
+  foreground between my screenshot and my click.
+- **S27** (`BRAIN/PATTERNS/publishing.md`, a new "A game's first publish" section): "A place opened from a local file
   publishes as a new experience: File > Publish to Roblox opens **Publish Experience** (Name, Description, Creator,
   Devices, Team Create and Data Sharing, both on by default); **Create** takes about 5 s, and the window reopens as
   the Team Create cloud place, titled with the experience's name, under a new Studio MCP id. New experiences start
@@ -144,7 +153,8 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   'Commit Failure: Publish Assets' for the scripts' version history; the place was fine (every script matched after),
   so compare the scripts again rather than republishing. Max players isn't in Studio's Experience Settings: Creator
   Hub > Places > the place > Access (it starts at 50). Studio Access to API Services is under Experience Settings >
-  Security." Seen 2026-10-05 publishing Steal a Sheep.
+  Security. The Limited audience (Playtesters, Friends) needs a content maturity label first: until the
+  questionnaire is done, Save Changes stays greyed out." Seen 2026-10-05 publishing Steal a Sheep.
 
 ## Done
 

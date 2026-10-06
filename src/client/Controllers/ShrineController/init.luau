@@ -213,8 +213,7 @@ local function play(show: { [string]: any })
 		showing = false
 		return
 	end
-	local tier = Economy.Tier(family)
-	model.Name = tier.FamilyName
+	model.Name = Economy.FamilyName(family)
 	lamb = model
 	frame("Show")
 	Show.Play({

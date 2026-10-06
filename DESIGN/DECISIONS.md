@@ -90,6 +90,10 @@ confirmed or reversed it.
   their pen by itself. Its **size shows only when it grows up in the pen**. A sheep's hidden Weight shifts its size
   odds; no kg on screen. Confirmed after the build: the **price** is 120 seconds of one Standard adult's income of the
   family (tier 1: 240 cash, tier 6: 23.4K) "for now"; a **Titan earns x5**; the lamb waits **30 s** on the altar.
+- **Six sheep a tier (the user, 2026-10-05)**: every god has six families, **Common, Uncommon, Rare, Epic, Legendary,
+  Mythic**, their own family as the Common; the 150 new looks in the lineup (DESIGN/HISTORY.md) are OK'd ("that's
+  good"). A wild lamb is Common 50%, Uncommon 25%, Rare 13%, Epic 7%, Legendary 4%, Mythic 1%; they earn x1, x1.5,
+  x2.5, x4, x8, x15. The fleeces are renamed **Plain / Shiny / Royal** and roll on top of any family as before.
 
 - **The Robux store (the user, 2026-10-05, over five mock-ups)**: Shear a Sheep's one scrolling store in its purple,
   with square studs and big art filling every card, the art growing with the pack (one, a pair, a pile, a sack, a
@@ -120,6 +124,31 @@ confirmed or reversed it.
 
 ## To review
 
+Calls made building six sheep a tier and the new Sheepdex (2026-10-05):
+
+- **Sheepdex rewards are claimed**, as in the mock-up and Steal an Egg: delivering finds the family, the Claim button
+  pays. Families found before the change count as claimed (they were paid on delivery; save schema 3).
+- **Claim reward**: 30 s of the family's income in cash (rarity included) and 5% of its tier's sign number x the
+  rarity's multiplier in Climbing, at least 5 (tier 1: 5 to 19). **Herd gift** for claiming all six: 10 minutes of the
+  tier's Common income in cash and a quarter of the sign number in Climbing, at least 25 (tier 1: 1,200 and 25).
+- **The section's bar counts sheep found** (x/6) and turns green once the herd's gift is paid.
+- **Opening the Sheepdex shows the first sheep with a reward waiting** (else the first not found) and scrolls to it.
+- **Six sheep in a 3 x 2 grid** beside a tall god banner, one tier to a screen, like the reference's 4 x 2.
+- **The HUD's SHEEPDEX badge counts rewards waiting** (9+ past nine).
+
+- **Rarity colours**: the menus' card colours (Theme.Fleece.Rarity). Flock and Sell Stall cards now take the family's
+  rarity colour; a Shiny or Royal fleece shows as the token's sparkles and in the name ("Shiny Clover Sheep").
+- **Mythic is a divine version of the god's sheep where it can be** (Golden Elixir, Eternal Harvest, Quicksilver...),
+  so the top of each row is the most dressed: wings, halos, crowns, glowing wool.
+- **No family wears the Gold paint**: a Royal fleece paints any sheep gold, so a gold family would look Royal. Golden
+  Ram Sheep is gold foil wool instead (Golden Fleece is the store's Robux sheep).
+- **The theft card shows the family's rarity** in its colour over the name ("EPIC", then "Gambler Lamb").
+- **Legendary and Mythic lambs are announced** to players who have reached the tier, like Royal fleeces: "A Mythic
+  King of Olympus Lamb appeared in Zeus's pasture!"
+- **First finds pay per family**: the Sheepdex reward is 30 s of the family's income (rarity included), so a Mythic's
+  first delivery pays 15 times a Common's. The Merge Shrine's price is 120 s of the family's income the same way.
+- **Keyed by god, not tier** (`Config/Herds`), so the gods' new order (t3code/order-olympian-gods) needs no change here.
+
 Calls made building the daily gifts (2026-10-05):
 
 - **The prizes' fine print**: the walker's rate leaves trails out; the cash leaves out the friend boost and 2x Money.
@@ -132,7 +161,7 @@ Calls made building the daily gifts (2026-10-05):
   its income, like any sheep). A full flock (100) refuses Days 4 and 7 until there's room.
 - **The menu** opens by itself once a session, 45 s after a gift waits, when the player is off the mountain, not
   carrying and no other menu is open (after the free gift's 30 s). Claiming leaves it open with a notice ("+197K cash",
-  "Rare Laurel Lamb is in your pen!") and the button counting down; Day 7 shows its own card ("Day 7!", the Pegasus,
+  "Shiny Laurel Lamb is in your pen!") and the button counting down; Day 7 shows its own card ("Day 7!", the Pegasus,
   "In your pen now", Awesome!). After Day 7 every card shows a tick until the next Day 1.
 - **The HUD**: DAILY sits under GIFT at the top of the left column, with a red "!" and a glow while a gift waits and
   its countdown in place of its name once claimed. The column stops 70 points above the bottom (the wrapping itself is
@@ -177,7 +206,7 @@ Calls made building the Merge Shrine (2026-10-05):
 - **Luck**: three Standard sheep bring 40%; each step of size above Standard adds, up to 100% for three Titans. 40%
   gives 58/34/8/0.2% Standard/Large/Giant/Titan; 100% gives 40/44/15/0.7% (the Climbing session's weight bands decide
   the tail).
-- **Fleece**: three Ordinary in: 72/24/4% Ordinary/Rare/Royal; three Royal in: 30/45/25%; mixes in between.
+- **Fleece**: three Plain in: 72/24/4% Plain/Shiny/Royal; three Royal in: 30/45/25%; mixes in between.
 - **Menu**: the camera turns to the shrine with no dark backdrop and the HUD hidden; the odds in the lab's glass panel
   on the left, your grown sheep as the shop's rows on the right (the newest god's first, then the biggest), one big
   Merge button with the price at the bottom. The first sheep picked sets the family; the others' buttons say
@@ -375,7 +404,7 @@ Calls made while building the MVP on 2026-10-05:
 - **Families are Shear a Sheep breeds**: Scarecrow, Moon (silver), Lava, Cotton Candy, Solar System, Ocean, Cloud,
   Royal and Storm Sheep as they are; Grape (purple Ringlets + a leaf), War (red Racka + a helmet) and Laurel (white
   Merino + a wreath) are plain breeds with a primitive extra; the Wingfoot (Cloud) Sheep has small neon ankle wings.
-- **Fleece rarity looks**: Rare sheep sparkle blue; Royal sheep have gold wool (Shear a Sheep's Gold paint) and sparkle.
+- **Fleece looks**: Shiny sheep sparkle blue; Royal sheep have gold wool (Shear a Sheep's Gold paint) and sparkle.
 - **Sizes on screen**: every sheep's base size is 1.6x the rig; lambs are 0.6 / 0.7 / 0.8 of it by burden (a clue to
   the burden) and grow towards 0.85 before the reveal; adults are 1 / 1.35 / 1.7 by size.
 - **Slides**: start by themselves when moving downhill on the ramp past the safety line (the map's StartingLine,
@@ -397,7 +426,7 @@ Calls made while building the MVP on 2026-10-05:
 - **HUD**: menu buttons (Flock, Shop, Sheepdex) appear after the first delivery; the objective line always shows the
   next useful step (steal, slide home, train, put sheep to work, train for Light/Heavy, climb to the next god), with a
   guide arrow to it; a training meter shows the next Climb Power target while on the walker.
-- **Tutorial**: a new player's private, Light, ordinary Demeter lamb sits in the meadow (others can't take it); its
+- **Tutorial**: a new player's private, Light, Plain Demeter lamb sits in the meadow (others can't take it); its
   run is protected from slide hits; any first delivery gives +60 coins and +25 Climb Power and removes it.
 - **Sounds**: Shear a Sheep's cues: the danger music during a chase, WolfScare on the alert, IntroWhip on a slide,
   Yelp/Scuffle on hits, Coin/DexReward/Upgrade/Reveal on rewards.

@@ -111,6 +111,17 @@ return function(t: Run.Suite)
 		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = bad } }))).ToBe(false)
 	end)
 
+	t.Test("schema 2: families already found were paid, so they start out claimed", function()
+		local data: any = { SchemaVersion = 2, Dex = { Meadow = true, Grape = true } }
+		t.Expect((PlayerData.Validate(data))).ToBe(true)
+		PlayerData.Migrate(data)
+		t.Expect(data.DexClaimed.Meadow).ToBe(true)
+		t.Expect(data.DexClaimed.Grape).ToBe(true)
+		t.Expect(data.DexClaimed.Moon).ToBe(nil)
+		t.Expect((PlayerData.Validate(data))).ToBe(true)
+		t.Expect((PlayerData.Validate({ DexClaimed = { Meadow = 1 } }))).ToBe(false)
+	end)
+
 	t.Test("Migrate stamps the current schema version", function()
 		local data: any = { Coins = 5 }
 		PlayerData.Migrate(data)

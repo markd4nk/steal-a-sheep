@@ -93,7 +93,7 @@ function SheepService.IsReady(_self: any): boolean
 	return template ~= nil
 end
 
--- A sheep of `family` in fleece `rarity` (1 Ordinary, 2 Rare, 3 Royal) at `scale` times its rig's size, at the origin.
+-- A sheep of `family` in fleece `rarity` (1 Plain, 2 Shiny, 3 Royal) at `scale` times its rig's size, at the origin.
 function SheepService.Build(_self: any, family: string, rarity: number, scale: number): Model?
 	local base = GameConfig.Breeds[family]
 	if not template or not kit or not base then
@@ -109,6 +109,11 @@ function SheepService.Build(_self: any, family: string, rarity: number, scale: n
 	Looks.Paint(model, breed, paint)
 	if base.Extra then
 		Extras.Add(model, base.Extra)
+	end
+	if base.Extras then
+		for _, extra in base.Extras do
+			Extras.Add(model, extra.Kind, extra.Color)
+		end
 	end
 	if rarity == 2 then
 		sparkle(model, Color3.fromRGB(140, 200, 255), 4)

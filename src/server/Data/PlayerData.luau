@@ -19,6 +19,8 @@ export type Data = {
 	NextId: number,
 	Deliveries: { [string]: number }, -- successful deliveries by source tier ("1" to "12")
 	Dex: { [string]: boolean }, -- families delivered at least once
+	DexClaimed: { [string]: boolean }, -- families whose Sheepdex reward was claimed
+	HerdGifts: { [string]: boolean }, -- gods whose whole herd was claimed, so its gift was paid
 	Tutorial: number, -- 0 until the first delivery, then 1; 2 once the stair walker was used
 	LastSeen: number, -- os.time() of the last settlement, for offline earnings; 0 for a new player
 	SpeedBuys: number, -- how many times 2x Speed was bought (Config/Store.SpeedPrices: the next one's price)
@@ -29,7 +31,7 @@ export type Data = {
 
 local PlayerData = {}
 
-PlayerData.SchemaVersion = 2
+PlayerData.SchemaVersion = 3
 
 PlayerData.Template = {
 	SchemaVersion = PlayerData.SchemaVersion,
@@ -44,6 +46,8 @@ PlayerData.Template = {
 	NextId = 1,
 	Deliveries = {},
 	Dex = {},
+	DexClaimed = {},
+	HerdGifts = {},
 	Tutorial = 0,
 	LastSeen = 0,
 	SpeedBuys = 0,
@@ -68,6 +72,20 @@ migrations[1] = function(data: any)
 		end
 		sheep.Burden = nil
 	end
+end
+
+-- Schema 3: the Sheepdex reward became a claim (SheepdexService). Families found before were paid on delivery, so they
+-- start out claimed.
+migrations[2] = function(data: any)
+	local claimed = {}
+	if type(data.Dex) == "table" then
+		for family, found in data.Dex do
+			if found == true then
+				claimed[family] = true
+			end
+		end
+	end
+	data.DexClaimed = claimed
 end
 
 local function isNatural(value: any): boolean
@@ -152,6 +170,12 @@ function PlayerData.Validate(data: any): (boolean, string?)
 	end
 	if data.Dex ~= nil and not flags(data.Dex) then
 		return false, "Dex is not a set"
+	end
+	if data.DexClaimed ~= nil and not flags(data.DexClaimed) then
+		return false, "DexClaimed is not a set"
+	end
+	if data.HerdGifts ~= nil and not flags(data.HerdGifts) then
+		return false, "HerdGifts is not a set"
 	end
 	if data.Trail ~= nil and type(data.Trail) ~= "string" then
 		return false, "Trail is not a string"

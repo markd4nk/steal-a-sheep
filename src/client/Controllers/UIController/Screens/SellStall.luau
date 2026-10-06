@@ -290,7 +290,7 @@ function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		for order, sheep in shown do
 			local card = MenuParts.NewCard(list, `Sheep{sheep.Id}`, order)
 			local face = card:FindFirstChild("Face") :: Frame
-			Style.PaintCard(card, SheepIcon.RarityLook(sheep.Rarity), sheep.Locked)
+			Style.PaintCard(card, SheepIcon.FamilyLook(sheep.Family), sheep.Locked)
 			SheepIcon.Paint(face:FindFirstChild("Token") :: Frame, sheep.Family, sheep.Rarity)
 			local lock = face:FindFirstChild("Lock")
 			if lock and lock:IsA("GuiObject") then

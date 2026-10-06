@@ -16,15 +16,18 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## Live
 
-- **Private test version (2026-10-05)**: "Steal a Sheep", universe 10769564664, place 114389615931493
-  (`https://www.roblox.com/games/114389615931493`), owned by getajobgle (who owns Shear a Sheep's assets). Audience
-  Private: only the owner and people with edit permission can play. Main @ 3c5ee43, its first version. Max 5 players,
-  Team Create on, Studio access to API services on; no products or passes yet.
-- **Not live yet**: the daily gifts (merged into main just after the publish, a71cab4). The next publish needs the
+- **Private test version 4 (2026-10-05)**: main @ a71cab4, everything up to the daily gifts. "Steal a Sheep",
+  universe 10769564664, place 114389615931493 (`https://www.roblox.com/games/114389615931493`), owned by getajobgle
+  (who owns Shear a Sheep's assets). Audience Private: only the owner and people with edit permission can play. Max 5
+  players, Team Create on, Studio access to API services on; no products or passes yet. (Version 1 was main @ 3c5ee43.)
+- **Not live yet**: six sheep a tier and the new Sheepdex (main 3989273, save schema 3). Each publish needs the
   user's OK.
+- **Limited audience (the user wants it: Friends and Playtesters) is blocked**: Creator Hub greys out Save until the
+  game has a content maturity label, and the questionnaire isn't started. It needs the user's answers (the Merge Shrine
+  is likely a paid random item: cash buys a random lamb, and cash is sold for Robux; its menu shows the odds).
 - The main Studio is now that cloud place (Team Create: edits there last without a Save and ship with the next
   publish). `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is
-  the local copy sessions build their own Studios from; the main checkout's was rebuilt from 3c5ee43.
+  the local copy sessions build their own Studios from; the main checkout's was rebuilt from a71cab4.
 
 ## The game, and where each part lives
 
@@ -101,6 +104,11 @@ lamb.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
 - Nothing from the daily gifts session (merged into main 2026-10-05 on the user's word). The published place (the
   main Studio, Team Create) still holds main's scripts from before it until main is synced there and published.
+- **Six sheep a tier and the new Sheepdex** (merged 2026-10-05): each god's six families (`Config/Herds`), rolled for
+  every wild lamb; fleeces Plain / Shiny / Royal; Sheepdex rewards claimed in the new Sheepdex (`SheepdexService`,
+  save schema 3) with a herd gift for all six. HISTORY.md has the details. Zeus's Legendary is the Golden Ram (the
+  store's Robux sheep is the Golden Fleece). The gods' new order (t3code/order-olympian-gods) still has to merge for
+  tiers to match the lineup the user OK'd.
 
 ## Not verified
 
@@ -120,9 +128,13 @@ lamb.
   the altar** (should go to the pen), **touch and gamepad** in its menu, and **a Titan's grow-up** (none rolled yet).
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
   `IsFriendsWithAsync` pairs and the join notices between two real friends are untested. The place is Private, so
-  friends can't join until they get edit permission or the audience changes (Creator Hub > Settings > Audience).
-  The left column (GIFT, FLOCK, SHOP, SHEEPDEX, the friend tile) wasn't checked on a phone's short screen.
+  friends can't join until they get edit permission or the audience changes (Limited needs a maturity label first).
+  The left column (GIFT, FLOCK, SHOP, SHEEPDEX, the friend tile) runs off the bottom of a Galaxy A06 (800 x 360):
+  SHEEPDEX is half off and the friend tile gone (seen 2026-10-05).
 
+- **Sheepdex claim pressed with the mouse or a finger**: claims were made through `Remotes.ClaimDex` in a playtest (the
+  menu then showed Claimed!, the badges and the green herd bar); the button itself wasn't clicked. Saving the claims
+  (schema 3) is unit-tested only: the place isn't published.
 - **Sell Stall on a phone and a gamepad**: played on a PC window only (mouse); the layout matches the mock-up's phone
   frame, not checked in the Device Simulator.
 - **Stair walker with two players**: another player's climb (posed on each device) and the owner-only sign prompts
@@ -150,6 +162,9 @@ lamb.
   falling behind), but no theft from tiers 13-30 was carried home and delivered on foot; and the climb speed check wasn't tried there.
 
 ## Known issues
+
+- **180 sheep previews**: SheepService builds a preview model of every family for the menus' 3D views at startup
+  (`ReplicatedStorage.SheepLooks`, about 5,800 parts); the Sheepdex draws a tier's sheep only when it scrolls near.
 
 - **The descent is full of the map's own trees, rocks and arches.** A slide that hits one slows, and stops if blocked;
   players steer round them; lanes stay as they are until the user adds obstacles (DECISIONS.md). Every run

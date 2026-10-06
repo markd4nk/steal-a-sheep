@@ -6,6 +6,45 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Republished: version 4, with the daily gifts (2026-10-05)**. The user: "look at what main has and then republish
+  what's already there", and keep it Limited. Main was a71cab4 then: the only code since version 1 was the daily
+  gifts (19 files; their debug commands go through the Studio-only DebugService). Swapped into the cloud place and
+  checked (117 scripts, 0 differences; Studio-side content identical to a fresh build); a playtest had both bootstraps
+  ready, 72 tests passing and a clean console with real DataStores; File > Publish to Roblox logged "Published new
+  changes" as version 4. Six sheep a tier (3989273) landed on main minutes later and isn't in it: its session is
+  waiting on the user. *Limited* couldn't be saved: Creator Hub greys out Save until the game has a content maturity
+  label, and the questionnaire needs the user's answers. Still Private.
+
+- **Six sheep a tier, and the new Sheepdex (2026-10-05)**. Merged into main at the user's request, after main's Robux
+  store: Zeus's Legendary became the Golden Ram (id `GoldenRam`), since the store's Robux sheep is `GoldenFleece`, and
+  GameConfig now refuses a herd id that's already a family; the put-down prompt, the carry card and the shrine menu
+  name a sheep by its family. Rechecked after the merge: check.ps1, 70 tests, a playtest (Golden Ram and King of
+  Olympus income and claim, console clean). Then main's daily gifts: the Pegasus Sheep (a special family on no
+  tier) earns at its own tier times Common, keeps its name, and never counts on the SHEEPDEX badge; Day 4's prize is
+  now a Shiny lamb (the card says so); DAILY and SHEEPDEX share the HUD's badge helper.
+  - *How it works*: `Config/Herds` lists each god's six families, Common (the god's own) to Mythic, keyed by god, and
+    the 150 new looks (Shear a Sheep builds, wool styles, materials and paints with 36 new primitive extras in
+    `SheepService/Extras`: halo, crown, antlers, witch hat, trident, bolt...); GameConfig turns them into Breeds and
+    Olympus maps every family to its god's tier. `Economy.FamilyRarities` holds the odds and multipliers;
+    `RollFamily` picks each wild lamb's family (WildService), `FamilyBase` is its income before fleece, size and rank,
+    `FamilyName` its name. Fleeces are Plain / Shiny / Royal. The theft card adds the rarity; Legendary and Mythic
+    lambs are announced. The Flock and Sell Stall cards take the family's rarity colour. `Screens/Sheepdex` is
+    rewritten from the mock-up (`studio/SheepIndexMockup.luau`): sections per tier, 3D sheep and gods drawn when a tier
+    scrolls near, silhouettes, badges, the picked sheep with its reward and Claim (`Remotes.ClaimDex`,
+    `SheepdexService`, which also pays the herd gift). `FlockService.Deliver` only finds a family now. Save schema 3
+    adds `DexClaimed` and `HerdGifts`. The HUD's SHEEPDEX shows a count badge. Debug: `GiveSheep` 30.6 gives Zeus's
+    Mythic; `FillDex` n marks n of every herd found.
+  - *The user's calls*: six a tier, Common to Mythic; the lineup's designs ("that's good"); odds 50/25/13/7/4/1 and
+    income x1/1.5/2.5/4/8/15; fleeces renamed Plain / Shiny / Royal; the gods' new order used before it merges; the
+    Sheepdex mock-up ("looks pretty good"). The design rules (Mythic as the god's sheep made divine, no family in the
+    Gold paint) and the reward numbers are in DECISIONS.md *To review*.
+  - *Checked*: check.ps1; 64 tests (new: herds data, schema 3 migration). Playtested in my own Studio copy built from
+    the branch: server and client Ready, 180 previews (5,846 parts), 121 wild lambs rolled about 50/30/13/5/2.5%,
+    six tier-1 families' income matching the formula, the theft card ("LEGENDARY / Grape King Lamb"), carrying a
+    Legendary, the Flock menu's colours, claims (cash and Climbing paid, a second claim and an unfound one refused),
+    the herd gift (+1,200 and +25 on the sixth), the Sheepdex on the Galaxy A06 (fits after giving the picture the
+    spare height), lazy drawing (tier 2 drawn when scrolled to, tier 5 not), console clean. Not checked: clicking
+    Claim (a script opened the menu after my desktop clicks went astray), saving, two players.
 - **Daily gifts, with the Pegasus Sheep on Day 7 (2026-10-05)**. The user: a daily gift to check in for every day,
   better and better prizes, "day seven could be some like super rare sheep", then keep it standard; mock-ups first.
   - *Mock-ups* (`DESIGN/ui/mockups/daily-gifts.html`, the Sell Stall's kit): A (seven in a row) and B (Days 1-6 in a

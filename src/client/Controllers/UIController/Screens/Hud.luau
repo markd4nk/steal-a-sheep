@@ -126,9 +126,11 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	tilesList.Wraps = true
 	UIKit.Padding(tiles, (PICTURE_SIZE + 12 - math.max(PICTURE_SIZE, Theme.MinTouch)) / 2, 0, 0, 0)
 	-- A red "!" on a button's corner: something waiting there.
-	local function alertOn(button: TextButton)
-		local alert =
-			UIKit.Text(button, "Alert", "!", 20, Color.Snow, UDim2.fromOffset(26, 26), { Stroke = Color.Line })
+	-- A red badge on a picture's corner: "!" unless `text` says otherwise (the Sheepdex's count of rewards waiting).
+	local function alertOn(button: TextButton, text: string?): TextLabel
+		local alert = UIKit.Text(button, "Alert", text or "!", 20, Color.Snow, UDim2.fromOffset(26, 26), {
+			Stroke = Color.Line,
+		})
 		alert.BackgroundTransparency = 0
 		alert.BackgroundColor3 = Color.Red500
 		alert.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -140,6 +142,7 @@ function Hud.Build(playerGui: Instance): ScreenGui
 		ring.Color = Color.Line
 		ring.Thickness = Theme.Line.Normal
 		ring.Parent = alert
+		return alert
 	end
 	-- The rewards at the top: the free gift until it's claimed, then the daily gifts' golden calendar.
 	local gift = UIKit.PictureButton(tiles, "GiftButton", Theme.Icons.MenuGift, PICTURE_SIZE, "GIFT")
@@ -154,6 +157,7 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	shop.LayoutOrder = 3
 	local dex = UIKit.PictureButton(tiles, "SheepdexButton", Theme.Icons.MenuSheepdex, PICTURE_SIZE, "SHEEPDEX")
 	dex.LayoutOrder = 4
+	alertOn(dex, "").Visible = false
 	local friends = UIKit.PictureButton(tiles, "FriendButton", Theme.Icons.HudInvite, PICTURE_SIZE, "INVITE")
 	friends.LayoutOrder = 5
 	-- The Robux store on the right edge, where the left column has no room left (as the reference game's store buttons).
@@ -472,6 +476,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 
 	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding. The gift's glows until claimed.
 	local giftButton = tiles:FindFirstChild("GiftButton") :: TextButton
+	local dexAlert = (tiles:FindFirstChild("SheepdexButton") :: TextButton):FindFirstChild("Alert") :: TextLabel
 	local dailyButton = tiles:FindFirstChild("DailyButton") :: TextButton
 	local dailyAlert = dailyButton:FindFirstChild("Alert") :: GuiObject
 	local dailyLabel = dailyButton:FindFirstChild("NameLabel") :: TextLabel
@@ -493,6 +498,17 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		local unclaimed = data.FreeGift == false
 		giftButton.Visible = unclaimed
 		Motion.SetGlow(Motion.FindGlow(giftButton), unclaimed and tiles.Visible)
+		-- Sheepdex rewards found but not claimed yet.
+		local waiting = 0
+		local found = if type(data.Dex) == "table" then data.Dex else {}
+		local claimed = if type(data.DexClaimed) == "table" then data.DexClaimed else {}
+		for family, isFound in found do
+			if isFound == true and claimed[family] ~= true and Olympus.ByFamily[family] then
+				waiting += 1
+			end
+		end
+		dexAlert.Visible = waiting > 0
+		dexAlert.Text = if waiting > 9 then "9+" else tostring(waiting)
 		refreshDaily()
 	end
 
@@ -507,7 +523,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		local tier = player:GetAttribute("CarryTier")
 		if type(family) == "string" and type(tier) == "number" then
 			SheepIcon.Paint(carryToken, family, 1)
-			carryName.Text = string.gsub(Olympus.Tiers[tier].FamilyName, "Sheep$", "Lamb")
+			carryName.Text = string.gsub(Economy.FamilyName(family), "Sheep$", "Lamb")
 		end
 	end
 	trove:Connect(returnButton.Activated, function()

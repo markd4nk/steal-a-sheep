@@ -2,6 +2,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Economy = require(ReplicatedStorage.Utils.Economy)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Theme = require(ReplicatedStorage.Config.Theme)
 
@@ -73,6 +74,11 @@ end
 -- The card colour for a fleece rarity (Theme.Fleece.Rarity's names).
 function SheepIcon.RarityLook(rarity: number): string
 	return if rarity >= 3 then "Legendary" elseif rarity == 2 then "Rare" else "Common"
+end
+
+-- The card colour for a family: its rarity in its god's herd (Common to Mythic, Theme.Fleece.Rarity's names).
+function SheepIcon.FamilyLook(family: string): string
+	return Economy.FamilyRarities[Economy.FamilyRarity(family)].Name
 end
 
 return table.freeze(SheepIcon)
