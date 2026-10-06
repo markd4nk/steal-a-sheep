@@ -41,6 +41,7 @@ ROOT = trailer_root()
 RAW = os.path.join(ROOT, "raw")
 WORK = os.path.join(ROOT, "work")
 OUT = os.path.join(ROOT, "out")
+# The output frame rate; a cut list's "fps" overrides it (takes are filmed at 60, so 30 halves them cleanly).
 FPS = 60
 # The captions' outline colour and font; a cut list's "ink" and "font" (a file in Roblox's content/fonts) override them.
 INK = "0x152A55"
@@ -215,7 +216,7 @@ def cut_clip(index: int, clip: dict, variant: str, spec: dict) -> tuple[str, flo
     return out, seconds
 
 
-def title_card(variant: str, spec: dict, title: dict, background: str) -> tuple[str, float]:
+def title_card(variant: str, spec: dict, title: dict, background: str, last: dict) -> tuple[str, float]:
     """The end card: the last frame of a clip, softened, with the game's name and a line under it."""
     width, height = spec["size"]
     tall = height > width
@@ -240,6 +241,21 @@ def title_card(variant: str, spec: dict, title: dict, background: str) -> tuple[
             f"bordercolor={INK}:x=(w-text_w)/2:y=h*0.42+{big // 2}+{small // 2}:alpha='{fade_alpha(0.6, seconds + 5, 0.3)}'"
         )
     filters += [f"fps={FPS}", "format=yuv420p"]
+
+    # The game's sound runs on under the card from where the last clip was cut, fading out, instead of stopping dead.
+    # It starts a transition early so the crossfade into the card joins the same moment of sound on both sides.
+    src = os.path.join(RAW, last["src"])
+    if probe(src)["audio"] and last.get("speed", 1.0) == 1.0 and last.get("game_audio_db", 0) > -60:
+        start = max(0.0, last["out"] - title.get("transition", 0.3))
+        audio_inputs = ["-ss", str(start), "-i", src]
+        audio_args = [
+            "-af",
+            f"asetpts=PTS-STARTPTS,volume={last.get('game_audio_db', 0)}dB,aformat=sample_rates=48000:channel_layouts=stereo,"
+            f"afade=t=out:st={seconds * 0.4:.3f}:d={seconds * 0.6:.3f},apad=whole_dur={seconds}",
+        ]
+    else:
+        audio_inputs = ["-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo"]
+        audio_args = []
     out = f"seg_{variant}_title.mkv"
     run(
         [
@@ -247,16 +263,14 @@ def title_card(variant: str, spec: dict, title: dict, background: str) -> tuple[
             "-0.5",
             "-i",
             background,
-            "-f",
-            "lavfi",
-            "-i",
-            "anullsrc=r=48000:cl=stereo",
+            *audio_inputs,
             "-map",
             "0:v:0",
             "-map",
             "1:a:0",
             "-vf",
             ",".join(filters),
+            *audio_args,
             "-t",
             f"{seconds:.3f}",
             "-c:v",
@@ -319,11 +333,12 @@ def music_filter(music: dict, length: float) -> str:
 
 
 def build(cut_path: str, only: str | None) -> None:
-    global INK, FONT
+    global INK, FONT, FPS
     with open(cut_path, encoding="utf-8") as f:
         cut = json.load(f)
     INK = cut.get("ink", INK)
     FONT = cut.get("font", FONT)
+    FPS = cut.get("fps", FPS)
     os.makedirs(WORK, exist_ok=True)
     os.makedirs(OUT, exist_ok=True)
     for variant, spec in cut["variants"].items():
@@ -336,7 +351,7 @@ def build(cut_path: str, only: str | None) -> None:
             segments.append((file, seconds, clip.get("transition", 0)))
             print(f"  {variant} {index:02d} {clip['src']} {seconds:.2f}s")
         if cut.get("title"):
-            file, seconds = title_card(variant, spec, cut["title"], segments[-1][0])
+            file, seconds = title_card(variant, spec, cut["title"], segments[-1][0], clips[-1])
             segments.append((file, seconds, cut["title"].get("transition", 0.3)))
         joined = f"joined_{variant}.mkv"
         length = join(segments, joined)

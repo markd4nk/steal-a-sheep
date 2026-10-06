@@ -101,6 +101,10 @@ lamb.
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
+- **Game page art and a trailer, first cuts** (overnight 2026-10-05, branch t3code/order-olympian-gods, nothing
+  uploaded): icon and thumbnail mock-ups (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The 9:16
+  cut still carries the game's APM music, which can't go to TikTok or Shorts (BRAIN trailers.md): it needs a licensed
+  track first.
 - **The Robux store can't sell yet** (merged 2026-10-05; the user: Creator Hub later): the game now exists on Roblox,
   so the 2 passes and 49 developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) can be made in
   universe 10769564664 at Config/Store's prices, their ids put in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`). Until
