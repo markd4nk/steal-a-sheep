@@ -16,18 +16,18 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## Live
 
-- **Private test version 4 (2026-10-05)**: main @ a71cab4, everything up to the daily gifts. "Steal a Sheep",
-  universe 10769564664, place 114389615931493 (`https://www.roblox.com/games/114389615931493`), owned by getajobgle
-  (who owns Shear a Sheep's assets). Audience Private: only the owner and people with edit permission can play. Max 5
-  players, Team Create on, Studio access to API services on; no products or passes yet. (Version 1 was main @ 3c5ee43.)
-- **Not live yet**: six sheep a tier and the new Sheepdex (main 3989273, save schema 3). Each publish needs the
-  user's OK.
+- **Private test version 5 (2026-10-05)**: main @ 3989273, everything up to six sheep a tier and the new Sheepdex
+  (save schema 3); every server restarted onto it. "Steal a Sheep", universe 10769564664, place 114389615931493
+  (`https://www.roblox.com/games/114389615931493`), owned by getajobgle (who owns Shear a Sheep's assets). Audience
+  Private: only the owner and people with edit permission can play. Max 5 players, Team Create on, Studio access to API
+  services on; no products or passes yet. Earlier: version 1 = 3c5ee43, version 4 = a71cab4 (2-3 were autosaves).
+  Each publish needs the user's OK.
 - **Limited audience (the user wants it: Friends and Playtesters) is blocked**: Creator Hub greys out Save until the
   game has a content maturity label, and the questionnaire isn't started. It needs the user's answers (the Merge Shrine
   is likely a paid random item: cash buys a random lamb, and cash is sold for Robux; its menu shows the odds).
 - The main Studio is now that cloud place (Team Create: edits there last without a Save and ship with the next
   publish). `StealASheep.rbxl` (`scripts/build-place.ps1`: the map, High Olympus, Shear a Sheep's assets, the code) is
-  the local copy sessions build their own Studios from; the main checkout's was rebuilt from a71cab4.
+  the local copy sessions build their own Studios from; the main checkout's was rebuilt from 3989273.
 
 ## The game, and where each part lives
 
@@ -112,9 +112,10 @@ lamb.
 
 ## Not verified
 
-- **The live game itself**: nobody has joined the published place yet. Checked only in Studio on the cloud place
-  (both bootstraps ready, 66 tests, ProfileStore "data will be saved", no warnings). Not yet seen in a real server:
-  Shear a Sheep's meshes, faces and sounds loading, the debug panel staying hidden, the store's "Not on sale yet".
+- **The live game itself**: the user has been in a live server (one player, moved onto version 5 by the restart), but
+  no agent has watched one: checked only in Studio on the cloud place (both bootstraps ready, 76 tests, ProfileStore
+  "data will be saved", no warnings). Unconfirmed in a real server: Shear a Sheep's meshes, faces and sounds loading,
+  the debug panel staying hidden, the store's "Not on sale yet", a save carried from version 4 to 5.
 
 - **Daily gifts over real days**: the 20-hour wait and the claims were tried with the debug day commands, not by
   waiting; keeping the day across a real rejoin is untested (the mock store). The HUD's wrapped column was seen on

@@ -6,6 +6,14 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **Version 5: six sheep a tier, servers restarted (2026-10-05)**. The user, through the six-sheep session: "merge to
+  main and then tell the other session to publish with this new version and then refresh all the servers". Main
+  3989273's 24 changed files swapped into the cloud place (120 scripts, 0 differences; Workspace fingerprint
+  unchanged); a playtest had both bootstraps ready, 76 tests passing, a clean console, and the Studio test save went
+  from schema 2 to 3 without a kick. Published as version 5. Creator Hub > Server management > Restart Servers, all
+  servers, no delay: 1 server with 1 player (on an older version) migrated, Completed 100%; the browser then showed 1
+  server, 1 player, none outdated. Restarting mattered: an old server refuses a save with a newer SchemaVersion.
+
 - **Republished: version 4, with the daily gifts (2026-10-05)**. The user: "look at what main has and then republish
   what's already there", and keep it Limited. Main was a71cab4 then: the only code since version 1 was the daily
   gifts (19 files; their debug commands go through the Studio-only DebugService). Swapped into the cloud place and

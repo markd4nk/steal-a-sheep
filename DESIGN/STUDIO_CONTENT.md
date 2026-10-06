@@ -9,6 +9,8 @@ here. Newest first.
   pictures are uploaded images (`Theme.Icons.DailyCash1/3/5`, `DailyClimb1/3`, `Pegasus`). Tried in this session's own
   copy of the place (`build/DailyPlaytest.rbxl`); the main Studio wasn't touched.
 
+- **2026-10-05, version 5 published**: main 3989273's scripts (six sheep a tier, the Sheepdex: 24 files, 120 scripts)
+  swapped into the cloud place and checked (0 differences; Workspace fingerprint unchanged). No place changes.
 - **2026-10-05, version 4 published**: main a71cab4's scripts (the daily gifts' 19 changed files) swapped into the
   cloud place and checked (117 scripts, 0 differences); its Studio-side content still matched a fresh build exactly.
   No place changes.
