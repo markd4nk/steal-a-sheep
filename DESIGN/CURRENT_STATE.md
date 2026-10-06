@@ -143,9 +143,9 @@ lamb.
   waiting; keeping the day across a real rejoin is untested (the mock store). The HUD's wrapped column was seen on
   Studio's small phone (three columns of two), not on a tablet or a 390-point phone; the menu wasn't tried on PC
   after the compact layout, nor with a gamepad.
-- **Real Robux purchases**: the products and passes exist now (2026-10-05), but nothing has gone through Roblox's
-  dialog or ProcessReceipt yet; the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and
-  the one-dialog-at-a-time rule with a real dialog are untested. Store on a phone: Galaxy A06 sideways only.
+- **Real Robux purchases**: Roblox's test purchase dialog with the real products granted +24K cash and 2x Speed
+  step 1 in Studio, receipts saved (overnight branch); a real charge, a pass bought in game and receipts while away
+  are untested. Store on a phone: Galaxy A06 sideways only.
 
 - **The Merge Shrine's region check** (`PolicyService`, 2026-10-05): not run in Studio or live yet.
 - **Merge Shrine with two players** (another player mustn't see your picks, merge or lamb), **leaving with a lamb on
@@ -158,17 +158,19 @@ lamb.
 - **Sheepdex claim pressed with the mouse or a finger**: claims were made through `Remotes.ClaimDex` in a playtest (the
   menu then showed Claimed!, the badges and the green herd bar); the button itself wasn't clicked. Saving the claims
   (schema 3) is unit-tested only: the place isn't published.
-- **Sell Stall on a phone and a gamepad**: played on a PC window only (mouse); the layout matches the mock-up's phone
-  frame, not checked in the Device Simulator.
+- **Menus on a phone**: every menu checked on a Galaxy A06 in the Device Simulator (overnight branch); not on a
+  real phone, a tablet or with a gamepad (the Controller Emulator switched the menus' hints to B, but the prompts'
+  controller glyph wasn't seen).
 - **Stair walker with two players**: another player's climb (posed on each device) and the owner-only sign prompts
   were only checked solo; the Robux upgrade can't be bought until its developer products exist.
 
-- **Two players**: slide hits and knockback (server checks, client knockback) were never tried with a second player.
+- **Two players**: checked in a Studio Server & Clients test on the overnight branch (slide hit and knockback,
+  "That's not your plot!", owner-only walker buttons, the shrine's private show); not with real players online.
 - **All-servers leaderboards**: their stores open on the published place (no warning in a Studio playtest of it), but
   writes and reads across servers, name lookups and the last write on leaving are untested.
-- **Saving**: a Studio playtest of the published place loaded a save from the real DataStore (`PlayerData_Studio`);
-  saves in the live game (`PlayerData`), rejoin, offline credit on a real rejoin and session locking are untested (the
-  offline maths is unit-tested).
+- **Saving**: three Studio sessions of a test player against the real Studio DataStore (`PlayerData_Studio`) kept
+  the sheep, tutorial, cash, settings and receipts, with the welcome-back card's offline cash (overnight branch); the
+  live game's `PlayerData` and session locking across real servers are untested.
 - **Touch and gamepad**: the overnight branch's prompts and HUD were checked on a Galaxy A06 in the Device Simulator
   (touch); a real phone, a tablet and a gamepad are untested. The slide uses Roblox's own input.
 - **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
