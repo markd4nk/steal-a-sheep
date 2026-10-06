@@ -7,6 +7,20 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
 
 ## Waiting
 
+- **S11** (`BRAIN/GOTCHAS.md`): "Roblox's moderation removes AI-generated limb meshes as if they broke the rules:
+  `generate_mesh` split two characters into head, torso, arms and legs, and within the hour two of the bare-skin limbs
+  (a leg, an arm: smooth skin-coloured tubes with rounded ends) were removed, with a notice to the account. Don't
+  split generated characters into bare limbs; generate them clothed, or whole. The public asset details
+  (`economy.roblox.com/v2/assets/<id>/details`) and Studio's cache still showed the removed meshes as fine, so only the
+  notice tells you." Seen 2026-10-05 making Steal a Sheep's Zeus mock-ups.
+- **S9** (`BRAIN/PATTERNS/testing-studio.md`): "`generate_mesh` reads `partNames` as one comma-separated string: a JSON
+  list passed through it keeps its brackets and quotes in the part names (`[\"head\"_geom`). Pass `head, torso, left
+  arm`. The result is a Model named after the prompt, one Model per part holding a MeshPart `<part>_geom`, dropped
+  far from the map at the camera's focus; the mesh is published to the creator (`publishedAssetId` in the job result),
+  so `insert_asset` brings it back later. Run it with `async` and collect with `wait_job_finished`: two in parallel
+  took about four minutes." Seen 2026-10-05 making Steal a Sheep's Zeus mock-ups.
+- **S10** (`BRAIN/PATTERNS/testing-studio.md`): "`screen_capture` calls sent in parallel to one Studio time out (two of
+  three did); send them one at a time." Seen 2026-10-05.
 - **S1** (`BRAIN/PATTERNS/characters.md`): "PlayerScripts may have no `PlayerModule`: in Studio 2026-10 the default
   control scripts weren't there, so `require(PlayerModule):GetControls():GetMoveVector()` is gone. Read the player's
   input as `Humanoid.MoveDirection` in a RenderStep bound after `Enum.RenderPriority.Character` (it still holds what
@@ -155,15 +169,37 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   Hub > Places > the place > Access (it starts at 50). Studio Access to API Services is under Experience Settings >
   Security. The Limited audience (Playtesters, Friends) needs a content maturity label first: until the
   questionnaire is done, Save Changes stays greyed out." Seen 2026-10-05 publishing Steal a Sheep.
-- **S30** (`BRAIN/GOTCHAS.md`): "A MaterialVariant on a MeshPart follows the mesh's UVs but keeps its `StudsPerTile`
+- **S28** (`BRAIN/PATTERNS/animations.md`, a new "Skinned meshes from Blender" part): "A Blender rig exported as FBX
+  (forward -Z, up Y, primary bone axis Y, no leaf bones) comes in through File > Import at its Blender size, one
+  Blender unit to one stud, facing -Z: a direction (x, y, z) in Blender's rig is (-x, z, y) in the model. The Bones
+  sit under the MeshPart (unanchored), with an `AnimationController` and an `InitialPoses` folder beside it. A Bone's
+  own axes aren't Blender's (its X and Z come in flipped), so pose from the model's axes, not the bone's:
+  `bone.Transform = CFrame.new(rc:VectorToObjectSpace(offset)) * (rc:Inverse() * q * rc)`, `rc` being the bone's rest
+  rotation relative to the MeshPart and `q` the rotation in the model's axes, carried by the parent bone." Seen
+  2026-10-05 in Steal a Sheep: Zeus's walk pose from Blender matched in Studio, foot for foot.
+- **S29** (`BRAIN/PATTERNS/desktop-recipes.md`, Import 3D): "Run end to end: `ctrl+m` in the Studio window opens
+  'Open 3D File (FBX, OBJ, GLB, GLTF)'; `window click_element` 'File name:' (role Edit, `window=` the dialog's hwnd),
+  `ctrl+a`, type the path, Enter; the 'Import Preview' window's defaults (Upload to Roblox, Add to Workspace, pivot at
+  the scene origin) were right for a rigged character with an embedded texture; Import. The mesh and texture upload at
+  once (`MeshId`, `TextureID`)." Seen 2026-10-05 in Steal a Sheep.
+- **S30** (`BRAIN/PATTERNS/npcs.md`, a new "NPCs as Roblox avatars" part): "`Players:CreateHumanoidModelFromDescription`
+  builds an NPC from any catalog items, owned or not, in Edit and on the server. Its HeightScale, WidthScale,
+  DepthScale and HeadScale go past the avatar editor's limits (1.65, head 2.1 worked). Avatars made this way have
+  AnimationConstraint joints, not Motor6Ds, and a dynamic head (FaceControls, no face Decal): give it a look with
+  `desc.Head` = a catalog dynamic head (angry ones exist), not a decal. In Edit, a joint's `Transform` doesn't move
+  anything, and moving an anchored limb makes Studio rebuild the body around it: pose in a playtest. There a
+  `Transform` set on the server doesn't replicate, so set it on each client too (`RunService.PreSimulation`, after the
+  Animator), or play an animation, whose tracks do replicate. Roblox's default R15 walk (507777826) plays on them."
+  Seen 2026-10-05 in Steal a Sheep, dressing Zeus from the catalog.
+- **S33** (`BRAIN/GOTCHAS.md`): "A MaterialVariant on a MeshPart follows the mesh's UVs but keeps its `StudsPerTile`
   size in studs: a part twice as big shows twice as many tiles, and the pattern bends and breaks where UV islands meet.
   A tile made for flat blocks (studs, bricks) reads better at half its size or less on small round meshes. A `Texture`
   on a MeshPart is projected flat from each face instead: an even grid, but only its picture, with no normal map, so
   bevels go flat. Glass and Neon parts draw no variant at all; for a glowing look, give a Plastic variant an
   `EmissiveMaskContent` (its own colour map works). A variant's BaseMaterial and maps are PluginSecurity: make variants
   in Studio, not from game scripts." Seen 2026-10-05 mocking up the map's Studs material on Steal a Sheep's wool.
-  (Numbered S30 because an unmerged branch already uses S28 and S29.)
-- **S31** (`BRAIN/PATTERNS/testing-studio.md`): "`_G` lasts between `execute_luau` calls in one Studio: define a
+  (S31 and S32 are taken on t3code/publish-readiness-checklist.)
+- **S34** (`BRAIN/PATTERNS/testing-studio.md`): "`_G` lasts between `execute_luau` calls in one Studio: define a
   long mock-up or test helper once (`_G.TEMP_Mockup = function(look) ... end`), rerun it with one-line calls, and set
   it to nil when done. The command's thread lacks the RobloxScript capability: reading `Lighting.Technology` or
   `MaterialService.Use2022Materials` errors." Seen 2026-10-05 in Edit, rendering four looks of the same scene.
