@@ -26,15 +26,24 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     player's `TrainRate` attribute while training. Every client runs a machine's steps at its climber's rate
     (`StairClimb.StepSeconds(rate)`): steps a second rise evenly with each tenfold of the rate, from 0.6 s a step on
     the free machine to 0.1 s on the top one with the Sunlight trail (`GameConfig.StairWalker.SlowestStep`,
-    `FastestStep`), so trails speed it up too. It was 0.6 s to 0.27 s by level, most of it in the first levels. Your
-    own client shows the Climbing shoe and "+N/s" over your head (`WalkerController`, `TrainGain` in PlayerGui), with
-    a small punch each second, just over the head's top (higher, it covered the machine's floating "LV" tag). The
+    `FastestStep`), so trails speed it up too. It was 0.6 s to 0.27 s by level, most of it in the first levels. The
     HUD's meter came out on the onboarding branch (it owns `Hud.luau`).
+  - *The pops* (the user, after a static "+N/s" over the head: "depending on how much they make per second, it also
+    depends how fast ... level one ... plus one, plus one in one second ... at level 30, I want like 10 things to say
+    plus ... 2.5T", "show me a mock-up ... a video"): `WalkerController` pops one "+N" a step off your own head, N =
+    rate x step time, so level 1 (now 0.5 s a step) shows "+1" twice a second and level 30 about ten "+2.5T"
+    (`Format.Rate(amount, 1)`: `Format.Short` and `Rate` take a `maxDecimals`, rounding down as before; new
+    `tests/Format.spec`). The pops are drawn on a canvas scaled to 6 studs over the head (`TrainGain` in PlayerGui,
+    the `Fit` UIScale), so they keep their size beside the character on a phone: the first try, in screen points,
+    covered half the Galaxy A06's screen. Your machine's floating level tag hides on your screen while you climb
+    (the pops rose through it) and comes back when you step off. The user, on the video (filmed in the cloud place on
+    the Galaxy A06 emulator, `record` of Studio's window in the background at 15 fps): "much better now"; one decimal,
+    keep the shoe, hide the level.
   - *Checked*: `check.ps1` passes. A playtest of the cloud place with the branch's 17 scripts staged in
     (`scripts/stage_branch.py --base 3667692`, then put back and verified): both bootstraps ready, 84 tests, a clean
     console. Snapped onto the walker: `TrainRate` 2, the steps measured on the client at 1.67 steps a second; at level
     30 (debug `SetWalker`) `TrainRate` 25T and 9.71 steps a second at 60 fps, both as the formula says; "+2/s" and
-    "+25T/s" over the head (screenshots; AlwaysOnTop billboards don't show in captures, BRAIN proposal S49, so it now
+    "+25T/s" over the head (the static label before the pops; screenshots; AlwaysOnTop billboards don't show in captures, BRAIN proposal S49, so it now
     draws normally). "Jump to get off" showed on the Tutorial 0 save. The Studio save was put back as found (walker
     level 1, Climbing 0). Not seen in play: the trimmed refusals and the menus without their tips.
 

@@ -155,7 +155,11 @@ confirmed or reversed it.
   once a session; **keep** the rare-lamb notice ("A Royal ... appeared in Zeus's pasture!").
 - **The stair walker (the user, 2026-10-06)**: no "Next" line or bar to the next god while training; "all it needs to
   indicate is that you're gaining plus speed, whatever you're making per second ... above the player". And "the
-  player should be moving on the treadmill way faster ... at higher levels and higher speeds."
+  player should be moving on the treadmill way faster ... at higher levels and higher speeds." Then, on the video
+  mock-up: like other games, numbers pop off the player, more of them the faster you train ("level one, if it's two
+  per second ... plus one, plus one in one second ... at level 30, I want like 10 things to say plus ... 2.5T"):
+  "much better now". One decimal ("+2.5T"), the shoe stays on each pop, and the machine's floating level hides while
+  you climb.
 
 - **The overnight work as summarized, merged and shipped (the user, 2026-10-06)**: "Yes, it looks good. You can merge
   it... just ship it. It still needs to stay private though." So version 8 went out with the audience left Private:
@@ -479,10 +483,12 @@ Calls building the stair walker (2026-10-05).
 - **The sign's prompts**: E upgrades with cash, R with Robux; only the owner sees them; they go at the top level, and
   the board says MAX LEVEL. An empty plot's machine shows level 1 with no floating tag.
 - **Step speed by training rate** (2026-10-06, replacing step speed by level): steps a second rise evenly with each
-  tenfold of the climber's rate, so a trail speeds them up too. Without a trail a step takes 0.60 s at level 1, 0.40
-  at 3, 0.31 at 5, 0.21 at 10, 0.14 at 20, 0.10 at 30 (Sunlight trail on top: 0.10, the fastest).
-- **While training** your own screen shows the Climbing shoe and "+N/s" in lime over your head, with a small punch
-  each second; other players don't see it over you.
+  tenfold of the climber's rate, so a trail speeds them up too. Without a trail a step takes 0.50 s at level 1 (two a
+  second, the user's example), 0.36 at 3, 0.29 at 5, 0.20 at 10, 0.13 at 20, 0.10 at 30 (Sunlight trail on top: 0.10,
+  the fastest).
+- **The pops** (your own screen only): one a step, the shoe and "+N" in lime, N what that step earned; each starts
+  just over your head somewhere across a 6-stud-tall space, rises about 4.8 studs in 0.9 s, fading for the last 0.3;
+  sized in studs, so they keep their size beside the character on any screen. Reduce Motion: they fade in place.
 - **Machine size**: treads 3 wide, 0.6 up and 1.0 deep (about 31 degrees), the player about 2 studs off the floor; the
   machine's sides, hood, console and the sign are solid, the entry step and stairs aren't.
 

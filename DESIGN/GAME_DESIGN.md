@@ -133,10 +133,11 @@ where it was. The next gift opens 20 hours after a claim.
 ## Stair walker (the user, 2026-10-05)
 A real StairMaster just outside each pen, beside the gate, like Steal an Egg's treadmill. Walk into it and you snap on
 and climb its moving steps (your legs on the steps, any avatar); jump to get off. Its level floats over it, its steps
-run faster with your training rate (each level, each trail; 0.6 s a step on the free machine to 0.1 s at the top),
-your "+N/s" floats over your head while you train, and it looks better as it upgrades: Starter, Sport, Pro, Turbo,
-Champion (levels 6 and up keep Champion's look for now, ending in an Olympus look later). The upgrade sign beside it
-buys the next level straight away, for cash or Robux (the store's walker prices).
+run faster with your training rate (each level, each trail; 0.5 s a step on the free machine to 0.1 s at the top),
+each step pops a "+N" off your head (what it earned: "+1" twice a second at first, about ten "+2.5T" a second at the
+top) while the machine's floating level hides on your screen, and it looks better as it upgrades: Starter, Sport, Pro,
+Turbo, Champion (levels 6 and up keep Champion's look for now, ending in an Olympus look later). The upgrade sign
+beside it buys the next level straight away, for cash or Robux (the store's walker prices).
 
 ## Climbing (the user, 2026-10-05)
 Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain

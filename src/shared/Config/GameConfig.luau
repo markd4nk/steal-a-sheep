@@ -432,7 +432,7 @@ local GameConfig = {
 	-- The stair walker machine outside each pen. Its steps run at the climber's training rate: SlowestStep seconds a
 	-- step on the free machine, FastestStep on the top one with the best trail (Utils/StairClimb.StepSeconds).
 	StairWalker = {
-		SlowestStep = 0.6,
+		SlowestStep = 0.5,
 		FastestStep = 0.1,
 		AnimateRange = 220, -- studs from the camera within which machines and climbers move
 	},
