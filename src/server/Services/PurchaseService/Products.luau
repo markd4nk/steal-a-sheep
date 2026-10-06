@@ -37,8 +37,9 @@ local function climb(amount: number): Grant
 	end
 end
 
--- What a Robux spent on a price step the player is already past is worth in Climbing: the second Climbing pack's rate.
-local CLIMB_PER_ROBUX = Store.Climb[2].Amount / Store.Climb[2].Price
+-- What a Robux spent on a price step the player is already past is worth in Climbing: the smallest Climbing pack's
+-- rate, so buying an old step again is never a cheaper way to Climbing than the packs.
+local CLIMB_PER_ROBUX = Store.Climb[1].Amount / Store.Climb[1].Price
 
 -- The `buy`th 2x Speed: Climbing doubled when it's the player's next step (a step further on, bought outside the
 -- store, counts as the next). A step they're already past, or one after it sold out (two dialogs racing, or a cheap

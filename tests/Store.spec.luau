@@ -139,7 +139,7 @@ return function(t: Run.Suite)
 		-- Speed.1 again (a client prompting the 3 R$ step twice): its price in Climbing, no doubling.
 		Products["Speed.1"](player, registry)
 		t.Expect(data.SpeedBuys).ToBe(1)
-		t.Expect(math.abs(data.ClimbPower - (200 + 3 * Store.Climb[2].Amount / Store.Climb[2].Price)) < 1e-6).ToBe(true)
+		t.Expect(math.abs(data.ClimbPower - (200 + 3 * Store.Climb[1].Amount / Store.Climb[1].Price)) < 1e-6).ToBe(true)
 		-- A step further on counts as the next one.
 		local before = data.ClimbPower
 		Products["Speed.4"](player, registry)

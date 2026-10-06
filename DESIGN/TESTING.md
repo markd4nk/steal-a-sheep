@@ -247,3 +247,13 @@ Useful measurements:
   `start_stop_play` brings its window forward. Sessions took turns (a "screen free" message), running logic-only
   checks while another session's window was in front.
 
+- **A local copy acting as the published place**: in Edit, `game:SetPlaceId(114389615931493)` and
+  `game:SetUniverseId(10769564664)` make a local `.rbxl`'s playtests use the universe's Studio DataStores ("data will be
+  saved") and its products for test purchases, with no change to the cloud place. Its MCP name then reads like the
+  cloud place's: address it by id only. Server & Clients test players (`Player1` -1, `Player2` -2) save under
+  `Player_-1` / `Player_-2` in `PlayerData_Studio`, away from the owner's own Studio save.
+- **Server & Clients from the desktop**: Test menu > Start Test Session > Server and Clients starts at once with the
+  toolbar's client count (it was 0: only a server). End Session from the same menu, set the count with the arrows
+  beside the person icon, then the blue Play. The windows show up in `list_roblox_studios` with no name: the server's
+  `execute_luau` takes `Server`, each client's `Client` (find which by `LocalPlayer.Name`), and clients call
+  `ReplicatedStorage.NetRemotes.<Name>:InvokeServer` (they can't `require` Remotes).
