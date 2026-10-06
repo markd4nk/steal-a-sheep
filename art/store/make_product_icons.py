@@ -4,7 +4,9 @@ the card's own words where it has them ("+150K CLIMB", "2x SPEED", "Lv 1 > 2"); 
 products; the passes keep their picture and words inside the circle Roblox crops them to.
 
     python art/store/make_store_art.py                                     the cards' pictures (art/store/export)
-    blender -b --factory-startup -P art/store/render_robux_sheep.py        the two Robux sheep (art/store/sheep)
+    the two Robux sheep, with the game's studs, into art/store/sheep: captured in a playtest
+    (studio/RobuxSheepIcons.luau) and cut out by art/store/cut_out_sheep.py; render_robux_sheep.py
+    draws studless stand-ins in Blender when no Studio is free
     python art/store/make_product_icons.py [<out folder>] [--store <Store.luau>]
 
 Reads the products and passes from src/shared/Config/Store.luau (or the --store file, for a branch with the Creator Hub

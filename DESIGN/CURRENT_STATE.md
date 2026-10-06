@@ -109,13 +109,14 @@ lamb.
   audit, game page art tools and trailer (`t3code/order-olympian-gods`) merged in, tested together (84 unit tests, two
   players, saving, test purchases, phone menus: HISTORY.md, the overnight entry). Shipping it needs
   `studio/SheepStuds.luau` run on the cloud place first.
-- **Settings menu** (built 2026-10-05 on branch `t3code/sheep-stud-style-mockups`, not merged; its look waits for
-  Mark's OK, `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound effects in four
-  steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in the save,
+- **Settings menu** (in main with the release candidate; Mark OK'd the mock-up 2026-10-06,
+  `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound effects in four steps and
+  Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in the save,
   `SoundController` volumes).
-- **Icons for the 49 products and 2 passes** (2026-10-05, files waiting for Mark's OK, not uploaded):
-  `art/store/make_product_icons.py` writes them to `.t3/userdata/attachments/product_icons/` (HISTORY.md).
-- **The map's studs on every sheep** (built 2026-10-05, branch `t3code/sheep-stud-style-mockups`, not merged): half-size
+- **Icons for the 49 products and 2 passes** (Mark: "good to upload", 2026-10-06; not uploaded yet):
+  `art/store/make_product_icons.py` writes them to `.t3/userdata/attachments/product_icons/`; the two Robux sheep are
+  Studio captures with the studs (HISTORY.md). Uploading 51 pictures needs an Open Cloud key from Mark or Creator Hub.
+- **The map's studs on every sheep** (in main with the release candidate, Mark's word 2026-10-06): half-size
   copies of the map's `Studs` material over every sheep's wool (`Looks.Studs`, `GameConfig.Sheep.Studs`), glowing
   studs on Neon wool, see-through studs on glass. The cloud place needs `studio/SheepStuds.luau` run in Edit before
   the publish that ships it; without the materials the wool stays plain and the server warns once.

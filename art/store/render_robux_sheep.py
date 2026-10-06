@@ -1,4 +1,5 @@
-"""The store's two Robux sheep for their product icons (make_product_icons.py): Shear a Sheep's fluffy sheep, built and
+"""Studless stand-ins for the store's two Robux sheep (the icons now use Studio captures with the game's studs:
+studio/RobuxSheepIcons.luau and cut_out_sheep.py), for when no Studio is free: Shear a Sheep's fluffy sheep, built and
 dressed by its own art/icons/render_sheep_icons.py with the camera and lights of its store icons, in this game's looks
 (GameConfig's GoldenFleece and Kronos; Kronos is Shear a Sheep's Time Sheep in the same colours). Like
 DESIGN/ui/art/pegasus.py it only reads that checkout (SHEAR_ART), which needs its face pictures in

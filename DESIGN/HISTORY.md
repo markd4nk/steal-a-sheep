@@ -71,6 +71,11 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   looks (`art/store/render_robux_sheep.py`, as `DESIGN/ui/art/pegasus.py` does), in the store art's ink outline.
   Output: `.t3/userdata/attachments/product_icons/<Key>.png` and `contact_sheet.png` (gitignored pictures: the icon
   pack may be used in the game, not shared). Checked by eye on the contact sheet and at full size.
+  - *Mark, 2026-10-06*: "good to upload"; the two Robux sheep should show the studs unless they're barely visible.
+    They show plainly, so both are now Studio captures of the game's own sheep (`studio/RobuxSheepIcons.luau` in a
+    playtest of a copy built from main: the store card's turn, lens and light, the camera closer) on black and on
+    white, cut out with their transparency by `art/store/cut_out_sheep.py` (Kronos's glass cape stays see-through),
+    then given the same ink outline. Not uploaded yet.
 
 - **The map's studs on every sheep (2026-10-05)**. On branch `t3code/sheep-stud-style-mockups`, not merged. The user
   asked for mock-ups of the map's stud style layered over the sheep, picked B, then: "build it on every sheep, and then
