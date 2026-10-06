@@ -47,17 +47,20 @@ lamb.
   `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
 
 - **Server**: `DataService`, `PurchaseService` (pack; the walker's Robux levels, no products made yet), `SheepService`, `PlotService`, `FlockService`,
-  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
+  `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`, `ShrineService`,
   `DebugService` (Studio only).
 - **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Popup, Studio
-  DebugPanel), `CarryController`, `MovementController`, `AnimController`, `PromptController`.
+  DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`, `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
   `Utils/Economy` (every formula), `Utils/Mountain` (ramp height, tiers by position, floor checks).
 - **Climbing** (merged 2026-10-05): one stat, no walls, one speed rule from Climbing and the lamb's hidden weight;
   gods at one set speed; weight saved and tilting size odds (`Economy.RollWeight`, `SizeOdds`, for the Merge Shrine).
   GAME_DESIGN.md, *Climbing* and *Lamb weight*.
 - **From Shear a Sheep**: UIKit, Theme, Style (trimmed), Panel, Buttons, Motion, Scale, the sheep rig, add-ons and
-  breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds, the Mutation Machine (as the Merge Shrine).
+  breed builds, Looks, CarryPose, CarryController, SheepClips, Sounds.
+- **Merge Shrine** (built 2026-10-05, branch t3code/research-sheep-merge, not merged): the Laurel Ring replaces the
+  Mutation Machine; three grown sheep of one family and cash make one rerolled lamb, carried home from the altar
+  (GAME_DESIGN.md, *Merge Shrine*).
 
 ## In progress
 
@@ -67,6 +70,8 @@ lamb.
 
 ## Not verified
 
+- **Merge Shrine with two players** (another player mustn't see your picks, merge or lamb), **leaving with a lamb on
+  the altar** (should go to the pen), **touch and gamepad** in its menu, and **a Titan's grow-up** (none rolled yet).
 - **Stair walker with two players**: another player's climb (posed on each device) and the owner-only sign prompts
   were only checked solo; the Robux upgrade can't be bought until its developer products exist.
 

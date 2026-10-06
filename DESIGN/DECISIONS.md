@@ -62,8 +62,40 @@ confirmed or reversed it.
 - **Leaderboards live on the map's billboards in the safe zone, not behind a HUD icon** (the user, 2026-10-05): This
   Server (the richest here, by income), Top Income (the richest overall, each player's best ever), Most Steals and
   Climb Power (titled CLIMBING since Climbing replaced Climb Power on screen). Titles are words only, no icon; otherwise the boards' look (dark panel, medal rows, headshots) is OK'd.
+- **The Merge Shrine is a gamble, like Steal an Egg's Fuse Machine (the user, 2026-10-05).** It replaced Shear a
+  Sheep's Mutation Machine in the hub. The model is mock-up C, the **Laurel Ring**: a round dais, three pedestals round
+  a centre altar, three fire columns and a floating laurel crown. **The pole of light and the orb exist only during a
+  merge.** The menu mixes Shear a Sheep's Mutation Machine with the Shop: pick any three grown sheep of the **same
+  family** (sizes and fleeces may differ), pay cash, and one fresh lamb of that family comes out with its potential
+  hidden. **Fleece and weight are rerolled**: weight usually comes out heavier, with a very small chance of a huge one,
+  and a new top size, **Titan**. The result **can be worse** than what went in, and the shrine **shows the odds**
+  first. Rarity is the family's, so it never goes up (Steal an Egg's fuse keeps the species too). The merge plays as in
+  the approved mock-up video (speed approved): the three turn to light and merge into one, it rises on the pole to the
+  orb, pops out as a lamb, spins, and drops onto the altar. The player **picks it up and carries it home** like a
+  stolen lamb. **Other players can't take it**; left on the altar for 30 s, or when its player leaves, it goes to
+  their pen by itself. Its **size shows only when it grows up in the pen**. A sheep's hidden Weight shifts its size
+  odds; no kg on screen. Confirmed after the build: the **price** is 120 seconds of one Standard adult's income of the
+  family (tier 1: 240 cash, tier 6: 23.4K) "for now"; a **Titan earns x5**; the lamb waits **30 s** on the altar.
 
 ## To review
+
+Calls made building the Merge Shrine (2026-10-05):
+
+- **Luck**: three Standard sheep bring 40%; each step of size above Standard adds, up to 100% for three Titans. 40%
+  gives 58/34/8/0.2% Standard/Large/Giant/Titan; 100% gives 40/44/15/0.7% (the Climbing session's weight bands decide
+  the tail).
+- **Fleece**: three Ordinary in: 72/24/4% Ordinary/Rare/Royal; three Royal in: 30/45/25%; mixes in between.
+- **Menu**: the camera turns to the shrine with no dark backdrop and the HUD hidden; the odds in the lab's glass panel
+  on the left, your grown sheep as the shop's rows on the right (the newest god's first, then the biggest), one big
+  Merge button with the price at the bottom. The first sheep picked sets the family; the others' buttons say
+  "Not <family>". Picks stand on the pedestals in order (1 left, 2 back, 3 right) at their real sizes. Walking 26
+  studs from the shrine closes it.
+- **One lamb at a time**: you can't merge again until the last lamb has left the altar ("Pick up your lamb first").
+- **Pick up**: an instant E prompt ("Pick up", the lamb's name) within 14 studs of the altar; the carry card's Return
+  button sends a shrine lamb to the pen.
+- **Celebration** when it lands: "NEW LAMB!" ("RARE!" or "ROYAL!" by fleece) with "Pick it up and take it home";
+  sounds: LabZap at the merge, LabRiser on the rise, RevealSparkle at the pop, PenDrop on landing. A Titan grow-up
+  plays RevealFireworks.
 
 Calls building the stair walker (2026-10-05).
 
@@ -99,8 +131,8 @@ Calls made building free placement and roaming sheep (2026-10-05):
   carrying: "Bring it into your pen" (arrow to your plot), inside "Put it down where you like".
 - **Roaming**: strolls of 3-12 studs at 3 studs/s, anywhere in the plot, every 5-14 s for grown sheep and 12-26 s for
   lambs; 30% go on for another leg, 20% are a turn on the spot; sheep keep 3.5 studs (or their sizes) apart. Where it was
-  put down is saved and it comes back there on rejoin; one out of storage hops in there; a merge's result hops in where
-  the first merged sheep was put down; one with no home yet (Studio's GiveSheep) gets any clear spot.
+  put down is saved and it comes back there on rejoin; one out of storage hops in there; a merged lamb carried home lands
+  where it's put down; one with no home yet (Studio's GiveSheep) gets any clear spot.
 - **Grazing**: lambs graze 90% of their standing time, adults 45% (3-9 s apart): bouts of 1-3 bites, each the head down
   to the grass for 1.6-2.8 s nibbling and tugging, then up a little chewing for 1.8-3 s, the head working side to side;
   0.4-1.6 s between a lamb's bouts. Wild lambs graze too. Faces: Munch's two frames in turn (0.22 s each) while
@@ -129,8 +161,8 @@ Calls made building Climbing (2026-10-05):
 - **Weight bands**: wild lambs weigh 1-1.1 (95%) or 1.1-1.5 (5%), about 1.06 on average. The shrine's luck (0-1)
   raises the heavy chance up to 60% and opens a Huge band, 1.5-3, up to 3%.
 - **Size odds by weight** (Standard / Large / Giant / Titan): 1.0: 85/14/1/0, 1.1: 60/35/5/0, 1.5: 15/60/25/0,
-  3.0: 0/20/50/30, straight lines between. Wild lambs overall come out about 72/25/3 (was 75/23/2.5). Titan (x4 income,
-  2.1 scale, placeholder numbers for the shrine to tune) only from Huge weights, so never wild.
+  3.0: 0/20/50/30, straight lines between. Wild lambs overall come out about 72/25/3 (was 75/23/2.5). Titan (x5 income,
+  2.1 scale; x5 the user's call) only from Huge weights, so never wild.
 - **Weight's only visible hint** is the lamb's size: 0.6 of an adult at the lightest, 0.8 at 1.5.
 - **Slides**: the god's speed x your speed factor, at least walking speed, kept all the way down; they reach it in
   about 2 seconds (speeding up by at least 26 studs/s each second).
@@ -220,10 +252,8 @@ Calls made while building the MVP on 2026-10-05:
   ServerStorage.ClearedDecor). Each penned sheep shows "+X/s" (and a lamb its growth %).
 - **Manual Equip pins a sheep**: Equip Best keeps pinned sheep and refills the rest; Store unpins.
 - **Selling is at the Sell Stall only** (the map's stall at z 175); the Flock menu opened there adds Sell with a
-  confirm showing the coins and the income lost. The Shop is the stall at z 205; the Merge Shrine is Shear a Sheep's Mutation
-  Machine between the stalls (opens after 3 deliveries).
-- **Merge picks the three**: the biggest of the group, then the two that earn least (stored ones first). The preview
-  shows the sizes used, the three's income against the result's, and the flock's income before and after.
+  confirm showing the coins and the income lost. The Shop is the stall at z 205; the Merge Shrine (opens after 3
+  deliveries) stands between the stalls.
 - **HUD**: menu buttons (Flock, Shop, Sheepdex) appear after the first delivery; the objective line always shows the
   next useful step (steal, slide home, train, put sheep to work, train for Light/Heavy, climb to the next god), with a
   guide arrow to it; a training meter shows the next Climb Power target while on the walker.

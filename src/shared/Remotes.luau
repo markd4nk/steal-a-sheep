@@ -42,8 +42,13 @@ local Remotes = {
 		{ Guard.OneOf(FLOCK_ACTIONS), Guard.Optional(SHEEP_ID) },
 		{ Count = 12, Window = 1 }
 	) :: Net.Request<(string, string?), (boolean, string?)>,
-	-- Three sheep into one at the Merge Shrine: (ok, message, the new sheep's id).
-	Merge = Net.Request("Merge", { Guard.Array(SHEEP_ID, 3) }, { Count = 4, Window = 1 }) :: Net.Request<({ string }), (boolean, string?, string?)>,
+	-- Three grown sheep of one family into one fresh lamb at the Merge Shrine (ShrineService): (ok, message).
+	Merge = Net.Request("Merge", { Guard.Array(SHEEP_ID, 3) }, { Count = 4, Window = 1 }) :: Net.Request<({ string }), (boolean, string?)>,
+	-- The player's merge went through: what their shrine shows (the three going in, the lamb coming out, ShrineController),
+	-- or nil once the lamb has left the altar (picked up, or gone to the pen by itself).
+	ShrineShow = Net.ToClient("ShrineShow") :: Net.ToClient<({ [string]: any }?)>,
+	-- Pick up your merged lamb from the shrine's altar.
+	ShrineCollect = Net.ToServer("ShrineCollect", {}, { Count = 3, Window = 1 }) :: Net.ToServer<()>,
 	-- The shop: the next stair walker, room for one more sheep in the pen, or a trail by id (bought, or equipped if
 	-- owned).
 	Buy = Net.Request("Buy", { Guard.OneOf(BUY_ITEMS), Guard.Optional(Guard.String(16)) }, { Count = 8, Window = 1 }) :: Net.Request<(string, string?), (boolean, string?)>,

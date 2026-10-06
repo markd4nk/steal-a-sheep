@@ -189,24 +189,65 @@ return function(t: Run.Suite)
 		end
 	)
 
-	t.Test("merging: three of a kind, the biggest size, one rank up, never less income", function()
-		local a = adult({ Id = "1", Size = 1 })
-		local b = adult({ Id = "2", Size = 3 })
-		local c = adult({ Id = "3", Size = 2 })
-		t.Expect((Economy.CanMerge({ a, b, c }))).ToBe(true)
-		local result = Economy.MergeResult({ a, b, c })
-		t.Expect(result.Size).ToBe(3)
-		t.Expect(result.Rank).ToBe(1)
-		t.Expect(Economy.IsAdult(result)).ToBe(true)
-		local inputs = Economy.AdultIncome(a) + Economy.AdultIncome(b) + Economy.AdultIncome(c)
-		t.Expect(Economy.AdultIncome(result) >= inputs).ToBe(true)
-		t.Expect((Economy.CanMerge({ a, b, adult({ Id = "4", Rarity = 2 }) }))).ToBe(false)
-		t.Expect((Economy.CanMerge({ a, b, adult({ Id = "5", Locked = true }) }))).ToBe(false)
-		t.Expect((Economy.CanMerge({ a, b, sheep({ Id = "6" }) }))).ToBe(false)
-		t.Expect((Economy.CanMerge({ a, a, b }))).ToBe(false)
-		local top = { adult({ Id = "7", Rank = 2 }), adult({ Id = "8", Rank = 2 }), adult({ Id = "9", Rank = 2 }) }
-		t.Expect((Economy.CanMerge(top))).ToBe(false)
-	end)
+	t.Test(
+		"the Merge Shrine: three grown sheep of one family in, one fresh lamb out, rolled with their luck",
+		function()
+			local a = adult({ Id = "1", Size = 1 })
+			local b = adult({ Id = "2", Size = 3, Rarity = 2 })
+			local c = adult({ Id = "3", Size = 2 })
+			t.Expect((Economy.CanShrine({ a, b, c }))).ToBe(true)
+			t.Expect((Economy.CanShrine({ a, b }))).ToBe(false)
+			t.Expect((Economy.CanShrine({ a, a, b }))).ToBe(false)
+			t.Expect((Economy.CanShrine({ a, b, adult({ Id = "4", Locked = true }) }))).ToBe(false)
+			t.Expect((Economy.CanShrine({ a, b, sheep({ Id = "5" }) }))).ToBe(false)
+			t.Expect((Economy.CanShrine({ a, b, adult({ Id = "6", Family = "Grape" }) }))).ToBe(false)
+			-- Different sizes and fleeces may go in together.
+			t.Expect((Economy.CanShrine({ a, b, adult({ Id = "7", Rarity = 3 }) }))).ToBe(true)
+
+			local standard = { a, adult({ Id = "8" }), adult({ Id = "9" }) }
+			local titans =
+				{ adult({ Id = "10", Size = 4 }), adult({ Id = "11", Size = 4 }), adult({ Id = "12", Size = 4 }) }
+			t.Expect(near(Economy.ShrineLuck(standard), Economy.ShrineBaseLuck)).ToBe(true)
+			t.Expect(near(Economy.ShrineLuck(titans), 1)).ToBe(true)
+			t.Expect(Economy.ShrineLuck({ a, b, c }) > Economy.ShrineLuck(standard)).ToBe(true)
+			t.Expect(Economy.ShrinePrice("Meadow")).ToBe(Economy.ShrinePriceSeconds * Economy.BaseIncome(1))
+
+			-- The odds the menu shows add up, Titan only through the shrine's luck, likelier with bigger sheep in.
+			for _, luck in { 0, Economy.ShrineBaseLuck, 1 } do
+				local total = 0
+				for _, chance in Economy.LuckySizeOdds(luck) do
+					total += chance
+				end
+				t.Expect(math.abs(total - 100) < 1e-6).ToBe(true)
+			end
+			t.Expect(Economy.LuckySizeOdds(0)[4]).ToBe(0)
+			local base, best = Economy.LuckySizeOdds(Economy.ShrineBaseLuck), Economy.LuckySizeOdds(1)
+			t.Expect(base[4] > 0 and base[4] < 1).ToBe(true)
+			t.Expect(best[4] > base[4]).ToBe(true)
+			t.Expect(best[1] < base[1]).ToBe(true)
+			local plain, royal =
+				Economy.ShrineFleeceOdds(standard), Economy.ShrineFleeceOdds({
+					adult({ Id = "13", Rarity = 3 }),
+					adult({ Id = "14", Rarity = 3 }),
+					adult({ Id = "15", Rarity = 3 }),
+				})
+			t.Expect(plain[3]).ToBe(Economy.ShrineFleece.Plain[3])
+			t.Expect(royal[3]).ToBe(Economy.ShrineFleece.Royal[3])
+
+			-- The roll: a fleece, a weight of at least 1 and a size in range; heavier on average than a wild lamb's.
+			local random = Random.new(7)
+			local shrine, wild = 0, 0
+			for _ = 1, 4000 do
+				local rarity, weight, size = Economy.ShrineRoll(random, standard)
+				t.Expect(rarity >= 1 and rarity <= 3).ToBe(true)
+				t.Expect(weight >= 1).ToBe(true)
+				t.Expect(size >= 1 and size <= #Economy.Sizes).ToBe(true)
+				shrine += weight
+				wild += Economy.RollWeight(random)
+			end
+			t.Expect(shrine > wild).ToBe(true)
+		end
+	)
 
 	t.Test("selling pays 15 seconds of current income", function()
 		t.Expect(Economy.SellValue(adult({ Size = 2 }))).ToBe(45)

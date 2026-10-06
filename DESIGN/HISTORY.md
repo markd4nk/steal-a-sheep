@@ -6,6 +6,29 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **The Merge Shrine: the Laurel Ring, a gamble like Steal an Egg's Fuse Machine (2026-10-05)**. Branch
+  t3code/research-sheep-merge, not merged (the user's call: no merging into main unless asked).
+  - *How it works*: `ShrineService` builds the Laurel Ring (`ShrineService/Model`) where the Mutation Machine stood
+    (`GameConfig.Shrine.At`) and runs the merge: `FlockService.ShrineMerge` checks three grown, unlocked sheep of one
+    family and the price (`Economy.ShrinePrice`), takes them and the cash, and makes one lamb from `Economy.ShrineRoll`
+    (fleece from `ShrineFleeceOdds`, weight from the Climbing session's `RollWeight` with `ShrineLuck`, size from
+    `RollSize`), saved at once with `Shrine = true` (out of the pen, can't be equipped or sold). Its owner's client
+    plays the merge (`ShrineController/Show`, the approved mock-up's beats) and leaves the lamb on the altar with a
+    Pick up prompt; `Remotes.ShrineCollect` puts it over their head (`WildService.CarryLamb`, no god), and main's put
+    down delivers it (`FlockService.ShrineArrive`, at the spot). Return, dying, leaving, or 30 s on the altar send it to
+    the pen. The Merge menu (rewritten) is the camera on the shrine with no backdrop, the odds panel
+    (`Economy.LuckySizeOdds`, the real roll's spread), the shop's rows and a big Merge button; picks stand on the
+    pedestals (`ShrineController:Preview`). Titan grow-ups get the biggest sound.
+  - *The user's calls*: DECISIONS.md, *The Merge Shrine is a gamble*. Steal an Egg research: three of the same species,
+    a cash fee, an egg of that species with its weight rerolled (it can come out smaller), mutations lost, rarity never
+    changes; plus a separate secret shrine for two-pet recipes.
+  - *Checked*: check.ps1; 56 tests (a new shrine test: rules, luck, odds summing to 100, the roll). Playtested in my
+    own Studio copy, before and after rebasing onto main's free-roaming pens: the menu, picks on the pedestals, the
+    merge end to end (cash and the three taken, the lamb in the flock), the merge show recorded, pick up and carry
+    (weight on the carry attribute), put down in the pen (the lamb hops in and grazes), the Return button, the 30 s
+    auto send home, and the refusals (too far, mixed families, a lamb in, two, the same twice, a second merge while
+    a lamb waits, rate limit). Not checked: two players, leaving with a lamb waiting, touch and gamepad, a Titan.
+
 - **Stair walker: a StairMaster outside the pen (2026-10-05)**. After the study below, the user: the first five looks
   are good, stick with five for now; the level floats over the machine; place it outside the pen, very close, like
   Steal an Egg's treadmill; an upgrade sign beside it to upgrade directly with cash or Robux. Earlier calls: gym at

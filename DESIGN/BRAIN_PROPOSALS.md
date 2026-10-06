@@ -101,6 +101,15 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   attachments folder) and delete the folder before committing. To film the game view without taking over the screen,
   pin the camera from a Client `execute_luau` (a RenderStepped that sets `CameraType` Scriptable and the CFrame), turn
   off the core UI, define a viewport over the 3D view, and record that with `foreground: false`." Seen 2026-10-05.
+- **S19** (`BRAIN/PATTERNS/sessions.md`, Worktrees): "To put uncommitted work on top of a newer main, a temporary WIP
+  commit and `git rebase main` work, but undo the commit with `git reset --soft HEAD~1`, never `git reset --soft
+  main`: another session can move main while you resolve the rebase, and resetting to the new main makes your tree
+  look like it reverts their commit." Seen 2026-10-05 in Steal a Sheep: main gained a merge mid-rebase, and status
+  showed the StairMaster's files as deleted until the reset was redone onto the commit the rebase used.
+- **S20** (`BRAIN/PATTERNS/sessions.md`, Tools on Windows): "Python's `open(path, 'w')` on Windows writes CRLF line
+  endings, so a script that edits a Luau or Markdown file turns every line CRLF. Open files for writing with
+  `newline='\n'`, or strip `\r` afterwards." Seen 2026-10-05 in Steal a Sheep: four edited services came back all
+  CRLF.
 
 ## Done
 
