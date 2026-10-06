@@ -80,7 +80,8 @@ confirmed or reversed it.
   off.
 - **Pulling back stops a slide dead; no auto-jump up the mountain (the user, 2026-10-06)**: "if they're sliding down,
   all they should be able to do is just move the other direction and just instantly stop" (momentum made it
-  impossible to break out); running up "should just be like they're running normally up", not hopping.
+  impossible to break out); running up "should just be like they're running normally up", not hopping. Pulling back
+  stops a thief carrying a lamb too, even mid-chase (the user: "leave it as is").
 - **Only ramps are solid on the descent (the user, 2026-10-06)**: "make the obstacles not have any sort of collision
   ... only the things that function as ramps should ... have collision", because dodging at a slide's speed is too
   hard; the mounds of the earlier levels that you can jump off, jump over or use for speed are the kind to keep.
