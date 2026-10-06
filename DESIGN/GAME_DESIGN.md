@@ -95,8 +95,8 @@ Each god has six sheep families (below); the table's is the god's own, their Com
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling and
-the free gift, and buys stair walker levels, pen space and trails. Robux buys from the store below.
+Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling, the
+free gift and the daily gifts, and buys stair walker levels, pen space and trails. Robux buys from the store below.
 
 ## The Robux store (the user, 2026-10-05)
 A STORE button on the HUD opens one page that scrolls, its section tabs outside the window on the right:
@@ -113,6 +113,19 @@ Each Roblox friend in your server adds +20% to your flock's cash income while th
 most); not offline earnings, not the leaderboards. A tile under the menu pictures shows it: two friends and "+40%",
 or, with no friends here, the invite picture and INVITE. Tapping it opens Roblox's invite. When a friend joins:
 "Sam joined: friend boost +20%"; the HUD's cash rate includes the boost.
+
+## Daily gifts (the user, 2026-10-05)
+Come back each day for a better gift; Day 7 is a super rare sheep found nowhere else, the **Pegasus Sheep**. Then the
+same week starts again (the user: "just this week for now"; later weeks are still to design). A missed day waits
+where it was. The next gift opens 20 hours after a claim.
+- Days 1-6: cash (3, 10 and 30 minutes of the pen's income), Climbing (1 and 3 minutes of the stair walker), and on
+  Day 4 a Rare lamb from the highest god the player has stolen from. Each is at least a small floor for new players.
+- **The Pegasus Sheep**: white and fluffy, big feathered wings tipped in gold, a glowing halo and gold hooves (the
+  user's pick: the third look in the mock-up). It arrives as a lamb with lucky size odds and earns as a sheep one god
+  above the highest stolen from, as much as a Royal sheep of that god. It can't go in the Merge Shrine.
+- The menu, layout B (the user's pick): Days 1-6 as cards, Day 7 big beside Claim; claimed days dark with a tick,
+  today's gold, the countdown on the button once claimed. It opens by itself once a session while a gift waits; the
+  HUD's DAILY (the golden calendar, under GIFT) opens it any time and shows the countdown once claimed.
 
 ## Stair walker (the user, 2026-10-05)
 A real StairMaster just outside each pen, beside the gate, like Steal an Egg's treadmill. Walk into it and you snap on

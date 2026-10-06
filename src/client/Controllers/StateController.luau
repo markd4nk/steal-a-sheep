@@ -2,8 +2,8 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Economy = require(ReplicatedStorage.Utils.Economy)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
-local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Signal = require(ReplicatedStorage.Packages.Signal)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -83,14 +83,8 @@ local ORDERS: { [string]: (a: SheepView, b: SheepView) -> boolean? } = {
 		return if a.Income ~= b.Income then a.Income > b.Income else nil
 	end,
 	Family = function(a, b)
-		-- The store's sheep have no tier: they sort after Zeus's.
-		local tierA, tierB = Olympus.ByFamily[a.Family], Olympus.ByFamily[b.Family]
-		local numberA = if tierA then tierA.Tier else Olympus.Count + 1
-		local numberB = if tierB then tierB.Tier else Olympus.Count + 1
-		if numberA ~= numberB then
-			return numberA < numberB
-		end
-		return nil
+		local orderA, orderB = Economy.FamilyOrder(a.Family), Economy.FamilyOrder(b.Family)
+		return if orderA ~= orderB then orderA < orderB else nil
 	end,
 	Size = function(a, b)
 		return if a.Size ~= b.Size then a.Size > b.Size else nil

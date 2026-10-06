@@ -4,7 +4,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Economy = require(ReplicatedStorage.Utils.Economy)
 local Format = require(ReplicatedStorage.Utils.Format)
-local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
 local Theme = require(ReplicatedStorage.Config.Theme)
 local Trove = require(ReplicatedStorage.Packages.Trove)
@@ -143,7 +142,7 @@ end
 
 -- A family's name without "Sheep" ("Meadow"), for a card.
 local function shortName(family: string): string
-	return if Olympus.ByFamily[family] then (string.gsub(Economy.FamilyName(family), " Sheep$", "")) else family
+	return (string.gsub(Economy.FamilyName(family), " Sheep$", ""))
 end
 
 function SellStall.new(context: Types.Context, gui: ScreenGui): Types.Screen

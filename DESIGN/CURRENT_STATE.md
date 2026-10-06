@@ -55,11 +55,15 @@ lamb.
   `art/store/make_store_art.py`. No products or passes exist on Roblox yet: Studio grants them with no dialog.
 - **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
   `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
+- **Daily gifts** (2026-10-05, merged into main): a week of gifts, the Pegasus Sheep on Day 7
+  (`DailyService`, `Economy.DailyWeek`/`Specials`, `Screens/Daily`, the HUD's DAILY; the Pegasus's wings, halo and
+  hooves are `SheepService/Extras` "Pegasus"). GAME_DESIGN.md, *Daily gifts*. The HUD's left column wraps into a
+  second column on short screens.
 
 - **Server**: `DataService`, `PurchaseService` (grants by Config/Store key), `StoreService`, `SheepService`, `PlotService`, `FlockService`,
   `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
-  `GiftService`, `ShrineService`, `DebugService` (Studio only).
-- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Store,
+  `GiftService`, `DailyService`, `ShrineService`, `DebugService` (Studio only).
+- **Client**: `StateController`, `SoundController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Daily, Store,
   Popup, Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`,
   `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
@@ -89,6 +93,8 @@ lamb.
 - Nothing from the Sell Stall session (merged into main 2026-10-05, the user's go-ahead). DECISIONS.md's *To review*
   lists its calls; a Studio opened before the merge still shows the Flock menu's old Sell until it's rebuilt.
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
+- Nothing from the daily gifts session (merged into main 2026-10-05 on the user's word). The published place (the
+  main Studio, Team Create) still holds main's scripts from before it until main is synced there and published.
 - **Six sheep a tier and the new Sheepdex** (merged 2026-10-05): each god's six families (`Config/Herds`), rolled for
   every wild lamb; fleeces Plain / Shiny / Royal; Sheepdex rewards claimed in the new Sheepdex (`SheepdexService`,
   save schema 3) with a herd gift for all six. HISTORY.md has the details. Zeus's Legendary is the Golden Ram (the
@@ -96,6 +102,11 @@ lamb.
   tiers to match the lineup the user OK'd.
 
 ## Not verified
+
+- **Daily gifts over real days**: the 20-hour wait and the claims were tried with the debug day commands, not by
+  waiting; keeping the day across a real rejoin is untested (the mock store). The HUD's wrapped column was seen on
+  Studio's small phone (three columns of two), not on a tablet or a 390-point phone; the menu wasn't tried on PC
+  after the compact layout, nor with a gamepad.
 
 - **Real Robux purchases**: no product or pass exists yet, so nothing went through Roblox's dialog or ProcessReceipt;
   the store's buttons were tried with Studio's no-dialog grant. Pass ownership from Roblox, receipts while away and

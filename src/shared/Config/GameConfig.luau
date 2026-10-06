@@ -44,7 +44,8 @@ export type Breed = {
 	BaaPitch: number,
 	SpecialFX: SpecialFX?,
 	Mutation: string?, -- a fleece paint laid over the wool (Silver, Rainbow, Gold)
-	Extra: string?, -- a primitive accessory SheepService adds (Leaf, Helmet, Wreath, Wings, BackWings, Blindfold, Flame)
+	-- A primitive accessory SheepService adds (Leaf, Helmet, Wreath, Wings, BackWings, Blindfold, Flame, Pegasus).
+	Extra: string?,
 	Extras: { Herds.Extra }?, -- more of them, each in an optional colour (SheepService/Extras)
 }
 
@@ -97,7 +98,8 @@ end
 
 -- The thirty families' looks, keyed by family id (Config/Olympus), then the store's two. Most are Shear a Sheep breeds as they are, in its
 -- colours; the Grape, War, Laurel, Cupid, Justice, Victory and Hearth sheep are its plain breeds recoloured, with a
--- primitive extra, and the Prism Sheep a plain one in rainbow puffs.
+-- primitive extra, and the Prism Sheep a plain one in rainbow puffs. Last, the families that are no god's
+-- (Economy.Specials): the daily gifts' Pegasus Sheep.
 local breeds: { [string]: Breed } = {
 	Meadow = look("Meadow", "Meadow Sheep", {
 		Build = "ScarecrowSheep",
@@ -291,6 +293,16 @@ local breeds: { [string]: Breed } = {
 		LegColor = rgb(72, 76, 104),
 		EarInnerColor = rgb(200, 210, 250),
 		SpecialFX = "StormSparks",
+	}),
+	-- Day 7 of the daily gifts: white and fluffy with big feathered wings tipped in gold, a halo and gold hooves
+	-- (Extras' "Pegasus"), the look the user picked from DESIGN/ui/mockups/daily-gifts.html.
+	Pegasus = look("Pegasus", "Pegasus Sheep", {
+		WoolColor = rgb(250, 250, 246),
+		WoolSize = 1.08,
+		FaceColor = rgb(250, 236, 214),
+		LegColor = rgb(250, 236, 214),
+		SpecialFX = "Sparkles",
+		Extra = "Pegasus",
 	}),
 	-- The Robux store's two sheep (Economy.RobuxSheep), in Shear a Sheep's colours for its Golden Fleece and Time Sheep.
 	GoldenFleece = look("GoldenFleece", "Golden Fleece", {
@@ -562,6 +574,11 @@ local GameConfig = {
 	Gift = {
 		AutoOpenSeconds = 30,
 		FavoriteTimeout = 60, -- seconds to wait for Roblox's favorite prompt to answer
+	},
+	-- The daily gifts' menu opens by itself once a session, this long after a gift is waiting and the player is free
+	-- (after the free gift's, so the two don't meet).
+	Daily = {
+		AutoOpenSeconds = 45,
 	},
 }
 
