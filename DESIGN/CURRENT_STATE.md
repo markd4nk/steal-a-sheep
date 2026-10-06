@@ -61,10 +61,10 @@ lamb.
 - **Gods in rank order** (branch `t3code/order-olympian-gods`, not merged): `Config/Olympus` reordered, new High
   Olympus stretches for the eleven Olympians who moved up. Main merged in (Climbing, pens, leaderboards, dropped
   lambs). Waiting for the user's OK on the new stretches before merging.
-- **Real god models**: whole, fully clothed gods (the user's pick after Roblox removed two bare limb meshes). Zeus
-  candidate (the user asked for C's bulk with two arms): asset 121399505965458, tunic, red sash and cape, big arms,
-  5,875 triangles, one 1024 texture, a neon-block bolt welded in his raised right fist; shown in a playtest in place of
-  the block Zeus. Two other bulky takes came out half bare-chested. Waiting for the user's OK.
+- **Real god models**: whole, fully clothed gods (the user's rule after Roblox removed two bare limb meshes; no bare
+  chests). Zeus candidate (the user: bulky take 2's size, fully clothed): asset 135867199676206, short-sleeved tunic
+  over chest and shoulders, red hem, angry, two arms, 5,954 triangles, one 1024 texture, a neon-block bolt welded in
+  his raised right fist; shown in a playtest in place of the block Zeus. Waiting for the user's OK.
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
   (`Faces.MunchA`/`MunchB`; `art/faces/chew_faces.py` draws them).
 - Nothing from the Climbing session. DECISIONS.md's *To review* lists its calls.
