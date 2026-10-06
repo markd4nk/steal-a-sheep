@@ -6,7 +6,8 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
-- **Less hand-holding after onboarding, and a faster stair walker (2026-10-06, branch `t3code/b39d69ab`)**. The user: after the
+- **Less hand-holding after onboarding, and a faster stair walker (2026-10-06, branch `t3code/remove-gameplay-hints`,
+  merged into main with the onboarding trail on the user's word)**. The user: after the
   onboarding the game shouldn't tell players what to do ("no is in reach"), and asked for every other part of the UI
   like that. Done alongside the onboarding session (`t3code/simplify-onboarding-guidance`), which owns `Hud.luau`.
   - *Cut*: FlockService's "<God>'s <Area> is in reach!" notice when Climbing passed a sign (its per-player `ClimbTier`
@@ -90,6 +91,39 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     bootstraps ready, 86 tests, 30 gods, "data will be saved", a clean console); File > Save to Roblox, then Publish
     to Roblox at 17:34 UTC: "Place published. Editors can now play this place in Roblox", v20. Audience still Private;
     no schema or remote changes, so no servers to restart.
+
+- **The onboarding trail (2026-10-06, branch `t3code/simplify-onboarding-guidance`, merged into main with the
+  less-hand-holding branch on the user's word)**. The user: too much said "steal this
+  person's sheep" and pointed at the sheep; instead chevrons on the floor "just like in Shear a Sheep" to "the place
+  where the player has to actually go", only for the first lamb, "very simple ... I don't want to hand-hold them the
+  entire time", and look at how Steal an Egg does it.
+  - *Steal an Egg* (frames of two fresh-account first plays, KreekCraft and Bloxtian PH, saved as `sae-*.jpg` in T3
+    Code's attachments): a short line per step ("Steal an Egg!", "RUN!!", "Go to your Pen!", "Hatch the Egg!") and a
+    red chevron trail to one egg just past the safe zone, flipping to point home on the grab, into the pen; on the
+    second steal nothing at all. The treadmill gets one line much later, when it's bought at $1K.
+  - *Built*: `UIController/GuidePath`, Shear a Sheep's `Guide/Path` (its solid white chevrons with a black edge, 17
+    at most, 3.4 studs apart at 13 studs/s, Reduce motion keeps them still) with two changes for this map. The way
+    always comes from PathfindingService, because the plots' fences, the hay and the leaderboards can't be seen by
+    rays (`CanQuery` off) and Shear a Sheep only asked for a way round when a ray hit something. The ground is found
+    near `Mountain.RampY`, not the goal's height, since the trail climbs the ramp. `Screens/Hud`'s `goal()` gives the
+    trail its target: the front of Pan's meadow until the player is in it, their pen from the mountain's foot while
+    carrying the first lamb (none on the slope), then the walker's `Zone` until `Tutorial` 2. The hint line, the
+    floating guide arrow with its distance, Train to climb and Put your sheep to work (with the FLOCK glow) are
+    removed, and so is the walker's training meter (Mark, via the less-hand-holding session t3code-b39d69ab, which
+    handles the hints after the onboarding).
+  - *Then the user*: "remove the thing that says wild lamb return. That is never necessary". The carried lamb's card at
+    the bottom (picture, name, Return) is gone, and so is `Remotes.ReturnSheep` with WildService's "The lamb ran back"
+    notice: nothing gives up a run now (a catch, a fall, a reset or leaving still ends one). Checked in a second
+    playtest of the cloud place (the four changed scripts swapped in, then main's put back): a debug steal carried the
+    lamb with no card or Return on screen, the chase banner as before, 84 tests, a clean console.
+  - *Checked*: `check.ps1`. A playtest of the cloud place, with the two scripts swapped in from a rojo-built model and
+    put back after: a blank save (`DebugBlankProfile`) on Plot1, with Studio's phone emulation on. Both bootstraps were
+    ready and 84 tests passed, with nothing from our code in the console. The player was walked by script along a
+    path. The trail went out through the gate and round the stalls; it ended by the tutorial lamb and showed no words
+    or arrow. A steal followed by standing still was punched by Pan, as before. A debug steal then slid to the foot,
+    where the trail turned to the pen and disappeared inside the fence. Put down gave `Tutorial` 1, the menus showed,
+    and a trail led to the walker. Stepping on gave `Tutorial` 2 and the trail was gone. Pictures are
+    `onboarding-*.jpg` in T3 Code's attachments.
 
 - **Version 8: the overnight work merged and shipped, private (2026-10-06)**. The user, on the morning summary: "Yes,
   it looks good. You can merge it"; the free gift's favorite gate stays ("allowed because some games do it"); no game

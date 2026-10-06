@@ -293,6 +293,12 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   History row, and **Publish to Roblox** publishes that autosaved version, so Version History and Server management
   show the autosave's time, not the publish's. Check that every edit came before that time." Seen 2026-10-06 in Steal
   a Sheep: version 8 was autosaved at 08:42 and published at 08:51.
+- **S48** (`BRAIN/GOTCHAS.md`): "A part with `CanQuery` off still blocks characters and PathfindingService if it's
+  `CanCollide`, but raycasts, `Blockcast` and `GetPartBoundsInBox` don't see it. Imported maps often switch
+  `CanQuery` off on fences, hay and props, so 'is the way clear?' checks with rays pass straight through a fence the
+  player can't. To find a walkable way, ask PathfindingService rather than testing with rays first." Seen 2026-10-06
+  porting Shear a Sheep's guide trail to Steal a Sheep. 305 of the plots' collidable fence parts had `CanQuery` off;
+  `ComputeAsync` still routed out through the gate (30-300 ms for about 250 studs, in Edit as well).
 
 ## Done
 

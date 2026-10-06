@@ -18,30 +18,27 @@ local Remotes = require(ReplicatedStorage.Remotes)
 local Theme = require(ReplicatedStorage.Config.Theme)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 local UIKit = require(ReplicatedStorage.Utils.UIKit)
+local GuidePath = require(script.Parent.Parent.GuidePath)
 local Motion = require(script.Parent.Parent.Motion)
 local Scale = require(script.Parent.Parent.Scale)
-local SheepIcon = require(script.Parent.Parent.SheepIcon)
 local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
--- The HUD in Shear a Sheep's Ranch Studs look: coins (with the flock's income) and Climbing at the top right, a hint
--- under the top bar only when one is needed (with a guide arrow for the first lamb and the first training), the menu
+-- The HUD in Shear a Sheep's Ranch Studs look: coins (with the flock's income) and Climbing at the top right, the menu
 -- pictures down the left (shown after the first delivery), notices, the friend boost's tile under them (tap to invite),
--- the chase banner, the card of the lamb being carried (with Return), and the stair walker's meter while training.
+-- the chase banner, and the onboarding's trail of chevrons on the ground. No hints in words and no card for the lamb
+-- being carried: players work the rest out (the user, 2026-10-06).
 local Hud = {}
 
 local PICTURE_SIZE = 66
 local TILES_BOTTOM = 70 -- the menu pictures stop this far above the bottom, clear of a phone's thumbstick
-local WORK_HINT_SECONDS = 12 -- "Put your sheep to work" shows this long after room opens up in the pen
-local CRAWL_SHARE = 0.5 -- climbing slower than this share of normal speed: "Train to climb"
-local MIDDLE_HALF_WIDTH = 160 -- half the widest hint or notice, in points: what must clear the menu pictures
+local MIDDLE_HALF_WIDTH = 160 -- half the widest notice, in points: what must clear the menu pictures
 -- Pixels Roblox's player list (the leaderstats: Income, Climbing) takes at the top right, with a margin. It opens there
 -- by default over the counters on a computer or a tablet; on a phone (a touch screen whose short side is under
 -- SMALL_TOUCH pixels) it starts closed.
 local PLAYER_LIST_WIDTH = 330
 local SMALL_TOUCH = 500
 local Color = Theme.Color
-local TextSize = Theme.TextSize
 
 local function pill(
 	parent: Instance,
@@ -106,20 +103,6 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	notice.AnchorPoint = Vector2.new(0.5, 0)
 	notice.Position = UDim2.new(0.5, 0, 0, 120)
 
-	-- The hint (Shear a Sheep's guide line): one short line, only while something needs doing.
-	local objective = UIKit.Frame(root, "Objective", UDim2.fromOffset(0, 0))
-	objective.AnchorPoint = Vector2.new(0.5, 0)
-	objective.Position = UDim2.new(0.5, 0, 0, 60)
-	objective.AutomaticSize = Enum.AutomaticSize.XY
-	objective.Visible = false
-	UIKit.List(objective, false, 2, Enum.HorizontalAlignment.Center)
-	local size = TextSize.Title + 4
-	UIKit.Text(objective, "TitleLabel", "", size, Color.Snow, UDim2.fromOffset(0, size + 6), {
-		Stroke = Color.Line,
-		Auto = Enum.AutomaticSize.X,
-		Order = 1,
-	})
-
 	-- The menu pictures down the left edge, as far as the bottom margin: on a short screen (a phone held sideways) the
 	-- rest wrap into a second column beside the first.
 	local tiles = UIKit.Frame(root, "Tiles", UDim2.new(0, PICTURE_SIZE + 12, 1, -(70 + TILES_BOTTOM)))
@@ -172,54 +155,9 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	banner.Position = UDim2.new(0.5, 0, 0, 150)
 	banner.ZIndex = 5
 
-	local arrow = UIKit.Arrow(root, "GuideArrow", "Guide")
-	arrow.ZIndex = 4
-
-	-- The lamb being carried, at the bottom: its token, name and burden, and Return.
-	local carry = UIKit.Frame(root, "CarryCard", UDim2.fromOffset(0, 64), Theme.Fleece.Tile.Base)
-	carry.AnchorPoint = Vector2.new(0.5, 1)
-	carry.Position = UDim2.new(0.5, 0, 1, -18)
-	carry.AutomaticSize = Enum.AutomaticSize.X
-	carry.Visible = false
-	UIKit.Corner(carry, Theme.Fleece.CardRadius)
-	UIKit.Surface(carry, Color.Line, 4, Color.Line, Theme.Line.Normal)
-	UIKit.Padding(carry, 8, 10, 0, 0)
-	local carryList = UIKit.List(carry, true, 10)
-	carryList.VerticalAlignment = Enum.VerticalAlignment.Center
-	UIKit.Token(carry, 52, "Token").LayoutOrder = 1
-	local words = UIKit.Frame(carry, "Words", UDim2.fromOffset(0, 52))
-	words.LayoutOrder = 2
-	words.AutomaticSize = Enum.AutomaticSize.X
-	UIKit.List(words, false, 0)
-	UIKit.Text(words, "NameLabel", "", 22, Color.Snow, UDim2.fromOffset(0, 28), {
-		Stroke = Color.Line,
-		Auto = Enum.AutomaticSize.X,
-		AlignX = Enum.TextXAlignment.Left,
-		Order = 1,
-	})
-	local giveUp = UIKit.Button(carry, "ReturnButton", "Soft", 110, Theme.ButtonHeight.Standard, "Return")
-	giveUp.LayoutOrder = 3
-
-	-- The stair walker's meter, while training: a bar to the next god's sign (the rate is on the Climbing counter).
-	local meter = UIKit.Frame(root, "TrainMeter", UDim2.fromOffset(300, 0))
-	meter.AnchorPoint = Vector2.new(0.5, 1)
-	meter.Position = UDim2.new(0.5, 0, 1, -24)
-	meter.AutomaticSize = Enum.AutomaticSize.Y
-	meter.Visible = false
-	UIKit.List(meter, false, 4, Enum.HorizontalAlignment.Center)
-	UIKit.Bar(meter, "Bar", UDim2.fromOffset(260, 12)).LayoutOrder = 2
-	UIKit.Text(meter, "GoalLabel", "", 16, Color.Snow, UDim2.fromOffset(0, 20), {
-		Font = Theme.Font.TextHeavy,
-		Stroke = Color.Line,
-		Auto = Enum.AutomaticSize.X,
-		Order = 3,
-	})
-
 	gui.Parent = playerGui
 	return gui
 end
-
-type Goal = { Title: string?, Target: Vector3? }
 
 function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local trove = Trove.new()
@@ -233,28 +171,15 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local climbPill = root:FindFirstChild("ClimbPill", true) :: Frame
 	local trainLabel = climbPill:FindFirstChild("RateLabel", true) :: TextLabel
 	local noticeLabel = root:FindFirstChild("NoticeLabel") :: TextLabel
-	local objective = root:FindFirstChild("Objective") :: Frame
-	local objectiveTitle = objective:FindFirstChild("TitleLabel") :: TextLabel
 	local tiles = root:FindFirstChild("Tiles") :: Frame
 	local storeButton = root:FindFirstChild("StoreButton") :: TextButton
 	local banner = root:FindFirstChild("Banner") :: TextLabel
-	local arrow = root:FindFirstChild("GuideArrow") :: Frame
-	local arrowLabel = arrow:FindFirstChild("Label") :: TextLabel
-	local pointer = arrow:FindFirstChild("Pointer", true) :: GuiObject
-	local carryCard = root:FindFirstChild("CarryCard") :: Frame
-	local carryToken = carryCard:FindFirstChild("Token") :: Frame
-	local carryName = carryCard:FindFirstChild("NameLabel", true) :: TextLabel
-	local returnButton = carryCard:FindFirstChild("ReturnButton") :: TextButton
-	local meter = root:FindFirstChild("TrainMeter") :: Frame
-	local meterBar = meter:FindFirstChild("Bar") :: Frame
-	local goalLabel = meter:FindFirstChild("GoalLabel") :: TextLabel
 	local stateController = context.Controllers.StateController
 	local sound = context.Controllers.SoundController
 
-	-- The hint, notices and chase banner stand in the middle of the screen, or, where the menu pictures wrap into a wide
-	-- block (a phone held sideways), in the middle of the room right of them, so nothing covers a picture.
+	-- Notices and the chase banner stand in the middle of the screen, or, where the menu pictures wrap into a wide block
+	-- (a phone held sideways), in the middle of the room right of them, so nothing covers a picture.
 	local below = 60
-	local tilesRight = 0 -- points from the left: where the menu pictures end
 	local noticeHome = noticeLabel.Position -- where a notice rests, from placeMiddle
 	local function placeMiddle()
 		local scale = Scale.Of(root)
@@ -268,12 +193,10 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 				end
 			end
 		end
-		tilesRight = left
 		local middle = width / 2
 		if left > middle - MIDDLE_HALF_WIDTH then
 			middle = (left + width) / 2
 		end
-		objective.Position = UDim2.new(0, middle, 0, below)
 		noticeHome = UDim2.new(0, middle, 0, below + 64)
 		if not noticeLabel.Visible then
 			noticeLabel.Position = noticeHome
@@ -396,7 +319,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	refreshCoins()
 	refreshClimb()
 
-	-- Where the guide arrow points: the player's own pad, walker, or a pasture.
+	-- One of the player's own plot pieces (the pen, the walker's entry), and the ground under its middle.
 	local function plotPiece(name: string): BasePart?
 		local index = player:GetAttribute("Plot")
 		local plots = workspace:FindFirstChild("Plots")
@@ -404,106 +327,50 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		local found = plot and plot:FindFirstChild(name, true)
 		return if found and found:IsA("BasePart") then found else nil
 	end
-	local function tutorialLamb(): Vector3?
-		local wild = workspace:FindFirstChild("WildSheep")
-		if not wild then
-			return nil
-		end
-		for _, model in wild:GetChildren() do
-			local prompt = model:FindFirstChild("StealPrompt", true)
-			if prompt and prompt:GetAttribute("OwnerId") == player.UserId and model:IsA("Model") then
-				return model:GetPivot().Position
-			end
-		end
-		return nil
+	local function floorUnder(piece: BasePart?): Vector3?
+		return if piece then piece.Position - Vector3.yAxis * piece.Size.Y / 2 else nil
 	end
-	local function pasture(tier: number): Vector3
-		local spots = Mountain.PastureSpots(tier)
-		local spot = spots[1]
-		return Vector3.new(spot.X, Mountain.RampY(spot.X) + 3, Olympus.LaneMiddleZ)
-	end
+	-- The front of the first god's meadow, mid-lane: the place the first trail leads to, not a lamb (the user,
+	-- 2026-10-06). The tutorial lamb waits just short of it; the meadow's wild lambs are past it.
+	local firstTier = Olympus.Tiers[1]
+	local meadowX = firstTier.XStart + (firstTier.XEnd - firstTier.XStart) * Olympus.PastureFrom
+	local meadow = Vector3.new(meadowX, Mountain.RampY(meadowX), Olympus.LaneMiddleZ)
 
-	-- "Put your sheep to work" waits for room to open up in the pen (more pen space, sheep merged away) while sheep are
-	-- stored, not for a sheep the player stored on purpose.
-	local workUntil = 0
-	local lastFree, lastStored = -1, -1
-	local function watchPen(data: { [string]: any })
-		local stored, equipped = 0, 0
-		for _, sheep in data.Sheep do
-			if sheep.Slot > 0 then
-				equipped += 1
-			elseif not sheep.AtShrine then
-				stored += 1
-			end
-		end
-		local free = math.max(0, (data.PenSlots or 0) - equipped)
-		if lastFree >= 0 and free > lastFree and stored > 0 and stored <= lastStored then
-			workUntil = os.clock() + WORK_HINT_SECONDS
-		end
-		if free == 0 or stored == 0 then
-			workUntil = 0
-		end
-		lastFree, lastStored = free, stored
-	end
-
-	-- Slowed to a crawl on a slope above the player's Climbing.
-	local function crawling(here: Vector3): boolean
-		local climb = player:GetAttribute("ClimbPower")
-		local power = if type(climb) == "number" then climb else 0
-		return Mountain.IsOnRamp(here)
-			and Mountain.TierAt(here.X) >= 2
-			and Mountain.SpeedAt(here.X, power, 1) < GameConfig.Movement.WalkSpeed * CRAWL_SHARE
-	end
-
-	-- The hint, only when one is needed: the first lamb (where it is, then home with it; the Put down prompt takes over
-	-- in the pen), the stair walker after it, the pen when room opens up, and a slope that's too steep.
-	local function goal(): Goal?
+	-- Where the trail leads, only until the first lamb is home and the stair walker tried once (the user, 2026-10-06:
+	-- simple, no hand-holding): from the pen to the first meadow; with the lamb, from the mountain's foot into the pen
+	-- (none on the slope, where the slide takes the player down; the Put down prompt takes over in the pen); then out to
+	-- the stair walker.
+	local function goal(): Vector3?
 		local data = stateController:Get()
-		if data.Sheep == nil then
+		local stage = data.Tutorial
+		if data.Sheep == nil or type(stage) ~= "number" or stage >= 2 then
 			return nil
 		end
 		local character = player.Character
 		local here = character and character:GetPivot().Position
-		local carrying = player:GetAttribute("Carrying") == true
-		if data.Tutorial == 0 then
-			if not carrying then
-				return { Title = `Steal {Olympus.Tiers[1].God}'s lamb`, Target = tutorialLamb() or pasture(1) }
-			end
-			local pen = plotPiece("Pen")
-			if not pen or (here and PenArea.Contains(pen, here, 0)) then
-				return nil
-			end
-			return {
-				Title = if here and Mountain.IsOnRamp(here) then "Slide home!" else nil,
-				Target = pen.Position,
-			}
-		end
-		if carrying then
+		if not here then
 			return nil
 		end
-		if data.Tutorial == 1 then
-			local walker = plotPiece("Zone")
-			return { Title = "Train on your Stair Walker", Target = if walker then walker.Position else nil }
+		local carrying = player:GetAttribute("Carrying") == true
+		if stage == 0 and not carrying then
+			-- In the meadow or past it, the lambs are in view: the trail would only point back.
+			return if here.X < meadowX - 4 then meadow else nil
 		end
-		if os.clock() < workUntil then
-			return { Title = "Put your sheep to work" }
+		if stage == 0 then
+			local pen = plotPiece("Pen")
+			if not pen or Mountain.IsOnRamp(here) or PenArea.Contains(pen, here, 0) then
+				return nil
+			end
+			return floorUnder(pen)
 		end
-		if here and player:GetAttribute("Training") ~= true and crawling(here) then
-			return { Title = "Train to climb" }
-		end
-		return nil
+		return if carrying then nil else floorUnder(plotPiece("Zone"))
 	end
 
-	local current: Goal? = nil
+	local current: Vector3? = nil
 	local function refreshGoal()
 		current = goal()
-		local title = current and current.Title
-		local modal = context.Controllers.UIController:IsModalOpen()
-		objective.Visible = title ~= nil and not modal
 		-- The STORE button on the right edge sits where an open menu's tabs (the store's own) stand.
-		storeButton.Visible = tiles.Visible and not modal
-		objectiveTitle.Text = title or ""
-		Motion.SetGlow(Motion.FindGlow(tiles:FindFirstChild("FlockButton") :: GuiObject), os.clock() < workUntil)
+		storeButton.Visible = tiles.Visible and not context.Controllers.UIController:IsModalOpen()
 	end
 
 	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding. The gift's glows until claimed.
@@ -545,48 +412,7 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		task.defer(placeMiddle)
 	end
 
-	-- The carry card.
-	local function refreshCarry()
-		local carrying = player:GetAttribute("Carrying") == true
-		carryCard.Visible = carrying
-		if not carrying then
-			return
-		end
-		local family = player:GetAttribute("CarriedFamily")
-		local tier = player:GetAttribute("CarryTier")
-		if type(family) == "string" and type(tier) == "number" then
-			SheepIcon.Paint(carryToken, family, 1)
-			carryName.Text = string.gsub(Economy.FamilyName(family), "Sheep$", "Lamb")
-		end
-	end
-	trove:Connect(returnButton.Activated, function()
-		Remotes.ReturnSheep:Fire()
-	end)
-	for _, name in { "Carrying", "CarriedFamily" } do
-		trove:Connect(player:GetAttributeChangedSignal(name), refreshCarry)
-	end
-	refreshCarry()
-
-	-- The training meter: from the god the player has reached to the next one's sign. Lamb weight stays hidden, so it
-	-- names no sheep; past Zeus's sign there's no next god and the meter stays away.
-	local function refreshMeter()
-		local climb = player:GetAttribute("ClimbPower")
-		local power = if type(climb) == "number" then climb else 0
-		local reached = Economy.ClimbTier(power)
-		local nextTier = Olympus.Tiers[reached + 1]
-		meter.Visible = player:GetAttribute("Training") == true and nextTier ~= nil
-		if not meter.Visible or not nextTier then
-			return
-		end
-		local reach = Economy.Targets(reached)
-		Style.SetBar(meterBar, math.clamp((power - reach) / math.max(nextTier.Reach - reach, 1), 0, 1))
-		goalLabel.Text = `Next: {nextTier.God} at {Format.Short(nextTier.Reach)}`
-	end
-	trove:Connect(player:GetAttributeChangedSignal("Training"), refreshMeter)
-	trove:Connect(player:GetAttributeChangedSignal("ClimbPower"), refreshMeter)
-
-	trove:Add(stateController.Changed:Connect(function(data: { [string]: any })
-		watchPen(data)
+	trove:Add(stateController.Changed:Connect(function()
 		refreshTiles()
 		refreshGoal()
 		refreshClimb()
@@ -672,81 +498,21 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		context.Notify(message, kind, cue)
 	end))
 
-	-- The guide arrow: over its target when it's on screen, on the screen's edge pointing at it when it isn't.
-	local SCREEN_MARGIN = 70
-	local HINT_GAP = 8 -- points kept between the arrow and the hint
-	-- Where the arrow (hanging from its point, in points) would cover the hint, it hangs just under the hint instead,
-	-- pointing up: a lamb far up the mountain sits right behind the hint's words. True when it moved.
-	local function underHint(x: number, y: number, scale: number): (number, boolean)
-		if not objective.Visible then
-			return y, false
-		end
-		local topLeft = (objective.AbsolutePosition - gui.AbsolutePosition) / scale
-		local size = objective.AbsoluteSize / scale
-		local box = arrow.AbsoluteSize / scale
-		local acrossHint = x + box.X / 2 > topLeft.X - HINT_GAP and x - box.X / 2 < topLeft.X + size.X + HINT_GAP
-		local downHint = y > topLeft.Y - HINT_GAP and y - box.Y < topLeft.Y + size.Y + HINT_GAP
-		if acrossHint and downHint then
-			return topLeft.Y + size.Y + HINT_GAP + box.Y, true
-		end
-		return y, false
-	end
-	trove:Connect(RunService.RenderStepped, function()
-		local target = current and current.Target
-		local camera = workspace.CurrentCamera
-		if not target or not camera or context.Controllers.UIController:IsModalOpen() then
-			arrow.Visible = false
-			return
-		end
+	-- The trail, laid each frame from where the player stands; a menu covers the world, so it waits behind one.
+	local path = GuidePath.new(workspace, function(): Model?
+		return player.Character
+	end)
+	trove:Add(function()
+		path:Destroy()
+	end)
+	trove:Connect(RunService.PreRender, function()
+		local covered = not gui.Enabled or context.Controllers.UIController:IsModalOpen()
+		local target = if covered then nil else current
 		local character = player.Character
-		local here = character and character:GetPivot().Position
-		if here and (here - target).Magnitude < 14 then
-			arrow.Visible = false
-			return
-		end
-		arrow.Visible = true
-		arrowLabel.Text = if here then `{math.floor((here - target).Magnitude)}m` else ""
-		local scale = Scale.Of(root)
-		local point, onScreen = camera:WorldToViewportPoint(target + Vector3.new(0, 6, 0))
-		local viewport = camera.ViewportSize
-		local inset = gui.AbsolutePosition
-		if onScreen then
-			local x = (point.X - inset.X) / scale
-			local y, moved = underHint(x, (point.Y - inset.Y) / scale, scale)
-			arrow.Position = UDim2.fromOffset(x, y)
-			pointer.Rotation = if moved then 180 else 0
-			return
-		end
-		-- Behind or off to the side: along the screen's edge, in the target's direction from the middle.
-		local middle = viewport / 2
-		local direction = Vector2.new(point.X, point.Y) - middle
-		if point.Z < 0 then
-			direction = -direction
-		end
-		if direction.Magnitude < 1 then
-			direction = Vector2.new(0, 1)
-		end
-		local unit = direction.Unit
-		local reach = math.min(
-			(middle.X - SCREEN_MARGIN) / math.max(math.abs(unit.X), 1e-3),
-			(middle.Y - SCREEN_MARGIN) / math.max(math.abs(unit.Y), 1e-3)
-		)
-		local at = middle + unit * reach
-		-- Clear of the menu pictures, and on a touch screen of the thumbstick and jump button along the bottom; the
-		-- pointer still turns to the target.
-		local right = viewport.X - SCREEN_MARGIN
-		local left = math.min(inset.X + (tilesRight + 40) * scale, right)
-		local bottom = math.max(
-			if UserInputService.TouchEnabled then viewport.Y * 0.6 else viewport.Y - SCREEN_MARGIN,
-			SCREEN_MARGIN
-		)
-		at = Vector2.new(math.clamp(at.X, left, right), math.clamp(at.Y, SCREEN_MARGIN, bottom))
-		local edgeX = (at.X - inset.X) / scale
-		arrow.Position = UDim2.fromOffset(edgeX, (underHint(edgeX, (at.Y - inset.Y) / scale, scale)))
-		pointer.Rotation = math.deg(math.atan2(unit.Y, unit.X)) - 90
+		path:Show(if target and character then character:GetPivot().Position else nil, target)
 	end)
 
-	-- The objective changes with where the player is (sliding, home), so it's checked a few times a second.
+	-- Where the trail leads changes with where the player is (on the slope, home), so it's checked a few times a second.
 	task.spawn(function()
 		while gui.Parent do
 			refreshGoal()

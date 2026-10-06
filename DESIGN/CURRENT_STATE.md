@@ -108,9 +108,17 @@ lamb.
   (GAME_DESIGN.md, *Merge Shrine*).
 - **The gods** (version 8): thirty in mythological rank, Pan tier 1 to Zeus 30, each a catalog-dressed Roblox avatar
   (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load.
-- **What the HUD says** (version 8): one message per moment, hints only when needed (`Screens/Hud`, `goal()`); every
-  ProximityPrompt drawn as the menus' button for the device, press or tap (`PromptController/Look`). HISTORY.md, the
-  overnight entry.
+- **Onboarding trail and less hand-holding** (merged into main 2026-10-06 on the user's word, not published yet): Shear
+  a Sheep's floor chevrons (`UIController/GuidePath`) guide only the first lamb (to Pan's meadow, home from the
+  mountain's foot, then to the stair walker), no words, no floating arrow, no carried lamb's card or Return. After
+  onboarding nothing tells the player what to do: no hints, no "in reach", no menu tips; refusals say only the fact.
+  GAME_DESIGN.md, *Onboarding*; DECISIONS.md, *No hand-holding after onboarding*.
+- **Stair walker pops** (merged into main 2026-10-06, not published yet): steps run at the climber's training rate
+  (0.5 s to 0.1 s a step), each popping a shoe and "+N" off your head ("+1" twice a second at level 1, about ten
+  "+2.5T" at level 30); your machine's floating level hides while you climb; no training meter.
+- **What the HUD says** (version 8): one message per moment (`Screens/Hud`); every ProximityPrompt drawn as the menus'
+  button for the device, press or tap (`PromptController/Look`). HISTORY.md, the overnight entry. Since the merge above
+  the HUD gives no hints in words at all.
 - **Settings menu** (version 8; `DESIGN/ui/mockups/settings.html`): a gear in Roblox's top bar opens Music and Sound
   effects in four steps and Reduce motion (`Screens/Settings`, `SettingsService`, `Remotes.SetSetting`, `Settings` in
   the save, `SoundController` volumes).
@@ -121,10 +129,6 @@ lamb.
 
 ## In progress
 
-- **Less hand-holding** (branch `t3code/b39d69ab`, not merged): no "in reach" notice, no menu tips, refusals say only
-  the fact; "Jump to get off" only on the onboarding's first climb. The stair walker's steps run at the climber's
-  training rate (0.5 s to 0.1 s a step), each popping a "+N" off your head. The HUD's hints and training meter go with
-  the onboarding branch (`t3code/simplify-onboarding-guidance`), which owns `Hud.luau`.
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
@@ -148,6 +152,9 @@ lamb.
 
 ## Not verified
 
+- **The onboarding trail on a real phone**: seen in a Studio playtest with Studio's phone emulation, walked by script
+  (pen to meadow, the trail home, the walker); a player's own first run, a real phone's frame rate with the trail's
+  pathfinding (a route each 1.5 s) and other plots than Plot1 weren't tried.
 - **Studs on every sheep on a phone and in a live server**: seen in a Studio playtest and in Edit on all 183 families,
   not on a real device; their cost on a low-end phone wasn't measured (no extra parts, only materials).
 - **The live game itself**: version 8 was checked only in a Studio playtest of the cloud place before its publish
