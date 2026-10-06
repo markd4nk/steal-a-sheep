@@ -109,11 +109,16 @@ local function tick(dt: number)
 		if player:GetAttribute("Training") ~= training then
 			player:SetAttribute("Training", training)
 		end
-		if not training then
+		-- Every client runs this climber's steps at their rate, and their own shows it over their head.
+		local rate = if training then Economy.TrainingRate(data.WalkerLevel, data.Trail) else nil
+		if player:GetAttribute("TrainRate") ~= rate then
+			player:SetAttribute("TrainRate", rate)
+		end
+		if not training or not rate then
 			continue
 		end
 		local before = Economy.ClimbTier(data.ClimbPower)
-		data.ClimbPower += Economy.TrainingRate(data.WalkerLevel, data.Trail) * dt
+		data.ClimbPower += rate * dt
 		player:SetAttribute("ClimbPower", data.ClimbPower)
 		local stepped = data.Tutorial == 1
 		if stepped then

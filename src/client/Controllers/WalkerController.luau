@@ -5,15 +5,20 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
+local Economy = require(ReplicatedStorage.Utils.Economy)
+local Format = require(ReplicatedStorage.Utils.Format)
 local GameConfig = require(ReplicatedStorage.Config.GameConfig)
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Remotes = require(ReplicatedStorage.Remotes)
 local StairClimb = require(ReplicatedStorage.Utils.StairClimb)
+local Theme = require(ReplicatedStorage.Config.Theme)
 local Trove = require(ReplicatedStorage.Packages.Trove)
+local UIKit = require(ReplicatedStorage.Utils.UIKit)
+local Motion = require(script.Parent.UIController.Motion)
 
--- The stair walkers on this device. A machine near the camera runs its steps while someone is on it, at its level's
--- speed, and everyone on a machine near the camera climbs its steps (Utils/StairClimb). Poses don't replicate, so each
--- device poses every climber it can see. Jumping while on your own machine steps you off.
+-- The stair walkers on this device. A machine near the camera runs its steps while someone is on it, at that
+-- climber's training rate, and everyone on a machine near the camera climbs its steps (Utils/StairClimb). Poses don't
+-- replicate, so each device poses every climber it can see. Jumping while on your own machine steps you off.
 local WalkerController = { Name = "WalkerController" }
 
 type Machine = {
@@ -25,14 +30,17 @@ type Machine = {
 	Placed: number?, -- the cycle the steps were last put at
 }
 type Climber = { Character: Model, Rig: StairClimb.Rig? }
+type Gain = { Billboard: BillboardGui, Label: TextLabel, Punch: UIScale, Since: number }
 
 local RESCAN = 1
 local LEAVE_GAP = 0.4
+local GAIN_HEIGHT = 40
 
 local trove = Trove.new()
 local player = Players.LocalPlayer
 local machines: { [Model]: Machine } = {}
 local climbers: { [Player]: Climber } = {}
+local gain: Gain? = nil
 local lastLeave = 0
 
 local function rescan()
@@ -101,7 +109,80 @@ local function machineOf(index: number): Machine?
 	return if model and model:IsA("Model") then machines[model] else nil
 end
 
+-- The climber's training rate (the server's TrainRate), or the machine's own level's until it arrives.
+local function rateOn(model: Model, climberId: number): number
+	local climber = Players:GetPlayerByUserId(climberId)
+	local rate = climber and climber:GetAttribute("TrainRate")
+	if type(rate) == "number" then
+		return rate
+	end
+	local level = model:GetAttribute("Level")
+	return Economy.WalkerRate(if type(level) == "number" then level - 1 else 0)
+end
+
+-- What you're gaining a second, over your own head while you train: the walker's only words.
+local function buildGain(): (BillboardGui, TextLabel, UIScale)
+	local billboard = Instance.new("BillboardGui")
+	billboard.Name = "TrainGain"
+	billboard.Size = UDim2.fromOffset(220, GAIN_HEIGHT)
+	billboard.StudsOffset = Vector3.new(0, 2.8, 0)
+	billboard.AlwaysOnTop = true
+	billboard.LightInfluence = 0
+	billboard.ResetOnSpawn = false
+	billboard.Enabled = false
+	local row = UIKit.Frame(billboard, "Row", UDim2.fromScale(1, 1))
+	UIKit.List(row, true, 4, Enum.HorizontalAlignment.Center)
+	local punch = Instance.new("UIScale")
+	punch.Name = "Punch"
+	punch.Parent = row
+	UIKit.Icon(row, "Icon", Theme.Icons.HudShoe, GAIN_HEIGHT).LayoutOrder = 1
+	local label = UIKit.Text(row, "RateLabel", "", 34, Theme.Color.Lime, UDim2.fromOffset(0, GAIN_HEIGHT), {
+		Stroke = Theme.Color.Line,
+		Auto = Enum.AutomaticSize.X,
+		Order = 2,
+	})
+	local stroke = label:FindFirstChild("TextStroke")
+	if stroke and stroke:IsA("UIStroke") then
+		stroke.Thickness = 3
+	end
+	return billboard, label, punch
+end
+
+local function showGain(dt: number)
+	local rate = player:GetAttribute("TrainRate")
+	local character = player.Character
+	local head = character and character:FindFirstChild("Head")
+	local on = type(rate) == "number" and head ~= nil and head:IsA("BasePart")
+	if not gain then
+		if not on then
+			return
+		end
+		local playerGui = player:FindFirstChildOfClass("PlayerGui")
+		if not playerGui then
+			return
+		end
+		local billboard, label, punch = buildGain()
+		billboard.Parent = playerGui
+		gain = { Billboard = billboard, Label = label, Punch = punch, Since = 0 }
+	end
+	local shown = gain :: Gain
+	shown.Billboard.Enabled = on
+	if not on or type(rate) ~= "number" then
+		shown.Since = 0
+		return
+	end
+	shown.Billboard.Adornee = head :: BasePart
+	shown.Label.Text = `+{Format.Rate(rate)}/s`
+	-- A beat a second, as the Climbing comes in.
+	shown.Since += dt
+	if shown.Since >= 1 then
+		shown.Since -= 1
+		Motion.Punch(shown.Punch, 1.1)
+	end
+end
+
 local function update(dt: number)
+	showGain(dt)
 	local camera = workspace.CurrentCamera
 	if not camera then
 		return
@@ -113,9 +194,9 @@ local function update(dt: number)
 			machines[model] = nil
 			continue
 		end
-		if model:GetAttribute("Climber") ~= nil then
-			local level = model:GetAttribute("Level")
-			machine.Cycle += dt / StairClimb.StepSeconds(if type(level) == "number" then level else 1)
+		local climberId = model:GetAttribute("Climber")
+		if type(climberId) == "number" then
+			machine.Cycle += dt / StairClimb.StepSeconds(rateOn(model, climberId))
 		end
 		if (model:GetPivot().Position - eye).Magnitude < range then
 			placeSteps(machine)
@@ -173,6 +254,10 @@ function WalkerController.Destroy(_self: any)
 	trove:Clean()
 	table.clear(machines)
 	table.clear(climbers)
+	if gain then
+		gain.Billboard:Destroy()
+		gain = nil
+	end
 end
 
 return WalkerController
