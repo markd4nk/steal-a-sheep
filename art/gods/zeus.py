@@ -4,20 +4,18 @@
 import numpy as np
 
 import sdf
-from sdf import box, cylinder, ellipsoid, limb, look_rot, plane_f, rot, sphere
+import style
+from sdf import box, cylinder, ellipsoid, limb, look_rot, plane_f
+from style import GOLD, GOLD_DARK, SOLE, shell
+from style import slab as _slab
 
 SKIN = (214, 146, 104)
 CLOTH = (240, 238, 230)
 DRAPE = (252, 252, 250)
 RED = (192, 40, 40)
-GOLD = (246, 192, 48)
-GOLD_DARK = (200, 134, 30)
 HAIR = (238, 240, 246)
 HAIR_DARK = (178, 184, 200)
-SOLE = (112, 70, 40)
-EYE_WHITE = (250, 250, 248)
 IRIS = (74, 50, 34)
-PUPIL = (24, 18, 14)
 LID = (64, 38, 28)
 MOUTH = (82, 28, 26)
 LIP = (196, 120, 98)
@@ -32,17 +30,8 @@ def joints():
     J["waist"] = np.array([0.0, 0.0, 5.55])
     J["neck"] = np.array([0.0, 0.05, 7.8])
     J["headTop"] = np.array([0.0, 0.0, 9.6])
+    style.arm_joints(J, 1.76, 7.4, 36, 1.72, 26, 1.48)
     for side, name in ((1, "Left"), (-1, "Right")):
-        shoulder = np.array([side * 1.76, 0.05, 7.4])
-        down = np.array([side * np.sin(np.radians(36)), 0.0, -np.cos(np.radians(36))])
-        elbow = shoulder + down * 1.72
-        fore = np.array([side * np.sin(np.radians(26)), -0.3, -np.cos(np.radians(26))])
-        fore /= np.linalg.norm(fore)
-        wrist = elbow + fore * 1.48
-        J[name + "Shoulder"] = shoulder
-        J[name + "Elbow"] = elbow
-        J[name + "Wrist"] = wrist
-        J[name + "Fist"] = wrist + fore * 0.62
         J[name + "Hip"] = np.array([side * 0.55, 0.0, 4.55])
         J[name + "Knee"] = np.array([side * 0.64, -0.06, 2.6])
         J[name + "Ankle"] = np.array([side * 0.66, 0.08, 0.52])
@@ -50,32 +39,8 @@ def joints():
     return J
 
 
-def _mix(a, b, t):
-    t = np.clip(t, 0, 1)[:, None]
-    return np.asarray(a, float) * (1 - t) + np.asarray(b, float) * t
-
-
 def _strands(freq, ax=0, az=0.0):
-    def color(P):
-        t = 0.5 + 0.5 * np.sin(freq * P[:, ax] + az * P[:, 2])
-        return _mix(HAIR, HAIR_DARK, 0.6 * t * t)
-
-    return color
-
-
-def _slab(point, axis, half):
-    p0 = np.asarray(point, float)
-    a = np.asarray(axis, float)
-    a = a / np.linalg.norm(a)
-    return lambda P: np.abs((P - p0) @ a) - half
-
-
-def shell(parts, thickness, clip, k=0.02, **kw):
-    """A layer `thickness` out from the union of `parts`, cut to where clip(P) < 0: belts, straps, trims."""
-    lo = np.min([p.lo for p in parts], axis=0)
-    hi = np.max([p.hi for p in parts], axis=0)
-    return sdf.Prim(lambda P: sdf.evaluate_points(parts, P) - thickness, world=True, bounds=(lo, hi),
-                    clip=(clip, k), **kw)
+    return style.strands(HAIR, HAIR_DARK, freq, ax, az)
 
 
 def shapes(J):
@@ -150,26 +115,9 @@ def shapes(J):
     for side in (1, -1):
         add(ellipsoid((side * 0.31, -0.47, 8.62), (0.21, 0.16, 0.13), k=0.15, color=SKIN, bone="Head", name="cheek"))
         add(ellipsoid((side * 0.62, 0.06, 8.75), (0.09, 0.17, 0.22), k=0.06, color=SKIN, bone="Head", name="ear"))
-        add(ellipsoid((side * 0.23, -0.64, eye_z), (0.17, 0.1, 0.1), k=0.05, sub=True, name="socket"))
-
-    def eye_color(P):
-        out = np.tile(np.asarray(EYE_WHITE, float), (len(P), 1))
-        for side in (1, -1):
-            dx = P[:, 0] - side * 0.21
-            dz = P[:, 2] - (eye_z - 0.01)
-            r = np.sqrt(dx * dx + dz * dz)
-            out[r < 0.085] = IRIS
-            out[r < 0.05] = PUPIL
-            # The upper lid, slanting down to the nose: the glare.
-            lid = (P[:, 2] - eye_z) > 0.055 - 0.3 * (np.abs(P[:, 0]) - 0.23)
-            out[lid & (np.sign(P[:, 0]) == side)] = LID
-        return out
-
+    # Thick, bushy white brows.
+    style.angry_eyes(add, 0.23, -0.57, eye_z, IRIS, LID, _strands(50, 2))
     for side in (1, -1):
-        add(ellipsoid((side * 0.23, -0.57, eye_z), (0.16, 0.08, 0.105), color=eye_color, bone="Head", name="eye"))
-        # Angry brows: thick, slanting down to the nose, over the top of the eyes.
-        add(ellipsoid((side * 0.26, -0.6, 8.92), (0.27, 0.12, 0.1), R=rot(y=-24 * side), k=0.04,
-                      color=_strands(50, 2), bone="Head", name="brow"))
         add(ellipsoid((side * 0.1, -0.74, 8.58), (0.09, 0.07, 0.06), k=0.05, color=SKIN, bone="Head",
                       name="nostril"))
     add(limb((0, -0.65, 8.9), (0, -0.82, 8.62), 0.07, 0.115, k=0.08, color=SKIN, bone="Head", name="nose"))
@@ -244,14 +192,7 @@ def shapes(J):
 
         add(shell([forearm, muscle], 0.07, _slab(el + fore * 1.1, fore, 0.3), color=bracer_color,
                   bone=name + "LowerArm", name="bracer"))
-        add(ellipsoid(wr + fore * 0.3, (0.4, 0.34, 0.44), R=look_rot(fore), k=0.12, color=SKIN, bone=name + "Hand",
-                      name="fist", reach=0.15))
-        across = np.cross(fore, np.array([0, 1.0, 0]))
-        across /= np.linalg.norm(across)
-        for n in range(4):
-            off = (n - 1.5) * 0.17
-            add(sphere(wr + fore * 0.6 + across * off + np.array([0, -0.18, 0]), 0.11, k=0.06, color=SKIN,
-                       bone=name + "Hand", name="knuckle"))
+        style.fist(add, name, wr, fore, SKIN)
 
         # Legs: thighs under the tunic, knees, big calves, sandals with gold straps up the shin.
         hp, kn, an, to = J[name + "Hip"], J[name + "Knee"], J[name + "Ankle"], J[name + "Toe"]
@@ -276,40 +217,19 @@ def shapes(J):
     return S
 
 
-BONES = {
-    # name: (head joint, tail joint, parent)
-    "LowerTorso": ("pelvis", "waist", None),
-    "UpperTorso": ("waist", "neck", "LowerTorso"),
-    "Head": ("neck", "headTop", "UpperTorso"),
-}
-for _side in ("Left", "Right"):
-    BONES[_side + "UpperArm"] = (_side + "Shoulder", _side + "Elbow", "UpperTorso")
-    BONES[_side + "LowerArm"] = (_side + "Elbow", _side + "Wrist", _side + "UpperArm")
-    BONES[_side + "Hand"] = (_side + "Wrist", _side + "Fist", _side + "LowerArm")
-    BONES[_side + "UpperLeg"] = (_side + "Hip", _side + "Knee", "LowerTorso")
-    BONES[_side + "LowerLeg"] = (_side + "Knee", _side + "Ankle", _side + "UpperLeg")
-    BONES[_side + "Foot"] = (_side + "Ankle", _side + "Toe", _side + "LowerLeg")
+BONES = style.bones()
 
 BOUNDS = ((-4.5, -1.7, -0.05), (4.5, 1.3, 9.8))
 
 
 def reweight(prims, P, who, names, W):
-    """The skirt hangs from the hips and follows each thigh more towards the hem, split down the middle."""
-    skirt = [n for n, p in enumerate(prims) if p.name == "skirt"][0]
-    sel = who == skirt
-    a = 0.8 * np.clip((4.85 - P[sel, 2]) / (4.85 - HEM), 0, 1) ** 1.2
-    t = np.clip((P[sel, 0] + 0.45) / 0.9, 0, 1)
-    left = t * t * (3 - 2 * t)
-    W[sel] = 0
-    W[sel, names.index("LowerTorso")] = 1 - a
-    W[sel, names.index("LeftUpperLeg")] = a * left
-    W[sel, names.index("RightUpperLeg")] = a * (1 - left)
-    return W
+    """The skirt hangs from the hips and follows each thigh more towards the hem."""
+    return style.follow_legs(prims, P, who, names, W, "skirt", 4.85, HEM)
+
 
 # The head's UV islands get this much more texture than their size would, for the painted eyes.
 FACE_ABOVE = 7.9
 FACE_UV_SCALE = 1.7
-
 
 
 def detail(J):

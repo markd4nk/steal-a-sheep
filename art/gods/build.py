@@ -240,6 +240,10 @@ def rig(god):
     names, W = sdf.weights(prims, co, who, ["Root"] + list(mod.BONES))
     if hasattr(mod, "reweight"):
         W = mod.reweight(prims, co, who, names, W)
+    # Roblox skins a vertex to at most four bones: keep each vertex's four strongest.
+    weakest = np.argsort(-W, axis=1)[:, 4:]
+    np.put_along_axis(W, weakest, 0.0, axis=1)
+    W /= np.maximum(W.sum(axis=1, keepdims=True), 1e-9)
     obj.vertex_groups.clear()
     for b, bone in enumerate(names):
         vg = obj.vertex_groups.new(name=bone)

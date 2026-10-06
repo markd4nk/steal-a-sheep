@@ -36,8 +36,9 @@ def _legs(rot, p, thigh_mid, thigh_amp, knee_rest, knee_amp, push):
         rot[side + "Foot"] = Rx(thigh - knee + toe)
 
 
-def walk(p):
-    """A heavy, angry stride; the bolt held up in his right fist."""
+def walk(p, right="raise"):
+    """A heavy, angry stride. right: "raise" holds the right fist up (Zeus's bolt), "carry" holds it in front, the
+    forearm forward (a sceptre carried upright)."""
     rot = {}
     s = math.sin(2 * math.pi * p)
     c4 = math.cos(4 * math.pi * p)
@@ -48,8 +49,12 @@ def walk(p):
     rot["LeftUpperArm"] = Rx(20 * s) @ Ry(18)
     rot["LeftLowerArm"] = Rx(-(18 + 14 * max(0.0, -s)))
     rot["LeftHand"] = Rx(-6)
-    rot["RightUpperArm"] = Rx(-22 + 3 * c4) @ Ry(40)
-    rot["RightLowerArm"] = Ry(100) @ Rx(-10)
+    if right == "carry":
+        rot["RightUpperArm"] = Rx(-14 + 2 * c4) @ Ry(-12)
+        rot["RightLowerArm"] = Rx(-72)
+    else:
+        rot["RightUpperArm"] = Rx(-22 + 3 * c4) @ Ry(40)
+        rot["RightLowerArm"] = Ry(100) @ Rx(-10)
     rot["RightHand"] = Rx(-8)
     return rot
 
@@ -109,7 +114,7 @@ def pose(rig, rot, lift=0.0):
     return contact
 
 
-BOLT_UP = Vector((0, -0.3, 1)).normalized()  # the bolt points up and a little ahead, whatever the arm does
+BOLT_UP = Vector((0, -0.18, 1)).normalized()  # the held symbol points up and a little ahead, whatever the arm does
 
 
 def upright(rig, name, direction=BOLT_UP):

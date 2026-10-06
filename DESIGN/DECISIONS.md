@@ -114,6 +114,16 @@ Calls in Zeus's Blender model (2026-10-05, a mock-up waiting for the user's OK):
   leaning in, both fists pumping, the bolt kept upright in his right. The game would speed both up to his real speed.
 - **The bolt** is 5 studs tall, gripped low.
 
+Calls in Hera's Blender model (2026-10-05, a mock-up):
+
+- **Her colours** are the game's (purple robe, gold): an ankle-length gown with a lighter front panel between gold
+  lines, a gold hem under a row of peacock eyes (her bird), puffed cap sleeves, a dark purple cape edged in gold.
+- **Face**: the same angry glare as Zeus with thin dark brows and a flick of liner, red lips in a frown; dark hair
+  parted and swept into a bun, a ringlet over each shoulder; a gold diadem with five points and a purple gem.
+- **Her symbol**: a gold sceptre topped with a glowing peacock eye (teal, blue, gold), carried upright in front of her
+  as she walks; she runs like Zeus.
+- **Shared style** (`art/gods/style.py`): the eyes and brows, fists, trims and the rig are the same for every god.
+
 Calls made ordering the gods by rank (2026-10-05):
 
 - **Which minor god takes which stage**: Pan on the meadow (the shepherds' god), Tyche on the bamboo, Hecate on the

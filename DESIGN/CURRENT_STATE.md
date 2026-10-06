@@ -81,6 +81,9 @@ lamb.
   `art/gods/gait.py` (bolt raised while walking, held upright while running). The rules are in DECISIONS.md
   (Confirmed). A test import worked in a Studio copy (mesh 74120242072184, an earlier texture), posed from Blender's
   numbers. The game still has the block gods: nothing is wired in yet.
+- **Hera mock-up in Blender (2026-10-05, the user asked to see the style on his wife)**: same pipeline and shared
+  style (`art/gods/style.py`, `hera.py`): purple gown with a peacock-eye hem, cape, diadem, sceptre with a neon
+  peacock eye carried upright. Shown in Blender only, waiting for the user's word.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game
