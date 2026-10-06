@@ -60,8 +60,8 @@ confirmed or reversed it.
 - **Its first five looks are the mock-up's** (Starter, Sport, Pro, Turbo, Champion), "stick with the five for a second";
   the level floats over the machine; the machine stands outside the pen, very close to it, like Steal an Egg's; its
   upgrade sign beside it upgrades it directly, for cash or Robux (the user, 2026-10-05).
-- **The stair walker's spot by the gate is right** (the user, 2026-10-05). Its Robux prices are being decided in
-  another session; the ones in `GameConfig.StairWalker.Robux` are placeholders until then.
+- **The stair walker's spot by the gate is right** (the user, 2026-10-05). Its Robux prices are the store's walker
+  ladder (below).
 - **Put lambs down anywhere in the pen (2026-10-05)**: like Steal an Egg, the thief brings the lamb into their pen and
   places it where they choose; no delivery platform, no fixed pads to unlock and stand sheep on. Sheep walk around on
   their own like Shear a Sheep's; lambs mostly eat off the floor, head down and chewing, with an eating face: the
@@ -101,6 +101,37 @@ confirmed or reversed it.
   their pen by itself. Its **size shows only when it grows up in the pen**. A sheep's hidden Weight shifts its size
   odds; no kg on screen. Confirmed after the build: the **price** is 120 seconds of one Standard adult's income of the
   family (tier 1: 240 cash, tier 6: 23.4K) "for now"; a **Titan earns x5**; the lamb waits **30 s** on the altar.
+- **Six sheep a tier (the user, 2026-10-05)**: every god has six families, **Common, Uncommon, Rare, Epic, Legendary,
+  Mythic**, their own family as the Common; the 150 new looks in the lineup (DESIGN/HISTORY.md) are OK'd ("that's
+  good"). A wild lamb is Common 50%, Uncommon 25%, Rare 13%, Epic 7%, Legendary 4%, Mythic 1%; they earn x1, x1.5,
+  x2.5, x4, x8, x15. The fleeces are renamed **Plain / Shiny / Royal** and roll on top of any family as before.
+
+- **The Robux store (the user, 2026-10-05, over five mock-ups)**: Shear a Sheep's one scrolling store in its purple,
+  with square studs and big art filling every card, the art growing with the pack (one, a pair, a pile, a sack, a
+  chest, a gold chest). Each picture is one outlined icon: overlapping stickers "looked sloppy". The section tabs
+  (Sheep, Passes, Speed, Climb, Cash) stand outside the window on its right, tight together and close to it; no
+  scrollbar inside. The approved mock-up is `steal-a-sheep-store-mockup-e-pc.png` / `-e-full.png` in T3 Code's
+  attachments folder.
+- **Hermes' winged sandal is the climbing icon everywhere**, the HUD's too, with white wings; gold wings only on 2x
+  Speed (the user, 2026-10-05, from a picture of a talaria).
+- **Store prices**: Golden Fleece 799 (earns 10x your best sheep) and Kronos Sheep 349 (3x), Robux only; passes 2x Money
+  249 and 2x Growth 149; Climbing packs +150K / 1M / 10M / 100M / 1B / 10B at 49 / 99 / 199 / 399 / 799 / 1,499; Cash
+  packs 24K / 200K / 800K / 4M / 8M at 45 / 149 / 299 / 499 / 720 (the user set 24K, 8M and their prices and the first
+  four Climbing amounts; the rest were proposed and accepted).
+- **2x Speed doubles Climbing and can be bought again, each buy three times the last**: 3, 9, 27, 81, 243, 729, 2,187,
+  then sold out.
+- **The stair walker's next level for Robux, beside its cash price**: 19 for the first level, 20% more each level
+  (3,132 for the last).
+- **The store as built is OK (the user, 2026-10-05)**, with the STORE button on the right edge of the screen; merged.
+  Creator Hub's products and passes come later.
+- **Daily gifts (2026-10-05)**: a check-in every day, the prizes better each day, a super rare sheep on Day 7; the
+  user picked layout B (Days 1-6 in a grid, Day 7 big beside Claim), the Pegasus Sheep with gold-tipped wings and a
+  halo (the third look), and a missed day waits where it was (no reset). "Just this week for now": the same week
+  repeats after Day 7 until later weeks are designed. Then, after playing it: the prize amounts are good, and so is the
+  phone layout (the HUD's left column wrapping into more columns on a short screen).
+- **The daily prizes** (the user's OK, 2026-10-05): Day 1 cash 3 minutes of the pen's income (at least 250), Day 2
+  Climbing 1 minute of the stair walker (at least 150), Day 3 cash 10 minutes (800), Day 4 a Rare lamb from the
+  highest god stolen from, Day 5 Climbing 3 minutes (450), Day 6 cash 30 minutes (2,500), Day 7 the Pegasus Sheep.
 
 ## To review
 
@@ -153,13 +184,82 @@ Calls made ordering the gods by rank (2026-10-05):
   floating rocks, rock pools, coral and tridents; Hera's golden urns, peacocks, crown and golden apples. The minor gods
   who moved down lost their stretches' props (rainbow, pipes, fountain, wheel of fortune, serpent staff, crystals,
   crossroads, fear moon, scales, laurel arch): the commission's stages are as they were.
+Calls made building six sheep a tier and the new Sheepdex (2026-10-05):
+
+- **Sheepdex rewards are claimed**, as in the mock-up and Steal an Egg: delivering finds the family, the Claim button
+  pays. Families found before the change count as claimed (they were paid on delivery; save schema 3).
+- **Claim reward**: 30 s of the family's income in cash (rarity included) and 5% of its tier's sign number x the
+  rarity's multiplier in Climbing, at least 5 (tier 1: 5 to 19). **Herd gift** for claiming all six: 10 minutes of the
+  tier's Common income in cash and a quarter of the sign number in Climbing, at least 25 (tier 1: 1,200 and 25).
+- **The section's bar counts sheep found** (x/6) and turns green once the herd's gift is paid.
+- **Opening the Sheepdex shows the first sheep with a reward waiting** (else the first not found) and scrolls to it.
+- **Six sheep in a 3 x 2 grid** beside a tall god banner, one tier to a screen, like the reference's 4 x 2.
+- **The HUD's SHEEPDEX badge counts rewards waiting** (9+ past nine).
+
+- **Rarity colours**: the menus' card colours (Theme.Fleece.Rarity). Flock and Sell Stall cards now take the family's
+  rarity colour; a Shiny or Royal fleece shows as the token's sparkles and in the name ("Shiny Clover Sheep").
+- **Mythic is a divine version of the god's sheep where it can be** (Golden Elixir, Eternal Harvest, Quicksilver...),
+  so the top of each row is the most dressed: wings, halos, crowns, glowing wool.
+- **No family wears the Gold paint**: a Royal fleece paints any sheep gold, so a gold family would look Royal. Golden
+  Ram Sheep is gold foil wool instead (Golden Fleece is the store's Robux sheep).
+- **The theft card shows the family's rarity** in its colour over the name ("EPIC", then "Gambler Lamb").
+- **Legendary and Mythic lambs are announced** to players who have reached the tier, like Royal fleeces: "A Mythic
+  King of Olympus Lamb appeared in Zeus's pasture!"
+- **First finds pay per family**: the Sheepdex reward is 30 s of the family's income (rarity included), so a Mythic's
+  first delivery pays 15 times a Common's. The Merge Shrine's price is 120 s of the family's income the same way.
+- **Keyed by god, not tier** (`Config/Herds`), so the gods' new order (t3code/order-olympian-gods) needs no change here.
+
+Calls made building the daily gifts (2026-10-05):
+
+- **The prizes' fine print**: the walker's rate leaves trails out; the cash leaves out the friend boost and 2x Money.
+  Amounts are worked out when claimed (the cards show what they'd give now).
+- **The wait**: the next gift opens 20 hours after a claim (not a calendar day), so playing at about the same time
+  each day works.
+- **The Pegasus Sheep** earns as tier "highest stolen + 1" (a Royal of that god), saved on the sheep so it keeps its
+  worth; it arrives as a lamb rolled with full luck (Heavy weights likely, Titan possible), white with sparkles, and
+  hops into the pen (stored if full). Not in the Sheepdex, can't go in the Merge Shrine; it can be sold (two minutes of
+  its income, like any sheep). A full flock (100) refuses Days 4 and 7 until there's room.
+- **The menu** opens by itself once a session, 45 s after a gift waits, when the player is off the mountain, not
+  carrying and no other menu is open (after the free gift's 30 s). Claiming leaves it open with a notice ("+197K cash",
+  "Shiny Laurel Lamb is in your pen!") and the button counting down; Day 7 shows its own card ("Day 7!", the Pegasus,
+  "In your pen now", Awesome!). After Day 7 every card shows a tick until the next Day 1.
+- **The HUD**: DAILY sits under GIFT at the top of the left column, with a red "!" and a glow while a gift waits and
+  its countdown in place of its name once claimed. The column stops 70 points above the bottom (the wrapping itself is
+  the user's OK).
+- **Pictures**: the store mock-up's cash (one stack, a pile, a chest) and Hermes' sandal (one, three) grow with the
+  day; Day 4 shows the lamb's token; Day 7 the rendered Pegasus.
+
+Calls made building the Robux store (2026-10-05):
+
+- **"Your best sheep"** is the highest income right now among the player's other sheep, stored ones included (a lamb
+  at its lamb rate), and at least a tier 1 adult's 2/s. 2x Money doubles the Robux sheep's income too.
+- **Robux sheep** arrive grown, Golden Fleece Giant-sized and Kronos Large (their income ignores size). They can't be
+  sold ("Robux sheep stay with you") or merged, aren't in the Sheepdex, and go into the pen if there's room, stored if
+  not; the flock limit never stops a purchase.
+- **Their looks**: Golden Fleece in Shear a Sheep's colours (gold wool, cream curled horns, happy face) with gold
+  sparkles (a new effect); Kronos Sheep is Shear a Sheep's Time Sheep.
+- **2x Speed at 0 Climbing** gives +25: each buy doubles, and gives at least +25.
+- **One Roblox dialog at a time** per player ("Finish your purchase first"), so a price step can't be bought twice at
+  its price. A receipt for a step already counted still doubles; a walker receipt that finds the walker maxed pays the
+  last level's cash price.
+- **Passes count offline too**: 2x Money on the offline cash, 2x Growth on growth while away. Every income shown (HUD,
+  flock cards, pen labels, the income boards) includes 2x Money.
+- **HUD**: the STORE button (the icon pack's golden Robux coin) is hidden like the others until the first delivery
+  (its place on the right edge is the user's OK). The store window's corner picture is the basket, as in the mock-ups.
+- **The tabs**: 2 points apart, 6 from the window (the user: tighter and closer). Where the window is short (a phone held
+  sideways) they start beside the header and shrink just enough for all five; on a phone they're about 0.8 size.
+- **Climbing's icon everywhere is the white-winged sandal** (HUD, store, the free gift); 2x Speed's has gold wings.
+- **Words**: "ROBUX ONLY" on the sheep, "CHEAP!" on 2x Speed with "Next: 9" under its price, "BEST VALUE" on +10B and
+  +8M, "Owned", "Sold out" and "MAX" when done; the walker card counts levels from 1, as the shop does.
+- **Before the products exist on Roblox**: in Studio a store button grants its product at once, with no dialog; a live
+  server says "Not on sale yet".
 
 Calls made building the Merge Shrine (2026-10-05):
 
 - **Luck**: three Standard sheep bring 40%; each step of size above Standard adds, up to 100% for three Titans. 40%
   gives 58/34/8/0.2% Standard/Large/Giant/Titan; 100% gives 40/44/15/0.7% (the Climbing session's weight bands decide
   the tail).
-- **Fleece**: three Ordinary in: 72/24/4% Ordinary/Rare/Royal; three Royal in: 30/45/25%; mixes in between.
+- **Fleece**: three Plain in: 72/24/4% Plain/Shiny/Royal; three Royal in: 30/45/25%; mixes in between.
 - **Menu**: the camera turns to the shrine with no dark backdrop and the HUD hidden; the odds in the lab's glass panel
   on the left, your grown sheep as the shop's rows on the right (the newest god's first, then the biggest), one big
   Merge button with the price at the bottom. The first sheep picked sets the family; the others' buttons say
@@ -216,9 +316,8 @@ Calls building the Sell Stall (2026-10-05).
 
 Calls building the stair walker (2026-10-05).
 
-- **Placeholder Robux prices (another session is deciding them; nothing is on sale)**: the next level costs R$ 19 (to
-  level 2), 39, 59, 99, then 149 for every level after. A developer product per price; ids 0 until they're made in Creator Hub, and the Robux
-  prompt says "Robux upgrades aren't on sale yet" meanwhile.
+- **Robux prices**: the store's walker ladder (Config/Store: 19 to level 2, then 20% more a level), the user's call in
+  the store's session; the sign's R prompt asks the store (StoreService), so it sells the same products.
 - **Levels 6-30 keep the Champion look** until more looks are designed.
 - **The sign** stands by the machine's entry, turned to the gate, written on both sides ("UPGRADE", the next level, its
   price in cash and R$).
@@ -347,7 +446,7 @@ Calls made while building the MVP on 2026-10-05:
 - **Families are Shear a Sheep breeds**: Scarecrow, Moon (silver), Lava, Cotton Candy, Solar System, Ocean, Cloud,
   Royal and Storm Sheep as they are; Grape (purple Ringlets + a leaf), War (red Racka + a helmet) and Laurel (white
   Merino + a wreath) are plain breeds with a primitive extra; the Wingfoot (Cloud) Sheep has small neon ankle wings.
-- **Fleece rarity looks**: Rare sheep sparkle blue; Royal sheep have gold wool (Shear a Sheep's Gold paint) and sparkle.
+- **Fleece looks**: Shiny sheep sparkle blue; Royal sheep have gold wool (Shear a Sheep's Gold paint) and sparkle.
 - **Sizes on screen**: every sheep's base size is 1.6x the rig; lambs are 0.6 / 0.7 / 0.8 of it by burden (a clue to
   the burden) and grow towards 0.85 before the reveal; adults are 1 / 1.35 / 1.7 by size.
 - **Slides**: start by themselves when moving downhill on the ramp past the safety line (the map's StartingLine,
@@ -370,6 +469,7 @@ Calls made while building the MVP on 2026-10-05:
   next useful step (steal, slide home, train, put sheep to work, train for Light/Heavy, climb to the next god), with a
   guide arrow to it; a training meter shows the next Climb Power target while on the walker.
 - **Tutorial**: a new player's private, Light, ordinary tier 1 lamb (Pan's) sits in the meadow (others can't take it); its
+- **Tutorial**: a new player's private, Light, Plain Demeter lamb sits in the meadow (others can't take it); its
   run is protected from slide hits; any first delivery gives +60 coins and +25 Climb Power and removes it.
 - **Sounds**: Shear a Sheep's cues: the danger music during a chase, WolfScare on the alert, IntroWhip on a slide,
   Yelp/Scuffle on hits, Coin/DexReward/Upgrade/Reveal on rewards.

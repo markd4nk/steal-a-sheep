@@ -81,7 +81,7 @@ end
 
 -- "Sun" for the Sun Sheep: what the rows' buttons say when another family is picked.
 local function shortName(family: string): string
-	return (string.gsub(Economy.Tier(family).FamilyName, " Sheep$", ""))
+	return (string.gsub(Economy.FamilyName(family), " Sheep$", ""))
 end
 
 local function oddsRow(parent: Instance, name: string, order: number, color: Color3)
@@ -340,7 +340,7 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local function paintRow(row: Row, sheep: View)
 		SheepIcon.Paint(row.Token, sheep.Family, sheep.Rarity)
 		local size = Economy.Sizes[sheep.Size] or Economy.Sizes[1]
-		row.Name.Text = Economy.Tier(sheep.Family).FamilyName
+		row.Name.Text = Economy.FamilyName(sheep.Family)
 		local fleece = if sheep.Rarity > 1 then ` {Economy.Rarities[sheep.Rarity].Name}` else ""
 		row.Detail.Text = `{size.Name}{fleece} · +{Format.Rate(sheep.Income)}/s`
 		local at = table.find(picks, sheep.Id)
@@ -390,7 +390,8 @@ function Merge.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		table.clear(byId)
 		local eligible: { View } = {}
 		for _, sheep in stateController:Flock() :: { any } do
-			if sheep.Adult and not sheep.AtShrine then
+			-- The store's sheep and the special families (the Pegasus Sheep) never go in.
+			if sheep.Adult and not sheep.AtShrine and not sheep.Robux and not Economy.Specials[sheep.Family] then
 				byId[sheep.Id] = sheep
 				table.insert(eligible, sheep)
 			end

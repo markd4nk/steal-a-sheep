@@ -82,8 +82,9 @@ local function makeLabel(model: Model): TextLabel
 	return words
 end
 
-function Pens.LabelText(sheep: Sheep): string
-	local rate = `+{Format.Rate(Economy.Income(sheep))}/s`
+-- `income` is what it earns a second for its owner now (FlockService works it out: their best sheep, 2x Money).
+function Pens.LabelText(sheep: Sheep, income: number): string
+	local rate = `+{Format.Rate(income)}/s`
 	if Economy.IsAdult(sheep) then
 		return rate
 	end
@@ -132,7 +133,8 @@ function Pens.Show(
 	ownerId: number,
 	folder: Instance,
 	build: (string, number, number) -> Model?,
-	from: CFrame?
+	from: CFrame?,
+	income: number
 ): Shown?
 	local scale = Pens.Scale(sheep)
 	local model = build(sheep.Family, sheep.Rarity, scale)
@@ -147,7 +149,7 @@ function Pens.Show(
 		model:SetAttribute("DroppedAt", workspace:GetServerTimeNow())
 	end
 	local label = makeLabel(model)
-	label.Text = Pens.LabelText(sheep)
+	label.Text = Pens.LabelText(sheep, income)
 	local shown: Shown = {
 		Model = model,
 		Scale = scale,
@@ -164,7 +166,7 @@ function Pens.Show(
 end
 
 -- Grows a lamb's model a little and updates its label; returns false when it needs rebuilding (it just grew up).
-function Pens.Update(shown: Shown, sheep: Sheep, now: number): boolean
+function Pens.Update(shown: Shown, sheep: Sheep, now: number, income: number): boolean
 	if Economy.IsAdult(sheep) ~= shown.Adult then
 		return false
 	end
@@ -176,7 +178,7 @@ function Pens.Update(shown: Shown, sheep: Sheep, now: number): boolean
 		shown.Model:SetAttribute("Radius", Pens.Radius(scale))
 		shown.Scale = scale
 	end
-	shown.Label.Text = Pens.LabelText(sheep)
+	shown.Label.Text = Pens.LabelText(sheep, income)
 	return true
 end
 
@@ -187,7 +189,8 @@ function Pens.Rebuild(
 	ownerId: number,
 	folder: Instance,
 	build: (string, number, number) -> Model?,
-	now: number
+	now: number,
+	income: number
 ): boolean
 	local scale = Pens.Scale(sheep)
 	local model = build(sheep.Family, sheep.Rarity, scale)
@@ -202,7 +205,7 @@ function Pens.Rebuild(
 	shown.Scale = scale
 	shown.Adult = Economy.IsAdult(sheep)
 	shown.Label = makeLabel(model)
-	shown.Label.Text = Pens.LabelText(sheep)
+	shown.Label.Text = Pens.LabelText(sheep, income)
 	shown.NextStroll = nextStroll(sheep)
 	setSpot(shown, at)
 	model.Parent = folder

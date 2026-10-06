@@ -11,6 +11,7 @@ local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Mountain = require(ReplicatedStorage.Utils.Mountain)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
+local Theme = require(ReplicatedStorage.Config.Theme)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 -- The gods' wild lambs: four spawns a tier, each rolled once (fleece, hidden weight, and the adult size it will grow
@@ -59,6 +60,7 @@ local CARRY_CHECK = 0.1
 -- How a theft ended -> whether the lamb is left lying where the thief was.
 local DROPS: { [string]: boolean } = { Caught = true, Died = true }
 local WRONG_PLOT_EVERY = 3
+local ANNOUNCED_RARITY = 5 -- Legendary and Mythic lambs are announced, like Royal fleeces
 local FALL_Y = -50
 
 local registry: Lifecycle.Registry = {}
@@ -79,7 +81,8 @@ end
 
 local function roll(tier: number): Roll
 	local rarity, weight, size = Economy.RollWild(random)
-	return { Family = Olympus.Tiers[tier].Family, Rarity = rarity, Weight = weight, Size = size }
+	local family = Economy.RollFamily(random, Olympus.Tiers[tier])
+	return { Family = family, Rarity = rarity, Weight = weight, Size = size }
 end
 
 local function asSheep(rolled: Roll): Economy.Sheep
@@ -98,7 +101,8 @@ local function asSheep(rolled: Roll): Economy.Sheep
 	}
 end
 
--- The inspection card over a wild lamb: its name and what it will earn grown up. Its weight stays hidden.
+-- The inspection card over a wild lamb: its family's rarity, its name and what it will earn grown up. Its weight stays
+-- hidden.
 local function card(model: Model, rolled: Roll)
 	local root = model.PrimaryPart
 	if not root then
@@ -108,7 +112,7 @@ local function card(model: Model, rolled: Roll)
 	local low, high = Economy.FutureRange(sheep)
 	local billboard = Instance.new("BillboardGui")
 	billboard.Name = "Card"
-	billboard.Size = UDim2.fromOffset(190, 46)
+	billboard.Size = UDim2.fromOffset(190, 64)
 	billboard.StudsOffsetWorldSpace = Vector3.new(0, 4, 0)
 	billboard.MaxDistance = 45
 	billboard.LightInfluence = 0
@@ -129,6 +133,8 @@ local function card(model: Model, rolled: Roll)
 		stroke.Parent = words
 		words.Parent = billboard
 	end
+	local kind = Economy.FamilyRarities[Economy.FamilyRarity(rolled.Family)].Name
+	line(string.upper(kind), 18, Theme.Fleece.Rarity[kind].Hi)
 	local rarity = Economy.Rarities[rolled.Rarity]
 	line(Economy.Name(sheep), 24, if rolled.Rarity > 1 then rarity.Color else Color3.new(1, 1, 1))
 	line(`Grows to +{Format.Rate(low)}-{Format.Rate(high)}/s`, 20, Color3.fromRGB(190, 255, 90))
@@ -199,12 +205,19 @@ local function fill(spawn: Spawn)
 	place(spawn)
 end
 
-local function announceRoyal(spawn: Spawn)
+-- A Royal fleece, or a Legendary or Mythic family: "A Mythic King of Olympus Lamb appeared in Zeus's pasture!"
+local function announce(spawn: Spawn)
 	local tier = Olympus.Tiers[spawn.Tier]
+	local rolled = spawn.Roll
+	local kind = Economy.FamilyRarity(rolled.Family)
+	local words = Economy.Name(asSheep(rolled))
+	if kind >= ANNOUNCED_RARITY then
+		words = `{Economy.FamilyRarities[kind].Name} {words}`
+	end
 	for _, player in Players:GetPlayers() do
 		local reached = player:GetAttribute("ClimbTier")
 		if type(reached) == "number" and reached >= spawn.Tier then
-			notify(player, `A Royal {tier.FamilyName} lamb appeared in {tier.God}'s pasture!`, "Rare", "Reveal")
+			notify(player, `A {words} appeared in {tier.God}'s pasture!`, "Rare", "Reveal")
 		end
 	end
 end
@@ -460,8 +473,8 @@ local function refill()
 		elseif spawn.State == "Empty" and now >= spawn.RefillAt then
 			spawn.Roll = roll(spawn.Tier)
 			fill(spawn)
-			if spawn.Roll.Rarity >= 3 then
-				announceRoyal(spawn)
+			if spawn.Roll.Rarity >= 3 or Economy.FamilyRarity(spawn.Roll.Family) >= ANNOUNCED_RARITY then
+				announce(spawn)
 			end
 		end
 	end

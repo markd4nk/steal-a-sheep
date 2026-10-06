@@ -2,6 +2,8 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local GameConfig = require(ReplicatedStorage.Config.GameConfig)
+local Herds = require(ReplicatedStorage.Config.Herds)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 
 -- Every formula of the economy, as pure functions so the server, the UI and the tests agree. The values are the
@@ -10,7 +12,7 @@ local Olympus = require(ReplicatedStorage.Config.Olympus)
 export type Sheep = {
 	Id: string,
 	Family: string,
-	Rarity: number, -- 1 Ordinary, 2 Rare, 3 Royal
+	Rarity: number, -- its fleece: 1 Plain, 2 Shiny, 3 Royal (its family's rarity is Economy.FamilyRarity)
 	Weight: number, -- hidden, 1 (lightest) and up: slows its carrier and tilts its size odds (Economy.RollWeight)
 	Size: number, -- 1 Standard to 4 Titan: rolled from its weight's odds when the lamb is made, hidden until grown
 	Grown: number, -- seconds it has grown (only while it's in a pen slot)
@@ -24,20 +26,36 @@ export type Sheep = {
 	HomeX: number?,
 	HomeZ: number?,
 	Shrine: boolean?, -- a merged lamb still on the Merge Shrine's altar, waiting to be carried home (ShrineService)
+	-- The tier it earns and grows as, for a sheep that is no god's (Economy.Specials: the daily gifts' Pegasus Sheep).
+	Tier: number?,
 }
 
 export type Rarity = { Name: string, Multiplier: number, Chance: number, Color: Color3 }
+export type FamilyRarity = { Name: string, Chance: number, Multiplier: number }
 export type WeightBand = { From: number, To: number, Chance: number, LuckyChance: number }
 export type Size = { Name: string, Multiplier: number, Scale: number }
 export type Trail = { Id: string, Name: string, Cost: number, Multiplier: number, Color: Color3 }
+export type RobuxSheep = { Name: string, Times: number, Size: number }
 
 local Economy = {}
 
+-- A sheep's fleece, rolled for every lamb on top of its family: Shiny sparkles blue, Royal is painted gold.
 Economy.Rarities = table.freeze({
-	{ Name = "Ordinary", Multiplier = 1, Chance = 80, Color = Color3.fromRGB(196, 202, 214) },
-	{ Name = "Rare", Multiplier = 1.5, Chance = 18, Color = Color3.fromRGB(90, 170, 255) },
+	{ Name = "Plain", Multiplier = 1, Chance = 80, Color = Color3.fromRGB(196, 202, 214) },
+	{ Name = "Shiny", Multiplier = 1.5, Chance = 18, Color = Color3.fromRGB(90, 170, 255) },
 	{ Name = "Royal", Multiplier = 2.5, Chance = 2, Color = Color3.fromRGB(255, 196, 40) },
 } :: { Rarity })
+
+-- A family's rarity in its god's herd (Config/Herds, the same order): the percent chance a wild lamb on its tier is
+-- one of it, and what its income is multiplied by.
+Economy.FamilyRarities = table.freeze({
+	{ Name = "Common", Chance = 50, Multiplier = 1 },
+	{ Name = "Uncommon", Chance = 25, Multiplier = 1.5 },
+	{ Name = "Rare", Chance = 13, Multiplier = 2.5 },
+	{ Name = "Epic", Chance = 7, Multiplier = 4 },
+	{ Name = "Legendary", Chance = 4, Multiplier = 8 },
+	{ Name = "Mythic", Chance = 1, Multiplier = 15 },
+} :: { FamilyRarity })
 
 -- A lamb's hidden weight: players never see it, they feel it. The carried lamb's tier's Reach counts that many times
 -- bigger in its carrier's speed (Economy.Ratio), and heavier lambs tend to grow bigger (Economy.SizeOdds). A roll
@@ -72,6 +90,11 @@ Economy.LambShare = 0.5 -- a lamb earns this share of its family's base, times i
 Economy.TutorialGrowth = 30
 Economy.SellSeconds = 120 -- the user, 2026-10-05: two minutes of income, near Steal an Egg's 100 s, to start
 Economy.DexRewardSeconds = 30
+Economy.DexClimbShare = 0.05 -- a claim's Climbing: this share of its tier's sign number (Reach), times its rarity's
+Economy.DexClimbMin = 5
+Economy.HerdRewardSeconds = 600 -- a whole herd's gift: this many seconds of the tier's Common income in cash
+Economy.HerdClimbShare = 0.25 -- and this share of its sign number in Climbing
+Economy.HerdClimbMin = 25
 Economy.TutorialCoins = 60
 Economy.TutorialClimb = 25
 -- How many sheep the pen holds: 8 to start, bought one at a time up to 20 (the user, 2026-10-05: like Steal a
@@ -89,6 +112,31 @@ Economy.MaxFriends = 4
 Economy.GiftSeconds = 180
 Economy.GiftCoins = 500
 Economy.GiftClimb = 500
+
+-- The daily gifts (DailyService, the user 2026-10-05): one a day for a week, better each day, a super rare sheep on
+-- the seventh, then the same week again. Cash is Seconds of the pen's income and Climbing Seconds of the stair walker
+-- (no trail), each at least Least, so a day is worth the same at any point in the game; Lamb is a Rare lamb from the
+-- highest god the player has stolen from; Pegasus the Pegasus Sheep. A missed day waits where it was.
+export type DailyPrize = { Kind: string, Seconds: number?, Least: number? } -- Kind: Cash, Climb, Lamb, Pegasus
+Economy.DailyWeek = table.freeze({
+	{ Kind = "Cash", Seconds = 180, Least = 250 },
+	{ Kind = "Climb", Seconds = 60, Least = 150 },
+	{ Kind = "Cash", Seconds = 600, Least = 800 },
+	{ Kind = "Lamb" },
+	{ Kind = "Climb", Seconds = 180, Least = 450 },
+	{ Kind = "Cash", Seconds = 1800, Least = 2500 },
+	{ Kind = "Pegasus" },
+} :: { DailyPrize })
+-- The next gift opens this long after a claim: under a day, so coming back at about the same time each day works.
+Economy.DailyCooldown = 20 * 3600
+-- The Pegasus lamb's weight is rolled with this luck (Economy.RollWeight): heavy ones likely, a Titan possible.
+Economy.PegasusLuck = 1
+
+-- Families that are no god's (no tier on the mountain, never wild): they earn as the tier saved on each sheep.
+export type Special = { FamilyName: string }
+Economy.Specials = table.freeze({
+	Pegasus = { FamilyName = "Pegasus Sheep" },
+} :: { [string]: Special })
 
 -- Climbing a second on the stair walker, by its level (0 is the free one). Each level covers the gap between the
 -- next two tiers' reach in about a minute, and the last carries Zeus's Heavy target.
@@ -133,6 +181,14 @@ Economy.Trails = table.freeze({
 	{ Id = "Storm", Name = "Storm Trail", Cost = 250000, Multiplier = 3, Color = Color3.fromRGB(140, 150, 255) },
 } :: { Trail })
 
+-- Sheep sold for Robux only (Config/Store), not stolen from a god: each earns `Times` its owner's best other sheep, so
+-- it stays their top earner at every tier (the user, 2026-10-05). They arrive grown, at `Size`, and can't be merged or
+-- sold.
+Economy.RobuxSheep = table.freeze({
+	GoldenFleece = { Name = "Golden Fleece", Times = 10, Size = 3 },
+	Kronos = { Name = "Kronos Sheep", Times = 3, Size = 2 },
+} :: { [string]: RobuxSheep })
+
 local trailsById: { [string]: Trail } = {}
 for _, trail in Economy.Trails do
 	trailsById[trail.Id] = trail
@@ -147,6 +203,47 @@ function Economy.Tier(family: string): Olympus.Tier
 	local tier = Olympus.ByFamily[family]
 	assert(tier, `Economy: no tier for family {family}`)
 	return tier
+end
+
+-- Its rarity in its god's herd (an index into Economy.FamilyRarities); 1 for a family that's no god's.
+function Economy.FamilyRarity(family: string): number
+	return Herds.RarityOf[family] or 1
+end
+
+-- A family's name ("Laurel Sheep", "Pegasus Sheep", "Golden Fleece"): a Robux one, a special one, or its look's.
+function Economy.FamilyName(family: string): string
+	local robux = Economy.RobuxSheep[family]
+	if robux then
+		return robux.Name
+	end
+	local special = Economy.Specials[family]
+	if special then
+		return special.FamilyName
+	end
+	local breed = GameConfig.Breeds[family]
+	if breed then
+		return breed.DisplayName
+	end
+	local tier = Olympus.ByFamily[family]
+	return if tier then tier.FamilyName else family
+end
+
+-- Where a family sorts among the others: its god's tier, the special and Robux families after the thirty.
+function Economy.FamilyOrder(family: string): number
+	local tier = Olympus.ByFamily[family]
+	return if tier then tier.Tier else Olympus.Count + 1
+end
+
+-- The tier a sheep earns and grows as: its own (a special family's), else its family's god's.
+function Economy.SheepTier(sheep: Sheep): number
+	return sheep.Tier or Economy.Tier(sheep.Family).Tier
+end
+
+-- What a Standard adult of the family earns a second, before its fleece, size and rank: the base income of its tier
+-- (`tier`, else its god's) times its rarity's.
+function Economy.FamilyBase(family: string, tier: number?): number
+	local multiplier = Economy.FamilyRarities[Economy.FamilyRarity(family)].Multiplier
+	return Economy.BaseIncome(tier or Economy.Tier(family).Tier) * multiplier
 end
 
 -- round(2 x 2.5^(tier - 1)): 2, 5, 13, 31, 78 ... 47,684 at tier 12 ... about 694 billion at Zeus's 30.
@@ -271,30 +368,57 @@ function Economy.Readiness(climb: number, tier: number): string
 	return "Heavy"
 end
 
+function Economy.IsRobuxSheep(family: string): boolean
+	return Economy.RobuxSheep[family] ~= nil
+end
+
 function Economy.GrowthSeconds(sheep: Sheep): number
+	if Economy.RobuxSheep[sheep.Family] then
+		return 1
+	end
 	if sheep.Tutorial then
 		return Economy.TutorialGrowth
 	end
-	return 45 + 15 * (Economy.Tier(sheep.Family).Tier - 1)
+	return 45 + 15 * (Economy.SheepTier(sheep) - 1)
 end
 
 function Economy.IsAdult(sheep: Sheep): boolean
 	return sheep.Grown >= Economy.GrowthSeconds(sheep)
 end
 
-function Economy.AdultIncome(sheep: Sheep): number
-	local base = Economy.BaseIncome(Economy.Tier(sheep.Family).Tier)
+-- `best` is Economy.BestIncome of the owner's flock: only a Robux sheep's income depends on it.
+function Economy.AdultIncome(sheep: Sheep, best: number?): number
+	local robux = Economy.RobuxSheep[sheep.Family]
+	if robux then
+		return robux.Times * math.max(best or 0, Economy.BaseIncome(1))
+	end
+	local base = Economy.FamilyBase(sheep.Family, Economy.SheepTier(sheep))
 	return base * Economy.Rarities[sheep.Rarity].Multiplier * Economy.Sizes[sheep.Size].Multiplier * 3 ^ sheep.Rank
 end
 
-function Economy.LambIncome(sheep: Sheep): number
-	local base = Economy.BaseIncome(Economy.Tier(sheep.Family).Tier)
+function Economy.LambIncome(sheep: Sheep, best: number?): number
+	if Economy.RobuxSheep[sheep.Family] then
+		return Economy.AdultIncome(sheep, best)
+	end
+	local base = Economy.FamilyBase(sheep.Family, Economy.SheepTier(sheep))
 	return base * Economy.LambShare * Economy.Rarities[sheep.Rarity].Multiplier
 end
 
 -- What it earns a second in a pen slot right now.
-function Economy.Income(sheep: Sheep): number
-	return if Economy.IsAdult(sheep) then Economy.AdultIncome(sheep) else Economy.LambIncome(sheep)
+function Economy.Income(sheep: Sheep, best: number?): number
+	return if Economy.IsAdult(sheep) then Economy.AdultIncome(sheep, best) else Economy.LambIncome(sheep, best)
+end
+
+-- What a flock's best sheep earns a second now (Robux sheep left out), at least a tier 1 adult's: what its Robux sheep
+-- earn a multiple of.
+function Economy.BestIncome(flock: { [string]: Sheep }): number
+	local best = Economy.BaseIncome(1)
+	for _, sheep in flock do
+		if not Economy.RobuxSheep[sheep.Family] then
+			best = math.max(best, Economy.Income(sheep))
+		end
+	end
+	return best
 end
 
 -- What the flock's income is multiplied by with `friends` friends in the server.
@@ -303,14 +427,14 @@ function Economy.FriendBoost(friends: number): number
 end
 
 -- A lamb's adult income from its smallest to its biggest possible size, for its weight (its size stays hidden).
-function Economy.FutureRange(sheep: Sheep): (number, number)
+function Economy.FutureRange(sheep: Sheep, best: number?): (number, number)
 	local odds = Economy.SizeOdds(sheep.Weight)
 	local low, high = math.huge, 0
 	for size, chance in odds do
 		if chance > 0 then
 			local copy = table.clone(sheep)
 			copy.Size = size
-			local income = Economy.AdultIncome(copy)
+			local income = Economy.AdultIncome(copy, best)
 			low = math.min(low, income)
 			high = math.max(high, income)
 		end
@@ -318,12 +442,26 @@ function Economy.FutureRange(sheep: Sheep): (number, number)
 	return low, high
 end
 
-function Economy.SellValue(sheep: Sheep): number
-	return Economy.Round(Economy.SellSeconds * Economy.Income(sheep))
+function Economy.SellValue(sheep: Sheep, best: number?): number
+	return Economy.Round(Economy.SellSeconds * Economy.Income(sheep, best))
 end
 
-function Economy.DexReward(tier: number): number
-	return Economy.DexRewardSeconds * Economy.BaseIncome(tier)
+-- A Sheepdex entry's claim, once the first of the family has been delivered: cash and Climbing.
+function Economy.DexReward(family: string): number
+	return Economy.Round(Economy.DexRewardSeconds * Economy.FamilyBase(family))
+end
+
+function Economy.DexClimb(family: string): number
+	local reach = Economy.Tier(family).Reach
+	local multiplier = Economy.FamilyRarities[Economy.FamilyRarity(family)].Multiplier
+	return math.max(Economy.DexClimbMin, Economy.Round(reach * Economy.DexClimbShare * multiplier))
+end
+
+-- The gift for claiming all of a tier's herd: cash and Climbing.
+function Economy.HerdReward(tier: number): (number, number)
+	local reach = Olympus.Tiers[tier].Reach
+	local coins = Economy.Round(Economy.HerdRewardSeconds * Economy.BaseIncome(tier))
+	return coins, math.max(Economy.HerdClimbMin, Economy.Round(reach * Economy.HerdClimbShare))
 end
 
 -- The upgrade from walker level L to L + 1: round(1200 x 2.5^L), about ten minutes of income from the tier
@@ -364,6 +502,40 @@ function Economy.GiftReward(walkerLevel: number, income: number): (number, numbe
 	return coins, climb
 end
 
+-- Whether a daily gift is waiting: never claimed, or DailyCooldown since the last claim (`last`, os.time()).
+function Economy.DailyReady(last: number, now: number): boolean
+	return last <= 0 or now - last >= Economy.DailyCooldown
+end
+
+-- Day `day`'s cash or Climbing (Economy.DailyWeek) for a pen earning `income` a second and a stair walker at
+-- `walkerLevel`; 0 for the sheep days.
+function Economy.DailyAmount(day: number, income: number, walkerLevel: number): number
+	local prize = Economy.DailyWeek[day]
+	if not prize or not prize.Seconds then
+		return 0
+	end
+	local rate = if prize.Kind == "Cash" then income else Economy.WalkerRate(walkerLevel)
+	return math.max(prize.Least or 0, Economy.Round(rate * prize.Seconds))
+end
+
+-- The highest tier a player has stolen from (Deliveries' keys), 1 before their first.
+function Economy.HighestStolen(deliveries: { [string]: number }): number
+	local highest = 1
+	for key, count in deliveries do
+		local tier = tonumber(key)
+		if tier and count > 0 and tier > highest and Olympus.Tiers[tier] then
+			highest = tier
+		end
+	end
+	return highest
+end
+
+-- The tier a Pegasus Sheep given now earns as: one above the highest god stolen from, so it earns like a Royal sheep
+-- of that god (each tier's base is 2.5x the last, as a Royal fleece is) while keeping its own white fleece.
+function Economy.PegasusTier(deliveries: { [string]: number }): number
+	return Economy.HighestStolen(deliveries) + 1
+end
+
 local function pick(random: Random, weights: { number }): number
 	local total = 0
 	for _, weight in weights do
@@ -390,6 +562,19 @@ function Economy.RollSize(random: Random, weight: number): number
 	return pick(random, Economy.SizeOdds(weight))
 end
 
+-- Which of `tier`'s herd a wild lamb is, by its families' rarities.
+function Economy.RollFamily(random: Random, tier: Olympus.Tier): string
+	local herd = Herds.ByGod[tier.God]
+	if not herd then
+		return tier.Family
+	end
+	local chances = {}
+	for index in herd do
+		chances[index] = Economy.FamilyRarities[index].Chance
+	end
+	return herd[pick(random, chances)]
+end
+
 -- A wild lamb's rolls: fleece rarity, weight (no luck), and its adult size (from its weight's odds).
 function Economy.RollWild(random: Random): (number, number, number)
 	local rarity = pick(random, { Economy.Rarities[1].Chance, Economy.Rarities[2].Chance, Economy.Rarities[3].Chance })
@@ -402,7 +587,7 @@ end
 -- lambs likelier and opens the Huge weights, the only way to a Titan. The lamb can come out worse than what went in.
 Economy.ShrinePriceSeconds = 120 -- a merge costs this many seconds of one Standard adult's income of the family
 Economy.ShrineBaseLuck = 0.4 -- three Standard adults' luck; each step of size in brings more, three Titans 1
--- Percent odds of an Ordinary, Rare and Royal lamb when all three sheep in are Ordinary, and when all three are Royal;
+-- Percent odds of a Plain, Shiny and Royal lamb when all three sheep in are Plain, and when all three are Royal;
 -- the fleeces in between land in between.
 Economy.ShrineFleece = table.freeze({
 	Plain = { 72, 24, 4 },
@@ -412,7 +597,7 @@ Economy.ShrineFleece = table.freeze({
 local SIZE_SAMPLES = 64
 
 function Economy.ShrinePrice(family: string): number
-	return Economy.Round(Economy.ShrinePriceSeconds * Economy.BaseIncome(Economy.Tier(family).Tier))
+	return Economy.Round(Economy.ShrinePriceSeconds * Economy.FamilyBase(family))
 end
 
 -- Three sheep go in when they're different, unlocked, grown sheep of one family. Returns why not.
@@ -426,6 +611,9 @@ function Economy.CanShrine(sheep: { Sheep }): (boolean, string?)
 			return false, "Pick three different sheep"
 		end
 		ids[entry.Id] = true
+		if Economy.RobuxSheep[entry.Family] then
+			return false, "Robux sheep can't merge"
+		end
 		if entry.Locked then
 			return false, "Unlock it first"
 		end
@@ -434,6 +622,9 @@ function Economy.CanShrine(sheep: { Sheep }): (boolean, string?)
 		end
 		if entry.Family ~= sheep[1].Family then
 			return false, "Pick three of one kind"
+		end
+		if Economy.Specials[entry.Family] then
+			return false, `{Economy.FamilyName(entry.Family)} can't be merged`
 		end
 	end
 	return true, nil
@@ -498,30 +689,39 @@ function Economy.ShrineRoll(random: Random, sheep: { Sheep }): (number, number, 
 	return rarity, weight, Economy.RollSize(random, weight)
 end
 
--- Coins an equipped sheep earns over `seconds`, growing as it goes (lamb rate until it's grown, adult rate after).
--- Returns the coins and the seconds it grew.
-function Economy.Earn(sheep: Sheep, seconds: number): (number, number)
+-- Coins an equipped sheep earns over `seconds`, growing as it goes (lamb rate until it's grown, adult rate after),
+-- `growth` times as fast as normal (2 with the 2x Growth pass). Returns the coins and the seconds it grew.
+function Economy.Earn(sheep: Sheep, seconds: number, best: number?, growth: number?): (number, number)
 	if seconds <= 0 then
 		return 0, 0
 	end
 	local need = Economy.GrowthSeconds(sheep)
-	local lambSeconds = math.clamp(need - sheep.Grown, 0, seconds)
-	local coins = lambSeconds * Economy.LambIncome(sheep) + (seconds - lambSeconds) * Economy.AdultIncome(sheep)
+	local lambSeconds = math.clamp((need - sheep.Grown) / (growth or 1), 0, seconds)
+	local coins = lambSeconds * Economy.LambIncome(sheep, best)
+		+ (seconds - lambSeconds) * Economy.AdultIncome(sheep, best)
 	return coins, seconds
 end
 
 -- The offline settlement: 25% of up to two hours of income, juvenile rate until each lamb matures in
 -- that window; growth itself runs for the whole time away. Mutates each sheep's Grown. Returns the coins and the
 -- sheep that grew up meanwhile.
-function Economy.Offline(equipped: { Sheep }, elapsed: number, maxSeconds: number, share: number): (number, { Sheep })
+function Economy.Offline(
+	equipped: { Sheep },
+	elapsed: number,
+	maxSeconds: number,
+	share: number,
+	best: number?,
+	growth: number?
+): (number, { Sheep })
 	local coins = 0
 	local matured: { Sheep } = {}
 	local credited = math.clamp(elapsed, 0, maxSeconds)
+	local speed = growth or 1
 	for _, sheep in equipped do
 		local wasAdult = Economy.IsAdult(sheep)
-		local earned = Economy.Earn(sheep, credited)
+		local earned = Economy.Earn(sheep, credited, best, speed)
 		coins += earned
-		sheep.Grown = math.min(sheep.Grown + math.max(elapsed, 0), Economy.GrowthSeconds(sheep))
+		sheep.Grown = math.min(sheep.Grown + math.max(elapsed, 0) * speed, Economy.GrowthSeconds(sheep))
 		if not wasAdult and Economy.IsAdult(sheep) then
 			table.insert(matured, sheep)
 		end
@@ -531,7 +731,11 @@ end
 
 -- The name a sheep goes by: "Large Royal Meadow Sheep", "Ascended Grape Sheep", "Meadow Lamb".
 function Economy.Name(sheep: Sheep, showSize: boolean?): string
-	local tier = Economy.Tier(sheep.Family)
+	local robux = Economy.RobuxSheep[sheep.Family]
+	if robux then
+		return robux.Name
+	end
+	local familyName = Economy.FamilyName(sheep.Family)
 	local parts: { string } = {}
 	if sheep.Rank > 0 then
 		table.insert(parts, Economy.RankNames[sheep.Rank])
@@ -544,11 +748,16 @@ function Economy.Name(sheep: Sheep, showSize: boolean?): string
 		table.insert(parts, Economy.Rarities[sheep.Rarity].Name)
 	end
 	if adult then
-		table.insert(parts, tier.FamilyName)
+		table.insert(parts, familyName)
 	else
-		table.insert(parts, (string.gsub(tier.FamilyName, "Sheep$", "Lamb")))
+		table.insert(parts, (string.gsub(familyName, "Sheep$", "Lamb")))
 	end
 	return table.concat(parts, " ")
+end
+
+-- 2x Speed from the store: Climbing doubled, and at least the tutorial's +25 so a new player gains something.
+function Economy.DoubleClimb(climb: number): number
+	return math.max(climb * 2, climb + Economy.TutorialClimb)
 end
 
 -- The model scale a sheep shows at: its weight's lamb size while it's young, its adult size after.

@@ -97,6 +97,13 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   `AssetFetchStatus.Failure` until Roblox's review clears it (minutes), and a Studio that fetched it before then may go
   on reporting Failure from `PreloadAsync` after it's cleared: check in a freshly opened Studio. In game code, swap in a
   new picture only once it has arrived, or a Decal shows nothing meanwhile." Seen 2026-10-05.
+- **S24** (`BRAIN/PATTERNS/desktop.md` or `ui.md`, mock-ups): "Uploaded images can't be downloaded by asset id without a
+  login (the thumbnails API returns its placeholder for Image assets, assetdelivery returns 403). Every image any
+  Studio on the computer has shown is still on disk: `%LOCALAPPDATA%\Roblox\rbx-storage\<xx>\<file>`, each an `RBXH`
+  header followed by the PNG (cut from the `\x89PNG` signature). The files aren't named by asset id: extract them all,
+  make a numbered contact sheet and pick by eye. With a project's game art this way, a mock-up can be drawn as HTML
+  and rendered with headless Chrome (`chrome --headless=new --screenshot`) when every Studio is busy with other
+  sessions." Seen 2026-10-05 mocking up Steal a Sheep's Robux store while three sessions held the open Studios.
 
 - **S11** (`BRAIN/PATTERNS/characters.md`, Posing from code): "To make a player's feet land on moving things (stair
   machines, treadmills, pedals), anchor the root and solve the legs yourself: after the Animator (`PreSimulation`), a
@@ -136,7 +143,22 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   endings, so a script that edits a Luau or Markdown file turns every line CRLF. Open files for writing with
   `newline='\n'`, or strip `\r` afterwards." Seen 2026-10-05 in Steal a Sheep: four edited services came back all
   CRLF.
-- **S22** (`BRAIN/PATTERNS/animations.md`, a new "Skinned meshes from Blender" part): "A Blender rig exported as FBX
+- **S22** (`BRAIN/PATTERNS/ui.md`): "A ScrollingFrame with `ScrollBarThickness = 0` still draws a 1-pixel line where
+  its bar would be; set `ScrollBarImageTransparency = 1` as well to hide the bar." Seen 2026-10-05 on Steal a Sheep's
+  store, whose tabs stand outside the window instead of a bar.
+- **S23** (`BRAIN/PATTERNS/testing-studio.md`): "`user_mouse_input`'s `instance_path` can't reach an instance whose name
+  has a dot in it ('Instance not found'): the dot splits the path. Name UI elements without dots (or tap by x/y)."
+  Seen 2026-10-05 clicking the store's `Sheep.GoldenFleece` card.
+- **S25** (`BRAIN/GOTCHAS.md`): "Neon brightens a part's colour towards white: a pale Neon colour (140, 255, 170) reads
+  as white, most of all in a ViewportFrame. Give Neon a saturated colour, (255, 90, 0) or (0, 220, 190), to keep its
+  hue." Seen 2026-10-05 rendering Steal a Sheep's sheep designs: four glowing Mythics came out white.
+- **S26** (`BRAIN/PATTERNS/testing-studio.md`): "To call the running game's client code from a playtest (open a menu,
+  press what the mouse would) without the mouse, add a TEMP_ LocalScript to StarterPlayerScripts in Edit that requires
+  the controller and acts when an attribute on the LocalPlayer changes, then set the attribute from a Client
+  `execute_luau`: the LocalScript shares the game's module copies, `execute_luau` doesn't (S7). Delete it after." Seen
+  2026-10-05 in Steal a Sheep: desktop clicks meant for my Studio landed in another session's, which had taken the
+  foreground between my screenshot and my click.
+- **S27** (`BRAIN/PATTERNS/animations.md`, a new "Skinned meshes from Blender" part): "A Blender rig exported as FBX
   (forward -Z, up Y, primary bone axis Y, no leaf bones) comes in through File > Import at its Blender size, one
   Blender unit to one stud, facing -Z: a direction (x, y, z) in Blender's rig is (-x, z, y) in the model. The Bones
   sit under the MeshPart (unanchored), with an `AnimationController` and an `InitialPoses` folder beside it. A Bone's
@@ -144,13 +166,12 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   `bone.Transform = CFrame.new(rc:VectorToObjectSpace(offset)) * (rc:Inverse() * q * rc)`, `rc` being the bone's rest
   rotation relative to the MeshPart and `q` the rotation in the model's axes, carried by the parent bone." Seen
   2026-10-05 in Steal a Sheep: Zeus's walk pose from Blender matched in Studio, foot for foot.
-- **S23** (`BRAIN/PATTERNS/desktop-recipes.md`, Import 3D): "Run end to end: `ctrl+m` in the Studio window opens
+- **S28** (`BRAIN/PATTERNS/desktop-recipes.md`, Import 3D): "Run end to end: `ctrl+m` in the Studio window opens
   'Open 3D File (FBX, OBJ, GLB, GLTF)'; `window click_element` 'File name:' (role Edit, `window=` the dialog's hwnd),
   `ctrl+a`, type the path, Enter; the 'Import Preview' window's defaults (Upload to Roblox, Add to Workspace, pivot at
   the scene origin) were right for a rigged character with an embedded texture; Import. The mesh and texture upload at
   once (`MeshId`, `TextureID`)." Seen 2026-10-05 in Steal a Sheep.
-
-- **S24** (`BRAIN/PATTERNS/npcs.md`, a new "NPCs as Roblox avatars" part): "`Players:CreateHumanoidModelFromDescription`
+- **S29** (`BRAIN/PATTERNS/npcs.md`, a new "NPCs as Roblox avatars" part): "`Players:CreateHumanoidModelFromDescription`
   builds an NPC from any catalog items, owned or not, in Edit and on the server. Its HeightScale, WidthScale,
   DepthScale and HeadScale go past the avatar editor's limits (1.65, head 2.1 worked). Avatars made this way have
   AnimationConstraint joints, not Motor6Ds, and a dynamic head (FaceControls, no face Decal): give it a look with

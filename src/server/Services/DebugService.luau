@@ -7,8 +7,10 @@ local ServerStorage = game:GetService("ServerStorage")
 
 local Lifecycle = require(ReplicatedStorage.Lifecycle)
 local Economy = require(ReplicatedStorage.Utils.Economy)
+local Herds = require(ReplicatedStorage.Config.Herds)
 local Olympus = require(ReplicatedStorage.Config.Olympus)
 local Remotes = require(ReplicatedStorage.Remotes)
+local Store = require(ReplicatedStorage.Config.Store)
 
 -- Studio-only test tools behind the debug panel (client `UIController/Screens/DebugPanel`) and the Studio MCP:
 -- `require(ReplicatedStorage.Remotes).Debug:Invoke("AddCash", 500)` from a Client `execute_luau`. Every command is
@@ -60,11 +62,28 @@ local commands: { [string]: Command } = {
 		registry.FriendService:Refresh(player)
 		return true, nil
 	end,
-	-- value: a tier. An ordinary lamb of that tier's family goes straight into the flock, as if delivered.
+	-- value: a tier, and after the point which of its herd (30.6 is Zeus's Mythic; 30 his Common). A plain lamb of it
+	-- goes straight into the flock, as if delivered.
 	GiveSheep = function(player, value)
-		local tier = Olympus.Tiers[math.clamp(math.floor(value or 1), 1, Olympus.Count)]
+		local number = value or 1
+		local tier = Olympus.Tiers[math.clamp(math.floor(number), 1, Olympus.Count)]
+		local herd = Herds.ByGod[tier.God]
+		local slot = math.floor((number % 1) * 10 + 0.5)
+		local family = if herd and herd[slot] then herd[slot] else tier.Family
 		local size = math.random(1, 3)
-		registry.FlockService:Deliver(player, { Family = tier.Family, Rarity = 1, Weight = 1.05, Size = size })
+		registry.FlockService:Deliver(player, { Family = family, Rarity = 1, Weight = 1.05, Size = size })
+		return true, nil
+	end,
+	-- value: how many of each herd to mark found in the Sheepdex, Common first (6 for all), their rewards unclaimed.
+	FillDex = function(player, value)
+		local data = registry.DataService:GetData(player)
+		local count = math.clamp(math.floor(value or 6), 0, #Herds.Rarities)
+		for _, herd in Herds.ByGod do
+			for index = 1, count do
+				data.Dex[herd[index]] = true
+			end
+		end
+		registry.FlockService:Push(player)
 		return true, nil
 	end,
 	-- Every lamb in the pen grows up now.
@@ -94,6 +113,25 @@ local commands: { [string]: Command } = {
 		registry.FlockService:Push(player)
 		return true, nil
 	end,
+	-- Today's daily gift waits now, as if the timer had run out.
+	DailyReady = function(player)
+		local data = registry.DataService:GetData(player)
+		data.DailyAt = 0
+		registry.FlockService:Push(player)
+		return true, nil
+	end,
+	-- value: the daily gifts' day to claim next (1 to 7), waiting now.
+	DailyDay = function(player, value)
+		local data = registry.DataService:GetData(player)
+		local day = math.floor(value or 1)
+		if day < 1 or day > #Economy.DailyWeek then
+			return false, `Day 1 to {#Economy.DailyWeek}`
+		end
+		data.DailyDay = day
+		data.DailyAt = 0
+		registry.FlockService:Push(player)
+		return true, nil
+	end,
 	-- value: the stair walker level to show (1 is the free machine).
 	SetWalker = function(player, value)
 		local data = registry.DataService:GetData(player)
@@ -110,12 +148,14 @@ local commands: { [string]: Command } = {
 		end
 		return false, "data not loaded"
 	end,
-	-- value: the developer product's id. Its grant runs as a purchase's would, with no dialog or receipt.
+	-- value: the developer product's id. Its grant runs as a purchase's would, with no dialog or receipt. (The store
+	-- grants products without an id straight away in Studio.)
 	GrantProduct = function(player, value)
-		if not value then
-			return false, "which product id?"
+		local key = if value then Store.KeyOfProduct(value) else nil
+		if not key then
+			return false, "no store product has that id"
 		end
-		return registry.PurchaseService:Grant(player, value)
+		return registry.PurchaseService:Grant(player, key)
 	end,
 	-- value: the pass's id. It counts as bought in this session.
 	GrantPass = function(player, value)

@@ -4,6 +4,8 @@
 -- Config/Olympus; the economy's formulas are in Utils/Economy. The sheep, carry and UI sections are Shear a Sheep's,
 -- kept in the same shape so its Looks, CarryPose, SheepRigLayout and UI kit work unchanged.
 
+local Herds = require(script.Parent.Herds)
+
 export type WoolStyle = "Puffs" | "Ringlets" | "Cloud" | "Icicle" | "Spotted"
 export type HornStyle = "SmallCurl" | "BigCurl" | "Spiral" | "FourHorn"
 export type Accessory = "Antennae" | "WolfHead"
@@ -13,6 +15,7 @@ export type SpecialFX =
 	| "StormSparks"
 	| "Stars"
 	| "Sparkles"
+	| "GoldSparkles"
 	| "MoonGlow"
 	| "Spores"
 	| "Wisps"
@@ -41,7 +44,9 @@ export type Breed = {
 	BaaPitch: number,
 	SpecialFX: SpecialFX?,
 	Mutation: string?, -- a fleece paint laid over the wool (Silver, Rainbow, Gold)
-	Extra: string?, -- a primitive accessory SheepService adds (Leaf, Helmet, Wreath, Wings, BackWings, Blindfold, Flame)
+	-- A primitive accessory SheepService adds (Leaf, Helmet, Wreath, Wings, BackWings, Blindfold, Flame, Pegasus).
+	Extra: string?,
+	Extras: { Herds.Extra }?, -- more of them, each in an optional colour (SheepService/Extras)
 }
 
 export type Mutation = {
@@ -91,9 +96,10 @@ local function look(id: string, name: string, overrides: { [string]: any }): Bre
 	return breed
 end
 
--- The thirty families' looks, keyed by family id (Config/Olympus). Most are Shear a Sheep breeds as they are, in its
+-- The thirty families' looks, keyed by family id (Config/Olympus), then the store's two. Most are Shear a Sheep breeds as they are, in its
 -- colours; the Grape, War, Laurel, Cupid, Justice, Victory and Hearth sheep are its plain breeds recoloured, with a
--- primitive extra, and the Prism Sheep a plain one in rainbow puffs.
+-- primitive extra, and the Prism Sheep a plain one in rainbow puffs. Last, the families that are no god's
+-- (Economy.Specials): the daily gifts' Pegasus Sheep.
 local breeds: { [string]: Breed } = {
 	Meadow = look("Meadow", "Meadow Sheep", {
 		Build = "ScarecrowSheep",
@@ -288,7 +294,42 @@ local breeds: { [string]: Breed } = {
 		EarInnerColor = rgb(200, 210, 250),
 		SpecialFX = "StormSparks",
 	}),
+	-- Day 7 of the daily gifts: white and fluffy with big feathered wings tipped in gold, a halo and gold hooves
+	-- (Extras' "Pegasus"), the look the user picked from DESIGN/ui/mockups/daily-gifts.html.
+	Pegasus = look("Pegasus", "Pegasus Sheep", {
+		WoolColor = rgb(250, 250, 246),
+		WoolSize = 1.08,
+		FaceColor = rgb(250, 236, 214),
+		LegColor = rgb(250, 236, 214),
+		SpecialFX = "Sparkles",
+		Extra = "Pegasus",
+	}),
+	-- The Robux store's two sheep (Economy.RobuxSheep), in Shear a Sheep's colours for its Golden Fleece and Time Sheep.
+	GoldenFleece = look("GoldenFleece", "Golden Fleece", {
+		WoolColor = rgb(255, 196, 64),
+		FaceColor = rgb(246, 226, 206),
+		LegColor = rgb(246, 226, 206),
+		EarInnerColor = rgb(250, 176, 180),
+		HornStyle = "BigCurl",
+		HornColor = rgb(240, 228, 198),
+		Face = "Happy",
+		SpecialFX = "GoldSparkles",
+	}),
+	Kronos = look("Kronos", "Kronos Sheep", {
+		Build = "TimeSheep",
+		WoolColor = rgb(246, 232, 196),
+		WoolSpotColor = rgb(236, 214, 166),
+		FaceColor = rgb(250, 240, 220),
+		LegColor = rgb(150, 112, 70),
+	}),
 }
+-- The gods' rarer families (Config/Herds), on the same defaults.
+for id, overrides in Herds.Looks do
+	assert(breeds[id] == nil, `Config/Herds: {id} is already a family (pick another id)`)
+	local fields = table.clone(overrides)
+	fields.Name = nil
+	breeds[id] = look(id, overrides.Name, fields)
+end
 
 local mutations: { [string]: Mutation } = {
 	Silver = {
@@ -387,15 +428,6 @@ local GameConfig = {
 		StepRange = 0.35,
 		StepDecay = 0.9,
 		AnimateRange = 220, -- studs from the camera within which machines and climbers move
-		-- Robux for the next level, by the level bought: 2, 3, 4, 5, then every level after. A product id of 0 isn't on
-		-- sale yet: make the developer products in Creator Hub and put their ids here.
-		Robux = {
-			{ Price = 19, ProductId = 0 },
-			{ Price = 39, ProductId = 0 },
-			{ Price = 59, ProductId = 0 },
-			{ Price = 99, ProductId = 0 },
-			{ Price = 149, ProductId = 0 },
-		} :: { { Price: number, ProductId: number } },
 	},
 
 	-- Offline earnings: a quarter of at most two hours.
@@ -542,6 +574,11 @@ local GameConfig = {
 	Gift = {
 		AutoOpenSeconds = 30,
 		FavoriteTimeout = 60, -- seconds to wait for Roblox's favorite prompt to answer
+	},
+	-- The daily gifts' menu opens by itself once a session, this long after a gift is waiting and the player is free
+	-- (after the free gift's, so the two don't meet).
+	Daily = {
+		AutoOpenSeconds = 45,
 	},
 }
 

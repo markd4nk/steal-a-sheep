@@ -4,6 +4,15 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-05, daily gifts**: no place changes (the menu, the HUD's DAILY and the Pegasus Sheep are made at
+  runtime; `SheepService` adds the Pegasus to `ReplicatedStorage.SheepLooks` with the other families). Its six
+  pictures are uploaded images (`Theme.Icons.DailyCash1/3/5`, `DailyClimb1/3`, `Pegasus`). Tried in this session's own
+  copy of the place (`build/DailyPlaytest.rbxl`); the main Studio wasn't touched.
+
+- **2026-10-05, the Robux store**: no place changes (the store and its HUD button are made at runtime). Its 17
+  pictures are uploaded images (ids in `Theme.Icons`). Tried in the main Studio with the branch's scripts swapped in
+  and swapped back; nothing saved.
+
 - **2026-10-05, friend boost**: no place changes (the HUD tile is made in code).
 
 - **2026-10-05, the free gift**: no place changes (its menu and HUD button are made at runtime; its two step

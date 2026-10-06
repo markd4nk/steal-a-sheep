@@ -36,6 +36,8 @@ return function(t: Run.Suite)
 		t.Expect((PlayerData.Validate({ Coins = 0 / 0 }))).ToBe(false)
 		t.Expect((PlayerData.Validate({ Coins = "100" }))).ToBe(false)
 		t.Expect((PlayerData.Validate({ WalkerLevel = 1.5 }))).ToBe(false)
+		t.Expect((PlayerData.Validate({ SpeedBuys = -1 }))).ToBe(false)
+		t.Expect((PlayerData.Validate({ SpeedBuys = 3 }))).ToBe(true)
 		t.Expect((PlayerData.Validate({ Receipts = { abc = "yesterday" } }))).ToBe(false)
 		t.Expect((PlayerData.Validate("not a table"))).ToBe(false)
 	end)
@@ -45,6 +47,24 @@ return function(t: Run.Suite)
 		bad.Rarity = 4
 		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = bad } }))).ToBe(false)
 		t.Expect((PlayerData.Validate({ Sheep = { ["2"] = sheep("1") } }))).ToBe(false)
+	end)
+
+	t.Test("the daily gifts: the day to claim next and when the last was claimed", function()
+		t.Expect(PlayerData.Template.DailyDay).ToBe(1)
+		t.Expect(PlayerData.Template.DailyAt).ToBe(0)
+		t.Expect((PlayerData.Validate({ DailyDay = 7, DailyAt = 1790000000 }))).ToBe(true)
+		t.Expect((PlayerData.Validate({ DailyDay = 0 }))).ToBe(false)
+		t.Expect((PlayerData.Validate({ DailyDay = 8 }))).ToBe(false)
+		t.Expect((PlayerData.Validate({ DailyAt = -5 }))).ToBe(false)
+	end)
+
+	t.Test("a special family's sheep keeps the tier it earns as", function()
+		local pegasus = sheep("1")
+		pegasus.Family = "Pegasus"
+		pegasus.Tier = 9
+		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = pegasus } }))).ToBe(true)
+		pegasus.Tier = 0
+		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = pegasus } }))).ToBe(false)
 	end)
 
 	t.Test("the free gift is a flag", function()
@@ -89,6 +109,17 @@ return function(t: Run.Suite)
 		local bad = sheep("1")
 		bad.Weight = 0.5
 		t.Expect((PlayerData.Validate({ Sheep = { ["1"] = bad } }))).ToBe(false)
+	end)
+
+	t.Test("schema 2: families already found were paid, so they start out claimed", function()
+		local data: any = { SchemaVersion = 2, Dex = { Meadow = true, Grape = true } }
+		t.Expect((PlayerData.Validate(data))).ToBe(true)
+		PlayerData.Migrate(data)
+		t.Expect(data.DexClaimed.Meadow).ToBe(true)
+		t.Expect(data.DexClaimed.Grape).ToBe(true)
+		t.Expect(data.DexClaimed.Moon).ToBe(nil)
+		t.Expect((PlayerData.Validate(data))).ToBe(true)
+		t.Expect((PlayerData.Validate({ DexClaimed = { Meadow = 1 } }))).ToBe(false)
 	end)
 
 	t.Test("Migrate stamps the current schema version", function()

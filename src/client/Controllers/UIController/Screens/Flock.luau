@@ -107,12 +107,9 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			return
 		end
 		nameLabel.Text = sheep.Name
-		Style.PaintRarity(rarityChip, SheepIcon.RarityLook(sheep.Rarity))
-		local rarityLabel = rarityChip:FindFirstChild("Label")
-		if rarityLabel and rarityLabel:IsA("TextLabel") then
-			rarityLabel.Text = string.upper(Economy.Rarities[sheep.Rarity].Name)
-		end
-		Style.PaintStage(stage, SheepIcon.RarityLook(sheep.Rarity))
+		local kind = SheepIcon.FamilyLook(sheep.Family)
+		Style.PaintRarity(rarityChip, kind)
+		Style.PaintStage(stage, kind)
 		rankChip.Visible = sheep.Rank > 0
 		if sheep.Rank > 0 then
 			Style.PaintRarity(rankChip, if sheep.Rank >= 2 then "Mythic" else "Epic")
@@ -137,7 +134,10 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		lines[2].Text = if sheep.Slot > 0
 			then (if sheep.Pinned then "In your pen (pinned)" else "In your pen")
 			else "Stored - not earning"
-		lines[3].Text = if sheep.Locked then "Locked: can't be sold or merged" else ""
+		lines[3].Text = if sheep.Robux
+			then "From the store: stays with you"
+			elseif sheep.Locked then "Locked: can't be sold or merged"
+			else ""
 		Buttons.Set(
 			equipButton,
 			if sheep.Slot > 0 then "Soft" else "Action",
@@ -174,7 +174,7 @@ function Flock.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		for order, sheep in flock do
 			local card = MenuParts.NewCard(list, `Sheep{sheep.Id}`, order)
 			local face = card:FindFirstChild("Face") :: Frame
-			Style.PaintCard(card, SheepIcon.RarityLook(sheep.Rarity))
+			Style.PaintCard(card, SheepIcon.FamilyLook(sheep.Family))
 			SheepIcon.Paint(face:FindFirstChild("Token") :: Frame, sheep.Family, sheep.Rarity)
 			local cardName = face:FindFirstChild("NameLabel") :: TextLabel
 			cardName.Text = (string.gsub(string.gsub(sheep.Name, " Sheep$", ""), " Lamb$", " Lamb"))

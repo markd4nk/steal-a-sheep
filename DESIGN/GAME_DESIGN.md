@@ -43,7 +43,11 @@ the sheep walking around on their own "just like in Shear a Sheep", lambs "mostl
   hopping in, grazing and faces on each device: `AnimController` (+ `Utils/SheepClips`).
 - Plots (the map's five), the pen box, where a sheep may stand or walk, stair walkers: `PlotService`.
 - Leaderboards on the map's four boards (This Server, Top Income, Most Steals, Climbing): `LeaderboardService`.
+- The Robux store: what it sells and its prices in `Config/Store`; prompts and passes `StoreService`; grants
+  `PurchaseService/Products`; the screen `Screens/Store`.
 - Free gift for liking and favoriting the game (Climbing and cash, once): `GiftService`, `Screens/Gift`.
+- Each god's six sheep: `Config/Herds` (looks, rarities); the Sheepdex's claims and herd gifts: `SheepdexService`,
+  `Screens/Sheepdex`.
 - Every formula: `src/shared/Utils/Economy.luau`; tiers and gods: `src/shared/Config/Olympus.luau`.
 
 ## The map
@@ -57,6 +61,8 @@ rising a degree or so a god from 32 to 52 (the user: no steeper than about 60, g
 kept), up to Zeus's throne plaza: five more minor gods, then the thirteen Olympians from the youngest, Dionysus, to
 Zeus's siblings, Hera and Zeus. Below the Twelve the myths set no order, so the minor gods follow the stages' themes.
 The climb is all on foot. High Olympus is sparse for now: the user will add obstacles to it later.
+
+Each god has six sheep families (below); the table's is the god's own, their Common.
 
 | Tier | God | Where | Family (Shear a Sheep breed) |
 | --- | --- | --- | --- |
@@ -92,9 +98,18 @@ The climb is all on foot. High Olympus is sparse for now: the user will add obst
 | 30 | Zeus | Throne of Olympus | Thunder Sheep (Storm Sheep) |
 
 ## Economy (as built)
-Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling and the free gift, and
-buys stair walker levels, pen space and trails. The one Robux offer: the next stair walker level, at the machine's
-sign (prices being decided in another session; the developer products aren't made yet).
+Cash, the only currency (code calls it `Coins`), comes from sheep in the pen, first-discovery rewards, selling, the
+free gift and the daily gifts, and buys stair walker levels, pen space and trails. Robux buys from the store below.
+
+## The Robux store (the user, 2026-10-05)
+A STORE button on the HUD opens one page that scrolls, its section tabs outside the window on the right:
+- **Sheep**: Golden Fleece (799) and Kronos Sheep (349), sold for Robux only. Each earns 10x / 3x the player's best
+  other sheep, so it stays their top earner at every tier; they arrive grown and can't be sold or merged.
+- **Passes**: 2x Money (all sheep income, offline too) and 2x Growth (lambs grow twice as fast, away too).
+- **Speed**: 2x Speed doubles Climbing; it can be bought again, three times the price each time (3 to 2,187, seven
+  buys). The stair walker's next level, for Robux (19, then 20% more a level) or its cash price.
+- **Climbing** packs (+150K to +10B) and **Cash** packs (24K to 8M).
+Hermes' winged sandal is the climbing icon everywhere (gold wings on 2x Speed).
 
 ## Friend boost (the user, 2026-10-05)
 Each Roblox friend in your server adds +20% to your flock's cash income while they stay (servers hold 5, so +80% at
@@ -102,12 +117,25 @@ most); not offline earnings, not the leaderboards. A tile under the menu picture
 or, with no friends here, the invite picture and INVITE. Tapping it opens Roblox's invite. When a friend joins:
 "Sam joined: friend boost +20%"; the HUD's cash rate includes the boost.
 
+## Daily gifts (the user, 2026-10-05)
+Come back each day for a better gift; Day 7 is a super rare sheep found nowhere else, the **Pegasus Sheep**. Then the
+same week starts again (the user: "just this week for now"; later weeks are still to design). A missed day waits
+where it was. The next gift opens 20 hours after a claim.
+- Days 1-6: cash (3, 10 and 30 minutes of the pen's income), Climbing (1 and 3 minutes of the stair walker), and on
+  Day 4 a Rare lamb from the highest god the player has stolen from. Each is at least a small floor for new players.
+- **The Pegasus Sheep**: white and fluffy, big feathered wings tipped in gold, a glowing halo and gold hooves (the
+  user's pick: the third look in the mock-up). It arrives as a lamb with lucky size odds and earns as a sheep one god
+  above the highest stolen from, as much as a Royal sheep of that god. It can't go in the Merge Shrine.
+- The menu, layout B (the user's pick): Days 1-6 as cards, Day 7 big beside Claim; claimed days dark with a tick,
+  today's gold, the countdown on the button once claimed. It opens by itself once a session while a gift waits; the
+  HUD's DAILY (the golden calendar, under GIFT) opens it any time and shows the countdown once claimed.
+
 ## Stair walker (the user, 2026-10-05)
 A real StairMaster just outside each pen, beside the gate, like Steal an Egg's treadmill. Walk into it and you snap on
 and climb its moving steps (your legs on the steps, any avatar); jump to get off. Its level floats over it, its steps
 run faster each level, and it looks better as it upgrades: Starter, Sport, Pro, Turbo, Champion (levels 6 and up
 keep Champion's look for now, ending in an Olympus look later). The upgrade sign beside it buys the next level
-straight away, for cash or Robux.
+straight away, for cash or Robux (the store's walker prices).
 
 ## Climbing (the user, 2026-10-05)
 Like Steal an Egg: train one stat, **Climbing** (the stair walker; saved as `ClimbPower`), to get up the mountain
@@ -132,6 +160,22 @@ Hidden: no words or numbers on screen, players feel it. A smooth range from 1 (l
 (`Weight`). Wild lambs: 1-1.1 mostly, 1.1-1.5 for one in twenty. Heavier lambs are slower to carry and tend to grow
 bigger (size odds shift with weight; Titan only from the Merge Shrine's huge rolls), and look a little bigger as lambs.
 
+## Six sheep a tier (the user, 2026-10-05)
+Every god's pasture holds six families (`Config/Herds`, keyed by god): **Common** (the god's own family), **Uncommon,
+Rare, Epic, Legendary, Mythic**, the rarer ones built from Shear a Sheep's builds and wool with primitive extras. Each
+wild lamb rolls its family: 50 / 25 / 13 / 7 / 4 / 1%. A family earns its tier's base income times x1, x1.5, x2.5, x4,
+x8, x15. On top of that every lamb still rolls its **fleece: Plain, Shiny (x1.5, blue sparkles) or Royal (x2.5, gold)**.
+The theft card shows the family's rarity; Legendary and Mythic lambs (and Royal fleeces) are announced. Menus colour a
+sheep's card by its family's rarity.
+
+## Sheepdex (Mark's mock-up, 2026-10-05)
+Like Steal an Egg's Pet Index: one scrolling list with a section per tier (its god, its six sheep in a 3 x 2 grid in
+their rarity's colours, dark silhouettes until found, a bar to the herd's gift) and the picked sheep beside it: its
+picture, rarity, income, where it lives and its reward. Delivering the first of a family finds it; its reward (30 s of
+the family's income in cash, and 5% of its tier's sign number x its rarity's multiplier in Climbing, at least 5) waits
+for **Claim** in the Sheepdex. Claiming all six of a god pays the herd's gift (10 minutes of the tier's Common income,
+and a quarter of its sign number in Climbing, at least 25). A red badge on the HUD's SHEEPDEX counts rewards waiting.
+
 ## Merge Shrine (the user, 2026-10-05)
 The Laurel Ring in the hub, where the Mutation Machine stood: pick three grown sheep of one family in its menu, pay
 cash, and they merge into one fresh lamb of that family. Its fleece and hidden weight are rerolled (so its adult size
@@ -142,5 +186,5 @@ a stolen lamb (no god chases it; nobody else sees or takes it); left there 30 s 
 when it grows up in the pen. `ShrineService` (server), `ShrineController` (the scene on each device), the Merge menu.
 
 ## Not built
-Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece rarity, premium products.
+Player plot raiding, trading, breeding, rebirth, god attacks, mutations beyond the fleece, gifting store items.
 These are just not built yet, not ruled out: build them if the user asks.
