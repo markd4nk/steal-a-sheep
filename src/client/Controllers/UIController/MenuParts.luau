@@ -69,6 +69,10 @@ function MenuParts.Detail(page: Frame, leftWidth: number): Frame
 	UIKit.List(detail, false, 6, Enum.HorizontalAlignment.Center)
 	local card = UIKit.Frame(detail, "Card", UDim2.new(1, 0, 0, 150))
 	card.LayoutOrder = 1
+	-- On a short screen (a phone held sideways) the picture gives up height so the buttons under it stay in the menu.
+	local shrink = Instance.new("UIFlexItem")
+	shrink.FlexMode = Enum.UIFlexMode.Shrink
+	shrink.Parent = card
 	local stage = UIKit.Stage(card, "Stage", UDim2.fromScale(1, 1), 10)
 	local view = Instance.new("ViewportFrame")
 	view.Name = "View"
