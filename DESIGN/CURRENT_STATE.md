@@ -48,7 +48,7 @@ lamb.
 - **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
   Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
   `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
-- **Robux store** (2026-10-05, branch `t3code/design-robux-shop`, not merged): the HUD's STORE (right edge) opens one
+- **Robux store** (2026-10-05, merged into main): the HUD's STORE (right edge) opens one
   scrolling page with its section tabs outside the window: two Robux-only sheep, 2x Money / 2x Growth passes, 2x Speed
   (re-buyable, tripling), the walker's next level, Climbing and Cash packs. `Config/Store` (catalog, prices, ladders),
   `StoreService` (dialogs, passes), `PurchaseService/Products` (grants by key), `Screens/Store`; art from
@@ -78,9 +78,10 @@ lamb.
 
 ## In progress
 
-- **The Robux store** is on `t3code/design-robux-shop`, playtested, waiting for the user to say merge. Before it can
-  sell: make the 2 passes and the developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) in
-  Creator Hub at Config/Store's prices and put their ids in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`).
+- **The Robux store can't sell yet** (merged 2026-10-05; the user: Creator Hub later): once the game is published,
+  make the 2 passes and 49 developer products (sheep 2, 2x Speed 7, stair walker 29, Climbing 6, Cash 5) at
+  Config/Store's prices and put their ids in `Config/Store` (`PRODUCT_IDS`, `PASS_IDS`). `StealASheep.rbxl` wasn't
+  rebuilt with the store: run `scripts/build-place.ps1` (or swap main's scripts into the open Studio).
 
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game

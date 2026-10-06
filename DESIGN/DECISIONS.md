@@ -107,6 +107,8 @@ confirmed or reversed it.
   then sold out.
 - **The stair walker's next level for Robux, beside its cash price**: 19 for the first level, 20% more each level
   (3,132 for the last).
+- **The store as built is OK (the user, 2026-10-05)**, with the STORE button on the right edge of the screen; merged.
+  Creator Hub's products and passes come later.
 
 ## To review
 
@@ -125,9 +127,8 @@ Calls made building the Robux store (2026-10-05):
   last level's cash price.
 - **Passes count offline too**: 2x Money on the offline cash, 2x Growth on growth while away. Every income shown (HUD,
   flock cards, pen labels, the income boards) includes 2x Money.
-- **HUD**: a STORE button (the icon pack's golden Robux coin) on the right edge, halfway down: the left column is full
-  on a phone (GIFT, FLOCK, SHOP, SHEEPDEX, INVITE). Hidden like the others until the first delivery. The store window's
-  corner picture is the basket, as in the mock-ups.
+- **HUD**: the STORE button (the icon pack's golden Robux coin) is hidden like the others until the first delivery
+  (its place on the right edge is the user's OK). The store window's corner picture is the basket, as in the mock-ups.
 - **The tabs**: 2 points apart, 6 from the window (the user: tighter and closer). Where the window is short (a phone held
   sideways) they start beside the header and shrink just enough for all five; on a phone they're about 0.8 size.
 - **Climbing's icon everywhere is the white-winged sandal** (HUD, store, the free gift); 2x Speed's has gold wings.

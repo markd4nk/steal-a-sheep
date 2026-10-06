@@ -40,7 +40,7 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     sideways: the window fits after the Motion fix, all five tabs fit, the Cash tab scrolls there. Screenshots in the
     session (`steal-a-sheep-store-built-*.jpg` in T3 Code's attachments). After merging main's Merge Shrine gamble: 66
     of 66 tests, Kronos bought (3x), the shrine's menu lists only the mountain's sheep with Kronos in the flock, console
-    clean.
+    clean. The user: merge it, STORE on the right edge is fine, Creator Hub later.
 - **The Merge Shrine: the Laurel Ring, a gamble like Steal an Egg's Fuse Machine (2026-10-05)**. Merged into main at
   the user's request.
   - *How it works*: `ShrineService` builds the Laurel Ring (`ShrineService/Model`) where the Mutation Machine stood
