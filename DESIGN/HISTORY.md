@@ -34,6 +34,16 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     point, run or laugh. It now waits up to 3 s. Replayed after the merge: 97 tests; a tier 1 theft showed Pan's point,
     the lunge (half laid at 1.5 s), flat while gliding, getting up on the catch, the laugh, the walk home, his sounds,
     the ChaseScreen; a clean console.
+  - *Shipped as version 27* (the user: "merge cleanly and then publish. I think we're ready to test the next
+    version"): main fast-forwarded to 7270d54 with the mystery lambs, onboarding trail and fewer hints merged in (101
+    tests and a theft in a place copy). The cloud place held version 20's scripts (74 matching, 39 changed, 7 new,
+    nothing extra, no TEMP_, the debug profile off); main's were set in, 120 of 120 scripts and 18 of 18 tests
+    matching. A playtest of the cloud place: both bootstraps ready, 101 tests, "data will be saved", Pan animating,
+    a clean console (no theft there: real saves and boards). File > Save to Roblox at 18:14 UTC, Publish to Roblox at
+    18:15: "Place published", v27. Went out since v20: the scarier steal and chase (22602c2), mystery lambs (b11ed32,
+    cf70420), the onboarding trail (f6fc9e6), no hand-holding after onboarding (864d603, a981e5a), the stair walker's
+    pops (0ebfad4, ee98609, 07259ba), this lunge, glide and surf (c1dfc58) and the gods' animation fix. No
+    Studio-side content changed. Audience still Private.
 - **Mystery lambs (2026-10-06, branch `t3code/mystery-lamb-mockup`, merged into main on the user's word)**.
   The user: lambs should be a mystery "so that the player doesn't actually know what they're getting", like Steal an
   Egg's eggs, with only a little indication (which is bigger, heavier, more basic), a default lamb look ("no wool, ...

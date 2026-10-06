@@ -16,9 +16,14 @@ history: one line per item, details in the files below. Keep it under 300 lines 
 
 ## Live
 
-- **Private test version 20 (2026-10-06, 17:34 UTC)**: main @ d8fc2b3, version 8 plus the momentum slides (below);
+- **Private test version 27 (2026-10-06, 18:15 UTC)**: main @ 7270d54, version 20 plus the scarier steal and chase,
+  mystery lambs, the onboarding trail, no hand-holding after onboarding, the stair walker's pops, and the gods' lunge
+  and belly glide with the players' surf (each below; HISTORY.md, the god lunge entry, lists them). Roblox numbers
+  Team Create's autosaves too, so 21-26 were never published. Remotes changed (`Chase`, `Reveal`); no servers were
+  checked for restarting (the place is Private). Same place, audience still Private.
+- **Private test version 20 (2026-10-06, 17:34 UTC)**: main @ d8fc2b3, version 8 plus the momentum slides;
   nothing else in code went out since 8 (main's other commits since were art and docs). Roblox numbers Team Create's
-  autosaves too, so 9-19 were never published. Same place, audience still Private.
+  autosaves too, so 9-19 were never published.
 - **Private test version 8 (2026-10-06)**: main @ 3667692, everything through the overnight work: one message per
   moment, the game's own prompt buttons, the Settings menu, studs on every sheep, the 30 gods as avatars in rank order
   with High Olympus rebuilt for it, the store's real products, the region check. No servers were running, so none to
@@ -107,15 +112,15 @@ lamb.
   Mutation Machine; three grown sheep of one family and cash make one rerolled lamb, carried home from the altar
   (GAME_DESIGN.md, *Merge Shrine*).
 - **The gods** (version 8): thirty in mythological rank, Pan tier 1 to Zeus 30, each a catalog-dressed Roblox avatar
-  (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load. Live,
-  they chase with Roblox's run; the lunge and belly glide are in main for the next version (below).
-- **Onboarding trail and less hand-holding** (merged into main 2026-10-06 on the user's word, not published yet): Shear
+  (`GodService/Looks.luau` and `Props.luau`, `GodController`), its block figure if the catalog fails to load. Since
+  version 27 they lunge and glide on their bellies (below).
+- **Onboarding trail and less hand-holding** (merged into main 2026-10-06 on the user's word, live in version 27): Shear
   a Sheep's floor chevrons (`UIController/GuidePath`) guide only the first lamb (to Pan's meadow, home from the
   mountain's foot, then to the stair walker), no words, no floating arrow, no carried lamb's card or Return, and no
   chase banner (the chase is ChaseController's sounds and red screen). After
   onboarding nothing tells the player what to do: no hints, no "in reach", no menu tips; refusals say only the fact.
   GAME_DESIGN.md, *Onboarding*; DECISIONS.md, *No hand-holding after onboarding*.
-- **Stair walker pops** (merged into main 2026-10-06, not published yet): steps run at the climber's training rate
+- **Stair walker pops** (merged into main 2026-10-06, live in version 27): steps run at the climber's training rate
   (0.5 s to 0.1 s a step), each popping a shoe and "+N" off your head ("+1" twice a second at level 1, about ten
   "+2.5T" at level 30); your machine's floating level hides while you climb; no training meter.
 - **What the HUD says** (version 8): one message per moment (`Screens/Hud`); every ProximityPrompt drawn as the menus'
@@ -129,7 +134,7 @@ lamb.
   `studio/SheepStuds.luau` (in the cloud place since 2026-10-06); without them the wool stays plain and the server warns
   once.
 
-- **Mystery lambs** (merged 2026-10-06, not published): every lamb is a bare white lamb with one spot per step of its
+- **Mystery lambs** (merged 2026-10-06, live in version 27): every lamb is a bare white lamb with one spot per step of its
   family's rarity in its grown sheep's colour (mock-up D), bigger and rounder the heavier, nothing over it and nothing
   naming it; it earns nothing, shows a clock and time left in the pen, and at 100% its fleece pops on at its real size
   with a "Your lamb grew up: ..." notice (the Sheepdex finds it then). `Utils/LambLook`, `SheepService/Lambs`,
@@ -139,12 +144,12 @@ lamb.
 
 - **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
   (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
-- **God lunge, belly glide and the surfing slide (2026-10-06, merged into main, not published)**: a god's chase opens
+- **God lunge, belly glide and the surfing slide (2026-10-06, live in version 27)**: a god's chase opens
   with a face-first lunge (its dive 1.6x as fast), then it glides on its belly; R15 players surf down instead of
   Roblox's sit. Clips as code (`Utils/BodyClips`), played by `GodController` and the new `SlideController` on every
   device; `Economy.LungeShare` for the dive. Playtested solo (HISTORY.md).
 - **Planned, later** (the user, 2026-10-06): a catch sound of each god's own (Zeus's thunder and so on).
-- **A scarier steal and chase (merged into main 2026-10-06, not published yet)**: an alarm, the god's
+- **A scarier steal and chase (merged into main 2026-10-06, live in version 27)**: an alarm, the god's
   roar, footsteps, yells, snarl, punch and laugh from the god (`GodController`; goddesses `Olympus.Goddess`), the
   thief's heartbeat, red edges, drained colour, shake and drums that build as it closes (`ChaseController`,
   `Utils/ChaseFeel`, `GameConfig.Chase`), "safe" on getting away; `Remotes.Chase` says how a chase ended. The user OK'd
