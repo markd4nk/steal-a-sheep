@@ -137,4 +137,19 @@ return function(t: Run.Suite)
 		t.Expect(math.abs(coins - (half * Economy.LambIncome(plain) + half * Economy.AdultIncome(plain))) < 1e-6)
 			.ToBe(true)
 	end)
+	t.Test("every product and pass has its own Roblox id", function()
+		local seen: { [number]: string } = {}
+		for _, key in Store.ProductKeys(Economy.MaxWalker) do
+			local id = Store.ProductId(key)
+			t.Expect(id > 0).ToBe(true)
+			t.Expect(seen[id]).ToBe(nil)
+			seen[id] = key
+			t.Expect(Store.KeyOfProduct(id)).ToBe(key)
+		end
+		for _, pass in Store.Passes do
+			local id = Store.PassId(pass.Key)
+			t.Expect(id > 0).ToBe(true)
+			t.Expect(Store.KeyOfPass(id)).ToBe(pass.Key)
+		end
+	end)
 end

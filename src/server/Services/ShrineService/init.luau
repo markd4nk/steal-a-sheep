@@ -1,6 +1,7 @@
 --!strict
 
 local Players = game:GetService("Players")
+local PolicyService = game:GetService("PolicyService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -31,12 +32,35 @@ type Waiting = {
 
 local CHECK_SECONDS = 0.5
 local LAND_SLACK = 0.5 -- the client's show may land a little before the server's clock says so
+local POLICY_TRIES = 3
+local POLICY_RETRY_SECONDS = 5
 
 local registry: Lifecycle.Registry = {}
 local trove = Trove.new()
 local random = Random.new()
 local waiting: { [Player]: Waiting } = {}
 local shrine: Model? = nil
+-- A merge's fee is cash, which the store sells for Robux, so the lamb it rolls is a paid random item: players whose
+-- region restricts those can't merge. Unknown until Roblox answers, and closed while unknown.
+local mayMerge: { [Player]: boolean } = {}
+
+local function fetchPolicy(player: Player)
+	for try = 1, POLICY_TRIES do
+		local ok, policy = pcall(function()
+			return PolicyService:GetPolicyInfoForPlayerAsync(player)
+		end)
+		if ok and typeof(policy) == "table" then
+			if player.Parent then
+				mayMerge[player] = policy.ArePaidRandomItemsRestricted ~= true
+			end
+			return
+		end
+		if try < POLICY_TRIES then
+			task.wait(POLICY_RETRY_SECONDS)
+		end
+	end
+	warn(`ShrineService: no paid random item policy for {player.Name}; the shrine stays closed to them`)
+end
 
 local function notify(player: Player, message: string, kind: string, sound: string?)
 	Remotes.Notify:Fire(player, message, kind, sound)
@@ -74,6 +98,9 @@ local function merge(player: Player, ids: { string }): (boolean, string?)
 	end
 	if waiting[player] then
 		return false, "Pick up your lamb first"
+	end
+	if not mayMerge[player] then
+		return false, "Merging isn't available in your region"
 	end
 	-- How the three looked, for the show: they're gone from the flock once the merge goes through.
 	local data = registry.DataService:GetData(player)
@@ -153,8 +180,15 @@ function ShrineService.Start(_self: any)
 
 	Remotes.Merge:Handle(merge)
 	trove:Add(Remotes.ShrineCollect:Connect(collect))
+	trove:Connect(Players.PlayerAdded, function(player: Player)
+		task.spawn(fetchPolicy, player)
+	end)
+	for _, player in Players:GetPlayers() do
+		task.spawn(fetchPolicy, player)
+	end
 	trove:Connect(Players.PlayerRemoving, function(player: Player)
 		sendHome(player, nil)
+		mayMerge[player] = nil
 	end)
 	local since = 0
 	trove:Connect(RunService.Heartbeat, function(dt: number)
