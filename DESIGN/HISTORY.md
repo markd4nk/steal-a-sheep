@@ -45,6 +45,11 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   merge it with this one, and it reached main first with the less-hand-holding branch. The chase banner went here (`Screens/Hud` has no chase handler at all now: ChaseController,
   merged from the chase session, owns the chase's sounds and red screen; `GameConfig.Ui.BannerSeconds` gone), and with the carry card gone, so did WildService's `CarriedColor` and
   `CarriedSpots`.
+  *Checked together* (main fcb605a with the chase, onboarding and less hand-holding merged in; the branch's scripts
+  staged in the cloud place, then version 20's put back and verified): both bootstraps ready, 96 tests, a clean
+  console; a steal showed only the counters (no banner, card, arrow or hint; the chase's red screen on); the lamb put
+  down read "Lamb", earned 0, "0:43" under a clock; `GrowAll` revealed "Clover Sheep | Standard | Uncommon". The test
+  save was wiped back to new. Main fast-forwarded to the branch; not published.
 - **Less hand-holding after onboarding, and a faster stair walker (2026-10-06, branch `t3code/remove-gameplay-hints`,
   merged into main with the onboarding trail on the user's word)**. The user: after the
   onboarding the game shouldn't tell players what to do ("no is in reach"), and asked for every other part of the UI
