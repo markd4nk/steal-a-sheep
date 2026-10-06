@@ -120,6 +120,8 @@ local function sheepModel(family: string): Model?
 end
 
 -- The tier's god, copied from the mountain (GodService's models in workspace.Gods), still, without its nameplate.
+-- Only the constraints that move it go: an avatar god's joints are constraints too, and without them its layered
+-- clothing (dresses, goat legs) doesn't draw.
 local function godModel(tier: number): Model?
 	local gods = workspace:FindFirstChild("Gods")
 	if not gods then
@@ -129,7 +131,12 @@ local function godModel(tier: number): Model?
 		if god:IsA("Model") and god:GetAttribute("Tier") == tier then
 			local copy = god:Clone()
 			for _, part in copy:GetDescendants() do
-				if part:IsA("BillboardGui") or part:IsA("Constraint") or part:IsA("Script") then
+				if
+					part:IsA("BillboardGui")
+					or part:IsA("AlignPosition")
+					or part:IsA("AlignOrientation")
+					or part:IsA("Script")
+				then
 					part:Destroy()
 				elseif part:IsA("BasePart") then
 					part.Anchored = true

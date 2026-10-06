@@ -24,7 +24,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
   - *Checked*: a playtest of the branch in a Studio copy: all 30 avatars load with every item and symbol, 76 tests
     pass, the console is clean; Zeus's alert (points), chase, catch (laughs) and walk home ran on a real theft; Hera's
     run checked; review lineups five at a time on the summit (`studio/GodLineup.luau`). Nike's hair hid her face in the
-    first lineup and was swapped. Not checked: the Sheepdex's viewport copy of an avatar god; a live server.
+    first lineup and was swapped. The Sheepdex's god pictures lost layered clothing (dresses, Pan's goat legs) because
+    the copy dropped every constraint, an avatar's joints among them; it now drops only the movement drivers and keeps
+    the joints (checked in the menu). Not checked: a live server.
 
 - **Maturity questionnaire, the store's products, the gods merged (2026-10-05)**. The user asked what was missing to
   publish, then: fill in the maturity questions from what's known, make the store's passes and products, and merge
