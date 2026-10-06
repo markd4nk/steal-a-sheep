@@ -80,6 +80,7 @@ lamb.
 
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
   `IsFriendsWithAsync` pairs and the join notices between two real friends are untested until the place is published.
+  The left column (GIFT, FLOCK, SHOP, SHEEPDEX, the friend tile) wasn't checked on a phone's short screen.
 
 - **Sell Stall on a phone and a gamepad**: played on a PC window only (mouse); the layout matches the mock-up's phone
   frame, not checked in the Device Simulator.

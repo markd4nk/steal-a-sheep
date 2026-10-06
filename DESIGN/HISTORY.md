@@ -23,6 +23,9 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     both bootstraps ready, console clean. INVITE tile with the uploaded icon; pretend 2 friends: tile "+40%", cash
     paid 6.57/s -> 9.19/s (x1.40); 4 friends +80%, 9 capped at +80%, back to INVITE at -1; the join notice drawn;
     tapping the tile opened Roblox's Invite Friends dialog (closed without inviting). Real friends untested.
+    After merging main (the free gift's GIFT button now tops the same column): 60 of 60 tests, console clean, the
+    five buttons fit a 793-pixel-tall window (INVITE ends at y 690), 1 friend showed +20% and +7.8/s on 6.5/s. The
+    user then: commit and merge it; no notice when a friend leaves; the tile's tutorial hiding left to the agent.
 
 - **Free gift for liking and favoriting (2026-10-05)**. The user, with a reference from another game (a "Free Gift!"
   panel: the reward big, numbered steps with a picture of the game page's button, Claim): give players something
