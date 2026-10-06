@@ -156,15 +156,28 @@ Calls in Hera's Blender model (2026-10-05, a mock-up):
   as she walks; she runs like Zeus.
 - **Shared style** (`art/gods/style.py`): the eyes and brows, fists, trims and the rig are the same for every god.
 
-Calls in the avatar Zeus mock-up (2026-10-05; a Roblox R15 avatar as the god, nothing built into the game):
+Calls dressing the thirty gods as Roblox avatars (2026-10-05; the user picked the route and Zeus's look, then "do
+the rest"; three helpers chose catalog items by sight, every id checked and loaded):
 
-- **Catalog items**: hair 126795757748952 and beard 76239336562150 (U8DEV's Greek god set), Roblox's Crown of Golden
-  Laurels 10770304, robe 87233169181342 or layered toga 136737172189289 (Manga Infinite), angry heads 90077016726721
-  (Classic Style Angry Face), 107620469684872 (Angry Grump pouty chibi), 120264055436211 (Angry Stare); skin
-  214, 160, 120. A game can dress its NPCs in any catalog item without owning it.
-- **Size**: Height, Width and Depth scale 1.65 (9.6 studs, the gods' height); head 1.3 times that for the cuter look.
-- **Not yet solved**: the robe and toga leave one side of the chest bare (a white torso colour would read as an
-  under-tunic); the toga lets a knee through when walking.
+- **Faces**: the gods wear the user's "Classic Style Angry Face"; the goddesses its match, "Furious Woman Face"
+  (76927731769378: the same angry brows and bared teeth, with lashes and lipstick).
+- **Size**: Height, Width and Depth scale 1.65 (9.6 studs, as before); head 1.3 times that, the cute look.
+- **Looks** (`GodService/Looks.luau` lists every item): each god reads by hair, crown or helmet, outfit colour and
+  wings, e.g. Pan a satyr with ram horns and goat legs, Phobos and Deimos Spartan armour, Thanatos a black hood and
+  wings, Hermes a winged helmet and winged shoes, Hephaestus a fire crown and apron, Poseidon teal hair and a blue
+  beard (it covers his mouth), Hera a gold crown and peacock tail. Bare chests where the outfit has them (the user
+  dropped the fully clothed rule).
+- **Held symbols** (`GodService/Props.luau`), blocks in the right fist: Zeus's bolt (raised), Poseidon's trident,
+  Hera's peacock-eye sceptre, Athena's and Ares's spears, Artemis's silver and Eros's pink bow, Apollo's lyre,
+  Hermes's caduceus, Asclepius's serpent staff, Hephaestus's hammer, Hecate's torch, Thanatos's scythe, Nemesis's
+  and Themis's swords, Dionysus's thyrsus, Pan's pipes, Tyche's cornucopia, Iris's rainbow wand, Nike's wreath,
+  Aeolus's wind, Hypnos's poppy, Morpheus's star wand, Demeter's wheat, Hestia's flame, Hebe's cup, Eris's golden
+  apple, Phobos's and Deimos's dark spears, Aphrodite's rose.
+- **Animations**: Roblox's own idle, walk (going home) and run (chasing), sped up to the god's speed; it points at
+  the thief when it spots them and laughs when it catches them. Only gods within 220 studs of the camera animate.
+- **Swapped after the first lineup**: Nike's windswept hair hid her face; she has an updo now. The user's calls:
+  Hebe a coloured dress (her celestial gown in rose and gold, so she isn't white like Themis), Demeter a darker
+  leaf green (a long dark green evening gown; the lime was too bright), Poseidon keeps his blue beard.
 
 Calls made ordering the gods by rank (2026-10-05):
 

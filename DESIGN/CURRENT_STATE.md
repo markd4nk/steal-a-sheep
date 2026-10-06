@@ -99,16 +99,12 @@ lamb.
 
 - **Gods in rank order and Zeus as a Roblox avatar** (merged into main 2026-10-05 on the user's word):
   `Config/Olympus` reordered (Pan tier 1 to Zeus 30), new High Olympus stretches for the eleven Olympians who moved
-  up; Zeus is a catalog-dressed avatar (`GodService/Looks.luau`), the other 29 keep their block figures until their
-  looks are in (branch `t3code/order-olympian-gods` continues). Not in a published version yet.
-- **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus built from shapes
-  in code (`art/gods/`, README there): one 6,000-triangle mesh, one 1024 texture, 16 bones; walk and run in
-  `art/gods/gait.py` (bolt raised while walking, held upright while running). The rules are in DECISIONS.md
-  (Confirmed). A test import worked in a Studio copy (mesh 74120242072184, an earlier texture), posed from Blender's
-  numbers. Not wired in.
-- **Hera mock-up in Blender (2026-10-05, the user asked to see the style on his wife)**: same pipeline and shared
-  style (`art/gods/style.py`, `hera.py`): purple gown with a peacock-eye hem, cape, diadem, sceptre with a neon
-  peacock eye carried upright. Shown in Blender only, waiting for the user's word.
+  up; Zeus a catalog-dressed avatar. Not in a published version yet.
+- **All 30 gods as Roblox avatars** (merged into main 2026-10-05 on the user's word, after their changes to Hebe and
+  Demeter): each god's catalog look in `GodService/Looks.luau`, its held symbol in `GodService/Props.luau`; all 30
+  load, 76 tests pass. Review shots: `studio/GodLineup.luau`. Not in a published version yet.
+- **Blender god models (parked: the user chose Roblox avatars, 2026-10-05)**: Zeus and Hera built from shapes in code
+  (`art/gods/`, README there), rigged, with a walk and a run. Not wired in.
 - **Planned, later**: gods lunge face first at a thief and chase on their bellies like penguins (DECISIONS.md).
 
 - Nothing from the free gift session (merged into main 2026-10-05).
