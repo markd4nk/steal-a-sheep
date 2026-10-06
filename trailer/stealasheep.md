@@ -26,3 +26,19 @@ slide is against the god's speed, `SetSpeed` for the walk-ins, `Steal` (tier) fo
 
 Page captions (gameplay only): 1 "Steal sheep from the gods", 3 "Slide home before they catch you", 6 "Fill your
 pens", 7 "Climb to Zeus", 9 "30 gods to rob". Social captions: shorter and louder ("STEAL FROM ZEUS", "RUN!").
+
+## As cut (2026-10-05)
+
+31.9 s in both formats, 30 fps; takes in `raw/`, in and out points in `stealasheep.cut.json`. Differences from the
+plan above:
+
+- 1-3 come from one take (`steal_chase2`): **Poseidon** (tier 28) steals, alerts and chases; Zeus's plaza edge stopped
+  the slide. Zeus does 8, the catch (`caught2`).
+- 4 (slide wide) isn't filmed: the high side camera was blocked by the slope.
+- 5 is the camera swinging through a tree into the full pen as the thief walks in (`home2`); no take of the lamb
+  being put down read well.
+- 7's caption sits at the top: the stage signs fill the lower third the whole way up.
+- The title card keeps the gods' shot's sound, fading out.
+
+The 9:16 cut still has the game's APM music: before it goes on TikTok or Shorts, lay a licensed track over it
+(BRAIN trailers.md).

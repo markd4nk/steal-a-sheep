@@ -234,6 +234,15 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   `TimeLength > 0`), build meshes with `AssetService:CreateMeshPartAsync` on the server, and load animations through
   an Animator (`Length > 0`). The public thumbnails and economy APIs aren't enough on their own: they said Completed
   for meshes moderation had removed." Seen 2026-10-05 in Steal a Sheep's asset audit (1,286 ids, all loading).
+- **S32** (`BRAIN/PATTERNS/trailers.md`, staging and cutting; the `edit.py` part also for RobloxPack's `trailer/`):
+  "To walk or steer the player's own character during a take, call `Humanoid:Move` in `BindToRenderStep` at
+  `Enum.RenderPriority.Input.Value + 1`. From `RenderStepped` it comes too late: Roblox's controls have already reset
+  MoveDirection when the game's own movement code reads it. Check every caption against its frame, since a game's
+  stage signs and nameplates often fill the lower third; move that clip's caption up with `y`. The OBS 'Trailer'
+  profile is shared by every game on the PC: if a shoot changes its recording path or canvas, put them back after.
+  `edit.py` takes a cut list `fps` (60 fps takes halve cleanly to 30), and the title card keeps the last clip's sound,
+  fading, instead of cutting to silence." Seen 2026-10-05 filming Steal a Sheep's trailer: the
+  slide wouldn't start under a RenderStepped steer, and stage signs collided with "Climb to Zeus".
 
 ## Done
 

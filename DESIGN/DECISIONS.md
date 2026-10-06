@@ -205,6 +205,14 @@ Calls in the studs on every sheep (2026-10-05, branch t3code/sheep-stud-style-mo
 - **Royal (gold) fleeces and silver paints** take metal studs; on glowing or glass families the Royal gold replaces the
   glow or the see-through look, as the gold paint already did.
 - Any other wool material keeps its look without studs (none uses one today).
+Calls in the trailer's first cut (2026-10-05, overnight; `trailer/stealasheep.md`, nothing uploaded):
+
+- **Order**: steal, the god's alert, the chase, home, a full pen, the climb, a catch (Zeus punches the thief off),
+  the 30 gods, the title. 31.9 s.
+- **Captions** (game page): "Steal sheep from the gods", "Slide home before they catch you", "Fill your pens", "Climb
+  to Zeus", "30 gods to rob". 9:16: "STEAL FROM THE GODS", "RUN!", "FILL YOUR PENS", "CLIMB TO ZEUS", "30 ANGRY GODS".
+- **The chase god is Poseidon** (tier 28): Zeus's plaza edge stopped the slide; Zeus does the catch.
+- **Sound**: the game's own music and sounds only; it fades out under the title card.
 
 Calls in Zeus's Blender model (2026-10-05, a mock-up waiting for the user's OK):
 

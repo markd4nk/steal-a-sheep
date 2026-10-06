@@ -99,6 +99,23 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
     families, plus Royal and Shiny fleeces, rendered in Edit: nothing broken (the Scarecrow's denim and checker
     pictures still show). Rechecked after merging main's avatar gods (78 tests, 121 of 121 wild lambs studded, console
     clean). Not run on the cloud place or on a phone.
+- **Trailer, first cut (2026-10-05, overnight)**. The overnight coordinator asked for 30-45 s of real gameplay, no
+  voice-over or promo text, HUD hidden, 1920x1080 at 30 fps plus a 9:16 cut. Nothing was uploaded or merged.
+  - *How it was made*: a Studio copy of the branch (`build/Trailer.rbxl`, deleted after) with `TrailerController` in
+    the client Registry (Studio only), staged with the debug remote (`DebugBlankProfile` on), filmed with OBS
+    (`trailer/obs.py`, a 1708x960 crop of the viewport at 60 fps), and cut by `trailer/edit.py` from
+    `trailer/stealasheep.cut.json`. `edit.py` gained a cut list `fps` and keeps the game's sound under the title card,
+    fading out. `studio/TrailerSummit.luau` puts client copies of all 30 gods on risers for the last shot.
+  - *What it took*: the slide only starts if the scripted `Humanoid:Move` runs in `BindToRenderStep` at
+    `Input + 1` (later, Roblox's controls zero MoveDirection before MovementController's check). `Climbing` set
+    close to the tier's Reach makes the slide about as fast as the god, for a close chase. Lowering Climbing while on
+    the summit knocks the thief down, so lower it lower down. The chase is Poseidon's (tier 28) because Zeus's plaza
+    edge stopped the slide. The Free Gift menu, which opens after the first delivery, is kept closed on the client.
+    The stage signs in the world sit where lower-third captions go, so "Climb to Zeus" sits at the top.
+  - *Not filmed*: a clean put-down (the thief stuck on the pen's fence corner or walked into the camera; the cut uses
+    the swoop into the full pen), the wide slide shot (occluded), a store or Sheepdex moment (optional).
+  - *Checked*: contact sheets of every take and of both cuts, every caption against the frame, loudness (-17 LUFS),
+    no silent gaps. Studio's layout was put back after (panels, view selector, ribbon, Device Simulator on).
 
 - **The thirty gods as Roblox avatars (2026-10-05)**. The user wanted real god models. Roblox's mesh generator kept
   missing (third arms, bare chests; moderation removed two limb meshes), and a Blender pipeline (`art/gods/`, Zeus and
