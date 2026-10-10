@@ -332,6 +332,70 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   input, so announce it as a short takeover); one background recording of the same window did move, so don't trust a
   background one." Seen 2026-10-06 filming Steal a Sheep's moving scenery with other sessions' Studios open.
 
+Rescued 2026-10-10 from worktrees where they were never committed or merged (S56-S57 uncommitted in
+`t3code/optimize-mobile-hud`; S58-S59, first numbered S54-S55, on the unmerged `t3code/gameplay-thumbnail-concepts`;
+S60, first numbered S15, uncommitted in `t3code/regular-farm-sheep-card`). The text is as written there.
+
+- **S56** (`BRAIN/PATTERNS/testing-studio.md`, Phones, replacing "its setters fail during a playtest"): "In a solo
+  playtest, `SetDeviceAsync` and `SetOrientationAsync` work from a **Client** `execute_luau` (Server calls fail), and
+  the UI lays itself out again for the new screen, so one playtest can sweep every phone: switch, wait about a second,
+  read `AbsolutePosition`s (plus `GuiService:GetGuiInset()` for screen pixels), capture. Reapply any test-only
+  change your own layout code resets when the viewport changes." Seen 2026-10-06 in Steal a Sheep: 16 phones
+  sideways, 4 upright and 2 tablets measured in one playtest.
+- **S57** (`BRAIN/PATTERNS/ui.md`): "On a touch screen Roblox's default dynamic thumbstick takes any touch that starts
+  in `TouchGui.TouchControlFrame.DynamicThumbstickFrame`: the left 40% of the screen (plus 100 px) and the bottom two
+  thirds below the top bar. A HUD button there takes the touch first, so a thumb meant for the stick opens a menu
+  instead. On phones keep buttons out of it (a row under the top bar, or the right side), and check against that
+  frame's `AbsolutePosition` in a Client call." Seen 2026-10-06 in Steal a Sheep: the menu pictures' lower row sat in
+  it on every phone preset (on a Galaxy A06 the zone started 151 of 338 px down).
+- **S58** (`BRAIN/PATTERNS/trailers.md`): "A Studio playtest wears the signed-in account's own avatar, which may be a
+  licensed character (a cartoon cat, a film hero) that a game page, thumbnail or ad can't show. Before filming, give
+  the character a plain look from the server: a `HumanoidDescription` with body colours (the classic noob: yellow
+  head and arms, blue torso, green legs) and a dynamic head, through `ApplyDescriptionAsync`; reapply on
+  `CharacterAdded`. Set its expression each frame after the Animator on the head's `FaceControls` (`JawDrop`,
+  `LipStretcher`, brow and lid raisers for shock; `LipCornerPuller`, `CheekRaiser` for a grin)." Seen 2026-10-06 in
+  Steal a Sheep's gameplay thumbnails: the test account's avatar was a Tom and Jerry cat.
+- **S59** (`BRAIN/PATTERNS/testing-studio.md`): "For a still, freeze or stage it on the client, not the server:
+  `RunService:Pause()` from a Server `execute_luau` stops the server's NPCs, but the client keeps simulating its own
+  character (it moved 11 studs on after the pause), and a server pause blocks the next remote. Pin the character and
+  NPCs with a client RenderStep (`PivotTo` each frame) and pose them over the Animator; the server's copies can stay
+  where they are." Seen 2026-10-06 in Steal a Sheep while framing thumbnails mid-chase.
+- **S60** (`BRAIN/PATTERNS/testing-studio.md`, Screenshots): "Take `screen_capture`s with different cameras one at a
+  time: sent in parallel, two came back as the same frame. For a model on a plain backdrop, stand it on a big floor
+  with walls around it but no roof, all `CastShadow = false`: a closed box counts as indoors, so the place's
+  `Lighting.Ambient` tints everything (pink in Steal a Sheep) instead of its `OutdoorAmbient`. Then cut the backdrop
+  out by colour (Pillow) and paste the model onto a plain background." Seen 2026-10-05 making a 360 card of a sheep.
+  (Its first sentence goes with S10.)
+
+From measuring what RobloxPack saves (2026-10-10, over Steal a Sheep's 34 sessions and Shear a Sheep's 103):
+
+- **S61** (`BRAIN/PATTERNS/testing.md`, a new section above *Playtest checklist*; and `AGENTS.md`, *Done means* step
+  2, "playtest (read `testing.md`'s *Before you test* first)"):
+  "## Before you test
+  These traps keep costing time though each is written up. Before a task's first playtest, read the section for
+  what you'll do:
+  - Screenshots: billboards missing, a minimized Studio, `screen_capture` calls sent in parallel
+    (`testing-studio.md`, Screenshots, the camera and what loads).
+  - The camera left Scriptable after an `execute_luau` call (the same section).
+  - Phones: taps landing off target, the Device Simulator left on (`testing-studio.md`, Phones).
+  - Moving the character from the client: a client `PivotTo` slides on the server (`testing-studio.md`, Clicking,
+    prompts, combat and NPCs).
+  - A second Studio needs the user's OK (`sessions.md`, One Studio window)."
+  Seen in Steal a Sheep's sessions: 46 episodes, about 73 minutes, of problems these files already covered, mostly
+  in sessions that never opened `testing-studio.md` (*Done means* points only to `testing.md`); about 7 sessions
+  opened a second Studio without asking.
+- **S62** (`AGENTS.md`): in *Start of every task* step 3, after "Read only what applies.": "Then search the game's
+  `DESIGN/BRAIN_PROPOSALS.md` for the topic: lessons wait there until the user approves them." In *The brain*, after
+  the sentence that sends lessons to `DESIGN/BRAIN_PROPOSALS.md`: "Commit a proposal on its own as soon as it's
+  written, and put that commit on main straight away (from a worktree, `git -C <main checkout> cherry-pick
+  <commit>` when the main checkout has no changes to the file). Left uncommitted, or on a branch nobody merges, it
+  reaches no other session and goes when the worktree does." Seen in Steal a Sheep's sessions: `screen_capture`
+  calls sent in parallel cost about 70 minutes over 6 sessions, about 30 of them after S10 described the fix, in
+  sessions that never read it; on 2026-10-10 five lessons (S56-S60) still sat uncommitted or on unmerged branches,
+  four days after they were written.
+
 ## Done
 
-- None yet.
+- **S63** (`scripts/check.ps1`, done 2026-10-10, Mark approved): "When `Packages` or `globalTypes.d.luau` is missing,
+  `check.ps1` runs `install.ps1` itself instead of stopping with 'Not installed. Run ./scripts/install.ps1 first.'"
+  Seen in the sessions: that stop came 76 times (54 in Shear a Sheep, 22 in Steal a Sheep), in most new worktrees.

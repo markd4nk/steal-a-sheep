@@ -180,6 +180,8 @@ lamb.
   (`art/gamepage/`), a 31.9 s trailer in 16:9 and 9:16 (`trailer/`). The user keeps Roblox's default icon and
   thumbnails for now (2026-10-06). The 9:16 cut still carries the game's APM music, which can't go to TikTok or Shorts
   (BRAIN trailers.md): it needs a licensed track first.
+- **Phone HUD pass, unmerged** (`t3code/optimize-mobile-hud`, 2026-10-06): 12 files of HUD, prompt and menu changes
+  (`Shop.luau` deleted) sit uncommitted in that worktree. Its two lessons are in BRAIN_PROPOSALS.md (S56-S57).
 
 - Nothing from the free gift session (merged into main 2026-10-05).
 - Nothing from the pens session (merged into main 2026-10-05). The Munch eating face is uploaded and in the game

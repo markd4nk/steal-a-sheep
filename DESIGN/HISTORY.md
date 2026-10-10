@@ -6,6 +6,17 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **What RobloxPack saves, measured; `check.ps1` installs a new worktree itself (2026-10-10)**. The user asked how
+  much time the pack saves. Measured from the session logs: Steal's 34 sessions in `~/.claude-second`, Shear's 103 in
+  `~/.claude`, and Prophunt's and TRUGO's Codex logs (TruWorlds games, so not a Roblox baseline).
+  - *Result*: on Steal's first 1.5 days (38 agent-hours), the BRAIN saved 2.3-5.2 h (95 uses, each priced by what the
+    same problem cost Shear) and the starter code about 1-2 h (estimated). The routine every session runs cost
+    1.2-4.7 h (`check.ps1`, DESIGN docs, the start-of-task check, BRAIN reading), and keeping the pack up to date
+    0.9 h. That is about +2 h net. The routine is about 10% of agent time and grows with sessions; the savings come early.
+  - *The user's calls*: `check.ps1` now runs `install.ps1` when a worktree isn't installed (S63, synced to
+    RobloxPack). S61 and S62 are proposed for the two biggest leaks. Five lessons left in other worktrees are copied
+    into BRAIN_PROPOSALS.md (S56-S60).
+  - *Checked*: `check.ps1` in this fresh worktree installed, then passed. Not playtested (no game code changed).
 - **A slide stops dead when pulled back; no auto-jump up the mountain (2026-10-06, merged into main on the user's
   word, live in version 29)**. The user, after version 28: running up made climbers auto-jump on
   the slope; and with momentum nobody could break out of a slide: moving the other way should stop it at once.

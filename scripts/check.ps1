@@ -1,8 +1,10 @@
 $ErrorActionPreference = 'Stop'
 Push-Location (Split-Path $PSScriptRoot -Parent)
 try {
+    # A new worktree has none of the generated files, and stopping here cost a round trip in every one.
     if (-not (Test-Path globalTypes.d.luau) -or -not (Test-Path Packages)) {
-        throw 'Not installed. Run ./scripts/install.ps1 first.'
+        Write-Host '== Not installed yet: running install.ps1'
+        & (Join-Path $PSScriptRoot 'install.ps1')
     }
     function Invoke-Step([string]$name, [scriptblock]$run) {
         Write-Host "== $name"

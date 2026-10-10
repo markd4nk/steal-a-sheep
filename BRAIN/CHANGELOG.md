@@ -4,6 +4,8 @@ What changed in the shared files (`BRAIN/`, `AGENTS.md`, `CLAUDE.md`, `scripts/c
 `scripts/brain-sync.ps1`), newest first, and which game it came from. A game that's behind RobloxPack can read what
 it's missing here, then run `./scripts/brain-sync.ps1 -FromPack`. Add a line with every approved change.
 
+- **2026-10-10**, from Steal a Sheep (Mark approved S63): `scripts/check.ps1` runs `install.ps1` itself when a
+  worktree has no `Packages` or type definitions yet, instead of stopping with "Not installed".
 - **2026-10-05**, from the starter code's first Studio test (Mark approved F1): `GOTCHAS.md`, a client script can
   start before its sibling folders are copied into `PlayerScripts`. RobloxPack's client bootstrap waits for them.
 - **2026-10-05**, RobloxPack's starter code (Mark approved D1-D4): the debug panel and `DebugService`,
