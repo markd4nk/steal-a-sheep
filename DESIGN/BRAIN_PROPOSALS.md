@@ -101,6 +101,11 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   attachments folder) and delete the folder before committing. To film the game view without taking over the screen,
   pin the camera from a Client `execute_luau` (a RenderStepped that sets `CameraType` Scriptable and the CFrame), turn
   off the core UI, define a viewport over the 3D view, and record that with `foreground: false`." Seen 2026-10-05.
+- **S15** (`BRAIN/PATTERNS/testing-studio.md`, Screenshots): "Take `screen_capture`s with different cameras one at a
+  time: sent in parallel, two came back as the same frame. For a model on a plain backdrop, stand it on a big floor
+  with walls around it but no roof, all `CastShadow = false`: a closed box counts as indoors, so the place's
+  `Lighting.Ambient` tints everything (pink in Steal a Sheep) instead of its `OutdoorAmbient`. Then cut the backdrop
+  out by colour (Pillow) and paste the model onto a plain background." Seen 2026-10-05 making a 360 card of a sheep.
 
 ## Done
 
