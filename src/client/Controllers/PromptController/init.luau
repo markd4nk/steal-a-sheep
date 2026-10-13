@@ -20,7 +20,7 @@ local Look = require(script.Look)
 local PromptController = { Name = "PromptController" }
 
 local OPENS: { [string]: { Screen: string, Options: { [string]: any }? } } = {
-	Shop = { Screen = "Shop" },
+	Shop = { Screen = "Store", Options = { Section = "Upgrades" } },
 	Sell = { Screen = "SellStall" },
 	Merge = { Screen = "Merge" },
 }

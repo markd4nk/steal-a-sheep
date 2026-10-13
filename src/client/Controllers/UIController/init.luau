@@ -18,7 +18,6 @@ local Types = require(script.Types)
 local screenModules: { [string]: Types.ScreenModule } = {
 	Hud = require(script.Screens.Hud),
 	Flock = require(script.Screens.Flock),
-	Shop = require(script.Screens.Shop),
 	Store = require(script.Screens.Store),
 	Gift = require(script.Screens.Gift),
 	Daily = require(script.Screens.Daily),
@@ -119,7 +118,8 @@ local function mount(name: string, module: Types.ScreenModule)
 	end
 	gui.ResetOnSpawn = false
 	if gui:FindFirstChild("Root") and name ~= "DebugPanel" then
-		Scale.Bind(gui, trove, if name == "Hud" then 1.2 else nil)
+		-- The HUD is drawn for phones (small corner pictures, 2026-10-06), so a computer's screen draws it half again as big.
+		Scale.Bind(gui, trove, if name == "Hud" then 1.5 else nil)
 	end
 	trove:Add(Buttons.Watch(gui))
 	-- Every menu's header chip shows the player's coins.
@@ -165,7 +165,6 @@ function UIController.Start(_self: any)
 		"Popup",
 		"Settings",
 		"Flock",
-		"Shop",
 		"Sheepdex",
 		"Merge",
 		"SellStall",
@@ -175,6 +174,17 @@ function UIController.Start(_self: any)
 		"DebugPanel",
 	}
 	task.spawn(function()
+		-- Phones and tablets play sideways only (the user, 2026-10-06): held upright, the HUD has no room and the
+		-- mountain's view is narrow. The first spawn copies StarterGui's setting over this one, so it's set again
+		-- whenever it changes (the place's StarterGui says the same, from the first frame).
+		local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui") :: PlayerGui
+		local function sideways()
+			if playerGui.ScreenOrientation ~= Enum.ScreenOrientation.LandscapeSensor then
+				playerGui.ScreenOrientation = Enum.ScreenOrientation.LandscapeSensor
+			end
+		end
+		trove:Connect(playerGui:GetPropertyChangedSignal("ScreenOrientation"), sideways)
+		sideways()
 		for _, name in order do
 			local module = screenModules[name]
 			if module and not destroyed then

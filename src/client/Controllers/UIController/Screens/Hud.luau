@@ -24,15 +24,18 @@ local Scale = require(script.Parent.Parent.Scale)
 local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
--- The HUD in Shear a Sheep's Ranch Studs look: coins (with the flock's income) and Climbing at the top right, the menu
--- pictures down the left (shown after the first delivery), notices, the friend boost's tile under them (tap to invite),
--- and the onboarding's trail of chevrons on the ground. No hints in words, no card for the lamb being carried and no
--- chase banner: players work the rest out (the user, 2026-10-06); a chase is heard, not read.
+-- The HUD in Shear a Sheep's Ranch Studs look: coins (with the flock's income) and Climbing at the top right, three
+-- small menu pictures in each top corner under them (shown after the first delivery): FLOCK, SHEEPDEX and SHOP on the
+-- left, DAILY, INVITE (the friend boost) and the free GIFT, while it waits, on the right. Nothing else stands on the
+-- screen, so the view and a phone's thumbstick (the left 40% below the top third) stay clear (the user, 2026-10-06).
+-- Notices under the rows, and the onboarding's trail of chevrons on the ground. No hints in words, no card for the
+-- lamb being carried and no chase banner: players work the rest out (the user, 2026-10-06); a chase is heard, not read.
 local Hud = {}
 
-local PICTURE_SIZE = 66
-local TILES_BOTTOM = 70 -- the menu pictures stop this far above the bottom, clear of a phone's thumbstick
-local MIDDLE_HALF_WIDTH = 160 -- half the widest notice, in points: what must clear the menu pictures
+local PICTURE_SIZE = 36
+local NAME_SIZE = 11 -- the pictures' names, in points
+local ROW_GAP = 4 -- points between the pictures in a corner
+local ROW_HEIGHT = 52 -- a corner's row, its names included: the notices stand under it
 -- Pixels Roblox's player list (the leaderstats: Income, Climbing) takes at the top right, with a margin. It opens there
 -- by default over the counters on a computer or a tablet; on a phone (a touch screen whose short side is under
 -- SMALL_TOUCH pixels) it starts closed.
@@ -48,20 +51,20 @@ local function pill(
 	color: Color3,
 	order: number
 ): Frame
-	local holder = UIKit.Frame(parent, name, UDim2.fromOffset(0, 44))
+	local holder = UIKit.Frame(parent, name, UDim2.fromOffset(0, 32))
 	holder.LayoutOrder = order
 	holder.AutomaticSize = Enum.AutomaticSize.X
-	UIKit.Padding(holder, 50, 2, 0, 0)
+	UIKit.Padding(holder, 37, 2, 0, 0)
 	local punch = Instance.new("UIScale")
 	punch.Name = "Punch"
 	punch.Parent = holder
-	local picture = UIKit.Icon(holder, "Icon", icon, 52)
+	local picture = UIKit.Icon(holder, "Icon", icon, 36)
 	picture.AnchorPoint = Vector2.new(0, 0.5)
-	picture.Position = UDim2.new(0, -56, 0.5, -2)
-	local column = UIKit.Frame(holder, "Column", UDim2.fromOffset(0, 44))
+	picture.Position = UDim2.new(0, -39, 0.5, -1)
+	local column = UIKit.Frame(holder, "Column", UDim2.fromOffset(0, 32))
 	column.AutomaticSize = Enum.AutomaticSize.X
-	UIKit.List(column, false, -6)
-	local label = UIKit.Text(column, labelName, "...", 32, color, UDim2.fromOffset(0, 34), {
+	UIKit.List(column, false, -4)
+	local label = UIKit.Text(column, labelName, "...", 22, color, UDim2.fromOffset(0, 24), {
 		Stroke = Color.Line,
 		Auto = Enum.AutomaticSize.X,
 		AlignX = Enum.TextXAlignment.Left,
@@ -69,9 +72,9 @@ local function pill(
 	})
 	local stroke = label:FindFirstChild("TextStroke")
 	if stroke and stroke:IsA("UIStroke") then
-		stroke.Thickness = 3.5
+		stroke.Thickness = 2.5
 	end
-	UIKit.Text(column, "RateLabel", "", 16, Color.Snow, UDim2.fromOffset(0, 16), {
+	UIKit.Text(column, "RateLabel", "", 11, Color.Snow, UDim2.fromOffset(0, 12), {
 		Font = Theme.Font.TextHeavy,
 		Stroke = Color.Line,
 		Auto = Enum.AutomaticSize.X,
@@ -89,13 +92,13 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
 	local root = UIKit.Root(gui)
 
-	local topBar = UIKit.Frame(root, "TopBar", UDim2.new(1, 0, 0, 50))
+	local topBar = UIKit.Frame(root, "TopBar", UDim2.new(1, 0, 0, 40))
 	topBar.ZIndex = 2
-	local right = UIKit.Frame(topBar, "Right", UDim2.fromOffset(0, 50))
+	local right = UIKit.Frame(topBar, "Right", UDim2.fromOffset(0, 40))
 	right.AnchorPoint = Vector2.new(1, 0.5)
 	right.Position = UDim2.new(1, -10, 0.5, 0)
 	right.AutomaticSize = Enum.AutomaticSize.X
-	UIKit.List(right, true, 24)
+	UIKit.List(right, true, 12)
 	pill(right, "ClimbPill", Theme.Icons.HudShoe, "ClimbLabel", Color.Gold300, 1)
 	pill(right, "CoinPill", Theme.Icons.HudCash, "CoinLabel", Color.Lime, 2)
 
@@ -103,52 +106,51 @@ function Hud.Build(playerGui: Instance): ScreenGui
 	notice.AnchorPoint = Vector2.new(0.5, 0)
 	notice.Position = UDim2.new(0.5, 0, 0, 120)
 
-	-- The menu pictures down the left edge, as far as the bottom margin: on a short screen (a phone held sideways) the
-	-- rest wrap into a second column beside the first.
-	local tiles = UIKit.Frame(root, "Tiles", UDim2.new(0, PICTURE_SIZE + 12, 1, -(70 + TILES_BOTTOM)))
-	tiles.Position = UDim2.fromOffset(8, 70)
-	local tilesList = UIKit.List(tiles, false, 12, Enum.HorizontalAlignment.Left)
-	tilesList.Wraps = true
-	UIKit.Padding(tiles, (PICTURE_SIZE + 12 - math.max(PICTURE_SIZE, Theme.MinTouch)) / 2, 0, 0, 0)
-	-- A red "!" on a button's corner: something waiting there.
+	-- The menu pictures in a row in each top corner, under Roblox's top bar on the left and under the counters on the
+	-- right (Hud.new places them).
+	local function corner(name: string, alignX: Enum.HorizontalAlignment, anchorX: number): Frame
+		local row = UIKit.Frame(root, name, UDim2.fromOffset(0, ROW_HEIGHT))
+		row.AutomaticSize = Enum.AutomaticSize.X
+		row.AnchorPoint = Vector2.new(anchorX, 0)
+		UIKit.List(row, true, ROW_GAP, alignX)
+		return row
+	end
+	local left = corner("MenuLeft", Enum.HorizontalAlignment.Left, 0)
+	local rightRow = corner("MenuRight", Enum.HorizontalAlignment.Right, 1)
 	-- A red badge on a picture's corner: "!" unless `text` says otherwise (the Sheepdex's count of rewards waiting).
 	local function alertOn(button: TextButton, text: string?): TextLabel
-		local alert = UIKit.Text(button, "Alert", text or "!", 20, Color.Snow, UDim2.fromOffset(26, 26), {
+		local alert = UIKit.Text(button, "Alert", text or "!", 12, Color.Snow, UDim2.fromOffset(16, 16), {
 			Stroke = Color.Line,
 		})
 		alert.BackgroundTransparency = 0
 		alert.BackgroundColor3 = Color.Red500
 		alert.AnchorPoint = Vector2.new(0.5, 0.5)
-		alert.Position = UDim2.new(1, -8, 0, 6)
+		alert.Position = UDim2.new(1, -6, 0, 4)
 		alert.ZIndex = 5
 		UIKit.Corner(alert)
+		local stroke = alert:FindFirstChild("TextStroke")
+		if stroke and stroke:IsA("UIStroke") then
+			stroke.Thickness = 1.2
+		end
 		local ring = Instance.new("UIStroke")
 		ring.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		ring.Color = Color.Line
-		ring.Thickness = Theme.Line.Normal
+		ring.Thickness = 1.5
 		ring.Parent = alert
 		return alert
 	end
-	-- The rewards at the top: the free gift until it's claimed, then the daily gifts' golden calendar.
-	local gift = UIKit.PictureButton(tiles, "GiftButton", Theme.Icons.MenuGift, PICTURE_SIZE, "GIFT")
-	gift.LayoutOrder = 0
-	alertOn(gift)
-	local daily = UIKit.PictureButton(tiles, "DailyButton", Theme.Icons.HudDaily, PICTURE_SIZE, "DAILY")
-	daily.LayoutOrder = 1
-	alertOn(daily)
-	local flock = UIKit.PictureButton(tiles, "FlockButton", Theme.Icons.Wool, PICTURE_SIZE, "FLOCK")
-	flock.LayoutOrder = 2
-	local shop = UIKit.PictureButton(tiles, "ShopButton", Theme.Icons.MenuStore, PICTURE_SIZE, "SHOP")
-	shop.LayoutOrder = 3
-	local dex = UIKit.PictureButton(tiles, "SheepdexButton", Theme.Icons.MenuSheepdex, PICTURE_SIZE, "SHEEPDEX")
-	dex.LayoutOrder = 4
-	alertOn(dex, "").Visible = false
-	local friends = UIKit.PictureButton(tiles, "FriendButton", Theme.Icons.HudInvite, PICTURE_SIZE, "INVITE")
-	friends.LayoutOrder = 5
-	-- The Robux store on the right edge, where the left column has no room left (as the reference game's store buttons).
-	local storeButton = UIKit.PictureButton(root, "StoreButton", Theme.Icons.HudRobux, PICTURE_SIZE, "STORE")
-	storeButton.AnchorPoint = Vector2.new(1, 0.5)
-	storeButton.Position = UDim2.new(1, -8, 0.5, 0)
+	local function picture(row: Frame, name: string, image: string, label: string, order: number): TextButton
+		local button = UIKit.PictureButton(row, name, image, PICTURE_SIZE, label, NAME_SIZE)
+		button.LayoutOrder = order
+		return button
+	end
+	picture(left, "FlockButton", Theme.Icons.Wool, "FLOCK", 1)
+	alertOn(picture(left, "SheepdexButton", Theme.Icons.MenuSheepdex, "SHEEPDEX", 2), "").Visible = false
+	picture(left, "ShopButton", Theme.Icons.MenuStore, "SHOP", 3)
+	alertOn(picture(rightRow, "DailyButton", Theme.Icons.HudDaily, "DAILY", 1))
+	picture(rightRow, "FriendButton", Theme.Icons.HudInvite, "INVITE", 2)
+	-- The free gift last, until it's claimed.
+	alertOn(picture(rightRow, "GiftButton", Theme.Icons.MenuGift, "GIFT", 3))
 
 	gui.Parent = playerGui
 	return gui
@@ -166,40 +168,15 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local climbPill = root:FindFirstChild("ClimbPill", true) :: Frame
 	local trainLabel = climbPill:FindFirstChild("RateLabel", true) :: TextLabel
 	local noticeLabel = root:FindFirstChild("NoticeLabel") :: TextLabel
-	local tiles = root:FindFirstChild("Tiles") :: Frame
-	local storeButton = root:FindFirstChild("StoreButton") :: TextButton
+	local menuLeft = root:FindFirstChild("MenuLeft") :: Frame
+	local menuRight = root:FindFirstChild("MenuRight") :: Frame
 	local stateController = context.Controllers.StateController
 	local sound = context.Controllers.SoundController
 
-	-- Notices stand in the middle of the screen, or, where the menu pictures wrap into a wide block
-	-- (a phone held sideways), in the middle of the room right of them, so nothing covers a picture.
-	local below = 60
-	local noticeHome = noticeLabel.Position -- where a notice rests, from placeMiddle
-	local function placeMiddle()
-		local scale = Scale.Of(root)
-		local width = root.AbsoluteSize.X / scale
-		local left = 0
-		if tiles.Visible then
-			for _, child in tiles:GetChildren() do
-				if child:IsA("GuiObject") and child.Visible then
-					local right = child.AbsolutePosition.X + child.AbsoluteSize.X - root.AbsolutePosition.X
-					left = math.max(left, right / scale)
-				end
-			end
-		end
-		local middle = width / 2
-		if left > middle - MIDDLE_HALF_WIDTH then
-			middle = (left + width) / 2
-		end
-		noticeHome = UDim2.new(0, middle, 0, below + 64)
-		if not noticeLabel.Visible then
-			noticeLabel.Position = noticeHome
-		end
-	end
-	-- On a computer or a tablet the counters stand left of Roblox's player list, which opens by default over the top
-	-- right there.
+	-- On a computer or a tablet the counters, and the pictures under them, stand left of Roblox's player list, which
+	-- opens by default over the top right there.
 	local counters = topBar:FindFirstChild("Right") :: Frame
-	local function clearPlayerList()
+	local function clearPlayerList(): number
 		local camera = workspace.CurrentCamera
 		local short = if camera then math.min(camera.ViewportSize.X, camera.ViewportSize.Y) else 0
 		local phone = UserInputService.TouchEnabled and short < SMALL_TOUCH
@@ -207,20 +184,19 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		local listed = opensListed and StarterGui:GetCoreGuiEnabled(Enum.CoreGuiType.PlayerList)
 		local shift = if listed then PLAYER_LIST_WIDTH / Scale.Of(root) else 0
 		counters.Position = UDim2.new(1, -10 - shift, 0.5, 0)
+		return shift
 	end
-	Scale.TopBar(gui, root, topBar, trove, function(top: number)
-		clearPlayerList()
-		below = top
-		tiles.Position = UDim2.fromOffset(8, below + 8)
-		tiles.Size = UDim2.new(0, PICTURE_SIZE + 12, 1, -(below + 8 + TILES_BOTTOM))
-		placeMiddle()
+	-- Notices stand in the middle, under the corners' rows.
+	local noticeHome = noticeLabel.Position
+	Scale.TopBar(gui, root, topBar, trove, function(below: number)
+		local shift = clearPlayerList()
+		menuLeft.Position = UDim2.fromOffset(8, below)
+		menuRight.Position = UDim2.new(1, -8 - shift, 0, below)
+		noticeHome = UDim2.new(0.5, 0, 0, below + ROW_HEIGHT + 6)
+		if not noticeLabel.Visible then
+			noticeLabel.Position = noticeHome
+		end
 	end)
-	trove:Connect(tiles:GetPropertyChangedSignal("Visible"), placeMiddle)
-	local wrapping = tiles:FindFirstChildOfClass("UIListLayout")
-	if wrapping then
-		-- After the pictures wrap again (a resized window, the gift's picture gone), not before.
-		trove:Connect(wrapping:GetPropertyChangedSignal("AbsoluteContentSize"), placeMiddle)
-	end
 
 	-- Notices: one at a time, the rest queued (Shear a Sheep's HUD notices). A notice's sound plays when its words show.
 	local noticeRest = noticeHome
@@ -362,14 +338,12 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	local current: Vector3? = nil
 	local function refreshGoal()
 		current = goal()
-		-- The STORE button on the right edge sits where an open menu's tabs (the store's own) stand.
-		storeButton.Visible = tiles.Visible and not context.Controllers.UIController:IsModalOpen()
 	end
 
 	-- Menu pictures: hidden until the first delivery, like Shear a Sheep's onboarding. The gift's glows until claimed.
-	local giftButton = tiles:FindFirstChild("GiftButton") :: TextButton
-	local dexAlert = (tiles:FindFirstChild("SheepdexButton") :: TextButton):FindFirstChild("Alert") :: TextLabel
-	local dailyButton = tiles:FindFirstChild("DailyButton") :: TextButton
+	local giftButton = menuRight:FindFirstChild("GiftButton") :: TextButton
+	local dexAlert = (menuLeft:FindFirstChild("SheepdexButton") :: TextButton):FindFirstChild("Alert") :: TextLabel
+	local dailyButton = menuRight:FindFirstChild("DailyButton") :: TextButton
 	local dailyAlert = dailyButton:FindFirstChild("Alert") :: GuiObject
 	local dailyLabel = dailyButton:FindFirstChild("NameLabel") :: TextLabel
 	-- DAILY glows with its "!" while a gift waits; once claimed its name is the countdown to the next.
@@ -381,15 +355,16 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		dailyLabel.Text = if left <= 0
 			then "DAILY"
 			else string.format("%d:%02d:%02d", left // 3600, left % 3600 // 60, left % 60)
-		Motion.SetGlow(Motion.FindGlow(dailyButton), left <= 0 and tiles.Visible)
+		Motion.SetGlow(Motion.FindGlow(dailyButton), left <= 0 and menuRight.Visible)
 	end
 	local function refreshTiles()
 		local data = stateController:Get()
-		tiles.Visible = (data.Tutorial or 0) >= 1
-		storeButton.Visible = tiles.Visible
+		local shown = (data.Tutorial or 0) >= 1
+		menuLeft.Visible = shown
+		menuRight.Visible = shown
 		local unclaimed = data.FreeGift == false
 		giftButton.Visible = unclaimed
-		Motion.SetGlow(Motion.FindGlow(giftButton), unclaimed and tiles.Visible)
+		Motion.SetGlow(Motion.FindGlow(giftButton), unclaimed and shown)
 		-- Sheepdex rewards found but not claimed yet.
 		local waiting = 0
 		local found = if type(data.Dex) == "table" then data.Dex else {}
@@ -402,7 +377,6 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 		dexAlert.Visible = waiting > 0
 		dexAlert.Text = if waiting > 9 then "9+" else tostring(waiting)
 		refreshDaily()
-		task.defer(placeMiddle)
 	end
 
 	trove:Add(stateController.Changed:Connect(function()
@@ -427,22 +401,20 @@ function Hud.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			refreshDaily()
 		end
 	end)
-	trove:Connect((tiles:FindFirstChild("FlockButton") :: TextButton).Activated, function()
+	trove:Connect((menuLeft:FindFirstChild("FlockButton") :: TextButton).Activated, function()
 		context.Open("Flock")
 	end)
-	trove:Connect((tiles:FindFirstChild("ShopButton") :: TextButton).Activated, function()
-		context.Open("Shop")
-	end)
-	trove:Connect(storeButton.Activated, function()
+	-- One shop for cash and Robux alike (the user, 2026-10-06).
+	trove:Connect((menuLeft:FindFirstChild("ShopButton") :: TextButton).Activated, function()
 		context.Open("Store")
 	end)
-	trove:Connect((tiles:FindFirstChild("SheepdexButton") :: TextButton).Activated, function()
+	trove:Connect((menuLeft:FindFirstChild("SheepdexButton") :: TextButton).Activated, function()
 		context.Open("Sheepdex")
 	end)
 
 	-- The friend boost's tile: the boost while friends are here, the invite (and what a friend is worth) while none
 	-- are. Either way a tap opens Roblox's invite.
-	local friendButton = tiles:FindFirstChild("FriendButton") :: TextButton
+	local friendButton = menuRight:FindFirstChild("FriendButton") :: TextButton
 	local friendIcon = friendButton:FindFirstChild("Icon", true) :: ImageLabel
 	local friendLabel = friendButton:FindFirstChild("NameLabel") :: TextLabel
 	local function refreshFriends()

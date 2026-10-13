@@ -331,6 +331,18 @@ agent then applies the text, adds a line to `BRAIN/CHANGELOG.md`, moves the id t
   frames ('frames look identical'): Studio stops drawing a covered window. Record with `foreground=true` (it needs no
   input, so announce it as a short takeover); one background recording of the same window did move, so don't trust a
   background one." Seen 2026-10-06 filming Steal a Sheep's moving scenery with other sessions' Studios open.
+- **S56** (`BRAIN/PATTERNS/testing-studio.md`, Phones, replacing "its setters fail during a playtest"): "In a solo
+  playtest, `SetDeviceAsync` and `SetOrientationAsync` work from a **Client** `execute_luau` (Server calls fail), and
+  the UI lays itself out again for the new screen, so one playtest can sweep every phone: switch, wait about a second,
+  read `AbsolutePosition`s (plus `GuiService:GetGuiInset()` for screen pixels), capture. Reapply any test-only
+  change your own layout code resets when the viewport changes." Seen 2026-10-06 in Steal a Sheep: 16 phones
+  sideways, 4 upright and 2 tablets measured in one playtest.
+- **S57** (`BRAIN/PATTERNS/ui.md`): "On a touch screen Roblox's default dynamic thumbstick takes any touch that starts
+  in `TouchGui.TouchControlFrame.DynamicThumbstickFrame`: the left 40% of the screen (plus 100 px) and the bottom two
+  thirds below the top bar. A HUD button there takes the touch first, so a thumb meant for the stick opens a menu
+  instead. On phones keep buttons out of it (a row under the top bar, or the right side), and check against that
+  frame's `AbsolutePosition` in a Client call." Seen 2026-10-06 in Steal a Sheep: the menu pictures' lower row sat in
+  it on every phone preset (on a Galaxy A06 the zone started 151 of 338 px down).
 
 ## Done
 

@@ -117,21 +117,31 @@ for their marks (*Mystery lambs*).
 
 ## Economy (as built)
 Cash, the only currency (code calls it `Coins`), comes from grown sheep in the pen (lambs earn nothing),
-first-discovery rewards, selling, the free gift and the daily gifts, and buys stair walker levels, pen space and trails. Robux buys from the store below.
+first-discovery rewards, selling, the free gift and the daily gifts, and buys stair walker levels, pen space and trails. Both
+cash and Robux buy from the shop below.
 
-## The Robux store (the user, 2026-10-05)
-A STORE button on the HUD opens one page that scrolls, its section tabs outside the window on the right:
+## The HUD (the user, 2026-10-06: the old one "takes too much of the space", blocking vision and movement on phones)
+Cash and Climbing at the top right; three small pictures in each top corner, shown after the first lamb is home:
+FLOCK, SHEEPDEX and SHOP on the left, DAILY, INVITE and the free GIFT (last, until claimed) on the right. They stay on
+screen while carrying a lamb. Nothing stands lower than the top third, so a phone's thumbstick and the view stay clear.
+Notices appear in the middle under the rows. Phones and tablets play sideways only.
+
+## The shop (the user, 2026-10-05; one shop since 2026-10-06: "we have two stores or shops, they do the same thing")
+The HUD's SHOP opens one page that scrolls, its section tabs outside the window on the right. The Shop stall in the
+world opens it at Upgrades:
 - **Sheep**: Golden Fleece (799) and Kronos Sheep (349), sold for Robux only. Each earns 10x / 3x the player's best
   other sheep, so it stays their top earner at every tier; they arrive grown and can't be sold or merged.
 - **Passes**: 2x Money (all sheep income, offline too) and 2x Growth (lambs grow twice as fast, away too).
 - **Speed**: 2x Speed doubles Climbing; it can be bought again, three times the price each time (3 to 2,187, seven
   buys). The stair walker's next level, for Robux (19, then 20% more a level) or its cash price.
+- **Upgrades**, for cash: Pen Space (one more sheep in the pen) and the four trails in order (Dust, Laurel, Sunlight,
+  Storm; each is worn once bought, and the next unlocks).
 - **Climbing** packs (+150K to +10B) and **Cash** packs (24K to 8M).
 Hermes' winged sandal is the climbing icon everywhere (gold wings on 2x Speed).
 
 ## Friend boost (the user, 2026-10-05)
 Each Roblox friend in your server adds +20% to your flock's cash income while they stay (servers hold 5, so +80% at
-most); not offline earnings, not the leaderboards. A tile under the menu pictures shows it: two friends and "+40%",
+most); not offline earnings, not the leaderboards. The HUD's INVITE picture (top right) shows it: two friends and "+40%",
 or, with no friends here, the invite picture and INVITE. Tapping it opens Roblox's invite. When a friend joins:
 "Sam joined: friend boost +20%"; the HUD's cash rate includes the boost.
 
@@ -146,7 +156,7 @@ where it was. The next gift opens 20 hours after a claim.
   above the highest stolen from, as much as a Royal sheep of that god. It can't go in the Merge Shrine.
 - The menu, layout B (the user's pick): Days 1-6 as cards, Day 7 big beside Claim; claimed days dark with a tick,
   today's gold, the countdown on the button once claimed. It opens by itself once a session while a gift waits; the
-  HUD's DAILY (the golden calendar, under GIFT) opens it any time and shows the countdown once claimed.
+  HUD's DAILY (the golden calendar, top right) opens it any time and shows the countdown once claimed.
 
 ## Stair walker (the user, 2026-10-05)
 A real StairMaster just outside each pen, beside the gate, like Steal an Egg's treadmill. Walk into it and you snap on

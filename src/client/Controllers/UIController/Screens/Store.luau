@@ -21,12 +21,14 @@ local Prices = require(script.Parent.Parent.Prices)
 local Style = require(script.Parent.Parent.Style)
 local Types = require(script.Parent.Parent.Types)
 
--- The Robux store (the user, 2026-10-05; mock-up E): Shear a Sheep's one page that scrolls, in its purple, with every
--- card's picture filling it and growing with the pack. Sections: Sheep (Golden Fleece and Kronos Sheep, Robux only),
--- Passes (2x Money, 2x Growth), Speed (2x Speed, whose price triples with each buy until sold out, and the stair
--- walker's next level for Robux or cash), Climbing (six packs) and Cash (five). The section tabs stand outside the
--- window on its right, close to it; the lit one is the section in view and a tap scrolls there. The server picks the
--- product and opens Roblox's dialog (StoreService); this screen only asks. Gamepad: B closes.
+-- The shop, the HUD's SHOP and the Shop stall's (the user, 2026-10-05; mock-up E; the cash shop folded in 2026-10-06):
+-- Shear a Sheep's one page that scrolls, in its purple, with every card's picture filling it and growing with the
+-- pack. Sections: Sheep (Golden Fleece and Kronos Sheep, Robux only), Passes (2x Money, 2x Growth), Speed (2x Speed,
+-- whose price triples with each buy until sold out, and the stair walker's next level for Robux or cash), Upgrades
+-- (pen space and the four trails, for cash), Climbing (six packs) and Cash (five). The section tabs stand outside the
+-- window on its right, close to it; the lit one is the section in view and a tap scrolls there; Open's `Section`
+-- option starts there. The server picks the product and opens Roblox's dialog (StoreService), or takes the cash
+-- (Remotes.Buy); this screen only asks. Gamepad: B closes.
 local StoreScreen = {}
 
 local Color = Theme.Color
@@ -38,6 +40,8 @@ local SHEEP_HEIGHT = 236
 local PASS_HEIGHT = 150
 local HERO_HEIGHT = 150
 local WALKER_HEIGHT = 112
+local TRAIL_HEIGHT = 200
+local TRAIL_ART = 100
 local TILE_HEIGHT = 222
 local TILE_ART = 160
 local TAB_GAP = 6 -- points between the window's edge and its tabs
@@ -75,6 +79,8 @@ local TINTS = {
 	DoubleGrowth = Color3.fromRGB(240, 100, 40),
 	Speed = Color3.fromRGB(30, 120, 245),
 	Walker = Color3.fromRGB(23, 173, 158),
+	Pen = Color3.fromRGB(222, 120, 52),
+	Trail = Color3.fromRGB(70, 82, 112),
 	Climb = Color3.fromRGB(34, 150, 224),
 	Cash = Color3.fromRGB(46, 178, 80),
 }
@@ -84,9 +90,14 @@ local SECTIONS: { SectionSpec } = {
 	{ Name = "Sheep", Title = "SHEEP", Tab = "Sheep", Icon = Theme.Icons.Wool },
 	{ Name = "Passes", Title = "PASSES", Tab = "Passes", Icon = Theme.Icons.HudCrown },
 	{ Name = "Speed", Title = "SPEED", Tab = "Speed", Icon = Theme.Icons.HudBoost },
+	{ Name = "Upgrades", Title = "UPGRADES", Tab = "Upgrades", Icon = Theme.Icons.HudUpgrade },
 	{ Name = "Climb", Title = "CLIMBING", Tab = "Climb", Icon = Theme.Icons.HudShoe },
 	{ Name = "Cash", Title = "CASH", Tab = "Cash", Icon = Theme.Icons.HudCash },
 }
+local SECTION_ORDER: { [string]: number } = {}
+for index, spec in SECTIONS do
+	SECTION_ORDER[spec.Name] = index
+end
 
 -- A card's instance name: its key without the dot.
 local function cardName(key: string): string
@@ -246,10 +257,10 @@ local function perks(parent: Instance, lines: { string }, align: Enum.Horizontal
 end
 
 -- A section: its head (picture, name in capitals, a rule) and its cards' rows.
-local function section(list: Instance, order: number, spec: SectionSpec): Frame
+local function section(list: Instance, spec: SectionSpec): Frame
 	local holder = UIKit.Frame(list, `{spec.Name}Section`, UDim2.fromScale(1, 0))
 	holder.AutomaticSize = Enum.AutomaticSize.Y
-	holder.LayoutOrder = order
+	holder.LayoutOrder = SECTION_ORDER[spec.Name]
 	UIKit.List(holder, false, 8)
 	local head = UIKit.Frame(holder, "Head", UDim2.new(1, 0, 0, HEAD_HEIGHT))
 	head.LayoutOrder = 0
@@ -306,7 +317,7 @@ local function tile(
 end
 
 function StoreScreen.Build(playerGui: Instance): ScreenGui
-	local gui, window = UIKit.MenuGui("Store", "Day", "Store", nil, false, nil, {
+	local gui, window = UIKit.MenuGui("Store", "Day", "Shop", nil, false, nil, {
 		Accent = "Store",
 		Badge = Theme.Icons.MenuStore,
 		Width = 780,
@@ -337,7 +348,7 @@ function StoreScreen.Build(playerGui: Instance): ScreenGui
 	list.Parent = well
 
 	-- Sheep: the first offer's big card, the second's tall one.
-	local sheepSection = section(list, 1, SECTIONS[1])
+	local sheepSection = section(list, SECTIONS[SECTION_ORDER.Sheep])
 	local sheepRow = row(sheepSection, 1, SHEEP_HEIGHT)
 	for index, offer in Store.Sheep do
 		local robux = Economy.RobuxSheep[offer.Family]
@@ -382,7 +393,7 @@ function StoreScreen.Build(playerGui: Instance): ScreenGui
 	end
 
 	-- Passes: two side by side.
-	local passSection = section(list, 2, SECTIONS[2])
+	local passSection = section(list, SECTIONS[SECTION_ORDER.Passes])
 	local passRow = row(passSection, 1, PASS_HEIGHT)
 	for index, pass in Store.Passes do
 		local frame = card(passRow, pass.Key, share(1, 2, 2), TINTS[pass.Key] or TINTS.Cash)
@@ -407,7 +418,7 @@ function StoreScreen.Build(playerGui: Instance): ScreenGui
 	end
 
 	-- Speed: the 2x Speed banner, then the stair walker's next level.
-	local speedSection = section(list, 3, SECTIONS[3])
+	local speedSection = section(list, SECTIONS[SECTION_ORDER.Speed])
 	local heroRow = row(speedSection, 1, HERO_HEIGHT)
 	local hero = card(heroRow, "Speed", UDim2.fromScale(1, 1), TINTS.Speed)
 	chip(hero, "CHEAP!", true).Position = UDim2.new(1, -96, 0, 8)
@@ -469,8 +480,65 @@ function StoreScreen.Build(playerGui: Instance): ScreenGui
 	local cashButton = UIKit.Button(buttons, "CashButton", "Buy", 128, Theme.ButtonHeight.Standard, "...")
 	cashButton.LayoutOrder = 3
 
+	-- Upgrades, for cash: room for one more sheep (laid out as the walker's card), then the four trails side by side.
+	local upgradeSection = section(list, SECTIONS[SECTION_ORDER.Upgrades])
+	local pen = card(row(upgradeSection, 1, WALKER_HEIGHT), "PenSlot", UDim2.fromScale(1, 1), TINTS.Pen)
+	art(pen, UDim2.fromOffset(104, 104), Theme.Icons.Wool).Position = UDim2.fromOffset(4, 4)
+	local penWords = UIKit.Frame(pen, "Words", UDim2.new(1, -260, 0, 64))
+	penWords.Position = UDim2.fromOffset(116, 22)
+	penWords.ZIndex = 4
+	UIKit.List(penWords, false, 4)
+	label(penWords, "NameLabel", "Pen Space", 28, UDim2.new(1, 0, 0, 30))
+	local room = UIKit.Frame(penWords, "LevelRow", UDim2.fromOffset(0, 24))
+	room.AutomaticSize = Enum.AutomaticSize.X
+	room.LayoutOrder = 1
+	UIKit.List(room, true, 6).VerticalAlignment = Enum.VerticalAlignment.Center
+	UIKit.Text(room, "NowLabel", "", 21, Color.Snow, UDim2.fromOffset(0, 24), {
+		Stroke = Color.Line,
+		Auto = Enum.AutomaticSize.X,
+		Order = 1,
+	})
+	UIKit.Icon(room, "Arrow", Theme.Icons.ChevronWhite, 13).LayoutOrder = 2
+	UIKit.Text(room, "NextLabel", "", 21, Color.Lime, UDim2.fromOffset(0, 24), {
+		Stroke = Color.Line,
+		Auto = Enum.AutomaticSize.X,
+		Order = 3,
+	})
+	local penButton = UIKit.Button(pen, "BuyButton", "Buy", 128, Theme.ButtonHeight.Standard, "...")
+	penButton.AnchorPoint = Vector2.new(1, 0.5)
+	penButton.Position = UDim2.new(1, -12, 0.5, 0)
+	penButton.ZIndex = 5
+	local trailRow = row(upgradeSection, 2, TRAIL_HEIGHT)
+	for index, trail in Economy.Trails do
+		local frame = card(trailRow, `Trail{trail.Id}`, share(1, #Economy.Trails, #Economy.Trails), TINTS.Trail)
+		frame.LayoutOrder = index
+		local picture = art(frame, UDim2.new(1, -12, 0, TRAIL_ART), Theme.Icons.Star)
+		picture.Position = UDim2.fromOffset(6, 4)
+		local star = picture:FindFirstChild("Picture")
+		if star and star:IsA("ImageLabel") then
+			star.ImageColor3 = trail.Color
+		end
+		local name = UIKit.Text(frame, "NameLabel", trail.Name, 20, Color.Snow, UDim2.new(1, -12, 0, 24), {
+			Stroke = Color.Line,
+			Fit = true,
+		})
+		name.Position = UDim2.fromOffset(6, TRAIL_ART + 4)
+		name.ZIndex = 4
+		local line = UIKit.Text(frame, "LineLabel", "", Theme.TextSize.Body, Color.Snow, UDim2.new(1, -12, 0, 18), {
+			Font = Theme.Font.TextHeavy,
+		})
+		UIKit.TextStroke(line, Color.Line).Thickness = 1.5
+		line.Position = UDim2.fromOffset(6, TRAIL_ART + 28)
+		line.ZIndex = 4
+		local button = UIKit.Button(frame, "BuyButton", "Buy", 100, Theme.ButtonHeight.Standard, "...")
+		button.AnchorPoint = Vector2.new(0, 1)
+		button.Position = UDim2.new(0, 8, 1, -4)
+		button.Size = UDim2.new(1, -16, 0, button.Size.Y.Offset)
+		button.ZIndex = 5
+	end
+
 	-- Climbing: six packs, three to a row; the last says it's the best value.
-	local climbSection = section(list, 4, SECTIONS[4])
+	local climbSection = section(list, SECTIONS[SECTION_ORDER.Climb])
 	for index, pack in Store.Climb do
 		local holder = climbSection:FindFirstChild(`Row{(index - 1) // 3 + 1}`)
 			or row(climbSection, (index - 1) // 3 + 1, TILE_HEIGHT)
@@ -492,7 +560,7 @@ function StoreScreen.Build(playerGui: Instance): ScreenGui
 	end
 
 	-- Cash: three, then the fourth beside the biggest, two cards wide.
-	local cashSection = section(list, 5, SECTIONS[5])
+	local cashSection = section(list, SECTIONS[SECTION_ORDER.Cash])
 	local cashRows = { row(cashSection, 1, TILE_HEIGHT), row(cashSection, 2, TILE_HEIGHT) }
 	for index, pack in Store.Cash do
 		if index < #Store.Cash then
@@ -561,12 +629,20 @@ function StoreScreen.Build(playerGui: Instance): ScreenGui
 		icon.AnchorPoint = Vector2.new(0.5, 0)
 		icon.Position = UDim2.new(0.5, 0, 0, 5)
 		icon.ZIndex = 2
-		local words = UIKit.Text(button, "TabLabel", spec.Tab, 17, Color.Snow, UDim2.new(1, 0, 0, 20), {
+		local words = UIKit.Text(button, "TabLabel", spec.Tab, 17, Color.Snow, UDim2.new(1, -4, 0, 20), {
 			Stroke = Color.Line,
+			Fit = true,
 		})
 		words.AnchorPoint = Vector2.new(0.5, 1)
 		words.Position = UDim2.new(0.5, 0, 1, 0)
 		words.ZIndex = 3
+		-- The tabs shrink as a column on a short window, so a long name ("Upgrades") must shrink further than text
+		-- usually may.
+		local limit = words:FindFirstChildOfClass("UITextSizeConstraint")
+		if limit then
+			limit:SetAttribute("MinPoints", 7)
+			limit.MinTextSize = 7
+		end
 		button.Parent = tabs
 	end
 
@@ -662,6 +738,42 @@ function StoreScreen.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			setDone(cashButton, "MAX")
 		end
 
+		local function setCash(button: TextButton, price: number, text: string?)
+			Buttons.Set(button, if cash() >= price then "Buy" else "CantAfford", text or Format.Short(price))
+			Buttons.SetIcon(button, Theme.Icons.HudCash)
+		end
+
+		local pen = find("PenSlot")
+		local slots = if type(data.PenSlots) == "number" then data.PenSlots else 0
+		local penCost = Economy.PenCost(slots + 1)
+		local penButton = buttonIn(pen);
+		(pen:FindFirstChild("NowLabel", true) :: TextLabel).Text = `{slots} sheep`
+		(pen:FindFirstChild("NextLabel", true) :: TextLabel).Text = if penCost then tostring(slots + 1) else "MAX"
+		if penCost then
+			setCash(penButton, penCost)
+		else
+			setDone(penButton, "MAX")
+		end
+
+		local trails = if type(data.Trails) == "table" then data.Trails else {}
+		for index, trail in Economy.Trails do
+			local frame = find(`Trail{trail.Id}`)
+			local button = buttonIn(frame);
+			(frame:FindFirstChild("LineLabel", true) :: TextLabel).Text = `{trail.Multiplier}x training`
+			local previous = Economy.Trails[index - 1]
+			if trails[trail.Id] then
+				-- Owned: tap to wear it, or to take it off.
+				local worn = data.Trail == trail.Id
+				Buttons.Set(button, if worn then "Owned" else "Action", if worn then "Equipped" else "Equip")
+				Buttons.SetIcon(button, nil)
+			elseif previous and not trails[previous.Id] then
+				Buttons.Set(button, "Locked", "Locked")
+				Buttons.SetIcon(button, Theme.Icons.HudLock)
+			else
+				setCash(button, trail.Cost)
+			end
+		end
+
 		for _, listOfPacks in { Store.Climb, Store.Cash } do
 			for _, pack in listOfPacks do
 				setRobux(buttonIn(find(pack.Key)), pack.Key)
@@ -729,22 +841,28 @@ function StoreScreen.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	trove:Connect(walkerRobux.Activated, function()
 		buy("Walker", walkerRobux)
 	end)
-	-- The cash price is the shop's own purchase.
-	local walkerCash = buttonIn(walker, "CashButton")
-	trove:Connect(walkerCash.Activated, function()
-		if busy or Buttons.IsStill(walkerCash) then
+	-- What cash buys (the walker's level, pen space, a trail, or wearing one) goes to ShopService.
+	local function buyWithCash(item: string, which: string?, button: TextButton)
+		if busy then
 			return
 		end
-		if Buttons.Kind(walkerCash) == "CantAfford" then
-			Buttons.Shake(walkerCash)
+		local kind = Buttons.Kind(button)
+		if kind == "Locked" then
+			Buttons.Shake(button)
+			sound:Play("Denied")
+			return
+		elseif Buttons.IsStill(button) then
+			return
+		elseif kind == "CantAfford" then
+			Buttons.Shake(button)
 			say("Not enough cash", "Bad")
 			return
 		end
 		busy = true
-		Buttons.Loading(walkerCash, true)
+		Buttons.Loading(button, true)
 		task.spawn(function()
-			local ok, success, message = Remotes.Buy:Invoke("Walker", nil)
-			Buttons.Loading(walkerCash, false)
+			local ok, success, message = Remotes.Buy:Invoke(item, which)
+			Buttons.Loading(button, false)
 			busy = false
 			if not ok then
 				say("Couldn't reach the server, try again", "Bad")
@@ -756,7 +874,21 @@ function StoreScreen.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			end
 			refresh()
 		end)
+	end
+	local walkerCash = buttonIn(walker, "CashButton")
+	trove:Connect(walkerCash.Activated, function()
+		buyWithCash("Walker", nil, walkerCash)
 	end)
+	local penButton = buttonIn(find("PenSlot"))
+	trove:Connect(penButton.Activated, function()
+		buyWithCash("PenSlot", nil, penButton)
+	end)
+	for _, trail in Economy.Trails do
+		local button = buttonIn(find(`Trail{trail.Id}`))
+		trove:Connect(button.Activated, function()
+			buyWithCash("Trail", trail.Id, button)
+		end)
+	end
 	for _, listOfPacks in { Store.Climb, Store.Cash } do
 		for _, pack in listOfPacks do
 			local button = buttonIn(find(pack.Key))
@@ -882,7 +1014,7 @@ function StoreScreen.new(context: Types.Context, gui: ScreenGui): Types.Screen
 	return {
 		Modal = true,
 		StartsOpen = false,
-		Open = function(_self: Types.Screen)
+		Open = function(_self: Types.Screen, options: { [string]: any }?)
 			isOpen = true
 			list.CanvasPosition = Vector2.zero
 			pinned = nil
@@ -891,6 +1023,15 @@ function StoreScreen.new(context: Types.Context, gui: ScreenGui): Types.Screen
 			showSheep()
 			panel.Show()
 			lightTabs()
+			-- The Shop stall opens on its own things (Upgrades), once the window has popped in to its drawn size.
+			local start = if options then options.Section else nil
+			if type(start) == "string" and SECTION_ORDER[start] then
+				task.delay(Theme.Motion.PopIn.Time, function()
+					if isOpen then
+						scrollTo(start)
+					end
+				end)
+			end
 			ContextActionService:BindActionAtPriority(
 				BACK_ACTION,
 				function(_action: string, state: Enum.UserInputState, _input: InputObject): Enum.ContextActionResult

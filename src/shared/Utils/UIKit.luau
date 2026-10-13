@@ -1602,17 +1602,17 @@ local PICTURE_NAME = 18 -- a HUD picture's one-word name under it, in points
 local PICTURE_NAME_DROP = 10 -- how far that name hangs below the picture
 local OFFER_PILL = 22 -- an offer's price or time pill
 
--- A name in snow with a thick ink outline, for the HUD's pictures ("STORE", "WOLF GUARD").
-local function pictureName(parent: Instance, text: string): TextLabel
-	local label =
-		UIKit.Text(parent, "NameLabel", text, PICTURE_NAME, Color.Snow, UDim2.new(1, 50, 0, PICTURE_NAME + 4), {
-			Stroke = Color.Line,
-		})
+-- A name in snow with a thick ink outline, for the HUD's pictures ("STORE", "WOLF GUARD"), `size` points tall (18).
+local function pictureName(parent: Instance, text: string, size: number?): TextLabel
+	local points = size or PICTURE_NAME
+	local label = UIKit.Text(parent, "NameLabel", text, points, Color.Snow, UDim2.new(1, 50, 0, points + 4), {
+		Stroke = Color.Line,
+	})
 	label.AnchorPoint = Vector2.new(0.5, 1)
 	label.ZIndex = 3
 	local stroke = label:FindFirstChild("TextStroke")
 	if stroke and stroke:IsA("UIStroke") then
-		stroke.Thickness = 3.5
+		stroke.Thickness = 3.5 * points / PICTURE_NAME
 	end
 	return label
 end
@@ -1620,12 +1620,21 @@ end
 -- A HUD button that is only its picture (Theme.Icons' Menu pictures: the Sheepdex book, the Store's basket, the
 -- Settings gear), with no face colour, lip or box, and optionally a one-word `label` under it (NameLabel). A
 -- TextButton with the Picture attribute, so Buttons squishes it and grows it under the mouse; its Face is clear and
--- round and holds the Icon and the hints' Glow rings, which pulse round it as a halo.
-function UIKit.PictureButton(parent: Instance?, name: string, image: string, size: number, label: string?): TextButton
+-- round and holds the Icon and the hints' Glow rings, which pulse round it as a halo. `nameSize` makes the name
+-- smaller than the HUD's usual 18 points (the phone HUD's small corner pictures).
+function UIKit.PictureButton(
+	parent: Instance?,
+	name: string,
+	image: string,
+	size: number,
+	label: string?,
+	nameSize: number?
+): TextButton
 	local side = math.max(size, Theme.MinTouch)
+	local drop = math.ceil(PICTURE_NAME_DROP * (nameSize or PICTURE_NAME) / PICTURE_NAME)
 	local button = Instance.new("TextButton")
 	button.Name = name
-	button.Size = UDim2.fromOffset(side, if label then side + PICTURE_NAME_DROP else side)
+	button.Size = UDim2.fromOffset(side, if label then side + drop else side)
 	button.BackgroundTransparency = 1
 	button.AutoButtonColor = false
 	button.Text = ""
@@ -1639,11 +1648,22 @@ function UIKit.PictureButton(parent: Instance?, name: string, image: string, siz
 	face.ZIndex = 2
 	UIKit.Corner(face)
 	UIKit.Glow(face, Color.Snow, Color.Ink, Line.Thick)
+	if size < 48 then
+		-- A small picture's halo is thinner and closer, so it doesn't swallow the picture.
+		local glow = face:FindFirstChild("Glow")
+		local ring = face:FindFirstChild("GlowRing")
+		if glow and glow:IsA("UIStroke") and ring and ring:IsA("UIStroke") then
+			glow.Thickness = 2
+			glow.BorderOffset = UDim.new(0, 1.5)
+			ring.BorderOffset = UDim.new(0, 3.5)
+			ring.Thickness = 1.5
+		end
+	end
 	local picture = UIKit.Icon(face, "Icon", image, size)
 	picture.AnchorPoint = Vector2.new(0.5, 0.5)
 	picture.Position = UDim2.fromScale(0.5, 0.5)
 	if label then
-		pictureName(button, label).Position = UDim2.fromScale(0.5, 1)
+		pictureName(button, label, nameSize).Position = UDim2.fromScale(0.5, 1)
 	end
 	button.Parent = parent
 	return button

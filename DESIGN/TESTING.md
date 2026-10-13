@@ -41,6 +41,34 @@ its `Build(StarterGui)`, name the ScreenGui `TEMP_...`, enable it, fill its labe
 `Root.Size` (1/scale) and each `UITextSizeConstraint` from its `MaxPoints`/`MinPoints` attributes times the scale, as
 `UIController/Scale` does in play. Delete the `TEMP_` guis after.
 
+## Phone HUD sweep (2026-10-06)
+
+One solo playtest of the cloud place (main @ 4368631), the debug panel hidden, a save given three sheep, 1.23M cash
+and 204K Climbing, then `WipeSave` (the Studio save was a new player's before). Devices were switched from a Client
+`execute_luau` (`StudioDeviceSimulatorService:SetDeviceAsync`, works mid-playtest); each HUD piece's
+`AbsolutePosition` plus `GuiService:GetGuiInset()` gives screen pixels. The thumbstick's touch zone is
+`TouchGui.TouchControlFrame.DynamicThumbstickFrame` (left 40% + 100 px, bottom two thirds below the top bar).
+
+| Screen (drawn size) | HUD's share of the screen | Menu pictures | In the thumbstick zone |
+| --- | --- | --- | --- |
+| Galaxy S22 Ultra, A16, S25 Ultra, A06 (677-705 x 338) | 19-20% | 3 x 2, to 69% of the height | DAILY, SHOP, INVITE |
+| iPhone 7, 13, 13 Pro, 14, 16, 16 Pro, 17 Pro (666-749 x 361-380) | 16-18% | 3 x 2, to 63-65% | DAILY, SHOP, INVITE |
+| iPhone XR, 11 (801 x 392) | 15% | 3 x 2, to 61% | DAILY, SHOP, INVITE |
+| iPhone 6 Plus, 13 Pro Max, 16 Pro Max (735-831 x 406-418) | 14-16% | 2 x 3, to 79-81% | four of six |
+| Upright (iPhone 7, A06, 17 Pro, 16 Pro Max) | 13-18% | one column, to 70-88% | SHEEPDEX, INVITE; the gear over the Climbing number |
+
+Also seen: STORE mid-right where the right thumb turns the camera; a long notice ("Phobos punched you! You dropped
+the lamb") running under STORE and off a Galaxy A06's edge. Client-side mock-ups (the live HUD re-laid out: pictures
+42 pt, names 12 pt, counters' icons 38 pt) cut the share to 7-10% on every phone with nothing in the zone.
+
+The built HUD (36 pt pictures in each top corner, branch t3code/b58848de): 5.5-7.9% of a phone's screen (3.1% on an
+iPad 10th generation), nothing lower than 34% of the height, nothing in the zone or on the jump button, on all 16
+phones and two tablets. Taps in this simulator landed 47 px left of the aim on the Galaxy A06 and 62 px left on the
+iPhone 16 Pro Max (log `InputBegan` positions to measure). A notice sent from a Server `execute_luau` through
+`require(Remotes).Notify:Fire` never arrived; `ReplicatedStorage.NetRemotes.Notify:FireClient(player, text, kind)`
+did. The running UIController can't be reached from a Client call either (a `require` there gets a fresh copy): open
+menus by tapping, or through a station's prompt (`InputHoldBegin`).
+
 ## Slide animation mock-ups (2026-10-06)
 
 - **Is the surf or a god's clip on?** A `PreSimulation` connection made from `execute_luau` ran before the

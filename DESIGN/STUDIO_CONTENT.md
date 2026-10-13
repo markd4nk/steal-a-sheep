@@ -4,6 +4,10 @@ What the code expects in the place file, which isn't on disk: names, tags, key p
 builds each, and what the place holds now (saved to Roblox or not). Instances the code creates at runtime don't belong
 here. Newest first.
 
+- **2026-10-06, sideways only** (branch t3code/b58848de, the user's word): the cloud place's
+  `StarterGui.ScreenOrientation` set to `LandscapeSensor` (was `Sensor`), so phones start sideways; the HUD and the
+  merged shop are made at runtime, nothing else in the place changed. `UIController` sets `PlayerGui.ScreenOrientation`
+  the same way, so a fresh place without it still turns sideways once the UI starts.
 - **2026-10-06, version 29 published** (saved 19:06:52, published 19:07:04 UTC): main 2bbcf5a's two changed scripts
   (`MovementController`, `Config/GameConfig`) set in the cloud place; nothing Studio-side changed.
 - **2026-10-06, version 28 published** (saved 18:55:41, published 18:56:04 UTC): main 8cfd60d's two changed

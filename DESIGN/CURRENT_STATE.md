@@ -86,23 +86,23 @@ lamb.
 - **Leaderboards**: the map's four boards by the plots (`workspace.Base.Leaderboard`): This Server (income now) and
   Top Income, Most Steals and Climbing (top 10 across all servers, this server's players drawn in live):
   `LeaderboardService` (OrderedDataStores, log-scaled values). The player list still shows Income and Climbing.
-- **Robux store** (2026-10-05, merged into main): the HUD's STORE (right edge) opens one
-  scrolling page with its section tabs outside the window: two Robux-only sheep, 2x Money / 2x Growth passes, 2x Speed
-  (re-buyable, tripling), the walker's next level, Climbing and Cash packs. `Config/Store` (catalog, prices, ladders),
+- **The shop** (Robux store 2026-10-05; on branch t3code/b58848de the cash shop is folded in as its Upgrades section and
+  the HUD's SHOP and the Shop stall open it): one scrolling page with its section tabs outside the window: two
+  Robux-only sheep, 2x Money / 2x Growth passes, 2x Speed (re-buyable, tripling), the walker's next level, Upgrades
+  (pen space, trails, for cash), Climbing and Cash packs. `Config/Store` (catalog, prices, ladders),
   `StoreService` (dialogs, passes), `PurchaseService/Products` (grants by key), `Screens/Store`; art from
   `art/store/make_store_art.py`. The products and passes exist on Roblox (Live, above); with their ids in, Studio
   shows Roblox's test purchase dialog instead of granting at once (the debug panel still grants).
 - **Friend boost** (2026-10-05): +20% live income per Roblox friend in the server, up to 4 (`FriendService`,
-  `Economy.FriendBoost`); the HUD tile under Sheepdex shows "+N%" or INVITE and opens Roblox's invite.
+  `Economy.FriendBoost`); the HUD's INVITE picture shows "+N%" or INVITE and opens Roblox's invite.
 - **Daily gifts** (2026-10-05, merged into main): a week of gifts, the Pegasus Sheep on Day 7
   (`DailyService`, `Economy.DailyWeek`/`Specials`, `Screens/Daily`, the HUD's DAILY; the Pegasus's wings, halo and
-  hooves are `SheepService/Extras` "Pegasus"). GAME_DESIGN.md, *Daily gifts*. The HUD's left column wraps into a
-  second column on short screens.
+  hooves are `SheepService/Extras` "Pegasus"). GAME_DESIGN.md, *Daily gifts*.
 
 - **Server**: `DataService`, `PurchaseService` (grants by Config/Store key), `StoreService`, `SheepService`, `PlotService`, `FlockService`,
   `FriendService`, `GodService`, `WildService`, `MountainService`, `TrainingService`, `ShopService`, `LeaderboardService`,
   `GiftService`, `DailyService`, `ShrineService`, `DebugService` (Studio only).
-- **Client**: `StateController`, `SoundController`, `ChaseController`, `UIController` (Hud, Flock, Shop, Sheepdex, Merge, Gift, Daily, Store,
+- **Client**: `StateController`, `SoundController`, `ChaseController`, `UIController` (Hud, Flock, Sheepdex, Merge, Gift, Daily, Store,
   Popup, Studio DebugPanel), `CarryController`, `MovementController`, `AnimController`, `ShrineController`,
   `PromptController`.
 - **Shared**: `Config/Olympus` (tiers, gods, ramp profile), `Config/GameConfig` (looks, movement, carry, UI),
@@ -160,6 +160,11 @@ lamb.
   Roblox's sit. Clips as code (`Utils/BodyClips`), played by `GodController` and the new `SlideController` on every
   device; `Economy.LungeShare` for the dive. Playtested solo (HISTORY.md).
 - **Planned, later** (the user, 2026-10-06): a catch sound of each god's own (Zeus's thunder and so on).
+- **Phone HUD and one shop (2026-10-06, branch t3code/b58848de, not merged)**: three 36 pt pictures in each top
+  corner (FLOCK, SHEEPDEX, SHOP; DAILY, INVITE, GIFT), smaller counters, no STORE, notices centred under the rows
+  (`Screens/Hud`); the cash shop's menu folded into the store (`Screens/Shop` deleted); sideways only
+  (`UIController.Start`, and the place's StarterGui). 5-8% of a phone's screen, clear of the thumbstick on all 16
+  phone presets. HISTORY.md; TESTING.md, *Phone HUD sweep*.
 - **A scarier steal and chase (merged into main 2026-10-06, live in version 27)**: an alarm, the god's
   roar, footsteps, yells, snarl, punch and laugh from the god (`GodController`; goddesses `Olympus.Goddess`), the
   thief's heartbeat, red edges, drained colour, shake and drums that build as it closes (`ChaseController`,
@@ -213,9 +218,8 @@ lamb.
   Every asset (1,286) loads in a Studio playtest (TESTING.md, Asset audit, 2026-10-05).
 
 - **Daily gifts over real days**: the 20-hour wait and the claims were tried with the debug day commands, not by
-  waiting; keeping the day across a real rejoin is untested (the mock store). The HUD's wrapped column was seen on
-  Studio's small phone (three columns of two), not on a tablet or a 390-point phone; the menu wasn't tried on PC
-  after the compact layout, nor with a gamepad.
+  waiting; keeping the day across a real rejoin is untested (the mock store). The menu wasn't tried on PC after the
+  compact layout, nor with a gamepad.
 - **Real Robux purchases**: Roblox's test purchase dialog with the real products granted +24K cash and 2x Speed
   step 1 in Studio, receipts saved (overnight branch); a real charge, a pass bought in game and receipts while away
   are untested. Store on a phone: Galaxy A06 sideways only.
@@ -226,7 +230,6 @@ lamb.
 - **Friend boost with real friends**: tried with Studio's pretend count (debug "Friends in server"); real
   `IsFriendsWithAsync` pairs and the join notices between two real friends are untested. The place is Private, so
   friends can't join until they get edit permission or the audience changes (Limited needs a maturity label first).
-  On a Galaxy A06 (800 x 360) the left column wraps into three columns of two, all six showing (overnight branch).
 
 - **Sheepdex claim pressed with the mouse or a finger**: claims were made through `Remotes.ClaimDex` in a playtest (the
   menu then showed Claimed!, the badges and the green herd bar); the button itself wasn't clicked. Saving the claims
@@ -244,8 +247,10 @@ lamb.
 - **Saving**: three Studio sessions of a test player against the real Studio DataStore (`PlayerData_Studio`) kept
   the sheep, tutorial, cash, settings and receipts, with the welcome-back card's offline cash (overnight branch); the
   live game's `PlayerData` and session locking across real servers are untested.
-- **Touch and gamepad**: the overnight branch's prompts and HUD were checked on a Galaxy A06 in the Device Simulator
-  (touch); a real phone, a tablet and a gamepad are untested. The slide uses Roblox's own input.
+- **Touch and gamepad**: the prompts were checked on a Galaxy A06 in the Device Simulator (touch), the new HUD on all
+  16 phone presets and two tablets there; a real phone and a gamepad are untested. The slide uses Roblox's own input.
+- **Sideways only**: Studio's simulator turns the screen whatever the game asks, so the lock is unseen; the place's
+  StarterGui and `PlayerGui.ScreenOrientation` both say LandscapeSensor.
 - **Pens with two players**: a lamb put down in someone else's plot is refused ("not your plot"), tried solo by
   teleporting into another plot; homes saved across a real rejoin and on a different plot number are untested.
 - **Sound by ear**: cues are Shear a Sheep's library sounds, not listened to. The chase's were heard by the user in the

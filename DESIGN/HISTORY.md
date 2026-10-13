@@ -6,6 +6,36 @@ finish a task. The current state is `DESIGN/CURRENT_STATE.md`.
 
 ## Built
 
+- **The phone HUD: three small pictures in each top corner, one shop, sideways only (2026-10-06, branch
+  t3code/b58848de, not merged)**. The user: the HUD "takes too much of the space", "blocking vision, blocking the
+  movement"; playtest every phone.
+  - *What was wrong*, on all 16 phone presets in the Device Simulator (TESTING.md, *Phone HUD sweep*): the HUD covered
+    14-20% of the screen; the six menu pictures (66 pt) stood in a block down the left to 63-81% of the height, and
+    their lower row sat in Roblox's dynamic thumbstick's touch zone (left 40% + 100 px, the bottom two thirds below the
+    top bar), so a thumb meant for the stick opened DAILY or SHOP; STORE stood mid-right where the right thumb turns
+    the camera; a long notice ran under STORE and off a Galaxy A06's edge; held upright (the place allowed it) the gear
+    covered the Climbing number.
+  - *The user's calls*: mock-ups A (one row of seven) and B (3 + 4 at 42 pt) turned down; "about three buttons on each
+    side, small", top left and top right; no hiding while carrying a lamb; sideways only; rows over columns (columns
+    put SHOP 33-49 px into the stick's zone on every phone); and SHOP and STORE are one shop ("they do the same exact
+    thing"), so the right has three with the gift last.
+  - *How it works*: `Screens/Hud` builds `MenuLeft` (FLOCK, SHEEPDEX, SHOP) and `MenuRight` (DAILY, INVITE, GIFT while
+    unclaimed) as rows of 36 pt pictures with 11 pt names (`UIKit.PictureButton`'s new `nameSize`; small pictures get
+    a thinner halo), placed under the top bar's row by `Scale.TopBar`; the right row follows the counters left of
+    Roblox's player list on a computer. Counters: 36 pt icons, 22 pt numbers. Notices sit centred under the rows. On a
+    computer the HUD is drawn 1.5x (was 1.2x for the old big pictures). SHOP opens `Screens/Store`, now titled Shop,
+    with an Upgrades section (Pen Space as the walker's card, the four trails as cards: buy, Equip, Equipped, Locked)
+    after Speed; the cash buys go to `Remotes.Buy` as the old shop's did. The Shop stall's prompt opens it scrolled to
+    Upgrades (`Open`'s `Section` option). `Screens/Shop` is deleted. Sideways: `UIController.Start` sets
+    `PlayerGui.ScreenOrientation` to LandscapeSensor and again whenever it changes (the first spawn copies StarterGui's
+    over it), and the place's StarterGui says the same.
+  - *Checked*: the branch's five scripts set in the cloud place for a solo playtest (main's put back after, matching
+    byte for byte): both bootstraps ready, 101 tests, a clean console. All 16 phones and two tablets measured: the HUD
+    3-8% of the screen, nothing lower than 34% of the height, nothing in the thumbstick's zone or on the jump button,
+    the rows never meeting. Tapped in the simulator: SHOP opens the shop at the top, its close button, the Dust Trail
+    bought for cash (then Equipped, Laurel unlocked); the stall's prompt opens it at Upgrades. A long notice centred
+    under the rows on a Galaxy A06; HD 1080 (a computer) and a steal on tier 4 seen. Not seen: the lock on a real
+    phone (the simulator rotates regardless), a real phone, a gamepad in the shop's new cards.
 - **A slide stops dead when pulled back; no auto-jump up the mountain (2026-10-06, merged into main on the user's
   word, live in version 29)**. The user, after version 28: running up made climbers auto-jump on
   the slope; and with momentum nobody could break out of a slide: moving the other way should stop it at once.

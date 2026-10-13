@@ -7,6 +7,13 @@ confirmed or reversed it.
 
 ## Confirmed rules
 
+- **The phone HUD (2026-10-06)**: the HUD "takes too much of the space", blocking vision and movement on phones.
+  The user turned down a long row across the top left (A), and two rows of 3 and 4 buttons at 42 pt (B). They want
+  about three buttons in each top corner, smaller, so they don't get in the way of moving: rows of 36 pt pictures
+  ("yeah, that works"), FLOCK, SHEEPDEX and SHOP on the left, DAILY, INVITE and the gift (last) on the right. The
+  buttons stay on screen while carrying a lamb (no hiding), and phones play sideways only.
+- **One shop (2026-10-06)**: "we have two stores or shops, they do the same exact thing", so the cash shop and the
+  Robux store are one menu behind SHOP.
 - **The chase's sounds (2026-10-06)**: Steal an Egg's terror with human sounds, since the guardians are gods. The
   alarm is option C, APM "Electronic Alarms (D)" (over A, the buzzier Red Alert, and the mock-up's "heavy metal"
   one). Every voice is one person in one take, never two sounds layered ("it feels like it's layered rather than just
@@ -284,6 +291,15 @@ Calls in the studs on every sheep (2026-10-05; merged and shipped in version 8, 
 
 ## To review
 
+Calls in the phone HUD and the one shop (2026-10-06):
+
+- **Upgrades sits after Speed** in the shop (Sheep, Passes, Speed, Upgrades, Climbing, Cash), next to the walker; the
+  HUD's SHOP opens at the top (the Robux sheep), the Shop stall opens at Upgrades.
+- **Pen Space and the trails as store cards**: Pen Space laid out as the walker's card (the wool picture, "8 sheep >
+  9", a cash button); the trails four across, each its star in the trail's colour, "1.25x training", and Buy, Equip,
+  Equipped or Locked. An Equipped trail can't be taken off any more (the old menu let a tap take it off).
+- **The HUD on a computer is drawn 1.5x** (pictures about 76 px on a 1080p screen; the old ones were about 112).
+- **Notices sit centred under the corner rows** at every size, and the counters are smaller (22 pt numbers, was 32).
 Calls in the slide stop and climbing without auto-jump (2026-10-06):
 
 - **"Pulling back" means a move whose uphill share is over 0.35**, as the old brake was: straight back, or back and to a
